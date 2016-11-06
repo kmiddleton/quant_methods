@@ -1,0 +1,86 @@
+---
+title: 'Analysis of Biological Data'
+author: "Kevin Middleton and Elizabeth King"
+date: 'Spring 2017'
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 3
+    fig_width: 6.5
+    latex_engine: xelatex
+    number_sections: no
+  html_document:
+    smart: no
+    theme: flatly
+fontsize: 12pt
+geometry: margin=1in
+mainfont: Helvetica
+mathfont: Helvetica
+monofont: Andale Mono
+csl: evolution.csl
+---
+
+## Course Goals
+
+### Main ideas
+
+### Background knowledge
+
+### Topics we will not cover
+
+----
+
+## Course information
+
+### Meeting times and place
+
+The course will meet Fridays from 1:00-3:00 Tucker FIXME.
+
+### Expectations
+
+### Problem sets
+
+### Review Project
+
+### Grading
+
+----
+
+## Schedule
+
+Note that this is a general outline. The schedule for topics is subject to change.
+
+_#_   | _Date_    | _Topic_                        | _Due_ |
+------|-----------|--------------------------------|-------|
+01    | F 1/19    | Introduction, planning, R      |       |
+02    | F 1/22    | Programming with data          |       |
+03    | F 1/26    | Review of basics               | PS 1  |
+04    | F 1/28    | Hypothesis testing             |       |
+05    | F 2/02    | Bivariate linear regression    | PS 2  |
+06    | F 2/05    | Maximum likelihood             |       |
+07    | F 2/09    | Linear models                  | PS 3  |
+08    | F 2/12    | Degree of relationship         |       |
+09    | F 2/16    | Experimental design            | PS 4  |
+10    | F 2/19    | Multi-way ANOVA                |       |
+11    | F 2/23    | ANCOVA                         | PS 5  |
+12    | F 2/26    | Perils of linear models        |       |
+13    | F 3/01    | Multilevel models              | PS 6  |
+14    | F 3/04    | Model based inference          |       |
+15    | F 3/08    | Multiple comparisons           | PS 7  |
+16    | F 3/11    | Dimensionality reduction       |       |
+
+## Academic Dishonesty
+
+Academic integrity is fundamental to the activities and principles of a university. All members of the academic community must be confident that each person's work has been responsibly and honorably acquired, developed, and presented. Any effort to gain an advantage not given to all students is dishonest whether or not the effort is successful. The academic community regards breaches of the academic integrity rules as extremely serious matters. Sanctions for such a breach may include academic sanctions from the instructor, including failing the course for any violation, to disciplinary sanctions ranging from probation to expulsion. When in doubt about plagiarism, paraphrasing, quoting, collaboration, or any other form of cheating, consult the course instructor.
+
+## Students with disabilities
+
+If you anticipate barriers related to the format or requirements of this course, if you have emergency medical information to share with me, or if you need to make arrangements in case the building must be evacuated, please let me know as soon as possible.
+
+If disability related accommodations are necessary (for example, a note taker, extended time on exams, captioning), please register with the Disability Center (http://disabilitycenter.missouri.edu), S5 Memorial Union, 573-882-4696, and then notify me of your eligibility for reasonable accommodations. For other MU resources for persons with disabilities, click on "Disability Resources" on the MU homepage.
+
+## Intellectual Pluralism
+
+The University community welcomes intellectual diversity and respects student rights. Students who have questions or concerns regarding the atmosphere in this class (including respect for diverse opinions) may contact the departmental chair or divisional director; the director of the Office of Students Rights and Responsibilities; the MU Equity Office, or equity@missouri.edu.
+
+All students will have the opportunity to submit an anonymous evaluation of the instructor(s) at the end of the course.
