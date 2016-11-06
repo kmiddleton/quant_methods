@@ -50,24 +50,30 @@ The course will meet Fridays from 1:00-3:00 Tucker FIXME.
 
 Note that this is a general outline. The schedule for topics is subject to change.
 
-_#_   | _Date_    | _Topic_                        | _Due_ |
-------|-----------|--------------------------------|-------|
-01    | F 1/19    | Introduction, planning, R      |       |
-02    | F 1/22    | Programming with data          |       |
-03    | F 1/26    | Review of basics               | PS 1  |
-04    | F 1/28    | Hypothesis testing             |       |
-05    | F 2/02    | Bivariate linear regression    | PS 2  |
-06    | F 2/05    | Maximum likelihood             |       |
-07    | F 2/09    | Linear models                  | PS 3  |
-08    | F 2/12    | Degree of relationship         |       |
-09    | F 2/16    | Experimental design            | PS 4  |
-10    | F 2/19    | Multi-way ANOVA                |       |
-11    | F 2/23    | ANCOVA                         | PS 5  |
-12    | F 2/26    | Perils of linear models        |       |
-13    | F 3/01    | Multilevel models              | PS 6  |
-14    | F 3/04    | Model based inference          |       |
-15    | F 3/08    | Multiple comparisons           | PS 7  |
-16    | F 3/11    | Dimensionality reduction       |       |
+_#_   | _Date_    | _Topic_                          |
+------|-----------|----------------------------------|
+00    |           | Pre-workshop. Installing R, etc. |
+01    | F 1/20    | Reproducible research, programming with data |
+02    | F 1/27    | Data cleaning, organization, visualization |
+03    | F 2/03    | Basic probability |
+04    | F 2/10    | Likelihood, Bayesian concepts, frequentist framework |
+05    | F 2/17    | Example applications of three inference frameworks |
+06    | F 2/24    | Parameter estimation, significanace testing |
+07    | F 3/03    | Randomization, multiple testing |
+08    | F 3/10    | Generalized linear models |
+09    | F 3/17    | Generalized linear models |
+10    | F 3/24    | Model comparison, model based inference |
+11    | F 4/07    | Kinship and phylogenetic methods |
+12    | F 4/14    | Multiple comparisons procedures |
+13    | F 4/21    | Composite variables |
+14    | F 4/28    | Composite variables |
+15    | F 5/05    | Experimental design |
+
+Other key dates:
+
+- 4/07 (Friday): Review project paper approval required
+- 5/10 (Wednesday): Final exam due
+- 5/12 (Friday): Review project due
 
 ## Academic Dishonesty
 
