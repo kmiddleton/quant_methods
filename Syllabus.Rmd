@@ -1,5 +1,5 @@
 ---
-title: 'Analysis of Biological Data'
+title: 'Quantitative Approaches in Biology'
 author: "Kevin Middleton and Elizabeth King"
 date: 'Spring 2017'
 output:
@@ -22,11 +22,34 @@ csl: evolution.csl
 
 ## Course Goals
 
+This is a graduate-level course in statistical analysis designed with the specific needs of students in life sciences, focusing on statistical literacy: performing, interpreting, and writing about biological data analysis. As such, we will assume a basic understanding of some topics and zero understanding of other topics. We will cover most topics broadly and occasionally in great depth, highlighting the perils and pitfalls of different methods, while providing guidelines for a wide array of statistical approaches to data analysis. We will seek to find the balance between really understanding all the math involved and learning to be a competent practitioner and consumer of analysis. We will emphasize the practical over the theoretical, with additional emphasis on the communication of data (plotting, graphs, figures) and of results.
+
 ### Main ideas
+
+> "Science is a way to teach how something gets known, what is not known, to what extent things are known (for nothing is known absolutely), how to handle doubt and uncertainty, what the rules of evidence are, how to think about things so that judgments can be made, how to distinguish truth from fraud, from show..." (Feynman, 1953)
+
+By the end of this course, you will have a foundation in the quantitative methods that are used to answer these fundamental questions of science.
 
 ### Background knowledge
 
+**If you have never used R before**, you must attend the pre-course workshop (01/13) to install R on your laptop and work through some Swirl tutorials (http://swirlstats.com/) prior to the first course meeting (01/20).
+
+We will start with the assumption of some previous exposure to the following topics:
+
+- Basic probability rules
+- Kinds of variables (continuous, categorical)
+- Basic understanding of distributions: normal (Gaussian), binomial (Bernoulli), $t$, $F$, $\chi^2$
+- Estimates of central tendency and spread (mean, median, variance, standard deviation, standard error, confidence intervals, $Z$-scores)
+- Tests of group means (and their assumptions)
+    - _t_-tests
+    - one-way ANOVA
+- Bivariate linear regression (and its assumptions)
+
+If anything on this list is unfamiliar to you, ask Google for help.
+
 ### Topics we will not cover
+
+1. Non-parametric statistics (because you learn in this class that you don't need them)
 
 ----
 
@@ -38,13 +61,48 @@ The course will meet Fridays from 1:00-3:00 Tucker FIXME.
 
 ### Expectations
 
+You will get as much or as little from this class as you put into it.
+
+This course will require you to watch lecture videos outside of class and answer questions related to those videos through Canvas. Treat these as you would a normal lecture. You should be taking notes. Pause the videos if you need to. You may need to rewatch and/or search the internet for additional information.
+
+We expect you to be an active participant in class. If you do not understand something, it is your responsibility to ask. Being a silent attendee will not benefit you, and your instructors will not know if you do not understand until it is too late.
+
+- You must try, be willing to fail, and keep trying.
+- You must learn from your mistakes so that you will avoid making them again.
+- Exhaust your own means before asking for help.^[How would you solve the problem if you were an independent researcher?] Then ask for help.
+- Do any readings that are assigned. Be prepared for discussion.
+- No mystery numbers are allowed. It should be clear where every number comes from.
+- Plot the data. The answer you get from your statistical test should be apparent from thoughtful plots of your data.
+
+### Quiz questions
+
+Each set of lecture videos will have associated quiz questions. Complete these before our weekly meeting. These questions are not graded for correctness, only for completion. They will help your instructors guide the discussion during out meetings, so please take these questions seriously.
+
 ### Problem sets
+
+Each week a pseudorandom number generator will assign groups to work collaboratively on a problem set. All members of the group should participate and the group will submit a single set of answers.
+
+Problem sets will not be graded for correctness, only for completion.
+
+You will fill out a peer evaluation of your group members each week. These evaluations will contribute to your participation grade. You mean participation score will be posted periodically.
 
 ### Review Project
 
+You will be required to choose a recent publication that includes a substantial quantitative and/or analytical component and write a peer review as you would if asked by a journal to review the manuscript. Additional details will be given in class.
+
 ### Grading
 
+1. Participation (50%): Your partiticpation grade in the course will be a function of:
+    1. Quiz questions (completion)
+    1. Problem sets (completion)
+    1. Peer evaluations
+    1. In class contributions
+2. Review Project (10%)
+3. Final Exam (40%)
+    - The final exam will be distributed at the beginning of May and will be due on 5/10. You can not work with other members of the class or anyone else on this exam. You will be able to use all other available resources (books, notes, lectures, internet, etc.).
+
 ----
+\newpage
 
 ## Schedule
 
@@ -52,7 +110,7 @@ Note that this is a general outline. The schedule for topics is subject to chang
 
 _#_   | _Date_    | _Topic_                          |
 ------|-----------|----------------------------------|
-00    |           | Pre-workshop. Installing R, etc. |
+00    | F 1/13    | Pre-workshop. Installing R, etc. |
 01    | F 1/20    | Reproducible research, programming with data |
 02    | F 1/27    | Data cleaning, organization, visualization |
 03    | F 2/03    | Basic probability |
