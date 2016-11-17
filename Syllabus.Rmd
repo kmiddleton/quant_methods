@@ -1,5 +1,6 @@
 ---
-title: 'Quantitative Approaches in Biology'
+title: 'Quantitative Approaches in the Life Sciences'
+subtitle: "PTH_AS 8285"
 author: "Kevin Middleton and Elizabeth King"
 date: 'Spring 2017'
 output:
@@ -106,7 +107,7 @@ You will be required to choose a recent publication that includes a substantial 
 
 ## Schedule
 
-Note that this is a general outline. The schedule for topics is subject to change.
+Note that this is a general outline. The schedule of topics is subject to change.
 
 _#_   | _Date_    | _Topic_                          |
 ------|-----------|----------------------------------|
