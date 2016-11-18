@@ -110,11 +110,11 @@ You will be required to choose a recent publication that includes a substantial 
 1. Participation (50%): Your partiticpation grade in the course will be a function of:
     1. Quiz questions (completion)
     1. Problem sets (completion)
-    1. Peer evaluations
+    1. Peer evaluations (both your own completion of and others' evaluation of you)
     1. In class contributions
 2. Review Project (10%)
 3. Final Exam (40%)
-    - The final exam will be distributed at the beginning of May and will be due on 5/10. You can not work with other members of the class or anyone else on this exam. You will be able to use all other available resources (books, notes, lectures, internet, etc.).
+    - The final exam will be distributed at the beginning of May and will be due on 5/10. *You can not work with other members of the class or anyone else on this exam*. You will be able to use all other available resources (books, notes, lectures, internet, etc.).
 
 ----
 \newpage
