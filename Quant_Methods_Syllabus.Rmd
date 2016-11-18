@@ -130,7 +130,7 @@ _#_   | _Date_    | _Topic_                          |
 02    | F 1/27    | Data cleaning, organization, visualization |
 03    | F 2/03    | Basic probability |
 04    | F 2/10    | Likelihood, Bayesian concepts, frequentist framework |
-05    | F 2/17    | Example applications of three inference frameworks |
+05    | F 2/17    | Applications of three inference frameworks |
 06    | F 2/24    | Parameter estimation, significanace testing |
 07    | F 3/03    | Randomization, multiple testing |
 08    | F 3/10    | Generalized linear models |
