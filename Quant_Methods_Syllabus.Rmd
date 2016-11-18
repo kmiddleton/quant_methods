@@ -46,17 +46,17 @@ We will start with the assumption of some previous exposure to the following top
     - one-way ANOVA
 - Bivariate linear regression (and its assumptions)
 
-If anything on this list is unfamiliar to you, ask Google for help.
+*You need not be an expert*, but if anything on this list is unfamiliar to you, ask Google for help. A list of online and print resources is provided in Canvas under the "Pre-course Workshop" module.
 
 ### Topics we will not cover
 
-1. Non-parametric statistics (because you learn in this class that you don't need them)
+1. Non-parametric statistics (because you will learn in this class that you don't need them)
 
 ----
 
 ## Course information
 
-### Collaborating Instructors
+### Your Collaborators
 
 Kevin Middleton
 
