@@ -1,5 +1,5 @@
 ---
-title: 'Quantitative Approaches in the Life Sciences'
+title: 'Quantitative Methods in Life Sciences'
 subtitle: "PTH_AS 8285"
 author: "Kevin Middleton and Elizabeth King"
 date: 'Spring 2017'
