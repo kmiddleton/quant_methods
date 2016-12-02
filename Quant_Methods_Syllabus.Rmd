@@ -1,8 +1,7 @@
 ---
-title: 'Quantitative Methods in Life Sciences'
-subtitle: "PTH_AS 8285"
+title: "Quantitative Methods in Life Sciences"
 author: "Kevin Middleton and Elizabeth King"
-date: 'Spring 2017'
+date: "Spring 2017"
 output:
   pdf_document:
     fig_caption: yes
@@ -13,11 +12,12 @@ output:
   html_document:
     smart: no
     theme: flatly
-fontsize: 12pt
 geometry: margin=1in
 mainfont: Helvetica
 mathfont: Helvetica
 monofont: Andale Mono
+fontsize: 12pt
+subtitle: PTH_AS 8285
 csl: evolution.csl
 ---
 
