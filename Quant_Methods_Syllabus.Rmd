@@ -3,15 +3,15 @@ title: "Quantitative Methods in Life Sciences"
 author: "Kevin Middleton and Elizabeth King"
 date: "Spring 2017"
 output:
+  html_document:
+    smart: no
+    theme: flatly
   pdf_document:
     fig_caption: yes
     fig_height: 3
     fig_width: 6.5
     latex_engine: xelatex
     number_sections: no
-  html_document:
-    smart: no
-    theme: flatly
 geometry: margin=1in
 mainfont: Helvetica
 mathfont: Helvetica
@@ -103,7 +103,7 @@ You will be required to choose a recent publication that includes a substantial 
 
 ### Grading
 
-1. Participation (50%): Your partiticpation grade in the course will be a function of:
+1. Participation (50%): Your participation grade in the course will be a function of:
     1. Quiz questions (completion)
     1. Problem sets (completion)
     1. Peer evaluations (both your own completion of and others' evaluation of you)
@@ -127,7 +127,7 @@ _#_   | _Date_    | _Topic_                          |
 03    | F 2/03    | Basic probability |
 04    | F 2/10    | Likelihood, Bayesian concepts, frequentist framework |
 05    | F 2/17    | Applications of three inference frameworks |
-06    | F 2/24    | Parameter estimation, significanace testing |
+06    | F 2/24    | Parameter estimation, significance testing |
 07    | F 3/03    | Randomization, multiple testing |
 08    | F 3/10    | Generalized linear models |
 09    | F 3/17    | Generalized linear models |
