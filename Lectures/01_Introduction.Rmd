@@ -14,6 +14,10 @@ csl: evolution.csl
 ```{r setup, echo=FALSE}
 ```
 
+background-image: url(./images/Energy_Neocortex.png)
+
+---
+
 # Notes
 
 YouTube: https://youtu.be/0zXsgRDkqQM
