@@ -9,7 +9,6 @@ output:
     nature:
       highlightStyle: github
 csl: evolution.csl
-bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE}
@@ -29,15 +28,9 @@ YouTube: https://youtu.be/0zXsgRDkqQM
 
 - Be more comfortable with data analysis
    - Data exploration and plotting
-
---
-
 - Recipes for analyses
    - Reuse what you have already done
    - Recognize when you can reuse
-
---
-
 - Gain experience programming
 - Design experiments that can be analyzed before you collect data
 - Write about analyses and results
@@ -72,7 +65,7 @@ YouTube: https://youtu.be/0zXsgRDkqQM
 
 # What you should already know
 
-- A basic understanding of math is necessary (some notation, mild integration)
+- A basic understanding of math is necessary (some notation)
     - Calculus-level understanding is not necessary
     - More important: an understanding of what goes into the math
 
@@ -106,21 +99,17 @@ YouTube: https://youtu.be/0zXsgRDkqQM
 > "[Statisticians] are at grave risk of becoming irrelevant, not because we are useless, but because we have focussed too much on doing the right thing, rather than doing something that works. As a field, statistics tends to lean towards abstinence based outreach: you should only do statistics if you're in a committed long-term relationship with a professional statistician. If you experiment on your own (or with friends), you will hurt yourself and others. Abstinence based approaches don't work because people will take the risk anyway, and most of the time they will safely enjoy themselves. ... Rather than stigmatizing amateur statistics, we should be doing
 out best to provide tools to make it safer." - *Wickham (2015)*
 
-## My goals
+---
+
+# Course goals
 
 1. Teach tools that help you be safe in your statistics (some degree of statistical literacy: reading, doing, writing)
 1. Teach you common problems, pitfalls, and concerns
 1. But don't induce *analysis paralysis* (Middleton, 2015)
 
-## What we will not cover
+---
 
-- Nonparametric statistics (Monte Carlo methods usually are a better option anyway)
-- Analyses unique to geometric morphometrics (although very many of the topics we will cover are relevant to GM)
-- Structural equation modeling (a small jump from multivariate regression)
-- Survival analysis (doubt any of us has reason to use it)
-- Bayesian approaches (though we probably all should be using them)
-
-## Course outline | Introductory concepts
+# Course outline | Introductory concepts
 
 - Review of basics
     - Probability
@@ -129,7 +118,9 @@ out best to provide tools to make it safer." - *Wickham (2015)*
     - Distributions
 - Hypothesis testing (good and bad)
 
-## Resources: Basic statistics
+---
+
+# Resources: Basic statistics
 
 _Gentle_:
 
@@ -145,80 +136,13 @@ _Advanced_:
 - _Biometry_ [@sokal_biometry_2011]
 - _Modern Applied Statistics with S_ [@venables_modern_2003]
 
-## Programming with data
+---
 
-- Getting used to using R
-- Basic plotting
+# Outline of topics
 
-## Topics in bivariate linear regression
+---
 
-- Assumptions and interpretations
-- Tests for specific slopes
-- Reduced major axis regression
-
-## Maximum likelihood
-
-- What it is, and why you care
-
-## General(ized) linear models
-
-- Introduction of general(ized) linear models
-- ANOVA / ANCOVA / MANOVA
-- Multicollinearity and other concerns
-
-## Degrees of relationship
-
-- Correlation
-- Multiple correlation
-- Canonical correlation (Cont DVs ~ Cont IVs)
-
-## Experimental design
-
-- Designing experiments that can be analyzed
-- Sample size and power for different standard tests
-- Power for non-standard tests
-
-## Mixed models
-
-- Random vs. fixed effects (variables)
-- Repeated measures and longitudinal data
-
-## Model based inference
-
-- What is a model?
-- Why would I compare models?
-- How to compare models
-
-## Multiple comparisons
-
-- Basics of good statistical practice
-- Rational for and comparison among different methods (how to never use Bonferroni again)
-
-## PCA-like methods
-
-- Dimensionality reduction as a step in a larger analysis
-- Clustering
-- Predicting group membership
-
-## Non-linear classifiers
-
-- We should all be using non-linear classifiers rather than linear classifiers
-    - But why aren't more biologists doing this?
-- Challenges
-
-## Monte Carlo methods
-
-- What is my distribution?
-- Distribution-free approaches
-- Replacements for non-parametric methods
-
-## Phylogenetic comparative methods
-
-- We should all be using comparative methods (where applicable).
-- Why?
-- How?
-
-## Why R?
+# Why R?
 
 - Free; now and always
 - Comprehensive and flexible (perhaps too much so for beginners)
@@ -228,29 +152,39 @@ _Advanced_:
     - No point and click
 - I know it best
 
-## R will become essential for scientists (you, your students)
+---
+
+# R will become essential for scientists (you, your students)
 
 - As important as Word and Excel
 - Learn it now while you have time and energy
 
-## Why not some other statistics program/language?
+---
+
+# Why not some other statistics program/language?
 
 - You probably won't have careers as biostatisticians (SAS, Stata)
 - Won't tie to you some non-free software (SAS, SPSS, Systat, Stata, NCSS/PASS, MATLAB)
 - Huge data (>$10^6$ observations) is rarely an issue (SAS, Stata, python, julia)
 - Speed is rarely an issue for us (fortran, julia, MATLAB, python)
 
-## R will make you angry
+---
+
+# R will make you angry
 
 - Unforgiving
 - Opaque
 - Inscrutable errors
 
-## R will make you happy
+---
+
+# R will make you happy
 
 - Takes time
 
-## Why no Powerpoint slides?
+---
+
+# Why no Powerpoint slides?
 
 - Inefficient to make slides
 - No mechanism to seamlessly include R output & graphics
@@ -258,8 +192,11 @@ _Advanced_:
 - Hard to keep track of changes
 - Let something else handle formatting (R Markdown)
     - Nice HTML output
+- Poor support for version control
 
-## R $\neq$ RStudio
+---
+
+# R $\neq$ RStudio
 
 - RStudio is an interface to R
 - R can be run without RStudio.
@@ -267,7 +204,9 @@ _Advanced_:
 - RStudio is the most important thing to ever happen to R
 - These slides were written using RStudio.
 
-## R Markdown {.smaller}
+---
+
+# R Markdown {.smaller}
 
 - Text-based markup language (i.e., HTML)
 - Variant of markdown (https://daringfireball.net/projects/markdown/)
@@ -281,7 +220,9 @@ _Advanced_:
     - http://moderndata.plot.ly/r-markdown-and-knitr-tutorial-part-1/
     - http://moderndata.plot.ly/r-markdown-and-knitr-tutorial-part-2/
 
-## Data Sets and Examples
+---
+
+# Data Sets and Examples
 
 - We will reuse example data sets in different contexts
     - Get to know them, much as you will get to know your own data
@@ -291,19 +232,13 @@ _Advanced_:
     - Make the math work with an example you trust
     - Then apply to your own data
 
-## Grading
+---
 
-- Problem sets: 70%
-    - For efficient marking: 1.0, 0.5, or 0.0 per item checked
-    - 1.0: Good, works
-    - 0.5: Sort of correct
-    - 0.0: Umm, no.
-- Final project & presentation (details later): 20%
-- Attendance, participation, attitude: 10%
+# Grading
 
-## Getting R set up & working with RStudio
+---
+
+# Getting R set up & working with RStudio
 
 - http://www.r-project.org
 - http://www.rstudio.com/
-
-## References {.references}
