@@ -1,5 +1,5 @@
 ---
-title: "Special Topics: Multivariate Statistics"
+title: "Quantitative Methods in Life Sciences"
 subtitle: "Introduction"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -8,7 +8,6 @@ output:
     seal: yes
     nature:
       highlightStyle: github
-csl: evolution.csl
 ---
 
 ```{r setup, echo=FALSE}

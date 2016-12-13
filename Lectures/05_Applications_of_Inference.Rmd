@@ -1,0 +1,197 @@
+---
+title: "Applications of Inference Frameworks"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    seal: yes
+    nature:
+      highlightStyle: github
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rethinking)
+library(cowplot)
+```
+
+# Notes
+
+---
+
+# Readings
+
+---
+
+# Three Frameworks
+
+1. Frequentist
+2. Maximum likelihood
+3. Bayesian
+
+---
+
+# Estimating a mean
+
+---
+
+# Linear Regression
+
+$$Y=a+bX$$
+
+Where
+
+- $Y$ is the response variable
+- $X$ is the explanatory variable
+- $a$ is the $Y$-intercept ($Y$ when $X=0$)
+- $b$ is the slope of the line
+
+---
+
+# Linear Regression
+
+$$Y = \theta_1 + \theta_2 X$$
+
+Where
+
+- $Y$ is the response variable
+- $X$ is the explanatory variable
+- $\theta_1$ is $\alpha$ for which $a$ is the estimate ($\hat{\alpha} = a$)
+- $\theta_2$ is $\beta$ for which $b$ is the estimate ($\hat{\beta} = b$)
+
+---
+
+# Linear Regression
+
+What values of $\theta_1$ and $\theta_2$ provide the best fit line through $Y$ as a function of $X$?
+
+$$Y = \theta_1 + \theta_2 X$$
+
+How do we estimate $\theta_1$ and $\theta_2$?
+
+---
+
+# Generate data
+
+Generate $n=30$ random data points: $X \sim \mathcal{N}(10, 1)$ and $Y = 2.3 X + \epsilon$, where $\epsilon \sim \mathcal{N}(1, 1)$:
+
+```{r Generate_data}
+set.seed(4)
+n <- 30
+X <- rnorm(n, mean = 10, sd = 1)
+Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
+M <- data.frame(X, Y)
+M %>% head()
+```
+
+---
+
+# Generate data
+
+```{r, echo=FALSE}
+ggplot(M, aes(X, Y)) + geom_point()
+```
+
+---
+
+# Solve analytically
+
+$Y$ is a (n x 1) vector of observed values
+$X$ is an (n X 2) matrix of ones followed by observations
+
+$$\theta = (X'X)^{-1} X'Y$$
+
+Where $X'$ is the transpose of $X$ and $X{-1}$ is the inverse [See: https://www.mathsisfun.com/algebra/matrix-inverse.html].
+
+```{r}
+(X_mat <- matrix(c(rep(1, n), X), ncol = 2))
+```
+
+---
+
+# Solve analytically
+
+```{r}
+(theta <- (solve(t(X_mat) %*% X_mat)) %*% (t(X_mat) %*% Y))
+```
+
+`theta` is a 2 x 1 matrix of coefficients:
+
+$$
+\theta=\left[\begin{array}{c}
+`r round(theta[1, 1], 3)`\\
+`r round(theta[2, 1], 3)`
+\end{array}\right]
+$$
+
+---
+
+```{r}
+lm_fast <- function(X, Y) {
+  X_mat <- matrix(cbind(rep(1, length(Y)), X), nrow = length(Y))
+  theta <- (solve(t(X_mat) %*% X_mat, tol = 1e-25)) %*% (t(X_mat) %*% Y)
+  return(theta)
+}
+
+predict_Y <- function(theta, X) {
+  X <- as.matrix(X, nrow = length(theta))
+  Y_hat <- theta[1, 1] + rowSums(theta[2:nrow(theta), 1] * X)
+  return(Y_hat)
+}
+
+log_lik <- function(Y, Y_hat) {
+  var_hat <- sum((Y - Y_hat)^2) / (length(Y))
+  sd_hat <- sqrt(var_hat)
+  probs_Y <- dnorm(Y, mean = Y_hat, sd = sd_hat)
+  LL <- sum(log(probs_Y))
+  return(LL)
+}
+```
+
+---
+
+```{r}
+theta <- lm_fast(X, Y)
+Y_hat <- predict_Y(theta, X)
+(LL <- log_lik(Y, Y_hat))
+
+fm <- lm(Y~X)
+logLik(fm)
+
+X_mat <- matrix(c(rep(1, length(X)), X), ncol = 2)
+fm_fast <- fastLmPure(X_mat, as.matrix(Y))
+log_lik(Y, fm_fast$fitted.values)
+```
+
+---
+
+```{r}
+t1 <- Sys.time()
+
+reps <- 10^4
+liks <- numeric(length = reps)
+
+load("~/Dropbox/House/Aprob.rda")
+n <- nrow(Aprob)
+
+# Add column of 1's for intercept term
+X <- as.matrix(cbind(rep(1, n), Aprob[, 2:9]), nrow = n)
+
+set.seed(5)
+
+for (i in 1:reps) {
+  Y <- rexp(n, rate = 10)
+  
+  # Normalize so each row sums to 1.
+  fm_fast <- fastLmPure(X, Y)
+  liks[i] <- log_lik(Y, fm_fast$fitted.values)
+}
+Sys.time() - t1
+
+ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) + geom_path()
+```
+
+```{r}
+```
+
