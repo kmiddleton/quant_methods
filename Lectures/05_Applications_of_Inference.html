@@ -4,16 +4,16 @@
     <title>Applications of Inference Frameworks</title>
     <meta charset="utf-8">
     <meta name="author" content="Elizabeth King and Kevin Middleton" />
-    <link href="libs/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link href="05_Applications_of_Inference_files/remark-css-0.0.1/example.css" rel="stylesheet" />
   </head>
   <body>
     <textarea id="source">
-class: center, middle
+class: center, middle, inverse
 
 # Applications of Inference Frameworks
 ## Quantitative Methods in Life Sciences
 ### Elizabeth King and Kevin Middleton
-### Last updated: 2016-12-03
+### Last updated: 2017-01-03
 
 ---
 
@@ -28,7 +28,7 @@ class: center, middle
 
 ---
 
-# Three Frameworks
+# Three frameworks
 
 1. Frequentist
 2. Maximum likelihood
@@ -36,24 +36,349 @@ class: center, middle
 
 ---
 
-# Estimating a mean
+# Inferring a mean
+
+Mean undulation rate for `\(n = 8\)` gliding snakes (http://www.flyingsnake.org/):
+
+
+```r
+undulation_rate &lt;- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
+```
+
+![](http://www.lazerhorse.org/wp-content/uploads/2015/01/Flying-Snake-Chrysopelea.jpg)
+
+What is the mean undulation rate for this sample of flying snakes?
 
 ---
 
-# Linear Regression
 
-`$$Y=a+bX$$`
+```r
+ggplot(data_frame(undulation_rate), aes(undulation_rate)) +
+  geom_histogram() +
+  labs(x = "Undulation Rate (Hz)", y = "Count")
+```
 
-Where
-
-- `\(Y\)` is the response variable
-- `\(X\)` is the explanatory variable
-- `\(a\)` is the `\(Y\)`-intercept (`\(Y\)` when `\(X=0\)`)
-- `\(b\)` is the slope of the line
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-2-1.png" width="672" /&gt;
 
 ---
 
-# Linear Regression
+# Frequentist inference of mean
+
+Arthimetic mean:
+
+`$$\hat{Y} = \frac{\sum_{i=1}^{n}Y_i}{n}$$`
+
+---
+
+# Frequentist inference of mean
+
+
+```r
+sum(undulation_rate) / length(undulation_rate)
+```
+
+```
+## [1] 1.375
+```
+
+---
+
+# Maximum likelihood inference of mean
+
+Define a function to calculate the probability of an observed value `\(Y_i\)` given the mean (`\(\mu\)`) and standard deviation (`\(\sigma\)`). Default to the standard normal distribution `\(\mathcal{N}(0,1)\)`.
+
+`$$f\left(Y_i; \mu, \sigma\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$`
+
+
+```r
+normal &lt;- function(Y, mu = 0, sigma = 1) {
+  1 / sqrt(2 * pi * sigma ^ 2) * 
+    exp((-(Y - mu) ^ 2 / (2 * sigma ^ 2)))
+}
+```
+
+_Note_: this function is built into R as `dnorm()`.
+
+---
+
+# Test our function
+
+
+```r
+normal(0, mu = 0, sigma = 1)
+```
+
+```
+## [1] 0.3989423
+```
+
+```r
+dnorm(0, mean = 0, sd = 1)
+```
+
+```
+## [1] 0.3989423
+```
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/normal_plot-1.png" width="672" /&gt;
+
+---
+
+# Calculating a likelihood
+
+If the mean is 0 and the standard deviation is 1, what is the likelihood of the observed values?
+
+1. This is a model.
+2. Calculate the probability of each observation.
+3. Overall model likelihood is the product of the individual probabilities.
+4. log-likelihood is more tractable, so calculate that.
+
+---
+
+# Model Likelihood (`\(\mathcal{L}\)`)
+
+For a set of `\(Y_i\)` and parameters (`\(\Theta\)`; i.e., mean and standard deviation) the likelihood of the model is the product of their individual probabilities:
+
+`$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$`
+
+Evaluate the likelihood function for different values of `\(\Theta\)` to estimate `\(\mathcal{L}\)` for different sets of `\(\Theta\)`.
+
+- Maximize `\(\mathcal{L}\)` and you will have the best set of parameter estimates.
+
+---
+
+# Model Likelihood (`\(\mathcal{L}\)`)
+
+Probabilities are in the range 0 to 1, so taking the product of a large number of probabilities can result in some very small numbers.
+
+- Computers don't handle really small numbers very well
+    - There is a lower limit to the smallest number a computer can keep track of.
+    - This is `\(2.2250739\times 10^{-308}\)` on my computer.
+
+Think about computing the likelihood for thousands or millions of observations.
+
+---
+
+# Model Likelihood (`\(\mathcal{L}\)`)
+
+It's usually easier to minimize the (natural) log of the likelihood function. The log-likelihood is easier to deal with mathematically.
+
+Log both sides of the equation:
+
+`$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \log\left(\prod_{i=1}^{n}\phi\left(Y_{i};\Theta\right)\right)$$`
+
+---
+
+# Model Likelihood (`\(\mathcal{L}\)`)
+
+Taking advantage of the algebraic rules associated with logs (the log of the products equals the sum of the logs):
+
+`$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(\phi\left(Y_{i};\Theta\right)\right)$$`
+
+So we just need to sum the log-likelihoods to get the overall model likelihood. 
+
+_Note_: `log()` is _natural_ log.
+
+---
+
+# Calculating the log-likelihood for a single combination of `\(\mu\)` and `\(\sigma\)`
+
+If the mean is 0 and the standard deviation is 1, what is the likelihood of the observed values?
+
+Probability for the first observation (`undulation_rate[1]`):
+
+
+```r
+undulation_rate[1]
+```
+
+```
+## [1] 0.9
+```
+
+```r
+normal(undulation_rate[1], mu = 0, sigma = 1)
+```
+
+```
+## [1] 0.2660852
+```
+
+---
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-7-1.png" width="672" /&gt;
+
+This is only the probability for first observation. We need the likelihoods for all 8 undulation rates to get a model likelihood.
+
+---
+
+# Calculating the log-likelihood for a single combination of `\(\mu\)` and `\(\sigma\)`
+
+Vector of probabilities for all values in `undulation_rate` given `mu = 0` and `sigma = 1`:
+
+
+```r
+(probs &lt;- normal(undulation_rate, mu = 0, sigma = 1))
+```
+
+```
+## [1] 0.26608525 0.19418605 0.19418605 0.17136859 0.14972747 0.14972747
+## [7] 0.11092083 0.05399097
+```
+
+Likelihood is the product of those probabilities:
+
+
+```r
+(lik &lt;- prod(probs))
+```
+
+```
+## [1] 2.308476e-07
+```
+
+---
+
+# Likelihood to log-likelihood
+
+
+```r
+log(lik)
+```
+
+```
+## [1] -15.28151
+```
+
+```r
+sum(log(probs))
+```
+
+```
+## [1] -15.28151
+```
+
+If the true mean is 0 and true standard deviation is 1, then the model log-likelihood is -15.282.
+
+Is there another combination of `\(\mu\)` and `\(\sigma\)` that gives a higher likelihood (= larger log-likelihood)?
+
+
+```r
+sum(log(normal(undulation_rate, mu = 1, sigma = 1)))
+```
+
+```
+## [1] -8.281508
+```
+
+
+---
+
+# Calculating the log-likelihood for a _range_ of `\(\mu\)` and `\(\sigma\)`
+
+Find the combination of `\(\mu\)` and `\(\sigma\)` that maximizes the log-likelihood of the model for the mean and standard deviation of undulation rates.
+
+Ranges of possible values
+
+1. Mean (`\(\mu\)`): `\(-\infty &lt; \mu &lt; \infty\)`
+2. Standard deviation (`\(\sigma\)`): `\(0 &lt; \sigma &lt; \infty\)`
+
+---
+
+# Grid approximation
+
+For combinations of `\(\mu\)` and `\(\sigma\)`, calculate the model likelihood. Pick the largest log-likelihood as the maximum likelihood estimates.
+
+Set up the grid:
+
+
+```r
+n &lt;- 100
+mus &lt;- seq(0.5, 10, length = n)
+sigmas &lt;- seq(0.1, 10, length = n)
+
+grid_mu_sigma &lt;- mesh(mus, sigmas)
+
+grid_approx &lt;- data_frame(
+  mus = as.numeric(grid_mu_sigma$x),
+  sigmas = as.numeric(grid_mu_sigma$y),
+  log_lik = rep(NA, length = n ^ 2)
+)
+head(grid_approx)
+```
+
+```
+## # A tibble: 6 × 3
+##         mus sigmas log_lik
+##       &lt;dbl&gt;  &lt;dbl&gt;   &lt;lgl&gt;
+## 1 0.5000000    0.1      NA
+## 2 0.5959596    0.1      NA
+## 3 0.6919192    0.1      NA
+## 4 0.7878788    0.1      NA
+## 5 0.8838384    0.1      NA
+## 6 0.9797980    0.1      NA
+```
+
+---
+
+# Grid approximation
+
+
+```r
+for (i in 1:nrow(grid_approx)) {
+  grid_approx[i, 3] &lt;- sum(log(normal(undulation_rate,
+                                      mu = grid_approx$mus[i],
+                                      sigma = grid_approx$mus[i])))
+}
+head(grid_approx)
+```
+
+```
+## # A tibble: 6 × 3
+##         mus sigmas    log_lik
+##       &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;
+## 1 0.5000000    0.1 -15.526331
+## 2 0.5959596    0.1 -11.080694
+## 3 0.6919192    0.1  -9.071303
+## 4 0.7878788    0.1  -8.257489
+## 5 0.8838384    0.1  -8.069381
+## 6 0.9797980    0.1  -8.221815
+```
+
+This approach is coarse and time consuming. For `\(n = 100\)`, there are 10000 comparisons.
+
+---
+
+# Grid approximation
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-13-1.png" width="672" /&gt;
+
+---
+
+# Grid approximation
+
+On this grid, the maximum likelihood estimates of `\(\mu\)` and `\(\sigma\)` are:
+
+
+```r
+grid_approx[which.max(grid_approx$log_lik), ]
+```
+
+```
+## # A tibble: 1 × 3
+##         mus sigmas   log_lik
+##       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
+## 1 0.8838384    0.1 -8.069381
+```
+
+
+---
+
+# Bayesian inference of mean
+
+---
+
+# Linear regression
 
 `$$Y = \theta_1 + \theta_2 X$$`
 
@@ -61,12 +386,12 @@ Where
 
 - `\(Y\)` is the response variable
 - `\(X\)` is the explanatory variable
-- `\(\theta_1\)` is `\(\alpha\)` for which `\(a\)` is the estimate (`\(\hat{\alpha} = a\)`)
-- `\(\theta_2\)` is `\(\beta\)` for which `\(b\)` is the estimate (`\(\hat{\beta} = b\)`)
+- `\(\theta_1\)` is the intercept (`\(a\)`)
+- `\(\theta_2\)` is the slope of the line (`\(b\)`)
 
 ---
 
-# Linear Regression
+# Linear regression
 
 What values of `\(\theta_1\)` and `\(\theta_2\)` provide the best fit line through `\(Y\)` as a function of `\(X\)`?
 
@@ -104,7 +429,7 @@ M %&gt;% head()
 
 # Generate data
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-1-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-15-1.png" width="672" /&gt;
 
 ---
 
@@ -185,13 +510,14 @@ $$
 
 ```r
 lm_fast &lt;- function(X, Y) {
-  X_mat &lt;- matrix(c(rep(1, n), X), ncol = 2)
-  theta &lt;- (solve(t(X_mat) %*% X_mat)) %*% (t(X_mat) %*% Y)
+  X_mat &lt;- matrix(cbind(rep(1, length(Y)), X), nrow = length(Y))
+  theta &lt;- (solve(t(X_mat) %*% X_mat, tol = 1e-25)) %*% (t(X_mat) %*% Y)
   return(theta)
 }
 
 predict_Y &lt;- function(theta, X) {
-  Y_hat &lt;- theta[1, 1] + theta[2, 1] * X
+  X &lt;- as.matrix(X, nrow = length(theta))
+  Y_hat &lt;- theta[1, 1] + rowSums(theta[2:nrow(theta), 1] * X)
   return(Y_hat)
 }
 
@@ -199,7 +525,8 @@ log_lik &lt;- function(Y, Y_hat) {
   var_hat &lt;- sum((Y - Y_hat)^2) / (length(Y))
   sd_hat &lt;- sqrt(var_hat)
   probs_Y &lt;- dnorm(Y, mean = Y_hat, sd = sd_hat)
-  return(sum(log(probs_Y)))
+  LL &lt;- sum(log(probs_Y))
+  return(LL)
 }
 ```
 
@@ -216,12 +543,67 @@ Y_hat &lt;- predict_Y(theta, X)
 ## [1] -40.25821
 ```
 
+```r
+fm &lt;- lm(Y~X)
+logLik(fm)
+```
+
+```
+## 'log Lik.' -40.25821 (df=3)
+```
+
+```r
+X_mat &lt;- matrix(c(rep(1, length(X)), X), ncol = 2)
+fm_fast &lt;- fastLmPure(X_mat, as.matrix(Y))
+log_lik(Y, fm_fast$fitted.values)
+```
+
+```
+## [1] -40.25821
+```
+
 ---
+
+
+```r
+t1 &lt;- Sys.time()
+
+reps &lt;- 10^4
+liks &lt;- numeric(length = reps)
+
+load("~/Dropbox/House/Aprob.rda")
+n &lt;- nrow(Aprob)
+
+# Add column of 1's for intercept term
+X &lt;- as.matrix(cbind(rep(1, n), Aprob[, 2:9]), nrow = n)
+
+set.seed(5)
+
+for (i in 1:reps) {
+  Y &lt;- rexp(n, rate = 10)
+  
+  # Normalize so each row sums to 1.
+  fm_fast &lt;- fastLmPure(X, Y)
+  liks[i] &lt;- log_lik(Y, fm_fast$fitted.values)
+}
+Sys.time() - t1
+```
+
+```
+## Time difference of 2.493448 secs
+```
+
+```r
+ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) + geom_path()
+```
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-20-1.png" width="672" /&gt;
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
 "highlightStyle": "github"
-});</script>
+});
+if (window.HTMLWidgets) slideshow.on('showSlide', function (slide) {setTimeout(function() {window.dispatchEvent(new Event('resize'));}, 100)});</script>
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
