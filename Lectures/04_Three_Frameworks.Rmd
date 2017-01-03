@@ -1,0 +1,34 @@
+---
+title: "Three Frameworks"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    seal: yes
+    nature:
+      highlightStyle: github
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rethinking)
+library(cowplot)
+```
+
+# Notes
+
+Gelman Bayesian intro: http://andrewgelman.com/2016/12/13/bayesian-statistics-whats/
+
+---
+
+# Readings
+
+---
+
+# Three Frameworks
+
+1. Frequentist
+2. Maximum likelihood
+3. Bayesian
+
