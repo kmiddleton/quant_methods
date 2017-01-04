@@ -16,6 +16,15 @@ library(rethinking)
 library(cowplot)
 library(RcppEigen)
 library(plot3D)
+#library(rgl)
+#setupKnitr <- function() {
+#  if (requireNamespace("knitr")) {
+#    knitr::knit_hooks$set(webgl = hook_webgl)
+#    knitr::knit_hooks$set(rgl = hook_rgl)
+#    environment(hook_webgl)$commonParts <- TRUE
+#    environment(hook_webgl)$reuse <- TRUE
+#  }
+#}
 ```
 
 # Notes
@@ -246,8 +255,8 @@ sigmas <- seq(0.1, 2, length = n)
 grid_mu_sigma <- mesh(mus, sigmas)
 
 grid_approx <- data_frame(
-  mus = as.numeric(grid_mu_sigma$x),
-  sigmas = as.numeric(grid_mu_sigma$y),
+  mu = as.numeric(grid_mu_sigma$x),
+  sigma = as.numeric(grid_mu_sigma$y),
   log_lik = rep(NA, length = n ^ 2)
 )
 ```
@@ -266,8 +275,8 @@ grid_approx
 for (i in 1:nrow(grid_approx)) {
   grid_approx[i, 3] <- 
     sum(log(normal(undulation_rate,
-                   mu = grid_approx$mus[i],
-                   sigma = grid_approx$sigmas[i])))
+                   mu = grid_approx$mu[i],
+                   sigma = grid_approx$sigma[i])))
 }
 head(grid_approx)
 ```
@@ -278,11 +287,24 @@ This approach is coarse and time consuming. For $n = `r n`$, there are `r nrow(g
 
 # Grid approximation
 
-```{r webgl=TRUE, echo=FALSE}
+```{r echo=FALSE}
 grid_approx <- do.call(data.frame,
                        lapply(grid_approx,
                               function(x) replace(x, is.infinite(x), NA)))
-scatter3D(grid_approx$mus, grid_approx$sigmas, grid_approx$log_lik, pch = 16)
+scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
+          labels = c("mu", "sigma", "log-likelihood"))
+```
+
+---
+
+# Grid approximation
+
+```{r webgl=TRUE, eval=FALSE}
+plot3d(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik,
+       type = "s", col = "red", size = 1,
+       xlab = "mu",
+       ylab = "sigma",
+       zlab = "log-likelihood")
 ```
 
 ---
@@ -299,12 +321,25 @@ grid_approx[which.max(grid_approx$log_lik), ]
 
 # Maximum likelihood as an optimization problem
 
+```{r echo=FALSE}
+scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
+          labels = c("mu", "sigma", "log-likelihood"), colkey = FALSE)
+```
+
+---
+
+# Maximum likelihood as an optimization problem
+
+Define a function that takes a vector of values to optimize `x` ($\mu$ and $\sigma$) as well as a set of data `Y` and returns the log-likelihood:
+
 ```{r}
 log_lik <- function(x, Y){
   probs <- normal(Y, mu = x[1], sigma = x[2])
   return(sum(log(probs)))
 }
 ```
+
+We can now jointly optimize $\mu$ and $\sigma$, maximizing the log-likelihood.
 
 ---
 
@@ -362,7 +397,8 @@ Cauchy distribution (location = 0, scale = 2)
 data_frame(
   x = seq(0, 10, length = 100),
   y = dcauchy(x, scale = 2)) %>% 
-  ggplot(aes(x, y)) + geom_line()
+  ggplot(aes(x, y)) + geom_line() +
+  labs(y = "Probability", x = "value")
 ```
 
 ---
@@ -377,7 +413,7 @@ fm_priors <- map2stan(
     sigma ~ dcauchy(0, 5)),
   data = data.frame(undulation_rate),
   WAIC = FALSE,
-  iter = 10^4,
+  iter = 10^5, warmup = 10^3,
   constraints = list(mu = "lower=0")
 )
 ```
@@ -411,6 +447,8 @@ post %>% gather(key, value) %>%
 ```{r}
 precis(fm_priors, digits = 5)
 ```
+
+We get a lower mean than the analytical or ML estimate (`r round(mean(undulation_rate), 3)`) because of the prior placing more probability on certain values.
 
 ---
 

@@ -13,7 +13,7 @@ class: center, middle, inverse
 # Applications of Inference Frameworks
 ## Quantitative Methods in Life Sciences
 ### Elizabeth King and Kevin Middleton
-### Last updated: 2017-01-03
+### Last updated: 2017-01-04
 
 ---
 
@@ -299,8 +299,8 @@ sigmas &lt;- seq(0.1, 2, length = n)
 grid_mu_sigma &lt;- mesh(mus, sigmas)
 
 grid_approx &lt;- data_frame(
-  mus = as.numeric(grid_mu_sigma$x),
-  sigmas = as.numeric(grid_mu_sigma$y),
+  mu = as.numeric(grid_mu_sigma$x),
+  sigma = as.numeric(grid_mu_sigma$y),
   log_lik = rep(NA, length = n ^ 2)
 )
 ```
@@ -314,18 +314,18 @@ grid_approx
 
 ```
 ## # A tibble: 10,000 × 3
-##          mus sigmas log_lik
-##        &lt;dbl&gt;  &lt;dbl&gt;   &lt;lgl&gt;
-## 1  0.1000000    0.1      NA
-## 2  0.1494949    0.1      NA
-## 3  0.1989899    0.1      NA
-## 4  0.2484848    0.1      NA
-## 5  0.2979798    0.1      NA
-## 6  0.3474747    0.1      NA
-## 7  0.3969697    0.1      NA
-## 8  0.4464646    0.1      NA
-## 9  0.4959596    0.1      NA
-## 10 0.5454545    0.1      NA
+##           mu sigma log_lik
+##        &lt;dbl&gt; &lt;dbl&gt;   &lt;lgl&gt;
+## 1  0.1000000   0.1      NA
+## 2  0.1494949   0.1      NA
+## 3  0.1989899   0.1      NA
+## 4  0.2484848   0.1      NA
+## 5  0.2979798   0.1      NA
+## 6  0.3474747   0.1      NA
+## 7  0.3969697   0.1      NA
+## 8  0.4464646   0.1      NA
+## 9  0.4959596   0.1      NA
+## 10 0.5454545   0.1      NA
 ## # ... with 9,990 more rows
 ```
 
@@ -338,22 +338,22 @@ grid_approx
 for (i in 1:nrow(grid_approx)) {
   grid_approx[i, 3] &lt;- 
     sum(log(normal(undulation_rate,
-                   mu = grid_approx$mus[i],
-                   sigma = grid_approx$sigmas[i])))
+                   mu = grid_approx$mu[i],
+                   sigma = grid_approx$sigma[i])))
 }
 head(grid_approx)
 ```
 
 ```
 ## # A tibble: 6 × 3
-##         mus sigmas   log_lik
-##       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
-## 1 0.1000000    0.1 -675.9308
-## 2 0.1494949    0.1 -626.4259
-## 3 0.1989899    0.1 -578.8807
-## 4 0.2484848    0.1 -533.2954
-## 5 0.2979798    0.1 -489.6698
-## 6 0.3474747    0.1 -448.0041
+##          mu sigma   log_lik
+##       &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+## 1 0.1000000   0.1 -675.9308
+## 2 0.1494949   0.1 -626.4259
+## 3 0.1989899   0.1 -578.8807
+## 4 0.2484848   0.1 -533.2954
+## 5 0.2979798   0.1 -489.6698
+## 6 0.3474747   0.1 -448.0041
 ```
 
 This approach is coarse and time consuming. For `\(n = 100\)`, there are 10000 comparisons.
@@ -368,6 +368,19 @@ This approach is coarse and time consuming. For `\(n = 100\)`, there are 10000 c
 
 # Grid approximation
 
+
+```r
+plot3d(grid_approx`\(mu, grid_approx\)`sigma, grid_approx$log_lik,
+       type = "s", col = "red", size = 1,
+       xlab = "mu",
+       ylab = "sigma",
+       zlab = "log-likelihood")
+```
+
+---
+
+# Grid approximation
+
 On this grid, the maximum likelihood estimates of `\(\mu\)` and `\(\sigma\)` are:
 
 
@@ -376,13 +389,21 @@ grid_approx[which.max(grid_approx$log_lik), ]
 ```
 
 ```
-##           mus    sigmas   log_lik
+##            mu     sigma   log_lik
 ## 1127 1.386869 0.3111111 -1.813363
 ```
 
 ---
 
 # Maximum likelihood as an optimization problem
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-16-1.png" width="672" /&gt;
+
+---
+
+# Maximum likelihood as an optimization problem
+
+Define a function that takes a vector of values to optimize `x` (`\(\mu\)` and `\(\sigma\)`) as well as a set of data `Y` and returns the log-likelihood:
 
 
 ```r
@@ -391,6 +412,8 @@ log_lik &lt;- function(x, Y){
   return(sum(log(probs)))
 }
 ```
+
+We can now jointly optimize `\(\mu\)` and `\(\sigma\)`, maximizing the log-likelihood.
 
 ---
 
@@ -466,7 +489,7 @@ Can we do better? Yes, Bayesian priors.
 
 # Prior for the mean
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-16-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-18-1.png" width="672" /&gt;
 
 ---
 
@@ -474,7 +497,7 @@ Can we do better? Yes, Bayesian priors.
 
 Cauchy distribution (location = 0, scale = 2)
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-17-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-19-1.png" width="672" /&gt;
 
 ---
 
@@ -489,46 +512,30 @@ fm_priors &lt;- map2stan(
     sigma ~ dcauchy(0, 5)),
   data = data.frame(undulation_rate),
   WAIC = FALSE,
-  iter = 10^4,
+  iter = 10^5, warmup = 10^3,
   constraints = list(mu = "lower=0")
 )
 ```
 
 ```
-## In file included from file42a14da9adda.cpp:8:
-## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
-## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math.hpp:4:
-## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
-## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:12:
-## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5:
-## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core/var.hpp:7:
-## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/math/tools/config.hpp:13:
-## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/config.hpp:39:
-## /Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/config/compiler/clang.hpp:196:11: warning: 'BOOST_NO_CXX11_RVALUE_REFERENCES' macro redefined [-Wmacro-redefined]
-## #  define BOOST_NO_CXX11_RVALUE_REFERENCES
-##           ^
-## &lt;command line&gt;:6:9: note: previous definition is here
-## #define BOOST_NO_CXX11_RVALUE_REFERENCES 1
-##         ^
-## 1 warning generated.
 ## 
 ## SAMPLING FOR MODEL 'undulation_rate ~ dnorm(mu, sigma)' NOW (CHAIN 1).
 ## 
-## Chain 1, Iteration:    1 / 10000 [  0%]  (Warmup)
-## Chain 1, Iteration: 1000 / 10000 [ 10%]  (Warmup)
-## Chain 1, Iteration: 2000 / 10000 [ 20%]  (Warmup)
-## Chain 1, Iteration: 3000 / 10000 [ 30%]  (Warmup)
-## Chain 1, Iteration: 4000 / 10000 [ 40%]  (Warmup)
-## Chain 1, Iteration: 5000 / 10000 [ 50%]  (Warmup)
-## Chain 1, Iteration: 5001 / 10000 [ 50%]  (Sampling)
-## Chain 1, Iteration: 6000 / 10000 [ 60%]  (Sampling)
-## Chain 1, Iteration: 7000 / 10000 [ 70%]  (Sampling)
-## Chain 1, Iteration: 8000 / 10000 [ 80%]  (Sampling)
-## Chain 1, Iteration: 9000 / 10000 [ 90%]  (Sampling)
-## Chain 1, Iteration: 10000 / 10000 [100%]  (Sampling)
-##  Elapsed Time: 0.457459 seconds (Warm-up)
-##                0.365293 seconds (Sampling)
-##                0.822752 seconds (Total)
+## Chain 1, Iteration:     1 / 100000 [  0%]  (Warmup)
+## Chain 1, Iteration:  1001 / 100000 [  1%]  (Sampling)
+## Chain 1, Iteration: 11000 / 100000 [ 11%]  (Sampling)
+## Chain 1, Iteration: 21000 / 100000 [ 21%]  (Sampling)
+## Chain 1, Iteration: 31000 / 100000 [ 31%]  (Sampling)
+## Chain 1, Iteration: 41000 / 100000 [ 41%]  (Sampling)
+## Chain 1, Iteration: 51000 / 100000 [ 51%]  (Sampling)
+## Chain 1, Iteration: 61000 / 100000 [ 61%]  (Sampling)
+## Chain 1, Iteration: 71000 / 100000 [ 71%]  (Sampling)
+## Chain 1, Iteration: 81000 / 100000 [ 81%]  (Sampling)
+## Chain 1, Iteration: 91000 / 100000 [ 91%]  (Sampling)
+## Chain 1, Iteration: 100000 / 100000 [100%]  (Sampling)
+##  Elapsed Time: 0.072522 seconds (Warm-up)
+##                6.50908 seconds (Sampling)
+##                6.5816 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'undulation_rate ~ dnorm(mu, sigma)' NOW (CHAIN 1).
@@ -537,9 +544,14 @@ fm_priors &lt;- map2stan(
 ## 
 ## 
 ## Chain 1, Iteration: 1 / 1 [100%]  (Sampling)
-##  Elapsed Time: 1.8e-05 seconds (Warm-up)
-##                0.000338 seconds (Sampling)
-##                0.000356 seconds (Total)
+##  Elapsed Time: 8e-06 seconds (Warm-up)
+##                7.6e-05 seconds (Sampling)
+##                8.4e-05 seconds (Total)
+```
+
+```
+## Warning in map2stan(alist(undulation_rate ~ dnorm(mu, sigma), mu ~ dcauchy(0, : There were 12 divergent iterations during sampling.
+## Check the chains (trace plots, n_eff, Rhat) carefully to ensure they are valid.
 ```
 
 Using the `map2stan()` from the rethinking package (https://github.com/rmcelreath/rethinking).
@@ -548,13 +560,13 @@ Using the `map2stan()` from the rethinking package (https://github.com/rmcelreat
 
 # Inspecting the samples
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-18-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-20-1.png" width="672" /&gt;
 
 ---
 
 # Summarizing the results
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-19-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-21-1.png" width="672" /&gt;
 
 ---
 
@@ -566,9 +578,14 @@ precis(fm_priors, digits = 5)
 ```
 
 ```
+## Warning in precis(fm_priors, digits = 5): There were 12 divergent iterations during sampling.
+## Check the chains (trace plots, n_eff, Rhat) carefully to ensure they are valid.
+```
+
+```
 ##          Mean  StdDev lower 0.89 upper 0.89 n_eff    Rhat
-## mu    1.36279 0.14379    1.13411    1.57500  2116 1.00260
-## sigma 0.39580 0.13830    0.21596    0.57005  2271 0.99987
+## mu    1.36376 0.15028    1.13589    1.59640 44038 0.99999
+## sigma 0.40131 0.14313    0.21600    0.58201 35576 1.00004
 ```
 
 ---
@@ -624,7 +641,7 @@ M %&gt;% head()
 
 # Generate data
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-21-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-23-1.png" width="672" /&gt;
 
 ---
 
@@ -785,14 +802,14 @@ Sys.time() - t1
 ```
 
 ```
-## Time difference of 3.363496 secs
+## Time difference of 36.44112 secs
 ```
 
 ```r
 ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) + geom_path()
 ```
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-26-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-28-1.png" width="672" /&gt;
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
