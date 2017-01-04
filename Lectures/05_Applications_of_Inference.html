@@ -58,7 +58,7 @@ ggplot(data_frame(undulation_rate), aes(undulation_rate)) +
   labs(x = "Undulation Rate (Hz)", y = "Count")
 ```
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-2-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/undulation_plot-1.png" width="672" /&gt;
 
 ---
 
@@ -126,7 +126,7 @@ dnorm(0, mean = 0, sd = 1)
 
 # Calculating a likelihood
 
-If the mean is 0 and the standard deviation is 1, what is the likelihood of the observed values?
+If the true mean is 0 and the standard deviation is 1, what is the likelihood of the observed values?
 
 1. This is a model.
 2. Calculate the probability of each observation.
@@ -143,7 +143,7 @@ For a set of `\(Y_i\)` and parameters (`\(\Theta\)`; i.e., mean and standard dev
 
 Evaluate the likelihood function for different values of `\(\Theta\)` to estimate `\(\mathcal{L}\)` for different sets of `\(\Theta\)`.
 
-- Maximize `\(\mathcal{L}\)` and you will have the best set of parameter estimates.
+- Maximize `\(\mathcal{L}\)` and you will have the maximum likelihood set of parameter estimates.
 
 ---
 
@@ -153,7 +153,7 @@ Probabilities are in the range 0 to 1, so taking the product of a large number o
 
 - Computers don't handle really small numbers very well
     - There is a lower limit to the smallest number a computer can keep track of.
-    - This is `\(2.2250739\times 10^{-308}\)` on my computer.
+    - This is `\(2.2250739\times 10^{-308}\)` in R on the computer that compiled these slides.
 
 Think about computing the likelihood for thousands or millions of observations.
 
@@ -206,7 +206,7 @@ normal(undulation_rate[1], mu = 0, sigma = 1)
 
 ---
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-7-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-6-1.png" width="672" /&gt;
 
 This is only the probability for first observation. We need the likelihoods for all 8 undulation rates to get a model likelihood.
 
@@ -271,14 +271,13 @@ sum(log(normal(undulation_rate, mu = 1, sigma = 1)))
 ## [1] -8.281508
 ```
 
-
 ---
 
 # Calculating the log-likelihood for a _range_ of `\(\mu\)` and `\(\sigma\)`
 
 Find the combination of `\(\mu\)` and `\(\sigma\)` that maximizes the log-likelihood of the model for the mean and standard deviation of undulation rates.
 
-Ranges of possible values
+Ranges of possible values:
 
 1. Mean (`\(\mu\)`): `\(-\infty &lt; \mu &lt; \infty\)`
 2. Standard deviation (`\(\sigma\)`): `\(0 &lt; \sigma &lt; \infty\)`
@@ -294,8 +293,8 @@ Set up the grid:
 
 ```r
 n &lt;- 100
-mus &lt;- seq(0.5, 10, length = n)
-sigmas &lt;- seq(0.1, 10, length = n)
+mus &lt;- seq(0.1, 5, length = n)
+sigmas &lt;- seq(0.1, 2, length = n)
 
 grid_mu_sigma &lt;- mesh(mus, sigmas)
 
@@ -304,19 +303,30 @@ grid_approx &lt;- data_frame(
   sigmas = as.numeric(grid_mu_sigma$y),
   log_lik = rep(NA, length = n ^ 2)
 )
-head(grid_approx)
+```
+
+---
+
+
+```r
+grid_approx
 ```
 
 ```
-## # A tibble: 6 × 3
-##         mus sigmas log_lik
-##       &lt;dbl&gt;  &lt;dbl&gt;   &lt;lgl&gt;
-## 1 0.5000000    0.1      NA
-## 2 0.5959596    0.1      NA
-## 3 0.6919192    0.1      NA
-## 4 0.7878788    0.1      NA
-## 5 0.8838384    0.1      NA
-## 6 0.9797980    0.1      NA
+## # A tibble: 10,000 × 3
+##          mus sigmas log_lik
+##        &lt;dbl&gt;  &lt;dbl&gt;   &lt;lgl&gt;
+## 1  0.1000000    0.1      NA
+## 2  0.1494949    0.1      NA
+## 3  0.1989899    0.1      NA
+## 4  0.2484848    0.1      NA
+## 5  0.2979798    0.1      NA
+## 6  0.3474747    0.1      NA
+## 7  0.3969697    0.1      NA
+## 8  0.4464646    0.1      NA
+## 9  0.4959596    0.1      NA
+## 10 0.5454545    0.1      NA
+## # ... with 9,990 more rows
 ```
 
 ---
@@ -326,23 +336,24 @@ head(grid_approx)
 
 ```r
 for (i in 1:nrow(grid_approx)) {
-  grid_approx[i, 3] &lt;- sum(log(normal(undulation_rate,
-                                      mu = grid_approx$mus[i],
-                                      sigma = grid_approx$mus[i])))
+  grid_approx[i, 3] &lt;- 
+    sum(log(normal(undulation_rate,
+                   mu = grid_approx$mus[i],
+                   sigma = grid_approx$sigmas[i])))
 }
 head(grid_approx)
 ```
 
 ```
 ## # A tibble: 6 × 3
-##         mus sigmas    log_lik
-##       &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;
-## 1 0.5000000    0.1 -15.526331
-## 2 0.5959596    0.1 -11.080694
-## 3 0.6919192    0.1  -9.071303
-## 4 0.7878788    0.1  -8.257489
-## 5 0.8838384    0.1  -8.069381
-## 6 0.9797980    0.1  -8.221815
+##         mus sigmas   log_lik
+##       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
+## 1 0.1000000    0.1 -675.9308
+## 2 0.1494949    0.1 -626.4259
+## 3 0.1989899    0.1 -578.8807
+## 4 0.2484848    0.1 -533.2954
+## 5 0.2979798    0.1 -489.6698
+## 6 0.3474747    0.1 -448.0041
 ```
 
 This approach is coarse and time consuming. For `\(n = 100\)`, there are 10000 comparisons.
@@ -365,16 +376,200 @@ grid_approx[which.max(grid_approx$log_lik), ]
 ```
 
 ```
-## # A tibble: 1 × 3
-##         mus sigmas   log_lik
-##       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
-## 1 0.8838384    0.1 -8.069381
+##           mus    sigmas   log_lik
+## 1127 1.386869 0.3111111 -1.813363
 ```
 
+---
+
+# Maximum likelihood as an optimization problem
+
+
+```r
+log_lik &lt;- function(x, Y){
+  probs &lt;- normal(Y, mu = x[1], sigma = x[2])
+  return(sum(log(probs)))
+}
+```
+
+---
+
+# Maximum likelihood as an optimization problem
+
+
+```r
+optim(c(0.1, 0.1),
+      log_lik,
+      Y = undulation_rate,
+      control = list(fnscale = -1,
+                     reltol = 10^-100))
+```
+
+```
+## $par
+## [1] 1.3750000 0.3031089
+## 
+## $value
+## [1] -1.802203
+## 
+## $counts
+## function gradient 
+##      287       NA 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL
+```
+
+---
+
+# Maximum likelihood as an optimization problem
+
+
+```r
+fm &lt;- glm(undulation_rate ~ 1)
+coef(fm)
+```
+
+```
+## (Intercept) 
+##       1.375
+```
+
+```r
+logLik(fm)
+```
+
+```
+## 'log Lik.' -1.802203 (df=2)
+```
 
 ---
 
 # Bayesian inference of mean
+
+Ranges of possible maximum likelihood values:
+
+1. `\(\mu\)`: `\(-\infty &lt; \mu &lt; \infty\)`
+2. `\(\sigma\)`: `\(0 &lt; \sigma &lt; \infty\)`
+
+Drawbacks:
+
+1. `\(\mu\)` can't be negative (no negative undulation rates) and probably isn't a large number
+2. `\(\sigma\)` is also probably not huge either
+
+Can we do better? Yes, Bayesian priors.
+
+---
+
+# Prior for the mean
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-16-1.png" width="672" /&gt;
+
+---
+
+# Prior for the mean
+
+Cauchy distribution (location = 0, scale = 2)
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-17-1.png" width="672" /&gt;
+
+---
+
+# Bayesian model
+
+
+```r
+fm_priors &lt;- map2stan(
+  alist(
+    undulation_rate ~ dnorm(mu, sigma),
+    mu ~ dcauchy(0, 2),
+    sigma ~ dcauchy(0, 5)),
+  data = data.frame(undulation_rate),
+  WAIC = FALSE,
+  iter = 10^4,
+  constraints = list(mu = "lower=0")
+)
+```
+
+```
+## In file included from file42a14da9adda.cpp:8:
+## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math.hpp:4:
+## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:12:
+## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5:
+## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/StanHeaders/include/stan/math/rev/core/var.hpp:7:
+## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/math/tools/config.hpp:13:
+## In file included from /Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/config.hpp:39:
+## /Library/Frameworks/R.framework/Versions/3.3/Resources/library/BH/include/boost/config/compiler/clang.hpp:196:11: warning: 'BOOST_NO_CXX11_RVALUE_REFERENCES' macro redefined [-Wmacro-redefined]
+## #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+##           ^
+## &lt;command line&gt;:6:9: note: previous definition is here
+## #define BOOST_NO_CXX11_RVALUE_REFERENCES 1
+##         ^
+## 1 warning generated.
+## 
+## SAMPLING FOR MODEL 'undulation_rate ~ dnorm(mu, sigma)' NOW (CHAIN 1).
+## 
+## Chain 1, Iteration:    1 / 10000 [  0%]  (Warmup)
+## Chain 1, Iteration: 1000 / 10000 [ 10%]  (Warmup)
+## Chain 1, Iteration: 2000 / 10000 [ 20%]  (Warmup)
+## Chain 1, Iteration: 3000 / 10000 [ 30%]  (Warmup)
+## Chain 1, Iteration: 4000 / 10000 [ 40%]  (Warmup)
+## Chain 1, Iteration: 5000 / 10000 [ 50%]  (Warmup)
+## Chain 1, Iteration: 5001 / 10000 [ 50%]  (Sampling)
+## Chain 1, Iteration: 6000 / 10000 [ 60%]  (Sampling)
+## Chain 1, Iteration: 7000 / 10000 [ 70%]  (Sampling)
+## Chain 1, Iteration: 8000 / 10000 [ 80%]  (Sampling)
+## Chain 1, Iteration: 9000 / 10000 [ 90%]  (Sampling)
+## Chain 1, Iteration: 10000 / 10000 [100%]  (Sampling)
+##  Elapsed Time: 0.457459 seconds (Warm-up)
+##                0.365293 seconds (Sampling)
+##                0.822752 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL 'undulation_rate ~ dnorm(mu, sigma)' NOW (CHAIN 1).
+## WARNING: No variance estimation is
+##          performed for num_warmup &lt; 20
+## 
+## 
+## Chain 1, Iteration: 1 / 1 [100%]  (Sampling)
+##  Elapsed Time: 1.8e-05 seconds (Warm-up)
+##                0.000338 seconds (Sampling)
+##                0.000356 seconds (Total)
+```
+
+Using the `map2stan()` from the rethinking package (https://github.com/rmcelreath/rethinking).
+
+---
+
+# Inspecting the samples
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-18-1.png" width="672" /&gt;
+
+---
+
+# Summarizing the results
+
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-19-1.png" width="672" /&gt;
+
+---
+
+# Summarizing the results
+
+
+```r
+precis(fm_priors, digits = 5)
+```
+
+```
+##          Mean  StdDev lower 0.89 upper 0.89 n_eff    Rhat
+## mu    1.36279 0.14379    1.13411    1.57500  2116 1.00260
+## sigma 0.39580 0.13830    0.21596    0.57005  2271 0.99987
+```
 
 ---
 
@@ -429,7 +624,7 @@ M %&gt;% head()
 
 # Generate data
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-15-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-21-1.png" width="672" /&gt;
 
 ---
 
@@ -590,14 +785,14 @@ Sys.time() - t1
 ```
 
 ```
-## Time difference of 2.493448 secs
+## Time difference of 3.363496 secs
 ```
 
 ```r
 ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) + geom_path()
 ```
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-20-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-26-1.png" width="672" /&gt;
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({

@@ -48,7 +48,7 @@ What is the mean undulation rate for this sample of flying snakes?
 
 ---
 
-```{r message=FALSE}
+```{r undulation_plot, message=FALSE}
 ggplot(data_frame(undulation_rate), aes(undulation_rate)) +
   geom_histogram() +
   labs(x = "Undulation Rate (Hz)", y = "Count")
@@ -107,7 +107,7 @@ ggplot(M, aes(x, y)) + geom_line() +
 
 # Calculating a likelihood
 
-If the mean is 0 and the standard deviation is 1, what is the likelihood of the observed values?
+If the true mean is 0 and the standard deviation is 1, what is the likelihood of the observed values?
 
 1. This is a model.
 2. Calculate the probability of each observation.
@@ -124,7 +124,7 @@ $$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^
 
 Evaluate the likelihood function for different values of $\Theta$ to estimate $\mathcal{L}$ for different sets of $\Theta$.
 
-- Maximize $\mathcal{L}$ and you will have the best set of parameter estimates.
+- Maximize $\mathcal{L}$ and you will have the maximum likelihood set of parameter estimates.
 
 ---
 
@@ -134,7 +134,7 @@ Probabilities are in the range 0 to 1, so taking the product of a large number o
 
 - Computers don't handle really small numbers very well
     - There is a lower limit to the smallest number a computer can keep track of.
-    - This is $`r .Machine$double.xmin`$ on my computer.
+    - This is $`r .Machine$double.xmin`$ in R on the computer that compiled these slides.
 
 Think about computing the likelihood for thousands or millions of observations.
 
@@ -219,14 +219,13 @@ Is there another combination of $\mu$ and $\sigma$ that gives a higher likelihoo
 sum(log(normal(undulation_rate, mu = 1, sigma = 1)))
 ```
 
-
 ---
 
 # Calculating the log-likelihood for a _range_ of $\mu$ and $\sigma$
 
 Find the combination of $\mu$ and $\sigma$ that maximizes the log-likelihood of the model for the mean and standard deviation of undulation rates.
 
-Ranges of possible values
+Ranges of possible values:
 
 1. Mean ($\mu$): $-\infty < \mu < \infty$
 2. Standard deviation ($\sigma$): $0 < \sigma < \infty$
@@ -265,9 +264,10 @@ grid_approx
 
 ```{r grid_approx, cache=TRUE}
 for (i in 1:nrow(grid_approx)) {
-  grid_approx[i, 3] <- sum(log(normal(undulation_rate,
-                                      mu = grid_approx$mus[i],
-                                      sigma = grid_approx$sigmas[i])))
+  grid_approx[i, 3] <- 
+    sum(log(normal(undulation_rate,
+                   mu = grid_approx$mus[i],
+                   sigma = grid_approx$sigmas[i])))
 }
 head(grid_approx)
 ```
@@ -297,16 +297,120 @@ grid_approx[which.max(grid_approx$log_lik), ]
 
 ---
 
-# Maximum likelihood as an optimization
+# Maximum likelihood as an optimization problem
 
 ```{r}
-summary(glm(undulation_rate ~ 1))
+log_lik <- function(x, Y){
+  probs <- normal(Y, mu = x[1], sigma = x[2])
+  return(sum(log(probs)))
+}
 ```
 
+---
+
+# Maximum likelihood as an optimization problem
+
+```{r ML_optim, cache = TRUE}
+optim(c(0.1, 0.1),
+      log_lik,
+      Y = undulation_rate,
+      control = list(fnscale = -1,
+                     reltol = 10^-100))
+```
+
+---
+
+# Maximum likelihood as an optimization problem
+
+```{r ML_glm}
+fm <- glm(undulation_rate ~ 1)
+coef(fm)
+logLik(fm)
+```
 
 ---
 
 # Bayesian inference of mean
+
+Ranges of possible maximum likelihood values:
+
+1. $\mu$: $-\infty < \mu < \infty$
+2. $\sigma$: $0 < \sigma < \infty$
+
+Drawbacks:
+
+1. $\mu$ can't be negative (no negative undulation rates) and probably isn't a large number
+2. $\sigma$ is also probably not huge either
+
+Can we do better? Yes, Bayesian priors.
+
+---
+
+# Prior for the mean
+
+```{r, ref.label="undulation_plot", echo=FALSE, message=FALSE}
+
+```
+
+---
+
+# Prior for the mean
+
+Cauchy distribution (location = 0, scale = 2)
+
+```{r echo=FALSE, fig.height=3.5}
+data_frame(
+  x = seq(0, 10, length = 100),
+  y = dcauchy(x, scale = 2)) %>% 
+  ggplot(aes(x, y)) + geom_line()
+```
+
+---
+
+# Bayesian model
+
+```{r undulation_bayes, cache = TRUE}
+fm_priors <- map2stan(
+  alist(
+    undulation_rate ~ dnorm(mu, sigma),
+    mu ~ dcauchy(0, 2),
+    sigma ~ dcauchy(0, 5)),
+  data = data.frame(undulation_rate),
+  WAIC = FALSE,
+  iter = 10^4,
+  constraints = list(mu = "lower=0")
+)
+```
+
+Using the `map2stan()` from the rethinking package (https://github.com/rmcelreath/rethinking).
+
+---
+
+# Inspecting the samples
+
+```{r echo=FALSE}
+plot(fm_priors)
+```
+
+---
+
+# Summarizing the results
+
+```{r, echo=FALSE}
+post <- extract.samples(fm_priors) %>% as_data_frame()
+post %>% gather(key, value) %>% 
+  ggplot(aes(value)) +
+  geom_density() +
+  facet_grid(. ~ key)
+```
+
+---
+
+# Summarizing the results
+
+```{r}
+precis(fm_priors, digits = 5)
+```
 
 ---
 
