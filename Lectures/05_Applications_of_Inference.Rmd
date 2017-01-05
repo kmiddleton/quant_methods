@@ -12,7 +12,7 @@ output:
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(rethinking)
+library(rstan)
 library(cowplot)
 library(RcppEigen)
 library(plot3D)
@@ -405,27 +405,43 @@ data_frame(
 
 # Bayesian model
 
-```{r undulation_bayes, cache = TRUE}
-fm_priors <- map2stan(
-  alist(
-    undulation_rate ~ dnorm(mu, sigma),
-    mu ~ dcauchy(0, 2),
-    sigma ~ dcauchy(0, 5)),
-  data = data.frame(undulation_rate),
-  WAIC = FALSE,
-  iter = 10^5, warmup = 10^3,
-  constraints = list(mu = "lower=0")
-)
+```{r}
+model <- "
+data{
+    int<lower=1> N;
+    real undulation_rate[N];
+}
+parameters{
+    real<lower=0> mu;
+    real<lower=0> sigma;
+}
+model{
+    sigma ~ cauchy(0, 5);
+    mu ~ cauchy(0, 2);
+    undulation_rate ~ normal(mu, sigma);
+}
+"
 ```
 
-Using the `map2stan()` from the rethinking package (https://github.com/rmcelreath/rethinking).
+---
+
+# Sample the Bayesian model
+
+```{r stan_fit, cache=TRUE}
+fm_priors <- stan(
+  model_code = model,
+  data = list(undulation_rate = undulation_rate,
+              N = length(undulation_rate)),
+  iter = 10^4,
+  warmup = 10^3)
+```
 
 ---
 
 # Inspecting the samples
 
 ```{r echo=FALSE}
-plot(fm_priors)
+traceplot(fm_priors)
 ```
 
 ---
@@ -433,11 +449,13 @@ plot(fm_priors)
 # Summarizing the results
 
 ```{r, echo=FALSE}
-post <- extract.samples(fm_priors) %>% as_data_frame()
+post <- extract(fm_priors) %>% as_data_frame()
 post %>% gather(key, value) %>% 
+  filter(key != "lp__") %>% 
   ggplot(aes(value)) +
-  geom_density() +
-  facet_grid(. ~ key)
+  geom_line(stat = "density") +
+  facet_grid(. ~ key) +
+  labs(x = "Value", y = "Density")
 ```
 
 ---
@@ -445,10 +463,10 @@ post %>% gather(key, value) %>%
 # Summarizing the results
 
 ```{r}
-precis(fm_priors, digits = 5)
+print(fm_priors, digits = 5)
 ```
 
-We get a lower mean than the analytical or ML estimate (`r round(mean(undulation_rate), 3)`) because of the prior placing more probability on certain values.
+We get a lower mean than the analytical or ML estimate (`r round(mean(undulation_rate), 3)`) because the prior places more probability on lower values.
 
 ---
 

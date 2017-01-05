@@ -505,66 +505,148 @@ Cauchy distribution (location = 0, scale = 2)
 
 
 ```r
-fm_priors &lt;- map2stan(
-  alist(
-    undulation_rate ~ dnorm(mu, sigma),
-    mu ~ dcauchy(0, 2),
-    sigma ~ dcauchy(0, 5)),
-  data = data.frame(undulation_rate),
-  WAIC = FALSE,
-  iter = 10^5, warmup = 10^3,
-  constraints = list(mu = "lower=0")
-)
+model &lt;- "
+data{
+    int&lt;lower=1&gt; N;
+    real undulation_rate[N];
+}
+parameters{
+    real&lt;lower=0&gt; mu;
+    real&lt;lower=0&gt; sigma;
+}
+model{
+    sigma ~ cauchy(0, 5);
+    mu ~ cauchy(0, 2);
+    undulation_rate ~ normal(mu, sigma);
+}
+"
+```
+
+---
+
+# Sample the Bayesian model
+
+
+```r
+fm_priors &lt;- stan(
+  model_code = model,
+  data = list(undulation_rate = undulation_rate,
+              N = length(undulation_rate)),
+  iter = 10^4,
+  warmup = 10^3)
 ```
 
 ```
 ## 
-## SAMPLING FOR MODEL 'undulation_rate ~ dnorm(mu, sigma)' NOW (CHAIN 1).
+## SAMPLING FOR MODEL '96611e348692d6bffd8be0a075bf81f4' NOW (CHAIN 1).
 ## 
-## Chain 1, Iteration:     1 / 100000 [  0%]  (Warmup)
-## Chain 1, Iteration:  1001 / 100000 [  1%]  (Sampling)
-## Chain 1, Iteration: 11000 / 100000 [ 11%]  (Sampling)
-## Chain 1, Iteration: 21000 / 100000 [ 21%]  (Sampling)
-## Chain 1, Iteration: 31000 / 100000 [ 31%]  (Sampling)
-## Chain 1, Iteration: 41000 / 100000 [ 41%]  (Sampling)
-## Chain 1, Iteration: 51000 / 100000 [ 51%]  (Sampling)
-## Chain 1, Iteration: 61000 / 100000 [ 61%]  (Sampling)
-## Chain 1, Iteration: 71000 / 100000 [ 71%]  (Sampling)
-## Chain 1, Iteration: 81000 / 100000 [ 81%]  (Sampling)
-## Chain 1, Iteration: 91000 / 100000 [ 91%]  (Sampling)
-## Chain 1, Iteration: 100000 / 100000 [100%]  (Sampling)
-##  Elapsed Time: 0.072522 seconds (Warm-up)
-##                6.50908 seconds (Sampling)
-##                6.5816 seconds (Total)
-## 
-## 
-## SAMPLING FOR MODEL 'undulation_rate ~ dnorm(mu, sigma)' NOW (CHAIN 1).
-## WARNING: No variance estimation is
-##          performed for num_warmup &lt; 20
+## Chain 1, Iteration:    1 / 10000 [  0%]  (Warmup)
+## Chain 1, Iteration: 1000 / 10000 [ 10%]  (Warmup)
+## Chain 1, Iteration: 1001 / 10000 [ 10%]  (Sampling)
+## Chain 1, Iteration: 2000 / 10000 [ 20%]  (Sampling)
+## Chain 1, Iteration: 3000 / 10000 [ 30%]  (Sampling)
+## Chain 1, Iteration: 4000 / 10000 [ 40%]  (Sampling)
+## Chain 1, Iteration: 5000 / 10000 [ 50%]  (Sampling)
+## Chain 1, Iteration: 6000 / 10000 [ 60%]  (Sampling)
+## Chain 1, Iteration: 7000 / 10000 [ 70%]  (Sampling)
+## Chain 1, Iteration: 8000 / 10000 [ 80%]  (Sampling)
+## Chain 1, Iteration: 9000 / 10000 [ 90%]  (Sampling)
+## Chain 1, Iteration: 10000 / 10000 [100%]  (Sampling)
+##  Elapsed Time: 0.123801 seconds (Warm-up)
+##                0.882048 seconds (Sampling)
+##                1.00585 seconds (Total)
 ## 
 ## 
-## Chain 1, Iteration: 1 / 1 [100%]  (Sampling)
-##  Elapsed Time: 8e-06 seconds (Warm-up)
-##                7.6e-05 seconds (Sampling)
-##                8.4e-05 seconds (Total)
+## SAMPLING FOR MODEL '96611e348692d6bffd8be0a075bf81f4' NOW (CHAIN 2).
+## 
+## Chain 2, Iteration:    1 / 10000 [  0%]  (Warmup)
+## Chain 2, Iteration: 1000 / 10000 [ 10%]  (Warmup)
+## Chain 2, Iteration: 1001 / 10000 [ 10%]  (Sampling)
+## Chain 2, Iteration: 2000 / 10000 [ 20%]  (Sampling)
+## Chain 2, Iteration: 3000 / 10000 [ 30%]  (Sampling)
+## Chain 2, Iteration: 4000 / 10000 [ 40%]  (Sampling)
+## Chain 2, Iteration: 5000 / 10000 [ 50%]  (Sampling)
+## Chain 2, Iteration: 6000 / 10000 [ 60%]  (Sampling)
+## Chain 2, Iteration: 7000 / 10000 [ 70%]  (Sampling)
+## Chain 2, Iteration: 8000 / 10000 [ 80%]  (Sampling)
+## Chain 2, Iteration: 9000 / 10000 [ 90%]  (Sampling)
+## Chain 2, Iteration: 10000 / 10000 [100%]  (Sampling)
+##  Elapsed Time: 0.105338 seconds (Warm-up)
+##                0.799729 seconds (Sampling)
+##                0.905067 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL '96611e348692d6bffd8be0a075bf81f4' NOW (CHAIN 3).
+## 
+## Chain 3, Iteration:    1 / 10000 [  0%]  (Warmup)
+## Chain 3, Iteration: 1000 / 10000 [ 10%]  (Warmup)
+## Chain 3, Iteration: 1001 / 10000 [ 10%]  (Sampling)
+## Chain 3, Iteration: 2000 / 10000 [ 20%]  (Sampling)
+## Chain 3, Iteration: 3000 / 10000 [ 30%]  (Sampling)
+## Chain 3, Iteration: 4000 / 10000 [ 40%]  (Sampling)
+## Chain 3, Iteration: 5000 / 10000 [ 50%]  (Sampling)
+## Chain 3, Iteration: 6000 / 10000 [ 60%]  (Sampling)
+## Chain 3, Iteration: 7000 / 10000 [ 70%]  (Sampling)
+## Chain 3, Iteration: 8000 / 10000 [ 80%]  (Sampling)
+## Chain 3, Iteration: 9000 / 10000 [ 90%]  (Sampling)
+## Chain 3, Iteration: 10000 / 10000 [100%]  (Sampling)
+##  Elapsed Time: 0.104686 seconds (Warm-up)
+##                0.986591 seconds (Sampling)
+##                1.09128 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL '96611e348692d6bffd8be0a075bf81f4' NOW (CHAIN 4).
+## 
+## Chain 4, Iteration:    1 / 10000 [  0%]  (Warmup)
+## Chain 4, Iteration: 1000 / 10000 [ 10%]  (Warmup)
+## Chain 4, Iteration: 1001 / 10000 [ 10%]  (Sampling)
+## Chain 4, Iteration: 2000 / 10000 [ 20%]  (Sampling)
+## Chain 4, Iteration: 3000 / 10000 [ 30%]  (Sampling)
+## Chain 4, Iteration: 4000 / 10000 [ 40%]  (Sampling)
+## Chain 4, Iteration: 5000 / 10000 [ 50%]  (Sampling)
+## Chain 4, Iteration: 6000 / 10000 [ 60%]  (Sampling)
+## Chain 4, Iteration: 7000 / 10000 [ 70%]  (Sampling)
+## Chain 4, Iteration: 8000 / 10000 [ 80%]  (Sampling)
+## Chain 4, Iteration: 9000 / 10000 [ 90%]  (Sampling)
+## Chain 4, Iteration: 10000 / 10000 [100%]  (Sampling)
+##  Elapsed Time: 0.114366 seconds (Warm-up)
+##                0.826966 seconds (Sampling)
+##                0.941332 seconds (Total)
 ```
 
 ```
-## Warning in map2stan(alist(undulation_rate ~ dnorm(mu, sigma), mu ~ dcauchy(0, : There were 12 divergent iterations during sampling.
-## Check the chains (trace plots, n_eff, Rhat) carefully to ensure they are valid.
+## The following numerical problems occured the indicated number of times on chain 4
 ```
 
-Using the `map2stan()` from the rethinking package (https://github.com/rmcelreath/rethinking).
+```
+##                                                                                         count
+## Exception thrown at line 13: normal_log: Location parameter is inf, but must be finite!     1
+```
+
+```
+## When a numerical problem occurs, the Hamiltonian proposal gets rejected.
+```
+
+```
+## See http://mc-stan.org/misc/warnings.html#exception-hamiltonian-proposal-rejected
+```
+
+```
+## If the number in the 'count' column is small, do not ask about this message on stan-users.
+```
+
+```
+## Warning: There were 5 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+```
+
+```
+## Warning: Examine the pairs() plot to diagnose sampling problems
+```
 
 ---
 
 # Inspecting the samples
-
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-20-1.png" width="672" /&gt;
-
----
-
-# Summarizing the results
 
 &lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-21-1.png" width="672" /&gt;
 
@@ -572,21 +654,38 @@ Using the `map2stan()` from the rethinking package (https://github.com/rmcelreat
 
 # Summarizing the results
 
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-22-1.png" width="672" /&gt;
+
+---
+
+# Summarizing the results
+
 
 ```r
-precis(fm_priors, digits = 5)
+print(fm_priors, digits = 5)
 ```
 
 ```
-## Warning in precis(fm_priors, digits = 5): There were 12 divergent iterations during sampling.
-## Check the chains (trace plots, n_eff, Rhat) carefully to ensure they are valid.
+## Inference for Stan model: 96611e348692d6bffd8be0a075bf81f4.
+## 4 chains, each with iter=10000; warmup=1000; thin=1; 
+## post-warmup draws per chain=9000, total post-warmup draws=36000.
+## 
+##          mean se_mean      sd     2.5%     25%     50%     75%   97.5%
+## mu    1.36489 0.00121 0.15067  1.05173 1.27847 1.36804 1.45287 1.66141
+## sigma 0.40226 0.00123 0.14612  0.22424 0.30543 0.37011 0.46023 0.77199
+## lp__  3.14266 0.01147 1.17758 -0.02549 2.68372 3.50925 3.97805 4.28772
+##       n_eff    Rhat
+## mu    15573 1.00007
+## sigma 14134 1.00029
+## lp__  10537 1.00040
+## 
+## Samples were drawn using NUTS(diag_e) at Wed Jan  4 21:39:58 2017.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).
 ```
 
-```
-##          Mean  StdDev lower 0.89 upper 0.89 n_eff    Rhat
-## mu    1.36376 0.15028    1.13589    1.59640 44038 0.99999
-## sigma 0.40131 0.14313    0.21600    0.58201 35576 1.00004
-```
+We get a lower mean than the analytical or ML estimate (1.375) because the prior places more probability on lower values.
 
 ---
 
@@ -641,7 +740,7 @@ M %&gt;% head()
 
 # Generate data
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-23-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-24-1.png" width="672" /&gt;
 
 ---
 
@@ -802,14 +901,14 @@ Sys.time() - t1
 ```
 
 ```
-## Time difference of 36.44112 secs
+## Time difference of 7.673069 secs
 ```
 
 ```r
 ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) + geom_path()
 ```
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-28-1.png" width="672" /&gt;
+&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-29-1.png" width="672" /&gt;
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
