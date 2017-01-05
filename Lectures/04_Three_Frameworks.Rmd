@@ -20,6 +20,8 @@ library(cowplot)
 
 Gelman Bayesian intro: http://andrewgelman.com/2016/12/13/bayesian-statistics-whats/
 
+Casella: http://www.stat.ufl.edu/archived/casella/Talks/BayesRefresher.pdf
+
 ---
 
 # Readings
