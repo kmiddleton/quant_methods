@@ -119,24 +119,24 @@ You will be required to choose a recent publication that includes a substantial 
 
 Note that this is a general outline. The schedule of topics is subject to change.
 
-_#_   | _Date_    | _Topic_                          |
-------|-----------|----------------------------------|
-00    | F 1/13    | Pre-workshop. Installing R, etc. |
-01    | F 1/20    | Reproducible research, programming with data |
-02    | F 1/27    | Data cleaning, organization, visualization |
-03    | F 2/03    | Basic probability |
-04    | F 2/10    | Likelihood, Bayesian concepts, frequentist framework |
-05    | F 2/17    | Applications of three inference frameworks |
-06    | F 2/24    | Parameter estimation, significance testing |
-07    | F 3/03    | Randomization, multiple testing |
-08    | F 3/10    | Generalized linear models |
-09    | F 3/17    | Generalized linear models |
-10    | F 3/24    | Model comparison, model based inference |
-11    | F 4/07    | Kinship and phylogenetic methods |
-12    | F 4/14    | Multiple comparisons procedures |
-13    | F 4/21    | Composite variables |
-14    | F 4/28    | Composite variables |
-15    | F 5/05    | Experimental design |
+_#_  | _Date_  | _Topic_                          |
+-----|---------|----------------------------------|
+00   | F 1/13  | Pre-workshop. Installing R, etc. |
+01   | F 1/20  | Reproducible research, programming with data |
+02   | F 1/27  | Data cleaning, organization, visualization |
+03   | F 2/03  | Basic probability |
+04   | F 2/10  | Likelihood, Bayesian concepts, frequentist framework |
+05   | F 2/17  | Applications of three inference frameworks |
+06   | F 2/24  | Parameter estimation, significance testing |
+07   | F 3/03  | Randomization, multiple testing |
+08   | F 3/10  | Generalized linear models |
+09   | F 3/17  | Generalized linear models |
+10   | F 3/24  | Model comparison, model based inference |
+11   | F 4/07  | Kinship and phylogenetic methods |
+12   | F 4/14  | Multiple comparisons procedures |
+13   | F 4/21  | Composite variables |
+14   | F 4/28  | Composite variables |
+15   | F 5/05  | Experimental design |
 
 Other key dates:
 
