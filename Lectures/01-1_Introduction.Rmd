@@ -1,32 +1,23 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Special Topics: Multivariate Statistics</title>
-    <meta charset="utf-8">
-    <meta name="author" content="Elizabeth King and Kevin Middleton" />
-    <link href="libs/remark-css-0.0.1/example.css" rel="stylesheet" />
-  </head>
-  <body>
-    <textarea id="source">
-class: center, middle
-
-# Special Topics: Multivariate Statistics
-## Introduction
-### Elizabeth King and Kevin Middleton
-### Last updated: 2016-12-02
-
+---
+title: "Introduction"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    seal: yes
+    nature:
+      highlightStyle: github
 ---
 
-
-
+```{r setup, echo=FALSE}
+```
 
 background-image: url(./images/Energy_Neocortex.png)
 
 ---
 
 # Notes
-
-YouTube: https://youtu.be/0zXsgRDkqQM
 
 ---
 
@@ -106,7 +97,7 @@ YouTube: https://youtu.be/0zXsgRDkqQM
 
 # Safe statistics
 
-&gt; "[Statisticians] are at grave risk of becoming irrelevant, not because we are useless, but because we have focussed too much on doing the right thing, rather than doing something that works. As a field, statistics tends to lean towards abstinence based outreach: you should only do statistics if you're in a committed long-term relationship with a professional statistician. If you experiment on your own (or with friends), you will hurt yourself and others. Abstinence based approaches don't work because people will take the risk anyway, and most of the time they will safely enjoy themselves. ... Rather than stigmatizing amateur statistics, we should be doing
+> "[Statisticians] are at grave risk of becoming irrelevant, not because we are useless, but because we have focussed too much on doing the right thing, rather than doing something that works. As a field, statistics tends to lean towards abstinence based outreach: you should only do statistics if you're in a committed long-term relationship with a professional statistician. If you experiment on your own (or with friends), you will hurt yourself and others. Abstinence based approaches don't work because people will take the risk anyway, and most of the time they will safely enjoy themselves. ... Rather than stigmatizing amateur statistics, we should be doing
 out best to provide tools to make it safer." - *Wickham (2015)*
 
 ---
@@ -160,7 +151,6 @@ _Advanced_:
 - Publication quality plotting
 - Encourages good data analysis practices
     - No point and click
-- I know it best
 
 ---
 
@@ -175,8 +165,9 @@ _Advanced_:
 
 - You probably won't have careers as biostatisticians (SAS, Stata)
 - Won't tie to you some non-free software (SAS, SPSS, Systat, Stata, NCSS/PASS, MATLAB)
-- Huge data (&gt;`\(10^6\)` observations) is rarely an issue (SAS, Stata, python, julia)
+- Huge data (>$10^6$ observations) is rarely an issue (SAS, Stata, python, julia)
 - Speed is rarely an issue for us (fortran, julia, MATLAB, python)
+- Python (NumPy/SciPy/pandas/statsmodel) is less mature as a general statistical programming language
 
 ---
 
@@ -184,7 +175,7 @@ _Advanced_:
 
 - Unforgiving
 - Opaque
-- Inscrutable errors
+- Often inscrutable errors
 
 ---
 
@@ -197,7 +188,7 @@ _Advanced_:
 # Why no Powerpoint slides?
 
 - Inefficient to make slides
-- No mechanism to seamlessly include R output &amp; graphics
+- No mechanism to seamlessly include R output & graphics
 - Ugly equations
 - Hard to keep track of changes
 - Let something else handle formatting (R Markdown)
@@ -206,7 +197,7 @@ _Advanced_:
 
 ---
 
-# R `\(\neq\)` RStudio
+# R $\neq$ RStudio
 
 - RStudio is an interface to R
 - R can be run without RStudio.
@@ -216,13 +207,13 @@ _Advanced_:
 
 ---
 
-# R Markdown {.smaller}
+# R Markdown
 
 - Text-based markup language (i.e., HTML)
 - Variant of markdown (https://daringfireball.net/projects/markdown/)
 - Render to different formats (PDF, HTML, docx)
 - Inline R code
-    - Your text and analysis live together in one file
+    - Your text and analysis coexist together in one file
 - Resources
     - http://rmarkdown.rstudio.com/
     - R Markdown Reference Guide: https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
@@ -241,40 +232,3 @@ _Advanced_:
 - Know what your own statistical test should do
     - Make the math work with an example you trust
     - Then apply to your own data
-
----
-
-# Grading
-
----
-
-# Getting R set up &amp; working with RStudio
-
-- http://www.r-project.org
-- http://www.rstudio.com/
-    </textarea>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
-<script>var slideshow = remark.create({
-"highlightStyle": "github"
-});</script>
-
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  tex2jax: {
-    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-  }
-});
-</script>
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-(function () {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src  = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
-    script.src  = script.src.replace(/^https?:/, '');
-  document.getElementsByTagName('head')[0].appendChild(script);
-})();
-</script>
-  </body>
-</html>
