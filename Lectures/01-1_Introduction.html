@@ -1,19 +1,24 @@
----
-title: "Introduction"
-subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
-output:
-  xaringan::moon_reader:
-    seal: yes
-    nature:
-      highlightStyle: github
-csl: evolution.csl
-bibliography: Multivariate.bib
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Elizabeth King and Kevin Middleton" />
+    <link href="01-1_Introduction_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse
+
+# Introduction
+## Quantitative Methods in Life Sciences
+### Elizabeth King and Kevin Middleton
+### Last updated: 2017-01-08
+
 ---
 
-```{r setup, echo=FALSE}
-```
+
+
 
 background-image: url(./images/Energy_Neocortex.png)
 
@@ -99,7 +104,7 @@ background-image: url(./images/Energy_Neocortex.png)
 
 # Safe statistics
 
-> "[Statisticians] are at grave risk of becoming irrelevant, not because we are useless, but because we have focussed too much on doing the right thing, rather than doing something that works. As a field, statistics tends to lean towards abstinence based outreach: you should only do statistics if you're in a committed long-term relationship with a professional statistician. If you experiment on your own (or with friends), you will hurt yourself and others. Abstinence based approaches don't work because people will take the risk anyway, and most of the time they will safely enjoy themselves. ... Rather than stigmatizing amateur statistics, we should be doing
+&gt; "[Statisticians] are at grave risk of becoming irrelevant, not because we are useless, but because we have focussed too much on doing the right thing, rather than doing something that works. As a field, statistics tends to lean towards abstinence based outreach: you should only do statistics if you're in a committed long-term relationship with a professional statistician. If you experiment on your own (or with friends), you will hurt yourself and others. Abstinence based approaches don't work because people will take the risk anyway, and most of the time they will safely enjoy themselves. ... Rather than stigmatizing amateur statistics, we should be doing
 out best to provide tools to make it safer." - *Wickham (2015)*
 
 ---
@@ -167,7 +172,7 @@ _Advanced_:
 
 - You probably won't have careers as biostatisticians (SAS, Stata)
 - Won't tie to you some non-free software (SAS, SPSS, Systat, Stata, NCSS/PASS, MATLAB)
-- Huge data (>$10^6$ observations) is rarely an issue (SAS, Stata, python, julia)
+- Huge data (&gt;`\(10^6\)` observations) is rarely an issue (SAS, Stata, python, julia)
 - Speed is rarely an issue for us (fortran, julia, MATLAB, python)
 - Python (NumPy/SciPy/pandas/statsmodel) is less mature as a general statistical programming language
 
@@ -190,7 +195,7 @@ _Advanced_:
 # Why no Powerpoint slides?
 
 - Inefficient to make slides
-- No mechanism to seamlessly include R output & graphics
+- No mechanism to seamlessly include R output &amp; graphics
 - Ugly equations
 - Hard to keep track of changes
 - Let something else handle formatting (R Markdown)
@@ -199,7 +204,7 @@ _Advanced_:
 
 ---
 
-# R $\neq$ RStudio
+# R `\(\neq\)` RStudio
 
 - RStudio is an interface to R
 - R can be run without RStudio.
@@ -234,3 +239,30 @@ _Advanced_:
 - Know what your own statistical test should do
     - Make the math work with an example you trust
     - Then apply to your own data
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github"
+});
+if (window.HTMLWidgets) slideshow.on('showSlide', function (slide) {setTimeout(function() {window.dispatchEvent(new Event('resize'));}, 100)});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
