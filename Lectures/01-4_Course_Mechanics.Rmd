@@ -15,11 +15,33 @@ output:
 
 ---
 
-# Notes
+# General course information
 
 ---
 
-# Readings
+# What you need
+
+- Laptop
+- Enthusiasm
 
 ---
 
+# Book, etc.
+
+- There is no one-size-fits-all statistics textbook. Any that we chose would be a compromise.
+- No official textbook. Many recommendations on Canvas if you are looking for a book.
+
+---
+
+# Online lectures
+
+- Available Mondays (or sooner)
+- Watch, rewatch, take notes, look up things you don't understand, etc.
+
+---
+
+# Quiz questions
+
+- In between some of the lectures
+    - e.g., Watch a lecture, answer some questions
+- Not graded, but you do need to complete them.
