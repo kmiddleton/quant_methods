@@ -10,7 +10,13 @@ knitr::opts_chunk$set(echo = TRUE)
 library(cowplot)
 ```
 
-See: https://twitter.com/CoolDatasets
+See:
+
+- https://twitter.com/CoolDatasets
+- https://github.com/caesar0301/awesome-public-datasets
+- http://notawfulandboring.blogspot.com/2016/12/kevin-mcintyres-open-stats-lab.html
+- https://coast.noaa.gov/dataregistry/search/collection
+- https://www.nodc.noaa.gov/cgi-bin/OAS/prd/accession/download/115356
 
 ## `Lahman`: Sean Lahman's Baseball Database
 
