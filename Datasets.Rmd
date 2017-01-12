@@ -1,0 +1,142 @@
+---
+title: "Datasets"
+author: "Kevin Middleton"
+date: "1/12/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(cowplot)
+```
+
+See: https://twitter.com/CoolDatasets
+
+## `Lahman`: Sean Lahman's Baseball Database
+
+- See: http://varianceexplained.org/r/simulation-bayes-baseball/
+- Height, weight, batting, pitching for 18000+ baseball players.
+
+```{r}
+library(tidyverse)
+library(Lahman)
+career <- Batting %>%
+  filter(AB > 0) %>%
+  anti_join(Pitching, by = "playerID") %>%
+  group_by(playerID) %>%
+  summarize(H = sum(H), AB = sum(AB)) %>%
+  mutate(average = H / AB)
+
+career <- Master %>%
+  tbl_df() %>%
+  select(playerID, nameFirst, nameLast) %>%
+  unite(name, nameFirst, nameLast, sep = " ") %>%
+  inner_join(career, by = "playerID") %>%
+  select(-playerID)
+career
+```
+
+```{r}
+Batting %>%
+  filter(AB > 500) %>%
+  anti_join(Pitching, by = "playerID") %>%
+  group_by(playerID, yearID) %>%
+  summarize(H = sum(H), AB = sum(AB)) %>%
+  mutate(average = H / AB) %>%
+  ungroup() %>% 
+  select(yearID, average) %>% 
+  group_by(yearID) %>% 
+  summarize(max_avg = max(average)) %>% 
+  ggplot(aes(yearID, max_avg)) +
+  geom_line() +
+  labs(y = "Highest Batting Average")
+```
+
+## STDs nationally ranked by state by year
+
+- 2000-2015
+
+```{r}
+library(tidyverse)
+STD <- read_csv("data/STDs_Nationally_Ranked_By_State.csv")
+glimpse(STD)
+```
+
+```{r}
+STD %>% ggplot(aes(x = Year, y = Chlamydia_Rate, color = State)) +
+  geom_line() +
+  labs(y = "Rate of Chlamydia")
+```
+
+## Birth rates
+
+- https://www.datazar.com/project/p8801c779-35d2-4d2b-add2-087e11a67298
+- By year and age group, 1940-2013
+
+```{r}
+library(tidyverse)
+Births <- read_csv("data/birth_rates.csv")
+Births %>% 
+  ggplot(aes(Year, Birth_Rate, color = Age_Group)) +
+  geom_line() +
+  labs(y = "Birth Rate")
+```
+
+## Probability of death
+
+- Males, 1900 to present
+
+```{r}
+P_death <- read_csv("data/Death_Probability_of_Males_Since_1900.csv")
+
+P_death %>% 
+  filter(Year == 1900) %>% 
+  gather(key, value, -Year) %>% 
+  mutate(key = as.numeric(key)) %>% 
+  ggplot(aes(y = value, x = key)) +
+  geom_bar(stat = "identity") +
+  labs(y = "Probability of death", x = "Age")
+
+P_death %>% 
+  select(Year, `0`) %>% 
+  ggplot(aes(Year, `0`)) + 
+  geom_line() +
+  labs(y = "Probability of death before age 1")
+```
+
+## NASA fireball and bolide incidents
+
+```{r}
+library(tidyverse)
+library(stringr)
+library(ggmap)
+
+fireball <- read_csv("data/NASA_Fireball_And_Bolide_Reports.csv")
+head(fireball)
+
+sanitize_latitude <- function(x) {
+  NS <- str_sub(x, start = -1)
+  lat <- as.numeric(str_replace(x, "[NS]", ""))
+  lat <- if_else(NS == "S", -lat, lat)
+  return(lat)
+}
+
+sanitize_longitude <- function(x) {
+  EW <- str_sub(x, start = -1)
+  long <- as.numeric(str_replace(x, "[EW]", ""))
+  long <- if_else(EW == "W", -long, long)
+  return(long)
+}
+
+fireball <- fireball %>% 
+  mutate(lat = sanitize_latitude(`Latitude (Deg)`),
+         long = sanitize_longitude(`Longitude (Deg)`))
+
+map <- get_map(location = c(0, 0), zoom = 1)
+
+ggmap(map) + 
+  geom_point(data = fireball,
+             aes(long, lat, size = `Total Radiated Energy (J)`)) +
+  labs(x = "Longitude", y = "Latitude")
+```
+
