@@ -146,3 +146,63 @@ ggmap(map) +
   labs(x = "Longitude", y = "Latitude")
 ```
 
+## Global landslide catalog export
+
+```{r}
+library(tidyverse)
+library(ggmap)
+landslide <- read_csv("data/Global_Landslide_Catalog_Export.csv") %>% 
+  select(latitude, longitude, country)
+glimpse(landslide)
+```
+
+```{r}
+map <- get_map(location = c(-84, 10), zoom = 3)
+
+ggmap(map) + 
+  geom_point(data = landslide,
+             aes(y = latitude, x = longitude)) +
+  labs(x = "Longitude", y = "Latitude")
+```
+
+## Los Angeles water use
+
+```{r}
+library(tidyverse)
+library(stringr)
+LA <- read_csv("data/Los_Angeles_Water_Use_Average_By_Zipcode.csv") %>%
+  mutate(zip_code = str_split(`Location 1`, "\n", simplify = TRUE)[, 1],
+         lat_lon = str_split(`Location 1`, "\n", simplify = TRUE)[, 2])
+LA %>% 
+  select(-lat_lon, -`Location 1`) %>% 
+  gather(key, value, -zip_code) %>% 
+  ggplot(aes(x = key, y = value, group = zip_code, color = zip_code)) +
+  geom_line() +
+  theme(legend.position = "none")
+```
+
+## Meteorite landings
+
+```{r}
+meteor <- read_csv("data/Meteorite_Landings.csv") %>% 
+  select(reclat, reclong, `mass (g)`) %>% 
+  drop_na()
+
+map <- get_map(location = c(0, 0), zoom = 1)
+
+ggmap(map) +
+  ggplot(data = meteor, aes(y = reclat, x = reclong)) +
+  geom_point()
+
+```
+
+## Near Earth comets
+
+## NYC SAT
+
+## Titanic passengers
+
+## USDA Plants
+
+## Fuel Economy
+
