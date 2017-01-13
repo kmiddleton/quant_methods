@@ -196,13 +196,45 @@ ggmap(map) +
 
 ```
 
-## Near Earth comets
-
 ## NYC SAT
 
-## Titanic passengers
+```{r}
+library(tidyverse)
+SAT <- read_csv("data/New_York_City_SAT_Results.csv",
+                na = "s") %>% 
+  drop_na()
 
-## USDA Plants
+SAT %>% 
+  ggplot(aes(`SAT Critical Reading Avg. Score`,
+             `SAT Writing Avg. Score`)) +
+  geom_point()
+
+SAT %>% 
+  ggplot(aes(`Num of SAT Test Takers`,
+             `SAT Writing Avg. Score`)) +
+  geom_point()
+
+SAT %>% 
+  ggplot(aes(`Num of SAT Test Takers`,
+             `SAT Math Avg. Score`)) +
+  geom_point()
+
+SAT %>% 
+  select(-DBN, -`SCHOOL NAME`) %>% 
+  gather(key, value, -`Num of SAT Test Takers`) %>% 
+  ggplot(aes(`Num of SAT Test Takers`, value, color = key)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", se = FALSE)
+```
+
+```{r}
+with(SAT, cor.test(`SAT Critical Reading Avg. Score`,
+                   `SAT Writing Avg. Score`))
+with(SAT, cor.test(`SAT Critical Reading Avg. Score`,
+                   `SAT Math Avg. Score`))
+```
+
+## Titanic passengers
 
 ## Fuel Economy
 
