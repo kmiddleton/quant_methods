@@ -1,0 +1,23 @@
+---
+title: "Hypothesis Testing"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    seal: yes
+    nature:
+      highlightStyle: github
+---
+
+```{r setup, echo=FALSE}
+```
+
+---
+
+# Notes
+
+---
+
+# Readings
+

@@ -8,8 +8,6 @@ output:
     seal: yes
     nature:
       highlightStyle: github
-csl: evolution.csl
-bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE}
