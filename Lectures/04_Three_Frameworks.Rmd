@@ -1,5 +1,5 @@
 ---
-title: "Three Frameworks"
+title: "Likelihood, Bayesian concepts, frequentist framework"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -28,9 +28,16 @@ Casella: http://www.stat.ufl.edu/archived/casella/Talks/BayesRefresher.pdf
 
 ---
 
-# Three Frameworks
+# From probability to likelihood
+
+---
+
+# Three frameworks for hypothesis testing
 
 1. Frequentist
-2. Maximum likelihood
-3. Bayesian
+2. Bayesian
+3. Maximum likelihood (effectvely a very narrow form of Bayesian)
 
+---
+
+# Two frameworks for hypothesis testing
