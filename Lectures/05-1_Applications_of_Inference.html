@@ -4,7 +4,7 @@
     <title>Applications of Inference Frameworks</title>
     <meta charset="utf-8">
     <meta name="author" content="Elizabeth King and Kevin Middleton" />
-    <link href="05_Applications_of_Inference_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link href="05-1_Applications_of_Inference_files/remark-css-0.0.1/example.css" rel="stylesheet" />
   </head>
   <body>
     <textarea id="source">
@@ -13,7 +13,7 @@ class: center, middle, inverse
 # Applications of Inference Frameworks
 ## Quantitative Methods in Life Sciences
 ### Elizabeth King and Kevin Middleton
-### Last updated: 2017-01-04
+### Last updated: 2017-01-13
 
 ---
 
@@ -28,9 +28,9 @@ class: center, middle, inverse
 
 ---
 
-# Three frameworks
+# Three frameworks for inference
 
-1. Frequentist
+1. Analytical
 2. Maximum likelihood
 3. Bayesian
 
@@ -58,19 +58,21 @@ ggplot(data_frame(undulation_rate), aes(undulation_rate)) +
   labs(x = "Undulation Rate (Hz)", y = "Count")
 ```
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/undulation_plot-1.png" width="672" /&gt;
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/undulation_plot-1.png" width="672" /&gt;
 
 ---
 
-# Frequentist inference of mean
+# Analytical inference of mean
 
-Arthimetic mean:
+Arithmetic mean:
 
 `$$\hat{Y} = \frac{\sum_{i=1}^{n}Y_i}{n}$$`
 
+`$$mean~undulation~rate = \frac{\sum_{i=1}^{n}undulation~rate_i}{n}$$`
+
 ---
 
-# Frequentist inference of mean
+# Analytical inference of mean
 
 
 ```r
@@ -85,7 +87,7 @@ sum(undulation_rate) / length(undulation_rate)
 
 # Maximum likelihood inference of mean
 
-Define a function to calculate the probability of an observed value `\(Y_i\)` given the mean (`\(\mu\)`) and standard deviation (`\(\sigma\)`). Default to the standard normal distribution `\(\mathcal{N}(0,1)\)`.
+Define a function to calculate the probability of an observed value `\(Y_i\)` drawn from a [normal distribution](http://mathworld.wolfram.com/NormalDistribution.html) given the mean (`\(\mu\)`) and standard deviation (`\(\sigma\)`). Default to the [standard normal distribution](http://mathworld.wolfram.com/StandardNormalDistribution.html) `\(\mathcal{N}(0,1)\)`.
 
 `$$f\left(Y_i; \mu, \sigma\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$`
 
@@ -120,7 +122,7 @@ dnorm(0, mean = 0, sd = 1)
 ## [1] 0.3989423
 ```
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/normal_plot-1.png" width="672" /&gt;
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/normal_plot-1.png" width="672" /&gt;
 
 ---
 
@@ -157,11 +159,22 @@ Probabilities are in the range 0 to 1, so taking the product of a large number o
 
 Think about computing the likelihood for thousands or millions of observations.
 
+
+```r
+.50^1000
+```
+
+```
+## [1] 9.332636e-302
+```
+
 ---
 
 # Model Likelihood (`\(\mathcal{L}\)`)
 
 It's usually easier to minimize the (natural) log of the likelihood function. The log-likelihood is easier to deal with mathematically.
+
+`$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$`
 
 Log both sides of the equation:
 
@@ -206,7 +219,7 @@ normal(undulation_rate[1], mu = 0, sigma = 1)
 
 ---
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-6-1.png" width="672" /&gt;
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/unnamed-chunk-7-1.png" width="672" /&gt;
 
 This is only the probability for first observation. We need the likelihoods for all 8 undulation rates to get a model likelihood.
 
@@ -226,7 +239,7 @@ Vector of probabilities for all values in `undulation_rate` given `mu = 0` and `
 ## [7] 0.11092083 0.05399097
 ```
 
-Likelihood is the product of those probabilities:
+Overall likelihood is the product of those probabilities:
 
 
 ```r
@@ -362,20 +375,7 @@ This approach is coarse and time consuming. For `\(n = 100\)`, there are 10000 c
 
 # Grid approximation
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-13-1.png" width="672" /&gt;
-
----
-
-# Grid approximation
-
-
-```r
-plot3d(grid_approx`\(mu, grid_approx\)`sigma, grid_approx$log_lik,
-       type = "s", col = "red", size = 1,
-       xlab = "mu",
-       ylab = "sigma",
-       zlab = "log-likelihood")
-```
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/unnamed-chunk-14-1.png" width="672" /&gt;
 
 ---
 
@@ -397,7 +397,7 @@ grid_approx[which.max(grid_approx$log_lik), ]
 
 # Maximum likelihood as an optimization problem
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-16-1.png" width="672" /&gt;
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/unnamed-chunk-16-1.png" width="672" /&gt;
 
 ---
 
@@ -421,7 +421,7 @@ We can now jointly optimize `\(\mu\)` and `\(\sigma\)`, maximizing the log-likel
 
 
 ```r
-optim(c(0.1, 0.1),
+optim(c(0.1, 0.1), # Start at 0.1, 0.1
       log_lik,
       Y = undulation_rate,
       control = list(fnscale = -1,
@@ -489,7 +489,7 @@ Can we do better? Yes, Bayesian priors.
 
 # Prior for the mean
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-18-1.png" width="672" /&gt;
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/unnamed-chunk-18-1.png" width="672" /&gt;
 
 ---
 
@@ -497,28 +497,30 @@ Can we do better? Yes, Bayesian priors.
 
 Cauchy distribution (location = 0, scale = 2)
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-19-1.png" width="672" /&gt;
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/unnamed-chunk-19-1.png" width="672" /&gt;
 
 ---
 
 # Bayesian model
 
+[stan](http://mc-stan.org/) code:
+
 
 ```r
 model &lt;- "
-data{
+  data{
     int&lt;lower=1&gt; N;
     real undulation_rate[N];
-}
-parameters{
+  }
+  parameters{
     real&lt;lower=0&gt; mu;
     real&lt;lower=0&gt; sigma;
-}
-model{
+  }
+  model{
     sigma ~ cauchy(0, 5);
     mu ~ cauchy(0, 2);
     undulation_rate ~ normal(mu, sigma);
-}
+  }
 "
 ```
 
@@ -533,12 +535,13 @@ fm_priors &lt;- stan(
   data = list(undulation_rate = undulation_rate,
               N = length(undulation_rate)),
   iter = 10^4,
-  warmup = 10^3)
+  warmup = 10^3,
+  seed = 12)
 ```
 
 ```
 ## 
-## SAMPLING FOR MODEL '96611e348692d6bffd8be0a075bf81f4' NOW (CHAIN 1).
+## SAMPLING FOR MODEL '339acd0649a290bdec1497a993a2112f' NOW (CHAIN 1).
 ## 
 ## Chain 1, Iteration:    1 / 10000 [  0%]  (Warmup)
 ## Chain 1, Iteration: 1000 / 10000 [ 10%]  (Warmup)
@@ -552,12 +555,12 @@ fm_priors &lt;- stan(
 ## Chain 1, Iteration: 8000 / 10000 [ 80%]  (Sampling)
 ## Chain 1, Iteration: 9000 / 10000 [ 90%]  (Sampling)
 ## Chain 1, Iteration: 10000 / 10000 [100%]  (Sampling)
-##  Elapsed Time: 0.123801 seconds (Warm-up)
-##                0.882048 seconds (Sampling)
-##                1.00585 seconds (Total)
+##  Elapsed Time: 0.083004 seconds (Warm-up)
+##                0.917541 seconds (Sampling)
+##                1.00055 seconds (Total)
 ## 
 ## 
-## SAMPLING FOR MODEL '96611e348692d6bffd8be0a075bf81f4' NOW (CHAIN 2).
+## SAMPLING FOR MODEL '339acd0649a290bdec1497a993a2112f' NOW (CHAIN 2).
 ## 
 ## Chain 2, Iteration:    1 / 10000 [  0%]  (Warmup)
 ## Chain 2, Iteration: 1000 / 10000 [ 10%]  (Warmup)
@@ -571,12 +574,12 @@ fm_priors &lt;- stan(
 ## Chain 2, Iteration: 8000 / 10000 [ 80%]  (Sampling)
 ## Chain 2, Iteration: 9000 / 10000 [ 90%]  (Sampling)
 ## Chain 2, Iteration: 10000 / 10000 [100%]  (Sampling)
-##  Elapsed Time: 0.105338 seconds (Warm-up)
-##                0.799729 seconds (Sampling)
-##                0.905067 seconds (Total)
+##  Elapsed Time: 0.092344 seconds (Warm-up)
+##                0.647172 seconds (Sampling)
+##                0.739516 seconds (Total)
 ## 
 ## 
-## SAMPLING FOR MODEL '96611e348692d6bffd8be0a075bf81f4' NOW (CHAIN 3).
+## SAMPLING FOR MODEL '339acd0649a290bdec1497a993a2112f' NOW (CHAIN 3).
 ## 
 ## Chain 3, Iteration:    1 / 10000 [  0%]  (Warmup)
 ## Chain 3, Iteration: 1000 / 10000 [ 10%]  (Warmup)
@@ -590,12 +593,12 @@ fm_priors &lt;- stan(
 ## Chain 3, Iteration: 8000 / 10000 [ 80%]  (Sampling)
 ## Chain 3, Iteration: 9000 / 10000 [ 90%]  (Sampling)
 ## Chain 3, Iteration: 10000 / 10000 [100%]  (Sampling)
-##  Elapsed Time: 0.104686 seconds (Warm-up)
-##                0.986591 seconds (Sampling)
-##                1.09128 seconds (Total)
+##  Elapsed Time: 0.079285 seconds (Warm-up)
+##                0.599603 seconds (Sampling)
+##                0.678888 seconds (Total)
 ## 
 ## 
-## SAMPLING FOR MODEL '96611e348692d6bffd8be0a075bf81f4' NOW (CHAIN 4).
+## SAMPLING FOR MODEL '339acd0649a290bdec1497a993a2112f' NOW (CHAIN 4).
 ## 
 ## Chain 4, Iteration:    1 / 10000 [  0%]  (Warmup)
 ## Chain 4, Iteration: 1000 / 10000 [ 10%]  (Warmup)
@@ -609,34 +612,13 @@ fm_priors &lt;- stan(
 ## Chain 4, Iteration: 8000 / 10000 [ 80%]  (Sampling)
 ## Chain 4, Iteration: 9000 / 10000 [ 90%]  (Sampling)
 ## Chain 4, Iteration: 10000 / 10000 [100%]  (Sampling)
-##  Elapsed Time: 0.114366 seconds (Warm-up)
-##                0.826966 seconds (Sampling)
-##                0.941332 seconds (Total)
+##  Elapsed Time: 0.080041 seconds (Warm-up)
+##                0.848947 seconds (Sampling)
+##                0.928988 seconds (Total)
 ```
 
 ```
-## The following numerical problems occured the indicated number of times on chain 4
-```
-
-```
-##                                                                                         count
-## Exception thrown at line 13: normal_log: Location parameter is inf, but must be finite!     1
-```
-
-```
-## When a numerical problem occurs, the Hamiltonian proposal gets rejected.
-```
-
-```
-## See http://mc-stan.org/misc/warnings.html#exception-hamiltonian-proposal-rejected
-```
-
-```
-## If the number in the 'count' column is small, do not ask about this message on stan-users.
-```
-
-```
-## Warning: There were 5 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+## Warning: There were 10 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
 ## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
 ```
 
@@ -648,273 +630,36 @@ fm_priors &lt;- stan(
 
 # Inspecting the samples
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-21-1.png" width="672" /&gt;
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/unnamed-chunk-21-1.png" width="672" /&gt;
 
 ---
 
 # Summarizing the results
 
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-22-1.png" width="672" /&gt;
+&lt;img src="05-1_Applications_of_Inference_files/figure-html/unnamed-chunk-22-1.png" width="672" /&gt;
 
 ---
 
 # Summarizing the results
 
 
-```r
-print(fm_priors, digits = 5)
 ```
-
-```
-## Inference for Stan model: 96611e348692d6bffd8be0a075bf81f4.
+## Inference for Stan model: 339acd0649a290bdec1497a993a2112f.
 ## 4 chains, each with iter=10000; warmup=1000; thin=1; 
 ## post-warmup draws per chain=9000, total post-warmup draws=36000.
 ## 
-##          mean se_mean      sd     2.5%     25%     50%     75%   97.5%
-## mu    1.36489 0.00121 0.15067  1.05173 1.27847 1.36804 1.45287 1.66141
-## sigma 0.40226 0.00123 0.14612  0.22424 0.30543 0.37011 0.46023 0.77199
-## lp__  3.14266 0.01147 1.17758 -0.02549 2.68372 3.50925 3.97805 4.28772
-##       n_eff    Rhat
-## mu    15573 1.00007
-## sigma 14134 1.00029
-## lp__  10537 1.00040
+##        mean se_mean    sd   2.5%   25%   50%   75% 97.5% n_eff  Rhat
+## mu    1.365   0.001 0.151  1.058 1.275 1.366 1.454 1.666 14465 1.000
+## sigma 0.402   0.001 0.144  0.225 0.306 0.371 0.459 0.764 11001 1.000
+## lp__  3.151   0.013 1.169 -0.033 2.707 3.500 3.985 4.288  8687 1.001
 ## 
-## Samples were drawn using NUTS(diag_e) at Wed Jan  4 21:39:58 2017.
+## Samples were drawn using NUTS(diag_e) at Fri Jan 13 12:13:10 2017.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).
 ```
 
 We get a lower mean than the analytical or ML estimate (1.375) because the prior places more probability on lower values.
-
-We get a lower mean than the analytical or ML estimate (1.375) because of the prior placing more probability on certain values.
-
----
-
-# Linear regression
-
-`$$Y = \theta_1 + \theta_2 X$$`
-
-Where
-
-- `\(Y\)` is the response variable
-- `\(X\)` is the explanatory variable
-- `\(\theta_1\)` is the intercept (`\(a\)`)
-- `\(\theta_2\)` is the slope of the line (`\(b\)`)
-
----
-
-# Linear regression
-
-What values of `\(\theta_1\)` and `\(\theta_2\)` provide the best fit line through `\(Y\)` as a function of `\(X\)`?
-
-`$$Y = \theta_1 + \theta_2 X$$`
-
-How do we estimate `\(\theta_1\)` and `\(\theta_2\)`?
-
----
-
-# Generate data
-
-Generate `\(n=30\)` random data points: `\(X \sim \mathcal{N}(10, 1)\)` and `\(Y = 2.3 X + \epsilon\)`, where `\(\epsilon \sim \mathcal{N}(1, 1)\)`:
-
-
-```r
-set.seed(4)
-n &lt;- 30
-X &lt;- rnorm(n, mean = 10, sd = 1)
-Y &lt;- 2.3 * X + rnorm(n, mean = 1, sd = 1)
-M &lt;- data.frame(X, Y)
-M %&gt;% head()
-```
-
-```
-##           X        Y
-## 1 10.216755 24.65200
-## 2  9.457507 23.80420
-## 3 10.891145 25.29542
-## 4 10.595981 23.88857
-## 5 11.635618 28.62305
-## 6 10.689275 25.18081
-```
-
----
-
-# Generate data
-
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-24-1.png" width="672" /&gt;
-
----
-
-# Solve analytically
-
-`\(Y\)` is a (n x 1) vector of observed values
-`\(X\)` is an (n X 2) matrix of ones followed by observations
-
-`$$\theta = (X'X)^{-1} X'Y$$`
-
-Where `\(X'\)` is the transpose of `\(X\)` and `\(X{-1}\)` is the inverse [See: https://www.mathsisfun.com/algebra/matrix-inverse.html].
-
-
-```r
-(X_mat &lt;- matrix(c(rep(1, n), X), ncol = 2))
-```
-
-```
-##       [,1]      [,2]
-##  [1,]    1 10.216755
-##  [2,]    1  9.457507
-##  [3,]    1 10.891145
-##  [4,]    1 10.595981
-##  [5,]    1 11.635618
-##  [6,]    1 10.689275
-##  [7,]    1  8.718753
-##  [8,]    1  9.786855
-##  [9,]    1 11.896540
-## [10,]    1 11.776863
-## [11,]    1 10.566604
-## [12,]    1 10.015719
-## [13,]    1 10.383057
-## [14,]    1  9.954863
-## [15,]    1 10.034352
-## [16,]    1 10.169027
-## [17,]    1 11.165027
-## [18,]    1  9.955796
-## [19,]    1  9.899632
-## [20,]    1  9.716555
-## [21,]    1 11.540815
-## [22,]    1 10.165169
-## [23,]    1 11.307622
-## [24,]    1 11.288257
-## [25,]    1 10.592897
-## [26,]    1  9.717056
-## [27,]    1 11.255884
-## [28,]    1 10.909839
-## [29,]    1  9.071972
-## [30,]    1 11.240181
-```
-
----
-
-# Solve analytically
-
-
-```r
-(theta &lt;- (solve(t(X_mat) %*% X_mat)) %*% (t(X_mat) %*% Y))
-```
-
-```
-##             [,1]
-## [1,] -0.03540546
-## [2,]  2.39524849
-```
-
-`theta` is a 2 x 1 matrix of coefficients:
-
-$$
-\theta=\left[\begin{array}{c}
--0.035\\
-2.395
-\end{array}\right]
-$$
-
----
-
-
-```r
-lm_fast &lt;- function(X, Y) {
-  X_mat &lt;- matrix(cbind(rep(1, length(Y)), X), nrow = length(Y))
-  theta &lt;- (solve(t(X_mat) %*% X_mat, tol = 1e-25)) %*% (t(X_mat) %*% Y)
-  return(theta)
-}
-
-predict_Y &lt;- function(theta, X) {
-  X &lt;- as.matrix(X, nrow = length(theta))
-  Y_hat &lt;- theta[1, 1] + rowSums(theta[2:nrow(theta), 1] * X)
-  return(Y_hat)
-}
-
-log_lik &lt;- function(Y, Y_hat) {
-  var_hat &lt;- sum((Y - Y_hat)^2) / (length(Y))
-  sd_hat &lt;- sqrt(var_hat)
-  probs_Y &lt;- dnorm(Y, mean = Y_hat, sd = sd_hat)
-  LL &lt;- sum(log(probs_Y))
-  return(LL)
-}
-```
-
----
-
-
-```r
-theta &lt;- lm_fast(X, Y)
-Y_hat &lt;- predict_Y(theta, X)
-(LL &lt;- log_lik(Y, Y_hat))
-```
-
-```
-## [1] -40.25821
-```
-
-```r
-fm &lt;- lm(Y~X)
-logLik(fm)
-```
-
-```
-## 'log Lik.' -40.25821 (df=3)
-```
-
-```r
-X_mat &lt;- matrix(c(rep(1, length(X)), X), ncol = 2)
-fm_fast &lt;- fastLmPure(X_mat, as.matrix(Y))
-log_lik(Y, fm_fast$fitted.values)
-```
-
-```
-## [1] -40.25821
-```
-
----
-
-
-```r
-t1 &lt;- Sys.time()
-
-reps &lt;- 10^4
-liks &lt;- numeric(length = reps)
-
-load("~/Dropbox/House/Aprob.rda")
-n &lt;- nrow(Aprob)
-
-# Add column of 1's for intercept term
-X &lt;- as.matrix(cbind(rep(1, n), Aprob[, 2:9]), nrow = n)
-
-set.seed(5)
-
-for (i in 1:reps) {
-  Y &lt;- rexp(n, rate = 10)
-  
-  # Normalize so each row sums to 1.
-  fm_fast &lt;- fastLmPure(X, Y)
-  liks[i] &lt;- log_lik(Y, fm_fast$fitted.values)
-}
-Sys.time() - t1
-```
-
-```
-<<<<<<< Updated upstream
-## Time difference of 7.673069 secs
-=======
-## Time difference of 36.21809 secs
->>>>>>> Stashed changes
-```
-
-```r
-ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) + geom_path()
-```
-
-&lt;img src="05_Applications_of_Inference_files/figure-html/unnamed-chunk-29-1.png" width="672" /&gt;
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({

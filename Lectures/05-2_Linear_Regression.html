@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Applications of Inference Frameworks</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Elizabeth King and Kevin Middleton" />
+    <link href="05-2_Linear_Regression_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse
+
+# Applications of Inference Frameworks
+## Quantitative Methods in Life Sciences
+### Elizabeth King and Kevin Middleton
+### Last updated: 2017-01-13
+
+---
+
+
+
+
+# Notes
+
+---
+
+# Readings
+
+---
+
+# Three frameworks for inference
+
+1. Analytical
+2. Maximum likelihood
+3. Bayesian
+
+---
+
+# Linear regression
+
+What values of `\(\theta_1\)` and `\(\theta_2\)` provide the best fit line through `\(Y\)` as a function of `\(X\)`?
+
+`$$Y = \theta_1 + \theta_2 X$$`
+
+How do we estimate `\(\theta_1\)` and `\(\theta_2\)`?
+
+---
+
+# Generate data
+
+Generate `\(n=30\)` random data points: `\(X \sim \mathcal{N}(10, 1)\)` and `\(Y = 2.3 X + \epsilon\)`, where `\(\epsilon \sim \mathcal{N}(1, 1)\)`:
+
+
+```r
+set.seed(4)
+n &lt;- 30
+X &lt;- rnorm(n, mean = 10, sd = 1)
+Y &lt;- 2.3 * X + rnorm(n, mean = 1, sd = 1)
+M &lt;- data.frame(X, Y)
+M %&gt;% head()
+```
+
+```
+##           X        Y
+## 1 10.216755 24.65200
+## 2  9.457507 23.80420
+## 3 10.891145 25.29542
+## 4 10.595981 23.88857
+## 5 11.635618 28.62305
+## 6 10.689275 25.18081
+```
+
+---
+
+# Generate data
+
+&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-1-1.png" width="672" /&gt;
+
+---
+
+# Solve analytically
+
+`\(Y\)` is a (n x 1) vector of observed values
+`\(X\)` is an (n X 2) matrix of ones followed by observations
+
+`$$\theta = (X'X)^{-1} X'Y$$`
+
+Where `\(X'\)` is the transpose of `\(X\)` and `\(X{-1}\)` is the inverse [See: https://www.mathsisfun.com/algebra/matrix-inverse.html].
+
+
+```r
+(X_mat &lt;- matrix(c(rep(1, n), X), ncol = 2))
+```
+
+```
+##       [,1]      [,2]
+##  [1,]    1 10.216755
+##  [2,]    1  9.457507
+##  [3,]    1 10.891145
+##  [4,]    1 10.595981
+##  [5,]    1 11.635618
+##  [6,]    1 10.689275
+##  [7,]    1  8.718753
+##  [8,]    1  9.786855
+##  [9,]    1 11.896540
+## [10,]    1 11.776863
+## [11,]    1 10.566604
+## [12,]    1 10.015719
+## [13,]    1 10.383057
+## [14,]    1  9.954863
+## [15,]    1 10.034352
+## [16,]    1 10.169027
+## [17,]    1 11.165027
+## [18,]    1  9.955796
+## [19,]    1  9.899632
+## [20,]    1  9.716555
+## [21,]    1 11.540815
+## [22,]    1 10.165169
+## [23,]    1 11.307622
+## [24,]    1 11.288257
+## [25,]    1 10.592897
+## [26,]    1  9.717056
+## [27,]    1 11.255884
+## [28,]    1 10.909839
+## [29,]    1  9.071972
+## [30,]    1 11.240181
+```
+
+---
+
+# Solve analytically
+
+
+```r
+(theta &lt;- (solve(t(X_mat) %*% X_mat)) %*% (t(X_mat) %*% Y))
+```
+
+```
+##             [,1]
+## [1,] -0.03540546
+## [2,]  2.39524849
+```
+
+`theta` is a 2 x 1 matrix of coefficients:
+
+$$
+\theta=\left[\begin{array}{c}
+-0.035\\
+2.395
+\end{array}\right]
+$$
+
+---
+
+
+```r
+lm_fast &lt;- function(X, Y) {
+  X_mat &lt;- matrix(cbind(rep(1, length(Y)), X), nrow = length(Y))
+  theta &lt;- (solve(t(X_mat) %*% X_mat, tol = 1e-25)) %*% (t(X_mat) %*% Y)
+  return(theta)
+}
+
+predict_Y &lt;- function(theta, X) {
+  X &lt;- as.matrix(X, nrow = length(theta))
+  Y_hat &lt;- theta[1, 1] + rowSums(theta[2:nrow(theta), 1] * X)
+  return(Y_hat)
+}
+
+log_lik &lt;- function(Y, Y_hat) {
+  var_hat &lt;- sum((Y - Y_hat)^2) / (length(Y))
+  sd_hat &lt;- sqrt(var_hat)
+  probs_Y &lt;- dnorm(Y, mean = Y_hat, sd = sd_hat)
+  LL &lt;- sum(log(probs_Y))
+  return(LL)
+}
+```
+
+---
+
+
+```r
+theta &lt;- lm_fast(X, Y)
+Y_hat &lt;- predict_Y(theta, X)
+(LL &lt;- log_lik(Y, Y_hat))
+```
+
+```
+## [1] -40.25821
+```
+
+```r
+fm &lt;- lm(Y~X)
+logLik(fm)
+```
+
+```
+## 'log Lik.' -40.25821 (df=3)
+```
+
+```r
+X_mat &lt;- matrix(c(rep(1, length(X)), X), ncol = 2)
+fm_fast &lt;- fastLmPure(X_mat, as.matrix(Y))
+log_lik(Y, fm_fast$fitted.values)
+```
+
+```
+## [1] -40.25821
+```
+
+---
+
+
+```r
+t1 &lt;- Sys.time()
+
+reps &lt;- 10^4
+liks &lt;- numeric(length = reps)
+
+load("~/Dropbox/House/Aprob.rda")
+n &lt;- nrow(Aprob)
+
+# Add column of 1's for intercept term
+X &lt;- as.matrix(cbind(rep(1, n), Aprob[, 2:9]), nrow = n)
+
+set.seed(5)
+
+for (i in 1:reps) {
+  Y &lt;- rexp(n, rate = 10)
+  
+  # Normalize so each row sums to 1.
+  fm_fast &lt;- fastLmPure(X, Y)
+  liks[i] &lt;- log_lik(Y, fm_fast$fitted.values)
+}
+Sys.time() - t1
+```
+
+```
+## Time difference of 3.13104 secs
+```
+
+```r
+ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) +
+  geom_path()
+```
+
+&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-6-1.png" width="672" /&gt;
+
+---
+
+
+```r
+library(modelr)
+
+fm &lt;- lm(Y ~ X, data = M)
+M_aug &lt;- M %&gt;% 
+  add_residuals(fm) %&gt;% 
+  add_predictions(fm)
+M_aug %&gt;% head()
+```
+
+```
+##           X        Y      resid     pred
+## 1 10.216755 24.65200  0.2157392 24.43626
+## 2  9.457507 23.80420  1.1865248 22.61767
+## 3 10.891145 25.29542 -0.7561708 26.05159
+## 4 10.595981 23.88857 -1.4560348 25.34460
+## 5 11.635618 28.62305  0.7882623 27.83479
+## 6 10.689275 25.18081 -0.3872517 25.56807
+```
+
+---
+
+&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-8-1.png" width="672" /&gt;
+
+---
+
+
+```r
+ggplot(M_aug, aes(resid)) +
+  geom_line(stat = "density")
+```
+
+&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-9-1.png" width="672" /&gt;
+
+```r
+summary(M_aug$resid)
+```
+
+```
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -1.68700 -0.69020 -0.07185  0.00000  0.76430  1.99700
+```
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github"
+});
+if (window.HTMLWidgets) slideshow.on('showSlide', function (slide) {setTimeout(function() {window.dispatchEvent(new Event('resize'));}, 100)});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

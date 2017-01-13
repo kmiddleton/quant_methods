@@ -14,7 +14,6 @@ output:
 library(tidyverse)
 library(rstan)
 library(cowplot)
-library(RcppEigen)
 library(plot3D)
 #library(rgl)
 #setupKnitr <- function() {
@@ -35,9 +34,9 @@ library(plot3D)
 
 ---
 
-# Three frameworks
+# Three frameworks for inference
 
-1. Frequentist
+1. Analytical
 2. Maximum likelihood
 3. Bayesian
 
@@ -65,15 +64,17 @@ ggplot(data_frame(undulation_rate), aes(undulation_rate)) +
 
 ---
 
-# Frequentist inference of mean
+# Analytical inference of mean
 
-Arthimetic mean:
+Arithmetic mean:
 
 $$\hat{Y} = \frac{\sum_{i=1}^{n}Y_i}{n}$$
 
+$$mean~undulation~rate = \frac{\sum_{i=1}^{n}undulation~rate_i}{n}$$
+
 ---
 
-# Frequentist inference of mean
+# Analytical inference of mean
 
 ```{r}
 sum(undulation_rate) / length(undulation_rate)
@@ -83,7 +84,7 @@ sum(undulation_rate) / length(undulation_rate)
 
 # Maximum likelihood inference of mean
 
-Define a function to calculate the probability of an observed value $Y_i$ given the mean ($\mu$) and standard deviation ($\sigma$). Default to the standard normal distribution $\mathcal{N}(0,1)$.
+Define a function to calculate the probability of an observed value $Y_i$ drawn from a [normal distribution](http://mathworld.wolfram.com/NormalDistribution.html) given the mean ($\mu$) and standard deviation ($\sigma$). Default to the [standard normal distribution](http://mathworld.wolfram.com/StandardNormalDistribution.html) $\mathcal{N}(0,1)$.
 
 $$f\left(Y_i; \mu, \sigma\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$
 
@@ -147,11 +148,17 @@ Probabilities are in the range 0 to 1, so taking the product of a large number o
 
 Think about computing the likelihood for thousands or millions of observations.
 
+```{r}
+.50^1000
+```
+
 ---
 
 # Model Likelihood ($\mathcal{L}$)
 
 It's usually easier to minimize the (natural) log of the likelihood function. The log-likelihood is easier to deal with mathematically.
+
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$
 
 Log both sides of the equation:
 
@@ -190,7 +197,13 @@ ggplot(M, aes(x, y)) + geom_line() +
   geom_point(aes(x = undulation_rate[1],
                  y = normal(undulation_rate[1], mu = 0, sigma = 1)),
              color = "red",
-             size = 3)
+             size = 3) +
+  geom_segment(aes(x = undulation_rate[1],
+                   xend = undulation_rate[1],
+                   y = 0,
+                   yend = normal(undulation_rate[1],
+                                 mu = 0, sigma = 1)),
+               color = "red")
 ```
 
 This is only the probability for first observation. We need the likelihoods for all `r length(undulation_rate)` undulation rates to get a model likelihood.
@@ -205,7 +218,7 @@ Vector of probabilities for all values in `undulation_rate` given `mu = 0` and `
 (probs <- normal(undulation_rate, mu = 0, sigma = 1))
 ```
 
-Likelihood is the product of those probabilities:
+Overall likelihood is the product of those probabilities:
 
 ```{r}
 (lik <- prod(probs))
@@ -299,18 +312,6 @@ scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
 
 # Grid approximation
 
-```{r webgl=TRUE, eval=FALSE}
-plot3d(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik,
-       type = "s", col = "red", size = 1,
-       xlab = "mu",
-       ylab = "sigma",
-       zlab = "log-likelihood")
-```
-
----
-
-# Grid approximation
-
 On this grid, the maximum likelihood estimates of $\mu$ and $\sigma$ are:
 
 ```{r}
@@ -346,7 +347,7 @@ We can now jointly optimize $\mu$ and $\sigma$, maximizing the log-likelihood.
 # Maximum likelihood as an optimization problem
 
 ```{r ML_optim, cache = TRUE}
-optim(c(0.1, 0.1),
+optim(c(0.1, 0.1), # Start at 0.1, 0.1
       log_lik,
       Y = undulation_rate,
       control = list(fnscale = -1,
@@ -405,21 +406,23 @@ data_frame(
 
 # Bayesian model
 
+[stan](http://mc-stan.org/) code:
+
 ```{r}
 model <- "
-data{
+  data{
     int<lower=1> N;
     real undulation_rate[N];
-}
-parameters{
+  }
+  parameters{
     real<lower=0> mu;
     real<lower=0> sigma;
-}
-model{
+  }
+  model{
     sigma ~ cauchy(0, 5);
     mu ~ cauchy(0, 2);
     undulation_rate ~ normal(mu, sigma);
-}
+  }
 "
 ```
 
@@ -433,7 +436,8 @@ fm_priors <- stan(
   data = list(undulation_rate = undulation_rate,
               N = length(undulation_rate)),
   iter = 10^4,
-  warmup = 10^3)
+  warmup = 10^3,
+  seed = 12)
 ```
 
 ---
@@ -462,157 +466,8 @@ post %>% gather(key, value) %>%
 
 # Summarizing the results
 
-```{r}
-print(fm_priors, digits = 5)
+```{r echo=FALSE}
+print(fm_priors, digits = 3)
 ```
 
 We get a lower mean than the analytical or ML estimate (`r round(mean(undulation_rate), 3)`) because the prior places more probability on lower values.
-
----
-
-# Linear regression
-
-$$Y = \theta_1 + \theta_2 X$$
-
-Where
-
-- $Y$ is the response variable
-- $X$ is the explanatory variable
-- $\theta_1$ is the intercept ($a$)
-- $\theta_2$ is the slope of the line ($b$)
-
----
-
-# Linear regression
-
-What values of $\theta_1$ and $\theta_2$ provide the best fit line through $Y$ as a function of $X$?
-
-$$Y = \theta_1 + \theta_2 X$$
-
-How do we estimate $\theta_1$ and $\theta_2$?
-
----
-
-# Generate data
-
-Generate $n=30$ random data points: $X \sim \mathcal{N}(10, 1)$ and $Y = 2.3 X + \epsilon$, where $\epsilon \sim \mathcal{N}(1, 1)$:
-
-```{r Generate_data}
-set.seed(4)
-n <- 30
-X <- rnorm(n, mean = 10, sd = 1)
-Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
-M <- data.frame(X, Y)
-M %>% head()
-```
-
----
-
-# Generate data
-
-```{r, echo=FALSE}
-ggplot(M, aes(X, Y)) + geom_point()
-```
-
----
-
-# Solve analytically
-
-$Y$ is a (n x 1) vector of observed values
-$X$ is an (n X 2) matrix of ones followed by observations
-
-$$\theta = (X'X)^{-1} X'Y$$
-
-Where $X'$ is the transpose of $X$ and $X{-1}$ is the inverse [See: https://www.mathsisfun.com/algebra/matrix-inverse.html].
-
-```{r}
-(X_mat <- matrix(c(rep(1, n), X), ncol = 2))
-```
-
----
-
-# Solve analytically
-
-```{r}
-(theta <- (solve(t(X_mat) %*% X_mat)) %*% (t(X_mat) %*% Y))
-```
-
-`theta` is a 2 x 1 matrix of coefficients:
-
-$$
-\theta=\left[\begin{array}{c}
-`r round(theta[1, 1], 3)`\\
-`r round(theta[2, 1], 3)`
-\end{array}\right]
-$$
-
----
-
-```{r}
-lm_fast <- function(X, Y) {
-  X_mat <- matrix(cbind(rep(1, length(Y)), X), nrow = length(Y))
-  theta <- (solve(t(X_mat) %*% X_mat, tol = 1e-25)) %*% (t(X_mat) %*% Y)
-  return(theta)
-}
-
-predict_Y <- function(theta, X) {
-  X <- as.matrix(X, nrow = length(theta))
-  Y_hat <- theta[1, 1] + rowSums(theta[2:nrow(theta), 1] * X)
-  return(Y_hat)
-}
-
-log_lik <- function(Y, Y_hat) {
-  var_hat <- sum((Y - Y_hat)^2) / (length(Y))
-  sd_hat <- sqrt(var_hat)
-  probs_Y <- dnorm(Y, mean = Y_hat, sd = sd_hat)
-  LL <- sum(log(probs_Y))
-  return(LL)
-}
-```
-
----
-
-```{r}
-theta <- lm_fast(X, Y)
-Y_hat <- predict_Y(theta, X)
-(LL <- log_lik(Y, Y_hat))
-
-fm <- lm(Y~X)
-logLik(fm)
-
-X_mat <- matrix(c(rep(1, length(X)), X), ncol = 2)
-fm_fast <- fastLmPure(X_mat, as.matrix(Y))
-log_lik(Y, fm_fast$fitted.values)
-```
-
----
-
-```{r}
-t1 <- Sys.time()
-
-reps <- 10^4
-liks <- numeric(length = reps)
-
-load("~/Dropbox/House/Aprob.rda")
-n <- nrow(Aprob)
-
-# Add column of 1's for intercept term
-X <- as.matrix(cbind(rep(1, n), Aprob[, 2:9]), nrow = n)
-
-set.seed(5)
-
-for (i in 1:reps) {
-  Y <- rexp(n, rate = 10)
-  
-  # Normalize so each row sums to 1.
-  fm_fast <- fastLmPure(X, Y)
-  liks[i] <- log_lik(Y, fm_fast$fitted.values)
-}
-Sys.time() - t1
-
-ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) + geom_path()
-```
-
-```{r}
-```
-
