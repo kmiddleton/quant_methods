@@ -21,21 +21,15 @@ library(latex2exp)
 
 # Notes
 
----
+## Readings
 
-# Readings
-
----
-
-# Three frameworks for inference
+## Three frameworks for inference
 
 1. Analytical
 2. Maximum likelihood
 3. Bayesian
 
----
-
-# Linear regression
+## Linear regression
 
 What values of $\theta_1$ and $\theta_2$ provide the best fit line through $Y$ as a function of $X$?
 
@@ -43,9 +37,7 @@ $$Y = \theta_1 + \theta_2 X$$
 
 How do we estimate $\theta_1$ and $\theta_2$?
 
----
-
-# Generate data
+## Generate data
 
 Generate $n=30$ random data points: $X \sim \mathcal{N}(10, 1)$ and $Y = 2.3 X + \epsilon$, where $\epsilon \sim \mathcal{N}(1, 1)$:
 
@@ -58,23 +50,17 @@ M <- data.frame(X, Y)
 M %>% head()
 ```
 
----
-
-# Generate data
+## Generate data
 
 ```{r, echo=FALSE}
 ggplot(M, aes(X, Y)) + geom_point()
 ```
 
----
-
-# Analytical solution 1
+## Analytical solution 1
 
 Sums of squares
 
----
-
-# Analytical solution 2: Matrix algebra
+## Analytical solution 2: Matrix algebra
 
 $Y$ is a ($n \times 1$) vector of observed values
 $X$ is an ($n \times 2$) matrix of ones followed by observations
@@ -87,9 +73,7 @@ Where $X'$ is the transpose of $X$ and $X{-1}$ is the [inverse](See: https://www
 (X_mat <- matrix(c(rep(1, n), X), ncol = 2))
 ```
 
----
-
-# Analytical solution 2
+## Analytical solution 2
 
 ```{r}
 (theta <- (solve(t(X_mat) %*% X_mat)) %*% (t(X_mat) %*% Y))
@@ -208,15 +192,11 @@ ggplot(M_aug, aes(resid)) +
 summary(M_aug$resid)
 ```
 
----
-
-# Maximum likelihood
+## Maximum likelihood
 
 FIXME
 
----
-
-# Bayesian
+## Bayesian
 
 What priors for intercept ($\theta_0$) and slope ($\theta_1$)?
 
@@ -233,9 +213,7 @@ p2 <- data_frame(x = x, y = dunif(x, -100, 100)) %>%
 plot_grid(p1, p2, ncol = 2)
 ```
 
----
-
-# Bayesian
+## Bayesian
 
 ```{r Bayes_regression, cache=TRUE, message=FALSE}
 library(rethinking)
@@ -254,26 +232,20 @@ fm <- map2stan(
 )
 ```
 
----
-
-# Bayesian
+## Bayesian
 
 ```{r, fig.height=4}
 plot(fm)
 ```
 
----
-
-# Bayesian
+## Bayesian
 
 ```{r}
 precis(fm, digits = 4)
 coef(lm(Y ~ X, data = M))
 ```
 
----
-
-# Key features
+## Key features
 
 - Analytical solutions are fast, hand-calculable
     - Unavailable for complex models (e.g., hierarchical models)

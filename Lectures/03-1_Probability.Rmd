@@ -13,11 +13,7 @@ output:
 ```{r setup, echo=FALSE}
 ```
 
----
+## Notes
 
-# Notes
-
----
-
-# Readings
+## Readings
 

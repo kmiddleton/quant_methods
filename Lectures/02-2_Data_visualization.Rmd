@@ -15,17 +15,11 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE}
 ```
 
----
+## Notes
 
-# Notes
+## Readings
 
----
-
-# Readings
-
----
-
-## Plotting: Get to know ggplot {.smaller}
+### Plotting: Get to know ggplot {.smaller}
 
 - ggplot documentation reference: http://docs.ggplot2.org/current/
 - R Graphics Cookbook: http://www.cookbook-r.com/Graphs/

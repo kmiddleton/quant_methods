@@ -13,34 +13,24 @@ output:
 ```{r setup, echo=FALSE}
 ```
 
----
+## General course information
 
-# General course information
-
----
-
-# What you need
+## What you need
 
 - Laptop
 - Enthusiasm
 
----
-
-# Book, etc.
+## Book, etc.
 
 - There is no one-size-fits-all statistics textbook. Any that we chose would be a compromise.
 - No official textbook. Many recommendations on Canvas if you are looking for a book.
 
----
-
-# Online lectures
+## Online lectures
 
 - Available Mondays (or sooner)
 - Watch, rewatch, take notes, look up things you don't understand, etc.
 
----
-
-# Quiz questions
+## Quiz questions
 
 - In between some of the lectures
     - e.g., Watch a lecture, answer some questions

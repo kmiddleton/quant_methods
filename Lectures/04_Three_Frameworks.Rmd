@@ -22,22 +22,14 @@ Gelman Bayesian intro: http://andrewgelman.com/2016/12/13/bayesian-statistics-wh
 
 Casella: http://www.stat.ufl.edu/archived/casella/Talks/BayesRefresher.pdf
 
----
+## Readings
 
-# Readings
+## From probability to likelihood
 
----
-
-# From probability to likelihood
-
----
-
-# Three frameworks for hypothesis testing
+## Three frameworks for hypothesis testing
 
 1. Frequentist
 2. Bayesian
 3. Maximum likelihood (effectvely a very narrow form of Bayesian)
 
----
-
-# Two frameworks for hypothesis testing
+## Two frameworks for hypothesis testing

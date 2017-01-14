@@ -18,9 +18,7 @@ library(cowplot)
 
 # Notes
 
----
-
-# Readings
+## Readings
 
 ---
 
@@ -28,9 +26,7 @@ library(cowplot)
 
 > For this reason, no matter how much math and proofs there are that show a method is, I really only feel comfortable with a method once I've worked with it simulated data. It's also a great way to teach myself about the statistical method." [David Robinson](http://varianceexplained.org/r/simulation-bayes-baseball/)
 
----
-
-# Learning a programming language
+## Learning a programming language
 
 Like learning a foreign language.
 
@@ -38,9 +34,7 @@ Like learning a foreign language.
 - Struggle
 - Gradual proficiency
 
----
-
-# What do you mean programming?
+## What do you mean programming?
 
 Modern Scientist == Programmer
 
@@ -51,15 +45,11 @@ Modern Scientist == Programmer
     - Code with comments reads as a step-by-step of your analysis
 - This is a process. It takes time to learn and be comfortable.
 
----
-
-# Why program?
+## Why program?
 
 > "If you had done something twice, you are likely to do it again." -- Brian Kernighan and Bob Pike
 
----
-
-# Good things about programming with data
+## Good things about programming with data
 
 - Forces you to be explicit.
     - R won't give unless you ask.
@@ -69,9 +59,7 @@ Modern Scientist == Programmer
 - Allows you to keep versions of your analysis
     - Revert to an older version
 
----
-
-# R and RStudio
+## R and RStudio
 
 - You are living in a good time.
     - The R Renaissance (2012 - present)
@@ -83,9 +71,7 @@ Modern Scientist == Programmer
 
 .center[![](http://s3.crackedcdn.com/phpimages/article/0/2/5/208025_v1.jpg)]
 
----
-
-# Base R vs. new tools
+## Base R vs. new tools
 
 - Should you learn the base R way or the new tools?
     - Both, eventually.
@@ -93,9 +79,7 @@ Modern Scientist == Programmer
 
 .center[![](https://arttodaymagazine.objects.frb.io/assets/uploads/2016/06/03152001/The-Madonna-Child-by-Sinorelli.jpg)]
 
----
-
-# The tidyverse
+## The tidyverse
 
 A set of packages to load, clean, filter, plot, and generally deal with data in a "tidy" way. Largely the work of [Hadley Wickham](http://hadley.nz/).
 
@@ -107,9 +91,7 @@ browseVignettes("tidyverse")
 
 Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)
 
----
-
-# Rules for raw data
+## Rules for raw data
 
 - Store your data in its rawest form
     - Excel ok
@@ -120,9 +102,7 @@ Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyvers
     - Script your analysis
     - No point and click
 
----
-
-# Opinionated rules for data files 
+## Opinionated rules for data files 
 
 - Garland [*How to Structure and Name Data Files*](http://biology.ucr.edu/people/faculty/Garland/How_to_Structure_and_Name_Data_Files_1.pdf)
 - Karl Broman's guide to data organization: http://kbroman.org/dataorg/
@@ -130,9 +110,7 @@ Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyvers
 - Wickham (2013): [Tidy Data](http://vita.had.co.nz/papers/tidy-data.pdf)
 - White et al. (2013): [Nine Simple Ways to Make It Easier to (Re)use Your Data](http://ojs.library.queensu.ca/index.php/IEE/article/view/4608)
 
----
-
-# Guidelines for data files
+## Guidelines for data files
 
 - Think about how to store your data _before_ you have data to store
     - Get it right the first time rather than to deal with bad decisions forever
@@ -144,9 +122,7 @@ Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyvers
     - File names, variable names, file formats, etc.
     - No spaces in data file names
 
----
-
-# Guidelines for data files
+## Guidelines for data files
 
 - Store data in the rawest form
     - No transformations, calculations, etc.
@@ -158,9 +134,7 @@ Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyvers
 - Use wide format
     - Each unique observation unit is a row
 
----
-
-# Guidelines for data files
+## Guidelines for data files
 
 - No spaces or units in column names
     - `body_mass` or `BodyMass` but not "Body Mass" or "Body Mass (g)"
@@ -169,9 +143,7 @@ Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyvers
     - With concatentation, it is easy to make date columns if you need them
     - We might be in the minority here.
 
----
-
-# Guidelines for data files
+## Guidelines for data files
 
 - Create a data dictionary (explanations of what your columns represent)
     - Cell comments, a separate Excel sheet, or separate file
@@ -181,27 +153,19 @@ Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyvers
     - Do you need 384 columns in that Excel file?
     - Use shared numeric IDs so that you can match and merge data across files
 
----
-
-# Examples, bad and good
+## Examples, bad and good
 
 ![](images/data_storage_1.png)
 
----
-
-# Examples, bad and good
+## Examples, bad and good
 
 ![](images/data_storage_2.png)
 
----
-
-# It would be nice to store data in csv files and edit in Excel, but...
+## It would be nice to store data in csv files and edit in Excel, but...
 
 ![](images/excel_1.png)
 
----
-
-# and
+## and
 
 ![](images/excel_2.png)
 
@@ -209,16 +173,12 @@ Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyvers
 - If you are entering data, use .xls or .xlsx and trust that translators will be available for as long as you are a scientist
 - If you are outputting data from another program, use csv or tab-delimits (if your data has commas).
 
----
-
-# Some hope: Comma Chameleon
+## Some hope: Comma Chameleon
 
 - Simple, cross-platform csv editing.
 - http://comma-chameleon.io/
 
----
-
-# Reading delimited files into R
+## Reading delimited files into R
 
 - csv: `read.csv()`
 - tab or otherwise delimited: `read.table()`
@@ -227,17 +187,13 @@ Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyvers
     - `read_csv()`
     - Like their base R counterparts but with more logical defaults
 
----
-
-# Beware of stringsAsFactors "feature"
+## Beware of stringsAsFactors "feature"
 
 - Base R file readers (`read.csv()`, `read.table()`, etc.) automatically convert strings into factors (`stringsAsFactors = TRUE`).
 - This is *probably* what you want, but it can be a giant pain if you don't.
   - You likely don't want your "Notes" column as a factor
 
----
-
-# Beware of stringsAsFactors "feature"
+## Beware of stringsAsFactors "feature"
 
 Options:
 
@@ -249,9 +205,7 @@ Also see:
 - http://notstatschat.tumblr.com/post/124987394001/stringsasfactors-sigh
 - http://simplystatistics.org/2015/07/24/stringsasfactors-an-unauthorized-biography/
 
----
-
-# Reading Excel files into R
+## Reading Excel files into R
 
 Package: [readxl](https://cran.r-project.org/web/packages/readxl/index.html)
 
@@ -261,9 +215,7 @@ library("readxl")
 M <- read_excel("MyFile.xlsx")
 ```
 
----
-
-# Other, less friendly R packages for reading Excel files
+## Other, less friendly R packages for reading Excel files
 
 In descending order of friendliness:
 
@@ -271,9 +223,7 @@ In descending order of friendliness:
 1. XLConnect: https://cran.r-project.org/web/packages/XLConnect/index.html
 1. gdata: https://cran.r-project.org/web/packages/gdata/index.html
 
----
-
-# Load some data
+## Load some data
 
 ```{r message=FALSE, warning=FALSE}
 M <- read_excel("../data/Mouse_Weaning_Data.xlsx",
@@ -287,17 +237,13 @@ M <- read_excel("../data/Mouse_Weaning_Data.xlsx",
     - Don't use `=` (even though you can).
     - "Assign the object on the right to the object on the left."
 
----
-
-## Use `str()` to get information
+### Use `str()` to get information
 
 ```{r}
 str(M)
 ```
 
----
-
-# `data.frame()`: a basic unit of storage
+## `data.frame()`: a basic unit of storage
 
 Mixed data types
 
@@ -308,17 +254,13 @@ Mixed data types
 
 `read_excel()` produces `tbl_df`s, which print a little prettier but are otherwise equivalent and completely compatible.
 
----
-
-# Selecting and filtering
+## Selecting and filtering
 
 - Selecting columns
 - Filtering a subset of rows
 - Aggregating summary statistics
 
----
-
-# Selecting columns: Base R
+## Selecting columns: Base R
 
 ```{r eval=FALSE}
 M$WnMass
@@ -326,9 +268,7 @@ M$WnMass
 
 `$` returns a single column from a `data.frame`. You'll use this form most often day to day.
 
----
-
-# Selecting columns: Base R
+## Selecting columns: Base R
 
 ```{r eval=FALSE}
 M[ , "WnMass"]  # Only the column WnMass
@@ -341,9 +281,7 @@ If either is empty, all are returned.
 
 - All rows are returned here. The space before `,` is empty.
 
----
-
-# Filtering rows: Base R
+## Filtering rows: Base R
 
 ```{r eval=FALSE}
 M[1, ]     # Row 1, all columns
@@ -352,9 +290,7 @@ M[1:5, ]   # Rows 1-5, all columns
 
 - The space after `,` is empty, so all columns are returned.
 
----
-
-# Filtering rows: Base R
+## Filtering rows: Base R
 
 Use `head()` to get a peek at the first few rows. A second argument to `head()` specifies the number of rows to show.
 
@@ -362,9 +298,7 @@ Use `head()` to get a peek at the first few rows. A second argument to `head()` 
 head(M[, c("MouseID", "Sex")])
 ```
 
----
-
-# Selecting and filtering simultaneously: Base R
+## Selecting and filtering simultaneously: Base R
 
 `subset()` or `[ , ]`
 
@@ -372,9 +306,7 @@ head(M[, c("MouseID", "Sex")])
 subset(M, WnMass < 6)
 ```
 
----
-
-# Selecting and filtering simultaneously: Base R
+## Selecting and filtering simultaneously: Base R
 
 `subset()` or `[ , ]`
 
@@ -384,9 +316,7 @@ subset(M, Sex == 1 & DamID == 1932, select = "WnMass")
 
 Use `&` for "and", and `|` for "or."
 
----
-
-# Making new columns
+## Making new columns
 
 - Calculate new variables
     - Transformation, etc.
@@ -394,9 +324,7 @@ Use `&` for "and", and `|` for "or."
     - e.g., year, months, day columns into a date
 - Splitting existing variables into >1 new variables
 
----
-
-# Calculate new variables: Base R
+## Calculate new variables: Base R
 
 Data transformations:
 
@@ -408,9 +336,7 @@ _Note_:
 - `log()` performs natural log.
 - `log10()` performs base-10 log.
 
----
-
-# Aggregating: Base R
+## Aggregating: Base R
 
 - Mean of every column that is not `DamID`. `head()` gives the first few rows.
 - Replace `mean` with `sd` to get standard deviation.
@@ -420,9 +346,7 @@ M_agr <- aggregate(M, by = list(M$DamID), FUN = "mean")
 head(M_agr)
 ```
 
----
-
-# Aggregating: Base R
+## Aggregating: Base R
 
 Subset, then aggregate
 
@@ -433,9 +357,7 @@ head(aggregate(M_Dam_Mass, by = list(M$DamID), FUN = "mean"))
 
 Less messy, but still needing some fixing. `Group.1` is Dam ID.
 
----
-
-# New tools: Selecting, filtering, aggregating
+## New tools: Selecting, filtering, aggregating
 
 - **dplyr**: https://cran.r-project.org/web/packages/dplyr/index.html
 - **tidyr**: https://cran.r-project.org/web/packages/tidyr/index.html
@@ -450,9 +372,7 @@ library("dplyr")
 library("tidyr")
 ```
 
----
-
-# tidyr
+## tidyr
 
 tidyr is most useful for moving data between "wide" and "long" formats:
 
@@ -464,9 +384,7 @@ Utility functions for existing variables:
 - `separate()`: splitting variables (1 column to >1)
 - `unite()`: joining variables (>1 columns to 1)
 
----
-
-# Combine existing variables: tidyr
+## Combine existing variables: tidyr
 
 ```{r}
 M <- M %>% unite(col = "YearMo", WnYear, WnMonth,
@@ -476,9 +394,7 @@ M %>% select(WnYear, WnMonth, YearMo) %>% head()
 
 `remove = FALSE` means that the pre-existing variables are not removed.
 
----
-
-# Main functions in dplyr
+## Main functions in dplyr
 
 - `mutate()`: create new columns
 - `glimpse()`: like `str()`
@@ -492,9 +408,7 @@ Functions can (should) be chained together with `%>%`
 
 - pass the result of the lefthand expression to the righthand expression.
 
----
-
-# Calculate new variables: ddply
+## Calculate new variables: ddply
 
 ```{r eval=FALSE}
 M <- M %>%
@@ -503,9 +417,7 @@ M <- M %>%
 
 - Assigning back to itself just adds the column `log10DamMass` to the end of the `data.frame`.
 
----
-
-# `mutate()` or not?
+## `mutate()` or not?
 
 `mutate()` lets you add many new variables at once.
 
@@ -521,25 +433,19 @@ M <- M %>% mutate(log10WnMass = log10(WnMass),
                   log10DamMass = log10(DamMass))
 ```
 
----
-
-# `glimpse()` is like `str()`
+## `glimpse()` is like `str()`
 
 ```{r}
 glimpse(M)
 ```
 
----
-
-# Selecting columns: dplyr
+## Selecting columns: dplyr
 
 ```{r}
 M %>% select(Sex, WnMass, DamID)
 ```
 
----
-
-# Chaining operations: dplyr
+## Chaining operations: dplyr
 
 ```{r}
 M %>% select(starts_with("wn")) %>% glimpse()
@@ -549,35 +455,27 @@ For more information and examples: `?select`
 
 `starts_with()`, `ends_with()`, `contains()`, `matches()`, `num_range()`, `one_of()`, `everything()`
 
----
-
-# Filtering: dplyr
+## Filtering: dplyr
 
 ```{r}
 M %>% filter((WnMass < 6 | WnMass > 19) & Sex == 0)
 ```
 
----
-
-# Sorting: dplyr
+## Sorting: dplyr
 
 ```{r}
 M %>% filter((WnMass < 6 | WnMass > 19) & Sex == 0) %>%
   arrange(WnMass)
 ```
 
----
-
-# Selecting and filtering
+## Selecting and filtering
 
 ```{r}
 M %>% filter((WnMass < 6 | WnMass > 19) & Sex == 0) %>% 
   select(MouseID, DamID, WnMass)
 ```
 
----
-
-# Aggregating: dplyr
+## Aggregating: dplyr
 
 Start by grouping data by some categorical variable:
 
@@ -595,9 +493,7 @@ Pass the grouped data to `summarize()`. Return the mean and standard deviation.
 M %>% group_by(Sex) %>% summarize(mean(WnMass), sd(WnMass))
 ```
 
----
-
-# Aggregating: dplyr
+## Aggregating: dplyr
 
 What's going on with `NA`?
 
@@ -609,9 +505,7 @@ sum(is.na(M$Sex))
 - Summing them converts `TRUE` to 1
 - We should probably drop those rows
 
----
-
-# Filtering out unwanted rows
+## Filtering out unwanted rows
 
 ```{r}
 M_no_NAs <- M %>% filter(!is.na(Sex))
@@ -627,9 +521,7 @@ sum(is.na(M_no_NAs$Sex))
 M_no_NAs %>% group_by(Sex) %>% summarize(mean(WnMass), sd(WnMass))
 ```
 
----
-
-# Analysis workflow
+## Analysis workflow
 
 1. Enter data (Excel, e.g.)
 1. Load raw data and perform manipulations
