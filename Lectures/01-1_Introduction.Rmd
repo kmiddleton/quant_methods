@@ -4,44 +4,25 @@ subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
 output:
-  xaringan::moon_reader:
-    seal: yes
-    nature:
-      highlightStyle: github
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE}
 ```
 
-# Notes
+## Notes
 
 None for this lecture.
 
-???
-
-Week 1: Reproducible research, programming with data
-	Goals:
-		Introduction to R
-			dealing with errors/debugging
-		Introduction to programming/reproducibility
-		File organization
-		Demystifying programming
-			programming & learning a language
-			
-	Problem set:
-		Very basic operations
-		Installing packages
-		Rendering .rmd
-
----
-
-# Readings
+## Readings
 
 None for this lecture.
 
----
-
-# Goals for this course
+## Goals for this course
 
 - Teach you to be an independent, modern scientist
 - Be more comfortable with data analysis
@@ -54,9 +35,7 @@ None for this lecture.
 - Write about analyses and results
 - Interpret what others have done (be good science consumers)
 
----
-
-# Goals for *your future as a scientist*
+## Goals for *your future as a scientist*
 
 - Teach you to be an independent, modern scientist
 - Be more comfortable with data analysis
@@ -69,44 +48,32 @@ None for this lecture.
 - Write about analyses and results
 - Interpret what others have done (be good science consumers)
 
----
-
-# Safe statistics
+## Safe statistics
 
 > "[Statisticians] are at grave risk of becoming irrelevant, not because we are useless, but because we have focussed too much on doing the right thing, rather than doing something that works. As a field, statistics tends to lean towards abstinence based outreach: you should only do statistics if you're in a committed long-term relationship with a professional statistician. If you experiment on your own (or with friends), you will hurt yourself and others. Abstinence based approaches don't work because people will take the risk anyway, and most of the time they will safely enjoy themselves. ... Rather than stigmatizing amateur statistics, we should be doing
 out best to provide tools to make it safer." - *Wickham (2015)*
 
----
+## Why are we teaching this class?
 
-# Why are we teaching this class?
-
----
-
-# What you should already know
+## What you should already know
 
 - A basic understanding of math is necessary (some notation)
     - Calculus-level understanding is not necessary
     - More important: an understanding of what goes into the math
 
----
-
-# What you should already know
+## What you should already know
 
 - General familiarity with some topics:
     - Kinds of variables and their distributions
     - Univariate (means, standard deviations, etc.) and bivariate (correlation, regression, one-way ANOVA) approaches
 
----
-
-# What you do not need to know
+## What you do not need to know
 
 Programming
 
 - But if you are inexperienced, you *will* need to put in more effort, particularly at the beginning
 
----
-
-# What we expect
+## What we expect
 
 - Participate
     - In class and in your groups
@@ -118,9 +85,7 @@ Programming
     - Exhaust your own options first (work with your group)
     - "What will I do when I'm on my own?" (Can Google help me?)
 
----
-
-# Course outline | Major topics
+## Course outline | Major topics
 
 1. Working with R for reproducible research
 1. Data organization and visualization
@@ -129,9 +94,7 @@ Programming
 1. Composite variables
 1. Experimental design
 
----
-
-# Resources
+## Resources
 
 Canvas $\rightarrow$ Modules $\rightarrow$ Pre-course Workshop
 
@@ -139,9 +102,7 @@ Canvas $\rightarrow$ Modules $\rightarrow$ Pre-course Workshop
 - Learning R
 - Statistics resources
 
----
-
-# Quiz 01-1
+## Quiz 01-1
 
 Go complete quiz 01-1 on Canvas now.
 

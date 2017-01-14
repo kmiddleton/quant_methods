@@ -11,3 +11,16 @@ M: Lecture 2 posted
 T:
 W:Problem set 1 due
 
+Week 1: Reproducible research, programming with data
+	Goals:
+		Introduction to R
+			dealing with errors/debugging
+		Introduction to programming/reproducibility
+		File organization
+		Demystifying programming
+			programming & learning a language
+
+	Problem set:
+		Very basic operations
+		Installing packages
+		Rendering .rmd

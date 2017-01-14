@@ -28,21 +28,15 @@ library(plot3D)
 
 # Notes
 
----
+## Readings
 
-# Readings
-
----
-
-# Three frameworks for inference
+## Three frameworks for inference
 
 1. Analytical
 2. Maximum likelihood
 3. Bayesian
 
----
-
-# Inferring a mean
+## Inferring a mean
 
 Mean undulation rate for $n = 8$ gliding snakes (http://www.flyingsnake.org/):
 
@@ -62,9 +56,7 @@ ggplot(data_frame(undulation_rate), aes(undulation_rate)) +
   labs(x = "Undulation Rate (Hz)", y = "Count")
 ```
 
----
-
-# Analytical inference of mean
+## Analytical inference of mean
 
 Arithmetic mean:
 
@@ -72,17 +64,13 @@ $$\hat{Y} = \frac{\sum_{i=1}^{n}Y_i}{n}$$
 
 $$mean~undulation~rate = \frac{\sum_{i=1}^{n}undulation~rate_i}{n}$$
 
----
-
-# Analytical inference of mean
+## Analytical inference of mean
 
 ```{r}
 sum(undulation_rate) / length(undulation_rate)
 ```
 
----
-
-# Maximum likelihood inference of mean
+## Maximum likelihood inference of mean
 
 Define a function to calculate the probability of an observed value $Y_i$ drawn from a [normal distribution](http://mathworld.wolfram.com/NormalDistribution.html) given the mean ($\mu$) and standard deviation ($\sigma$). Default to the [standard normal distribution](http://mathworld.wolfram.com/StandardNormalDistribution.html) $\mathcal{N}(0,1)$.
 
@@ -97,9 +85,7 @@ normal <- function(Y, mu = 0, sigma = 1) {
 
 _Note_: this function is built into R as `dnorm()`.
 
----
-
-# Test our function
+## Test our function
 
 ```{r}
 normal(0, mu = 0, sigma = 1)
@@ -113,9 +99,7 @@ ggplot(M, aes(x, y)) + geom_line() +
   labs(x = "Y", y = "Probability")
 ```
 
----
-
-# Calculating a likelihood
+## Calculating a likelihood
 
 If the true mean is 0 and the standard deviation is 1, what is the likelihood of the observed values?
 
@@ -124,9 +108,7 @@ If the true mean is 0 and the standard deviation is 1, what is the likelihood of
 3. Overall model likelihood is the product of the individual probabilities.
 4. log-likelihood is more tractable, so calculate that.
 
----
-
-# Model Likelihood ($\mathcal{L}$)
+## Model Likelihood ($\mathcal{L}$)
 
 For a set of $Y_i$ and parameters ($\Theta$; i.e., mean and standard deviation) the likelihood of the model is the product of their individual probabilities:
 
@@ -136,9 +118,7 @@ Evaluate the likelihood function for different values of $\Theta$ to estimate $\
 
 - Maximize $\mathcal{L}$ and you will have the maximum likelihood set of parameter estimates.
 
----
-
-# Model Likelihood ($\mathcal{L}$)
+## Model Likelihood ($\mathcal{L}$)
 
 Probabilities are in the range 0 to 1, so taking the product of a large number of probabilities can result in some very small numbers.
 
@@ -152,9 +132,7 @@ Think about computing the likelihood for thousands or millions of observations.
 .50^1000
 ```
 
----
-
-# Model Likelihood ($\mathcal{L}$)
+## Model Likelihood ($\mathcal{L}$)
 
 It's usually easier to minimize the (natural) log of the likelihood function. The log-likelihood is easier to deal with mathematically.
 
@@ -164,9 +142,7 @@ Log both sides of the equation:
 
 $$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \log\left(\prod_{i=1}^{n}\phi\left(Y_{i};\Theta\right)\right)$$
 
----
-
-# Model Likelihood ($\mathcal{L}$)
+## Model Likelihood ($\mathcal{L}$)
 
 Taking advantage of the algebraic rules associated with logs (the log of the products equals the sum of the logs):
 
@@ -176,9 +152,7 @@ So we just need to sum the log-likelihoods to get the overall model likelihood.
 
 _Note_: `log()` is _natural_ log.
 
----
-
-# Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
+## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
 
 If the mean is 0 and the standard deviation is 1, what is the likelihood of the observed values?
 
@@ -208,9 +182,7 @@ ggplot(M, aes(x, y)) + geom_line() +
 
 This is only the probability for first observation. We need the likelihoods for all `r length(undulation_rate)` undulation rates to get a model likelihood.
 
----
-
-# Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
+## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
 
 Vector of probabilities for all values in `undulation_rate` given `mu = 0` and `sigma = 1`:
 
@@ -224,9 +196,7 @@ Overall likelihood is the product of those probabilities:
 (lik <- prod(probs))
 ```
 
----
-
-# Likelihood to log-likelihood
+## Likelihood to log-likelihood
 
 ```{r}
 log(lik)
@@ -241,9 +211,7 @@ Is there another combination of $\mu$ and $\sigma$ that gives a higher likelihoo
 sum(log(normal(undulation_rate, mu = 1, sigma = 1)))
 ```
 
----
-
-# Calculating the log-likelihood for a _range_ of $\mu$ and $\sigma$
+## Calculating the log-likelihood for a _range_ of $\mu$ and $\sigma$
 
 Find the combination of $\mu$ and $\sigma$ that maximizes the log-likelihood of the model for the mean and standard deviation of undulation rates.
 
@@ -252,9 +220,7 @@ Ranges of possible values:
 1. Mean ($\mu$): $-\infty < \mu < \infty$
 2. Standard deviation ($\sigma$): $0 < \sigma < \infty$
 
----
-
-# Grid approximation
+## Grid approximation
 
 For combinations of $\mu$ and $\sigma$, calculate the model likelihood. Pick the largest log-likelihood as the maximum likelihood estimates.
 
@@ -280,9 +246,7 @@ grid_approx <- data_frame(
 grid_approx
 ```
 
----
-
-# Grid approximation
+## Grid approximation
 
 ```{r grid_approx, cache=TRUE}
 for (i in 1:nrow(grid_approx)) {
@@ -296,9 +260,7 @@ head(grid_approx)
 
 This approach is coarse and time consuming. For $n = `r n`$, there are `r nrow(grid_approx)` comparisons.
 
----
-
-# Grid approximation
+## Grid approximation
 
 ```{r echo=FALSE}
 grid_approx <- do.call(data.frame,
@@ -308,9 +270,7 @@ scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
           labels = c("mu", "sigma", "log-likelihood"))
 ```
 
----
-
-# Grid approximation
+## Grid approximation
 
 On this grid, the maximum likelihood estimates of $\mu$ and $\sigma$ are:
 
@@ -318,18 +278,14 @@ On this grid, the maximum likelihood estimates of $\mu$ and $\sigma$ are:
 grid_approx[which.max(grid_approx$log_lik), ]
 ```
 
----
-
-# Maximum likelihood as an optimization problem
+## Maximum likelihood as an optimization problem
 
 ```{r echo=FALSE}
 scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
           labels = c("mu", "sigma", "log-likelihood"), colkey = FALSE)
 ```
 
----
-
-# Maximum likelihood as an optimization problem
+## Maximum likelihood as an optimization problem
 
 Define a function that takes a vector of values to optimize `x` ($\mu$ and $\sigma$) as well as a set of data `Y` and returns the log-likelihood:
 
@@ -342,9 +298,7 @@ log_lik <- function(x, Y){
 
 We can now jointly optimize $\mu$ and $\sigma$, maximizing the log-likelihood.
 
----
-
-# Maximum likelihood as an optimization problem
+## Maximum likelihood as an optimization problem
 
 ```{r ML_optim, cache = TRUE}
 optim(c(0.1, 0.1), # Start at 0.1, 0.1
@@ -354,9 +308,7 @@ optim(c(0.1, 0.1), # Start at 0.1, 0.1
                      reltol = 10^-100))
 ```
 
----
-
-# Maximum likelihood as an optimization problem
+## Maximum likelihood as an optimization problem
 
 ```{r ML_glm}
 fm <- glm(undulation_rate ~ 1)
@@ -364,9 +316,7 @@ coef(fm)
 logLik(fm)
 ```
 
----
-
-# Bayesian inference of mean
+## Bayesian inference of mean
 
 Ranges of possible maximum likelihood values:
 
@@ -380,17 +330,13 @@ Drawbacks:
 
 Can we do better? Yes, Bayesian priors.
 
----
-
-# Prior for the mean
+## Prior for the mean
 
 ```{r, ref.label="undulation_plot", echo=FALSE, message=FALSE}
 
 ```
 
----
-
-# Prior for the mean
+## Prior for the mean
 
 Cauchy distribution (location = 0, scale = 2)
 
@@ -402,9 +348,7 @@ data_frame(
   labs(y = "Probability", x = "value")
 ```
 
----
-
-# Bayesian model
+## Bayesian model
 
 [stan](http://mc-stan.org/) code:
 
@@ -426,9 +370,7 @@ model <- "
 "
 ```
 
----
-
-# Sample the Bayesian model
+## Sample the Bayesian model
 
 ```{r stan_fit, cache=TRUE}
 fm_priors <- stan(
@@ -440,17 +382,13 @@ fm_priors <- stan(
   seed = 12)
 ```
 
----
-
-# Inspecting the samples
+## Inspecting the samples
 
 ```{r echo=FALSE}
 traceplot(fm_priors)
 ```
 
----
-
-# Summarizing the results
+## Summarizing the results
 
 ```{r, echo=FALSE}
 post <- extract(fm_priors) %>% as_data_frame()
@@ -462,9 +400,7 @@ post %>% gather(key, value) %>%
   labs(x = "Value", y = "Density")
 ```
 
----
-
-# Summarizing the results
+## Summarizing the results
 
 ```{r echo=FALSE}
 print(fm_priors, digits = 3)

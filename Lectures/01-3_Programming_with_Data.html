@@ -20,8 +20,6 @@ class: center, middle, inverse
 
 
 
----
-
 # Notes
 
 ---
@@ -30,9 +28,3463 @@ class: center, middle, inverse
 
 ---
 
-&gt; For example, last month I was working on a problem of logistic regression that I suspected had mislabeled outcomes (some zeroes turned to ones, and vice versa), and read up on some robust logistic regression methods, implemented in the robust package. But I wasn’t sure they would be effective on my data, so I did some random simulation of mislabeled outcomes and applied the method. The method didn’t work as well as I needed it to, which saved me from applying it to my data and thinking I’d solved the problem.
+&gt; "For example, last month I was working on a problem of logistic regression that I suspected had mislabeled outcomes (some zeroes turned to ones, and vice versa), and read up on some robust logistic regression methods, implemented in the robust package. But I wasn't sure they would be effective on my data, so I did some random simulation of mislabeled outcomes and applied the method. The method didn't work as well as I needed it to, which saved me from applying it to my data and thinking I'd solved the problem.
 
-&gt; For this reason, no matter how much math and proofs there are that show a method is , I really only feel comfortable with a method once I’ve worked with it simulated data. It’s also a great way to teach myself about the statistical method. [David Robinson](http://varianceexplained.org/r/simulation-bayes-baseball/)
+&gt; For this reason, no matter how much math and proofs there are that show a method is, I really only feel comfortable with a method once I've worked with it simulated data. It's also a great way to teach myself about the statistical method." [David Robinson](http://varianceexplained.org/r/simulation-bayes-baseball/)
+
+---
+
+# Learning a programming language
+
+Like learning a foreign language.
+
+- Practice
+- Struggle
+- Gradual proficiency
+
+---
+
+# What do you mean programming?
+
+Modern Scientist == Programmer
+
+- 95% of your analysis time is spent _not_ doing statistics.
+    - Wrangling data
+- Invest time now in learning the logic of programming. Save time later.
+- Reproducibility. You always know what you did.
+    - Code with comments reads as a step-by-step of your analysis
+- This is a process. It takes time to learn and be comfortable.
+
+---
+
+# Why program?
+
+&gt; "If you had done something twice, you are likely to do it again." -- Brian Kernighan and Bob Pike
+
+---
+
+# Good things about programming with data
+
+- Forces you to be explicit.
+    - R won't give unless you ask.
+- Forces you to have a record of your analysis.
+    - Add to/modify your data and rerun
+    - No point and click hell
+- Allows you to keep versions of your analysis
+    - Revert to an older version
+
+---
+
+# R and RStudio
+
+- You are living in a good time.
+    - The R Renaissance (2012 - present)
+    - The DaRk Ages (1993-2011)
+- People have extened the basic R functionality
+    - Reading &amp; writing data
+    - Working with data (selecting, filtering, aggregating)
+    - Plotting
+
+.center[![](http://s3.crackedcdn.com/phpimages/article/0/2/5/208025_v1.jpg)]
+
+---
+
+# Base R vs. new tools
+
+- Should you learn the base R way or the new tools?
+    - Both, eventually.
+    - We will use the new tools mostly. Difficult tasks become easy.
+
+.center[![](https://arttodaymagazine.objects.frb.io/assets/uploads/2016/06/03152001/The-Madonna-Child-by-Sinorelli.jpg)]
+
+---
+
+# The tidyverse
+
+A set of packages to load, clean, filter, plot, and generally deal with data in a "tidy" way. Largely the work of [Hadley Wickham](http://hadley.nz/).
+
+
+```r
+install.packages("tidyverse") # Once
+library(tidyverse)
+browseVignettes("tidyverse")
+```
+
+Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)
+
+---
+
+# Rules for raw data
+
+- Store your data in its rawest form
+    - Excel ok
+- Do you any calculations/analysis elsewhere
+    - **No stats or plots in Excel**
+    - So many reasons
+- Everything should be reproducible
+    - Script your analysis
+    - No point and click
+
+---
+
+# Opinionated rules for data files 
+
+- Garland [*How to Structure and Name Data Files*](http://biology.ucr.edu/people/faculty/Garland/How_to_Structure_and_Name_Data_Files_1.pdf)
+- Karl Broman's guide to data organization: http://kbroman.org/dataorg/
+- Leek research group's guide to sharing data: https://github.com/jtleek/datasharing
+- Wickham (2013): [Tidy Data](http://vita.had.co.nz/papers/tidy-data.pdf)
+- White et al. (2013): [Nine Simple Ways to Make It Easier to (Re)use Your Data](http://ojs.library.queensu.ca/index.php/IEE/article/view/4608)
+
+---
+
+# Guidelines for data files
+
+- Think about how to store your data _before_ you have data to store
+    - Get it right the first time rather than to deal with bad decisions forever
+- Keep everything.
+    - Disk space is cheap.
+    - Dropbox / Box / Google Drive / Sync, etc.
+    - Iterate file names (or -- better -- use version control)
+- Be consistent
+    - File names, variable names, file formats, etc.
+    - No spaces in data file names
+
+---
+
+# Guidelines for data files
+
+- Store data in the rawest form
+    - No transformations, calculations, etc.
+- Store data in rectangular format
+    - No empty cells, repeat values if necessary
+- Use only one header row
+    - Curse software that outputs more than one header row
+- Use `NA` for missing data
+- Use wide format
+    - Each unique observation unit is a row
+
+---
+
+# Guidelines for data files
+
+- No spaces or units in column names
+    - `body_mass` or `BodyMass` but not "Body Mass" or "Body Mass (g)"
+- Store dates as three separate columns (`Year`, `Month`, `Day`)
+    - Excel does weird things with dates
+    - With concatentation, it is easy to make date columns if you need them
+    - We might be in the minority here.
+
+---
+
+# Guidelines for data files
+
+- Create a data dictionary (explanations of what your columns represent)
+    - Cell comments, a separate Excel sheet, or separate file
+        - *Not in the column names*
+    - "Body mass in grams, measured to nearest 0.1 g."
+- Keep file sizes manageable
+    - Do you need 384 columns in that Excel file?
+    - Use shared numeric IDs so that you can match and merge data across files
+
+---
+
+# Examples, bad and good
+
+![](images/data_storage_1.png)
+
+---
+
+# Examples, bad and good
+
+![](images/data_storage_2.png)
+
+---
+
+# It would be nice to store data in csv files and edit in Excel, but...
+
+![](images/excel_1.png)
+
+---
+
+# and
+
+![](images/excel_2.png)
+
+- Working with csv files in Excel _not_ a viable (not-aggravating) option.
+- If you are entering data, use .xls or .xlsx and trust that translators will be available for as long as you are a scientist
+- If you are outputting data from another program, use csv or tab-delimits (if your data has commas).
+
+---
+
+# Some hope: Comma Chameleon
+
+- Simple, cross-platform csv editing.
+- http://comma-chameleon.io/
+
+---
+
+# Reading delimited files into R
+
+- csv: `read.csv()`
+- tab or otherwise delimited: `read.table()`
+- [readr](https://cran.r-project.org/web/packages/readr/index.html)
+    - `read_delim()`
+    - `read_csv()`
+    - Like their base R counterparts but with more logical defaults
+
+---
+
+# Beware of stringsAsFactors "feature"
+
+- Base R file readers (`read.csv()`, `read.table()`, etc.) automatically convert strings into factors (`stringsAsFactors = TRUE`).
+- This is *probably* what you want, but it can be a giant pain if you don't.
+  - You likely don't want your "Notes" column as a factor
+
+---
+
+# Beware of stringsAsFactors "feature"
+
+Options:
+
+- Pass `stringsAsFactors = FALSE` as a parameter.
+- Use `readr` functions `read_delim()` and `read_csv()`.
+
+Also see:
+
+- http://notstatschat.tumblr.com/post/124987394001/stringsasfactors-sigh
+- http://simplystatistics.org/2015/07/24/stringsasfactors-an-unauthorized-biography/
+
+---
+
+# Reading Excel files into R
+
+Package: [readxl](https://cran.r-project.org/web/packages/readxl/index.html)
+
+
+```r
+library("readxl")
+
+M &lt;- read_excel("MyFile.xlsx")
+```
+
+---
+
+# Other, less friendly R packages for reading Excel files
+
+In descending order of friendliness:
+
+1. xlsx: https://cran.r-project.org/web/packages/xlsx/index.html
+1. XLConnect: https://cran.r-project.org/web/packages/XLConnect/index.html
+1. gdata: https://cran.r-project.org/web/packages/gdata/index.html
+
+---
+
+# Load some data
+
+
+```r
+M &lt;- read_excel("../data/Mouse_Weaning_Data.xlsx",
+                na = "NA")
+```
+
+- Read file and assign to an object `M`.
+    - Look for it in the `data` directory, which is one level up from the working directory
+    - Explicitly say that "NA" is `NA`
+- Use `&lt;-` for assign.
+    - Don't use `=` (even though you can).
+    - "Assign the object on the right to the object on the left."
+
+---
+
+## Use `str()` to get information
+
+
+```r
+str(M)
+```
+
+```
+## Classes 'tbl_df', 'tbl' and 'data.frame':	2457 obs. of  22 variables:
+##  $ WnBatch : num  1 1 1 1 1 1 1 1 1 1 ...
+##  $ WnOrder : num  1 2 3 4 5 6 7 8 9 10 ...
+##  $ MouseID : num  1 2 3 4 5 6 7 8 9 10 ...
+##  $ Sex     : num  0 1 1 1 1 0 0 1 1 1 ...
+##  $ WnMass  : num  15.3 12.5 17.4 16.6 16.8 ...
+##  $ DamID   : chr  "229x" "229x" "229x" "229x" ...
+##  $ DamMass : num  30.7 30.7 30.7 30.7 30.7 ...
+##  $ SireID  : chr  "231x" "231x" "231x" "231x" ...
+##  $ SireMass: num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Lineage : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ WnYear  : num  2008 2008 2008 2008 2008 ...
+##  $ WnMonth : num  10 10 10 10 10 10 10 10 10 10 ...
+##  $ WnDay   : num  27 27 27 27 27 27 27 27 27 27 ...
+##  $ BYear   : num  2008 2008 2008 2008 2008 ...
+##  $ BMonth  : num  10 10 10 10 10 10 10 10 10 10 ...
+##  $ BDay    : num  6 6 6 6 6 6 6 6 6 6 ...
+##  $ SepYear : num  2008 2008 2008 2008 2008 ...
+##  $ SepMonth: num  10 10 10 10 10 10 10 10 10 10 ...
+##  $ SepDay  : num  1 1 1 1 1 1 1 1 1 1 ...
+##  $ Breeder : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Fate    : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Observ  : num  NA NA NA NA NA NA NA NA NA NA ...
+```
+
+---
+
+# `data.frame()`: a basic unit of storage
+
+Mixed data types
+
+  - Numeric
+  - Character
+  - Factor (categorical)
+  - Boolean (TRUE and FALSE)
+
+`read_excel()` produces `tbl_df`s, which print a little prettier but are otherwise equivalent and completely compatible.
+
+---
+
+# Selecting and filtering
+
+- Selecting columns
+- Filtering a subset of rows
+- Aggregating summary statistics
+
+---
+
+# Selecting columns: Base R
+
+
+```r
+M$WnMass
+```
+
+`$` returns a single column from a `data.frame`. You'll use this form most often day to day.
+
+---
+
+# Selecting columns: Base R
+
+
+```r
+M[ , "WnMass"]  # Only the column WnMass
+M[ , 1:3]       # Columns 1-3, all rows
+```
+
+`[rows, columns]` returns rows and columns from a `data.frame`.
+
+If either is empty, all are returned.
+
+- All rows are returned here. The space before `,` is empty.
+
+---
+
+# Filtering rows: Base R
+
+
+```r
+M[1, ]     # Row 1, all columns
+M[1:5, ]   # Rows 1-5, all columns
+```
+
+- The space after `,` is empty, so all columns are returned.
+
+---
+
+# Filtering rows: Base R
+
+Use `head()` to get a peek at the first few rows. A second argument to `head()` specifies the number of rows to show.
+
+
+```r
+head(M[, c("MouseID", "Sex")])
+```
+
+```
+## # A tibble: 6 × 2
+##   MouseID   Sex
+##     &lt;dbl&gt; &lt;dbl&gt;
+## 1       1     0
+## 2       2     1
+## 3       3     1
+## 4       4     1
+## 5       5     1
+## 6       6     0
+```
+
+---
+
+# Selecting and filtering simultaneously: Base R
+
+`subset()` or `[ , ]`
+
+
+```r
+subset(M, WnMass &lt; 6)
+```
+
+```
+## # A tibble: 6 × 22
+##   WnBatch WnOrder MouseID   Sex WnMass DamID DamMass SireID SireMass
+##     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;chr&gt;    &lt;dbl&gt;
+## 1       1      11      -9     0   5.69  205x   36.85   207x       NA
+## 2       2      14     407     0   4.76   351   28.46    354       NA
+## 3       8      90      -9     0   4.88   519   34.02    522       NA
+## 4       4      70      -9     1   4.17  1932   31.29   1939       NA
+## 5       4      71      -9     0   4.91  1932   31.29   1939       NA
+## 6       4      72      -9     0   3.77  1932   31.29   1939       NA
+## # ... with 13 more variables: Lineage &lt;dbl&gt;, WnYear &lt;dbl&gt;, WnMonth &lt;dbl&gt;,
+## #   WnDay &lt;dbl&gt;, BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;, SepYear &lt;dbl&gt;,
+## #   SepMonth &lt;dbl&gt;, SepDay &lt;dbl&gt;, Breeder &lt;dbl&gt;, Fate &lt;dbl&gt;, Observ &lt;dbl&gt;
+```
+
+---
+
+# Selecting and filtering simultaneously: Base R
+
+`subset()` or `[ , ]`
+
+
+```r
+subset(M, Sex == 1 &amp; DamID == 1932, select = "WnMass")
+```
+
+Use `&amp;` for "and", and `|` for "or."
+
+---
+
+# Making new columns
+
+- Calculate new variables
+    - Transformation, etc.
+- Combine existing variables into a new variable
+    - e.g., year, months, day columns into a date
+- Splitting existing variables into &gt;1 new variables
+
+---
+
+# Calculate new variables: Base R
+
+Data transformations:
+
+`M\`\(log10_WnMass &lt;- log10(M\\)`WnMass)`
+`M\`\(sqrt_WnMass &lt;- sqrt(M\\)`WnMass)`
+
+_Note_:
+
+- `log()` performs natural log.
+- `log10()` performs base-10 log.
+
+---
+
+# Aggregating: Base R
+
+- Mean of every column that is not `DamID`. `head()` gives the first few rows.
+- Replace `mean` with `sd` to get standard deviation.
+
+
+```r
+M_agr &lt;- aggregate(M, by = list(M$DamID), FUN = "mean")
+```
+
+```
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+```
+
+```r
+head(M_agr)
+```
+
+```
+##   Group.1 WnBatch WnOrder   MouseID       Sex    WnMass DamID DamMass
+## 1       1      10    95.0  202.2727 0.6363636  9.141818    NA   27.76
+## 2    1000       1    18.0   -9.0000 1.0000000 19.054000    NA   36.33
+## 3    1003       3    35.0 1126.0000 0.5454545 12.424545    NA   32.25
+## 4    1006       1     6.5 1105.5000 0.5000000 12.481667    NA   37.39
+## 5    1012       5    63.0  921.0000 0.4000000 16.158000    NA   39.12
+## 6    1022       1    14.0   -9.0000 0.3333333 15.483333    NA   30.23
+##   SireID SireMass Lineage WnYear WnMonth WnDay BYear BMonth BDay SepYear
+## 1     NA       NA      NA   2009       3    24  2009      3    3    2009
+## 2     NA       NA      NA   2011       8     2  2011      7   12    2011
+## 3     NA       NA      NA   2011       8     9  2011      7   19    2011
+## 4     NA       NA      NA   2011       8     2  2011      7   12    2011
+## 5     NA       NA      NA   2011       8    11  2011      7   22    2011
+## 6     NA       NA      NA   2011       8     2  2011      7   12    2011
+##   SepMonth SepDay Breeder Fate Observ
+## 1        2     25      NA   NA     NA
+## 2        7      9      NA   NA     NA
+## 3        7      9      NA   NA     NA
+## 4        7      9       1   NA     NA
+## 5        7     15      NA   NA     NA
+## 6        7      9       2   NA     NA
+```
+
+---
+
+# Aggregating: Base R
+
+Subset, then aggregate
+
+
+```r
+M_Dam_Mass &lt;- M[, c("DamID", "WnMass")]
+head(aggregate(M_Dam_Mass, by = list(M$DamID), FUN = "mean"))
+```
+
+```
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+
+## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+## returning NA
+```
+
+```
+##   Group.1 DamID    WnMass
+## 1       1    NA  9.141818
+## 2    1000    NA 19.054000
+## 3    1003    NA 12.424545
+## 4    1006    NA 12.481667
+## 5    1012    NA 16.158000
+## 6    1022    NA 15.483333
+```
+
+Less messy, but still needing some fixing. `Group.1` is Dam ID.
+
+---
+
+# New tools: Selecting, filtering, aggregating
+
+- **dplyr**: https://cran.r-project.org/web/packages/dplyr/index.html
+- **tidyr**: https://cran.r-project.org/web/packages/tidyr/index.html
+
+Tutorials:
+
+- http://seananderson.ca/2014/09/13/dplyr-intro.html
+- https://rpubs.com/bradleyboehmke/data_wrangling
+
+
+```r
+library("dplyr")
+library("tidyr")
+```
+
+---
+
+# tidyr
+
+tidyr is most useful for moving data between "wide" and "long" formats:
+
+- `gather()`: wide to long
+- `spread()`: long to wide
+
+Utility functions for existing variables:
+
+- `separate()`: splitting variables (1 column to &gt;1)
+- `unite()`: joining variables (&gt;1 columns to 1)
+
+---
+
+# Combine existing variables: tidyr
+
+
+```r
+M &lt;- M %&gt;% unite(col = "YearMo", WnYear, WnMonth,
+                 sep = "_", remove = FALSE)
+M %&gt;% select(WnYear, WnMonth, YearMo) %&gt;% head()
+```
+
+```
+## # A tibble: 6 × 3
+##   WnYear WnMonth  YearMo
+##    &lt;dbl&gt;   &lt;dbl&gt;   &lt;chr&gt;
+## 1   2008      10 2008_10
+## 2   2008      10 2008_10
+## 3   2008      10 2008_10
+## 4   2008      10 2008_10
+## 5   2008      10 2008_10
+## 6   2008      10 2008_10
+```
+
+`remove = FALSE` means that the pre-existing variables are not removed.
+
+---
+
+# Main functions in dplyr
+
+- `mutate()`: create new columns
+- `glimpse()`: like `str()`
+- `select()`: like `[ , ]` for columns
+- `filter()`: like `subset()` or `[ , ]` with conditions
+- `summarize()` with `group_by()`: like `aggregate()`
+- `arrange()`: sorting
+- `join()`: merging `data.frames`
+
+Functions can (should) be chained together with `%&gt;%`
+
+- pass the result of the lefthand expression to the righthand expression.
+
+---
+
+# Calculate new variables: ddply
+
+
+```r
+M &lt;- M %&gt;%
+  mutate(log10DamMass = log10(DamMass))
+```
+
+- Assigning back to itself just adds the column `log10DamMass` to the end of the `data.frame`.
+
+---
+
+# `mutate()` or not?
+
+`mutate()` lets you add many new variables at once.
+
+
+```r
+M`\(log10_WnMass &lt;- log10(M\)`WnMass)
+M`\(log10_DamMass &lt;- log10(M\)`DamMass)
+```
+
+vs.
+
+
+```r
+M &lt;- M %&gt;% mutate(log10WnMass = log10(WnMass),
+                  log10DamMass = log10(DamMass))
+```
+
+---
+
+# `glimpse()` is like `str()`
+
+
+```r
+glimpse(M)
+```
+
+```
+## Observations: 2,457
+## Variables: 25
+## $ WnBatch      &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
+## $ WnOrder      &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15...
+## $ MouseID      &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -9, -9, 11, 12, -9...
+## $ Sex          &lt;dbl&gt; 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0...
+## $ WnMass       &lt;dbl&gt; 15.26, 12.47, 17.37, 16.63, 16.76, 12.53, 10.89, ...
+## $ DamID        &lt;chr&gt; "229x", "229x", "229x", "229x", "229x", "205x", "...
+## $ DamMass      &lt;dbl&gt; 30.69, 30.69, 30.69, 30.69, 30.69, 36.85, 36.85, ...
+## $ SireID       &lt;chr&gt; "231x", "231x", "231x", "231x", "231x", "207x", "...
+## $ SireMass     &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ Lineage      &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ YearMo       &lt;chr&gt; "2008_10", "2008_10", "2008_10", "2008_10", "2008...
+## $ WnYear       &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2...
+## $ WnMonth      &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1...
+## $ WnDay        &lt;dbl&gt; 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 2...
+## $ BYear        &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2...
+## $ BMonth       &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1...
+## $ BDay         &lt;dbl&gt; 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6...
+## $ SepYear      &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2...
+## $ SepMonth     &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1...
+## $ SepDay       &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
+## $ Breeder      &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ Fate         &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ Observ       &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ log10WnMass  &lt;dbl&gt; 1.1835545, 1.0958665, 1.2397998, 1.2208922, 1.224...
+## $ log10DamMass &lt;dbl&gt; 1.486997, 1.486997, 1.486997, 1.486997, 1.486997,...
+```
+
+---
+
+# Selecting columns: dplyr
+
+
+```r
+M %&gt;% select(Sex, WnMass, DamID)
+```
+
+```
+## # A tibble: 2,457 × 3
+##      Sex WnMass DamID
+##    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;
+## 1      0  15.26  229x
+## 2      1  12.47  229x
+## 3      1  17.37  229x
+## 4      1  16.63  229x
+## 5      1  16.76  229x
+## 6      0  12.53  205x
+## 7      0  10.89  205x
+## 8      1  13.60  205x
+## 9      1  14.17  205x
+## 10     1  13.42  205x
+## # ... with 2,447 more rows
+```
+
+---
+
+# Chaining operations: dplyr
+
+
+```r
+M %&gt;% select(starts_with("wn")) %&gt;% glimpse()
+```
+
+```
+## Observations: 2,457
+## Variables: 6
+## $ WnBatch &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+## $ WnOrder &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,...
+## $ WnMass  &lt;dbl&gt; 15.26, 12.47, 17.37, 16.63, 16.76, 12.53, 10.89, 13.60...
+## $ WnYear  &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, ...
+## $ WnMonth &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10...
+## $ WnDay   &lt;dbl&gt; 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27...
+```
+
+For more information and examples: `?select`
+
+`starts_with()`, `ends_with()`, `contains()`, `matches()`, `num_range()`, `one_of()`, `everything()`
+
+---
+
+# Filtering: dplyr
+
+
+```r
+M %&gt;% filter((WnMass &lt; 6 | WnMass &gt; 19) &amp; Sex == 0)
+```
+
+```
+## # A tibble: 14 × 25
+##    WnBatch WnOrder MouseID   Sex WnMass DamID DamMass SireID SireMass
+##      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;chr&gt;    &lt;dbl&gt;
+## 1        1      11      -9     0   5.69  205x   36.85   207x       NA
+## 2        5      53     336     0  19.89   234   35.60    238       NA
+## 3        6      58     338     0  19.86   236   33.95    238       NA
+## 4        6      64      -9     0  19.50   236   33.95    238       NA
+## 5        2      14     407     0   4.76   351   28.46    354       NA
+## 6        4      90      -9     0  19.01   302   32.22    306       NA
+## 7        5      29      -9     0  19.44   453   33.36    457       NA
+## 8        5      32      -9     0  19.44   453   33.36    457       NA
+## 9        5      33      -9     0  19.20   453   33.36    457       NA
+## 10       5      46     534     0  19.24   446   35.79    449       NA
+## 11       8      90      -9     0   4.88   519   34.02    522       NA
+## 12       2      63      -9     0  19.50  1327   38.48   1328       NA
+## 13       4      71      -9     0   4.91  1932   31.29   1939       NA
+## 14       4      72      -9     0   3.77  1932   31.29   1939       NA
+## # ... with 16 more variables: Lineage &lt;dbl&gt;, YearMo &lt;chr&gt;, WnYear &lt;dbl&gt;,
+## #   WnMonth &lt;dbl&gt;, WnDay &lt;dbl&gt;, BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;,
+## #   SepYear &lt;dbl&gt;, SepMonth &lt;dbl&gt;, SepDay &lt;dbl&gt;, Breeder &lt;dbl&gt;,
+## #   Fate &lt;dbl&gt;, Observ &lt;dbl&gt;, log10WnMass &lt;dbl&gt;, log10DamMass &lt;dbl&gt;
+```
+
+---
+
+# Sorting: dplyr
+
+
+```r
+M %&gt;% filter((WnMass &lt; 6 | WnMass &gt; 19) &amp; Sex == 0) %&gt;%
+  arrange(WnMass)
+```
+
+```
+## # A tibble: 14 × 25
+##    WnBatch WnOrder MouseID   Sex WnMass DamID DamMass SireID SireMass
+##      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;chr&gt;    &lt;dbl&gt;
+## 1        4      72      -9     0   3.77  1932   31.29   1939       NA
+## 2        2      14     407     0   4.76   351   28.46    354       NA
+## 3        8      90      -9     0   4.88   519   34.02    522       NA
+## 4        4      71      -9     0   4.91  1932   31.29   1939       NA
+## 5        1      11      -9     0   5.69  205x   36.85   207x       NA
+## 6        4      90      -9     0  19.01   302   32.22    306       NA
+## 7        5      33      -9     0  19.20   453   33.36    457       NA
+## 8        5      46     534     0  19.24   446   35.79    449       NA
+## 9        5      29      -9     0  19.44   453   33.36    457       NA
+## 10       5      32      -9     0  19.44   453   33.36    457       NA
+## 11       6      64      -9     0  19.50   236   33.95    238       NA
+## 12       2      63      -9     0  19.50  1327   38.48   1328       NA
+## 13       6      58     338     0  19.86   236   33.95    238       NA
+## 14       5      53     336     0  19.89   234   35.60    238       NA
+## # ... with 16 more variables: Lineage &lt;dbl&gt;, YearMo &lt;chr&gt;, WnYear &lt;dbl&gt;,
+## #   WnMonth &lt;dbl&gt;, WnDay &lt;dbl&gt;, BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;,
+## #   SepYear &lt;dbl&gt;, SepMonth &lt;dbl&gt;, SepDay &lt;dbl&gt;, Breeder &lt;dbl&gt;,
+## #   Fate &lt;dbl&gt;, Observ &lt;dbl&gt;, log10WnMass &lt;dbl&gt;, log10DamMass &lt;dbl&gt;
+```
+
+---
+
+# Selecting and filtering
+
+
+```r
+M %&gt;% filter((WnMass &lt; 6 | WnMass &gt; 19) &amp; Sex == 0) %&gt;% 
+  select(MouseID, DamID, WnMass)
+```
+
+```
+## # A tibble: 14 × 3
+##    MouseID DamID WnMass
+##      &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+## 1       -9  205x   5.69
+## 2      336   234  19.89
+## 3      338   236  19.86
+## 4       -9   236  19.50
+## 5      407   351   4.76
+## 6       -9   302  19.01
+## 7       -9   453  19.44
+## 8       -9   453  19.44
+## 9       -9   453  19.20
+## 10     534   446  19.24
+## 11      -9   519   4.88
+## 12      -9  1327  19.50
+## 13      -9  1932   4.91
+## 14      -9  1932   3.77
+```
+
+---
+
+# Aggregating: dplyr
+
+Start by grouping data by some categorical variable:
+
+
+```r
+M %&gt;% group_by(Sex)
+```
+
+```
+## Source: local data frame [2,457 x 25]
+## Groups: Sex [3]
+## 
+##    WnBatch WnOrder MouseID   Sex WnMass DamID DamMass SireID SireMass
+##      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;chr&gt;    &lt;dbl&gt;
+## 1        1       1       1     0  15.26  229x   30.69   231x       NA
+## 2        1       2       2     1  12.47  229x   30.69   231x       NA
+## 3        1       3       3     1  17.37  229x   30.69   231x       NA
+## 4        1       4       4     1  16.63  229x   30.69   231x       NA
+## 5        1       5       5     1  16.76  229x   30.69   231x       NA
+## 6        1       6       6     0  12.53  205x   36.85   207x       NA
+## 7        1       7       7     0  10.89  205x   36.85   207x       NA
+## 8        1       8       8     1  13.60  205x   36.85   207x       NA
+## 9        1       9       9     1  14.17  205x   36.85   207x       NA
+## 10       1      10      10     1  13.42  205x   36.85   207x       NA
+## # ... with 2,447 more rows, and 16 more variables: Lineage &lt;dbl&gt;,
+## #   YearMo &lt;chr&gt;, WnYear &lt;dbl&gt;, WnMonth &lt;dbl&gt;, WnDay &lt;dbl&gt;, BYear &lt;dbl&gt;,
+## #   BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;, SepYear &lt;dbl&gt;, SepMonth &lt;dbl&gt;, SepDay &lt;dbl&gt;,
+## #   Breeder &lt;dbl&gt;, Fate &lt;dbl&gt;, Observ &lt;dbl&gt;, log10WnMass &lt;dbl&gt;,
+## #   log10DamMass &lt;dbl&gt;
+```
+
+--
+
+# Aggregating: dplyr
+
+Pass the grouped data to `summarize()`. Return the mean and standard deviation.
+
+
+```r
+M %&gt;% group_by(Sex) %&gt;% summarize(mean(WnMass), sd(WnMass))
+```
+
+```
+## # A tibble: 3 × 3
+##     Sex `mean(WnMass)` `sd(WnMass)`
+##   &lt;dbl&gt;          &lt;dbl&gt;        &lt;dbl&gt;
+## 1     0       13.01796     2.239148
+## 2     1       13.82238     2.461221
+## 3    NA             NA           NA
+```
+
+---
+
+# Aggregating: dplyr
+
+What's going on with `NA`?
+
+
+```r
+sum(is.na(M$Sex))
+```
+
+```
+## [1] 28
+```
+
+- `is.na()` returns `TRUE` if the value is `NA`
+- Summing them converts `TRUE` to 1
+- We should probably drop those rows
+
+---
+
+# Filtering out unwanted rows
+
+
+```r
+M_no_NAs &lt;- M %&gt;% filter(!is.na(Sex))
+```
+
+`!is.na()` returns `TRUE` for the values of `Sex` _not_ `NA`.
+
+
+```r
+sum(is.na(M_no_NAs$Sex))
+```
+
+```
+## [1] 0
+```
+
+
+```r
+M_no_NAs %&gt;% group_by(Sex) %&gt;% summarize(mean(WnMass), sd(WnMass))
+```
+
+```
+## # A tibble: 2 × 3
+##     Sex `mean(WnMass)` `sd(WnMass)`
+##   &lt;dbl&gt;          &lt;dbl&gt;        &lt;dbl&gt;
+## 1     0       13.01796     2.239148
+## 2     1       13.82238     2.461221
+```
+
+---
+
+# Analysis workflow
+
+1. Enter data (Excel, e.g.)
+1. Load raw data and perform manipulations
+    * Recode variables
+    * Create categorical variables where applicable
+    * Combine and transform variables if necessary
+1. Plot the raw data to look for mistakes, outliers, etc.
+    * Go back and fix errors
+    * Explore your data
+1. Statistical analysis
+1. Interpretation
+    * More analysis
+1. Make tables and figures for publication
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
@@ -40,5 +3492,23 @@ class: center, middle, inverse
 });
 if (window.HTMLWidgets) slideshow.on('showSlide', function (slide) {setTimeout(function() {window.dispatchEvent(new Event('resize'));}, 100)});</script>
 
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
   </body>
 </html>
