@@ -78,14 +78,20 @@ M %&gt;% head()
 
 ---
 
-# Solve analytically
+# Analytical solution 1
 
-`\(Y\)` is a (n x 1) vector of observed values
-`\(X\)` is an (n X 2) matrix of ones followed by observations
+Sums of squares
+
+---
+
+# Analytical solution 2: Matrix algebra
+
+`\(Y\)` is a (`\(n \times 1\)`) vector of observed values
+`\(X\)` is an (`\(n \times 2\)`) matrix of ones followed by observations
 
 `$$\theta = (X'X)^{-1} X'Y$$`
 
-Where `\(X'\)` is the transpose of `\(X\)` and `\(X{-1}\)` is the inverse [See: https://www.mathsisfun.com/algebra/matrix-inverse.html].
+Where `\(X'\)` is the transpose of `\(X\)` and `\(X{-1}\)` is the [inverse](See: https://www.mathsisfun.com/algebra/matrix-inverse.html).
 
 
 ```r
@@ -128,7 +134,7 @@ Where `\(X'\)` is the transpose of `\(X\)` and `\(X{-1}\)` is the inverse [See: 
 
 ---
 
-# Solve analytically
+# Analytical solution 2
 
 
 ```r
@@ -235,61 +241,208 @@ Sys.time() - t1
 ```
 
 ```
-## Time difference of 3.13104 secs
+## Time difference of 3.006009 secs
 ```
+
+---
+
 
 ```r
 ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) +
   geom_path()
 ```
 
-&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-6-1.png" width="672" /&gt;
+&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-7-1.png" width="672" /&gt;
 
 ---
 
 
 ```r
 library(modelr)
+```
 
+```
+## 
+## Attaching package: 'modelr'
+```
+
+```
+## The following object is masked from 'package:rethinking':
+## 
+##     resample
+```
+
+```r
 fm &lt;- lm(Y ~ X, data = M)
 M_aug &lt;- M %&gt;% 
   add_residuals(fm) %&gt;% 
   add_predictions(fm)
-M_aug %&gt;% head()
+M_aug
 ```
 
 ```
-##           X        Y      resid     pred
-## 1 10.216755 24.65200  0.2157392 24.43626
-## 2  9.457507 23.80420  1.1865248 22.61767
-## 3 10.891145 25.29542 -0.7561708 26.05159
-## 4 10.595981 23.88857 -1.4560348 25.34460
-## 5 11.635618 28.62305  0.7882623 27.83479
-## 6 10.689275 25.18081 -0.3872517 25.56807
+##            X        Y       resid     pred
+## 1  10.216755 24.65200  0.21573922 24.43626
+## 2   9.457507 23.80420  1.18652478 22.61767
+## 3  10.891145 25.29542 -0.75617078 26.05159
+## 4  10.595981 23.88857 -1.45603476 25.34460
+## 5  11.635618 28.62305  0.78826234 27.83479
+## 6  10.689275 25.18081 -0.38725166 25.56807
+## 7   8.718753 20.82573 -0.02244801 20.84818
+## 8   9.786855 24.44386  1.03731847 23.40655
+## 9  11.896540 27.89615 -0.56361782 28.45976
+## 10 11.776863 27.44924 -0.72386642 28.17311
+## 11 10.566604 26.64690  1.37266101 25.27424
+## 12 10.015719 24.21769  0.26295874 23.95473
+## 13 10.383057 26.17354  1.33894731 24.83460
+## 14  9.954863 22.20814 -1.60082873 23.80896
+## 15 10.034352 23.25802 -0.74134494 23.99936
+## 16 10.169027 23.52662 -0.79532508 24.32194
+## 17 11.165027 26.77841  0.07079726 26.70761
+## 18  9.955796 23.52268 -0.28852417 23.81120
+## 19  9.899632 24.49306  0.81638471 23.67667
+## 20  9.716555 21.55070 -1.68746374 23.23816
+## 21 11.540815 26.88013 -0.72758283 27.60771
+## 22 10.165169 23.75616 -0.55653798 24.31270
+## 23 11.307622 26.92790 -0.12126087 27.04916
+## 24 11.288257 27.39862  0.39584085 27.00277
+## 25 10.592897 27.33456  1.99734904 25.33721
+## 26  9.717056 22.75247 -0.48688811 23.23936
+## 27 11.255884 26.33603 -0.58920765 26.92523
+## 28 10.909839 26.78860  0.69222644 26.09637
+## 29  9.071972 21.70987  0.01564991 21.69422
+## 30 11.240181 28.20131  1.31369346 26.88762
 ```
 
 ---
-
-&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-8-1.png" width="672" /&gt;
-
----
-
-
-```r
-ggplot(M_aug, aes(resid)) +
-  geom_line(stat = "density")
-```
 
 &lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-9-1.png" width="672" /&gt;
 
-```r
-summary(M_aug$resid)
-```
+---
+
+&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-10-1.png" width="672" /&gt;
 
 ```
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 ## -1.68700 -0.69020 -0.07185  0.00000  0.76430  1.99700
 ```
+
+---
+
+# Bayesian
+
+What priors for intercept (`\(\theta_0\)`) and slope (`\(\theta_1\)`)?
+
+&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-11-1.png" width="672" /&gt;
+
+---
+
+# Bayesian
+
+
+```r
+library(rethinking)
+
+fm &lt;- map2stan(
+  alist(
+    Y ~ dnorm(mu, sigma),
+    mu &lt;- theta_0 + theta_1 * X,
+    theta_0 ~ dunif(-100, 100),
+    theta_1 ~ dunif(-100, 100),
+    sigma ~ dunif(0, 100)
+  ),
+  data = M,
+  WAIC = FALSE,
+  iter = 10^4
+)
+```
+
+```
+## 
+## SAMPLING FOR MODEL 'Y ~ dnorm(mu, sigma)' NOW (CHAIN 1).
+## 
+## Chain 1, Iteration:    1 / 10000 [  0%]  (Warmup)
+## Chain 1, Iteration: 1000 / 10000 [ 10%]  (Warmup)
+## Chain 1, Iteration: 2000 / 10000 [ 20%]  (Warmup)
+## Chain 1, Iteration: 3000 / 10000 [ 30%]  (Warmup)
+## Chain 1, Iteration: 4000 / 10000 [ 40%]  (Warmup)
+## Chain 1, Iteration: 5000 / 10000 [ 50%]  (Warmup)
+## Chain 1, Iteration: 5001 / 10000 [ 50%]  (Sampling)
+## Chain 1, Iteration: 6000 / 10000 [ 60%]  (Sampling)
+## Chain 1, Iteration: 7000 / 10000 [ 70%]  (Sampling)
+## Chain 1, Iteration: 8000 / 10000 [ 80%]  (Sampling)
+## Chain 1, Iteration: 9000 / 10000 [ 90%]  (Sampling)
+## Chain 1, Iteration: 10000 / 10000 [100%]  (Sampling)
+##  Elapsed Time: 8.48458 seconds (Warm-up)
+##                7.47725 seconds (Sampling)
+##                15.9618 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL 'Y ~ dnorm(mu, sigma)' NOW (CHAIN 1).
+## WARNING: No variance estimation is
+##          performed for num_warmup &lt; 20
+## 
+## 
+## Chain 1, Iteration: 1 / 1 [100%]  (Sampling)
+##  Elapsed Time: 5e-06 seconds (Warm-up)
+##                0.000146 seconds (Sampling)
+##                0.000151 seconds (Total)
+```
+
+```
+## Warning in map2stan(alist(Y ~ dnorm(mu, sigma), mu &lt;- theta_0 + theta_1 * : There were 3 divergent iterations during sampling.
+## Check the chains (trace plots, n_eff, Rhat) carefully to ensure they are valid.
+```
+
+---
+
+# Bayesian
+
+
+```r
+plot(fm)
+```
+
+&lt;img src="05-2_Linear_Regression_files/figure-html/unnamed-chunk-12-1.png" width="672" /&gt;
+
+---
+
+# Bayesian
+
+
+```r
+precis(fm, digits = 4)
+```
+
+```
+## Warning in precis(fm, digits = 4): There were 3 divergent iterations during sampling.
+## Check the chains (trace plots, n_eff, Rhat) carefully to ensure they are valid.
+```
+
+```
+##            Mean StdDev lower 0.89 upper 0.89 n_eff   Rhat
+## theta_0 -0.0487 2.4384    -3.7649     3.9312  1426 1.0004
+## theta_1  2.3968 0.2316     2.0188     2.7488  1426 1.0004
+## sigma    0.9991 0.1434     0.7796     1.2227  1003 0.9998
+```
+
+```r
+coef(lm(Y ~ X, data = M))
+```
+
+```
+## (Intercept)           X 
+## -0.03540546  2.39524849
+```
+
+---
+
+# Key features
+
+- Analytical solutions are fast, hand-calculable, but unavailable for complex models (e.g., hierarchical)
+- Analytical and ML estimates will converge given enough precision
+- Bayesian estimates include prior knowledge
+- ML and Bayesian estimates will converge for sufficiently flat priors
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({

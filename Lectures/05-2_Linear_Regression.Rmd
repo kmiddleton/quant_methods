@@ -15,6 +15,8 @@ library(tidyverse)
 library(cowplot)
 library(RcppEigen)
 library(plot3D)
+library(rethinking)
+library(latex2exp)
 ```
 
 # Notes
@@ -66,14 +68,20 @@ ggplot(M, aes(X, Y)) + geom_point()
 
 ---
 
-# Solve analytically
+# Analytical solution 1
 
-$Y$ is a (n x 1) vector of observed values
-$X$ is an (n X 2) matrix of ones followed by observations
+Sums of squares
+
+---
+
+# Analytical solution 2: Matrix algebra
+
+$Y$ is a ($n \times 1$) vector of observed values
+$X$ is an ($n \times 2$) matrix of ones followed by observations
 
 $$\theta = (X'X)^{-1} X'Y$$
 
-Where $X'$ is the transpose of $X$ and $X{-1}$ is the inverse [See: https://www.mathsisfun.com/algebra/matrix-inverse.html].
+Where $X'$ is the transpose of $X$ and $X{-1}$ is the [inverse](See: https://www.mathsisfun.com/algebra/matrix-inverse.html).
 
 ```{r}
 (X_mat <- matrix(c(rep(1, n), X), ncol = 2))
@@ -81,7 +89,7 @@ Where $X'$ is the transpose of $X$ and $X{-1}$ is the inverse [See: https://www.
 
 ---
 
-# Solve analytically
+# Analytical solution 2
 
 ```{r}
 (theta <- (solve(t(X_mat) %*% X_mat)) %*% (t(X_mat) %*% Y))
@@ -159,7 +167,11 @@ for (i in 1:reps) {
   liks[i] <- log_lik(Y, fm_fast$fitted.values)
 }
 Sys.time() - t1
+```
 
+---
+
+```{r}
 ggplot(as.data.frame(liks), aes(x = 1:length(liks), y = liks)) +
   geom_path()
 ```
@@ -173,7 +185,7 @@ fm <- lm(Y ~ X, data = M)
 M_aug <- M %>% 
   add_residuals(fm) %>% 
   add_predictions(fm)
-M_aug %>% head()
+M_aug
 ```
 
 ---
@@ -190,7 +202,7 @@ M_aug %>%
 
 ---
 
-```{r}
+```{r echo=FALSE}
 ggplot(M_aug, aes(resid)) +
   geom_line(stat = "density")
 summary(M_aug$resid)
@@ -198,10 +210,74 @@ summary(M_aug$resid)
 
 ---
 
+# Maximum likelihood
+
+FIXME
+
+---
+
+# Bayesian
+
+What priors for intercept ($\theta_0$) and slope ($\theta_1$)?
+
+```{r echo=FALSE, fig.height=4}
+p1 <- M %>% 
+  ggplot(aes(X, Y)) +
+  geom_point()
+x <- seq(-100, 100, length = 100)
+p2 <- data_frame(x = x, y = dunif(x, -100, 100)) %>% 
+  ggplot(aes(x, y)) +
+  geom_line() +
+  labs(x = "value", y = "Probability",
+       title = TeX("$U(-100, 100)$"))
+plot_grid(p1, p2, ncol = 2)
+```
+
+---
+
+# Bayesian
+
+```{r Bayes_regression, cache=TRUE, message=FALSE}
+library(rethinking)
+
+fm <- map2stan(
+  alist(
+    Y ~ dnorm(mu, sigma),
+    mu <- theta_0 + theta_1 * X,
+    theta_0 ~ dunif(-100, 100),
+    theta_1 ~ dunif(-100, 100),
+    sigma ~ dunif(0, 100)
+  ),
+  data = M,
+  WAIC = FALSE,
+  iter = 10^4
+)
+```
+
+---
+
+# Bayesian
+
+```{r, fig.height=4}
+plot(fm)
+```
+
+---
+
+# Bayesian
+
+```{r}
+precis(fm, digits = 4)
+coef(lm(Y ~ X, data = M))
+```
+
+---
+
 # Key features
 
-- Analytical solutions are fast, hand-calculable, but unavailable for complex models (e.g., hierarchical)
+- Analytical solutions are fast, hand-calculable
+    - Unavailable for complex models (e.g., hierarchical models)
 - Analytical and ML estimates will converge given enough precision
-- Bayesian estimates include prior knowledge
+- Bayesian estimates can include prior knowledge
 - ML and Bayesian estimates will converge for sufficiently flat priors
 
