@@ -1,0 +1,49 @@
+---
+title: "01-2Ex"
+author: "KingMiddleton"
+date: "1/14/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(ggplot2)
+library(cowplot)
+
+
+```
+
+```{r}
+#Read in data
+myDat <- read_excel("01-2Ex.xlsx")
+
+```
+
+```{r}
+
+#Plot data
+ggplot(myDat,aes(x=Length,y=Width)) +
+  geom_point()
+```
+
+```{r}
+
+#Filter out low temp outlier
+myDat <- myDat %>% filter(Notes!='LowTemp')
+
+#Calculate Area
+
+myDat$Area <- myDat$Length*myDat$Width
+```
+
+```{r}
+
+#make a plot
+
+ggplot(myDat, aes(x=as.factor(Group),y=Width,fill=as.factor(Group))) +
+  geom_boxplot(alpha=1/5) +
+  geom_point()
+
+```
+

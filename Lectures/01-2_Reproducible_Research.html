@@ -20,9 +20,9 @@ class: center, middle, inverse
 
 
 
----
-
 # Notes
+
+No notes for this lecture
 
 ---
 
@@ -37,9 +37,27 @@ Recommended:
 
 # What is reproducible research?
 
+&gt; "By reproducible, I mean that your work can be repeated by other researchers and they can arrive at the same results. For this to be the case, your work must be well documented, and your methods, code, and data all need to be available so that other researchers have the materials to reproduce everything." -VS Buffalo
+
 ---
 
 # Reproducible vs. replicable research
+
+1. Reproducible - Given only 1) the raw data and 2) the scripts (i.e. code), one can produce the same set of results and figures. Not almost the same set, the **SAME SET**.
+
+1. Replicable - Can one repeat the same experiment and reach the same conclusion?
+
+
+In this class, when we discuss reproducible research, this is what we will mean. Outside of this course, these terms are often used more generally or interchangeably. 
+---
+
+# Problems you are trying to avoid
+1. How did I make this figure?
+1. Why did I eliminate those data points?
+1. Where are the data I eliminated?
+1. What analysis did I use to reach this conclusion?
+1. I just added new samples. It is going to be so much work to run the analyses again!
+
 
 ---
 
@@ -52,15 +70,21 @@ Recommended:
 
 ---
 
-# Problems you are trying to avoid
-
----
-
 # Point and click vs. scripting analyses
+
 
 ---
 
 # Insulating data from analysis
+
+Treat raw data like an endangered species. Don't mess with it!
+
+In data science speak, raw data should always be read-only.
+    - /Project
+        - /RawData
+        - /Data
+        - /Scripts
+        - /Plots
 
 ---
 
@@ -68,7 +92,9 @@ Recommended:
 
 1. R
 1. Markdown
-1. Version control (git)
+1. Version control
+    - Ok = sequential numbers (never use "final"!)
+    - Better = Git (Interested? See [Git for Humans](https://speakerdeck.com/alicebartlett/git-for-humans))
 
 ---
 
@@ -97,7 +123,7 @@ Recommended:
 - Huge data (&gt;`\(10^6\)` observations) is rarely an issue (SAS, Stata, python, julia)
 - Speed is rarely an issue for us (fortran, julia, MATLAB, python)
 - Python (NumPy/SciPy/pandas/statsmodel) is less mature as a general statistical programming language
-
+- R is open source
 ---
 
 # R will make you angry
@@ -111,19 +137,10 @@ Recommended:
 
 # R will make you happy
 
-- Takes time
+- Keeps a record of what you did for you
+- (Almost) Anything is possible in R
+- Beautiful, reproducible plots
 
----
-
-# Why no Powerpoint slides?
-
-- Inefficient to make slides
-- No mechanism to seamlessly include R output &amp; graphics
-- Ugly equations
-- Hard to keep track of changes
-- Let something else handle formatting (R Markdown)
-    - Nice HTML output
-- Poor support for version control
 
 ---
 
@@ -132,8 +149,8 @@ Recommended:
 - RStudio is an interface to R
 - R can be run without RStudio.
     - The reverse is not true.
-- RStudio is the most important thing to ever happen to R
-- These slides were written using RStudio.
+- RStudio is one of the most important thing to ever happen to R
+- These slides were written in R, using RStudio and R Markdown.
 
 ---
 
@@ -153,7 +170,14 @@ Recommended:
 
 ---
 
-# Investment for your future self
+# Reproducibility is an investment for your future self
+
+Doing things “the hard way” now is the easy way in the long run.
+
+
+Be kind to your future self.
+
+&gt; Your closest collaborator is you six months ago, but you don't reply to emails.
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
