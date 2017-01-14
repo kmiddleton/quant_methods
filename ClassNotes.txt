@@ -11,6 +11,11 @@ M: Lecture 2 posted
 T:
 W:Problem set 1 due
 
+Reminders:
+
+- How do you know something works?
+
+
 Week 1: Reproducible research, programming with data
 	Goals:
 		Introduction to R
