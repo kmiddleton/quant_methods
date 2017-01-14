@@ -23,3 +23,6 @@ output:
 
 ---
 
+> "For example, last month I was working on a problem of logistic regression that I suspected had mislabeled outcomes (some zeroes turned to ones, and vice versa), and read up on some robust logistic regression methods, implemented in the robust package. But I wasn't sure they would be effective on my data, so I did some random simulation of mislabeled outcomes and applied the method. The method didn't work as well as I needed it to, which saved me from applying it to my data and thinking I'd solved the problem.
+
+> For this reason, no matter how much math and proofs there are that show a method is, I really only feel comfortable with a method once I've worked with it simulated data. It's also a great way to teach myself about the statistical method." [David Robinson](http://varianceexplained.org/r/simulation-bayes-baseball/)
