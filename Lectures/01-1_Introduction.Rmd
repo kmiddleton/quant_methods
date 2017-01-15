@@ -26,10 +26,10 @@ None for this lecture.
 
 - Teach you to be an independent, modern scientist
 - Be more comfortable with data analysis
-   - Data exploration and plotting
+    - Data exploration and plotting
 - Recipes for analyses
-   - Reuse what you have already done
-   - Recognize when you can reuse
+    - Reuse what you have already done
+    - Recognize when you can reuse
 - Gain experience programming
 - Design experiments that can be analyzed before you collect data
 - Write about analyses and results

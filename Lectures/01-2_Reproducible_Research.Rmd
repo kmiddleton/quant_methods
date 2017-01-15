@@ -16,7 +16,7 @@ bibliography: Multivariate.bib
 
 ## Notes
 
-No notes for this lecture
+None for this lecture
 
 ## Readings
 
@@ -31,9 +31,8 @@ Recommended:
 
 ## Reproducible vs. replicable research
 
-1. Reproducible - Given only 1) the raw data and 2) the scripts (i.e. code), one can produce the same set of results and figures. Not almost the same set, the **SAME SET**.
-
-1. Replicable - Can one repeat the same experiment and reach the same conclusion?
+1. *Reproducible* - Given only 1) the raw data and 2) the scripts (i.e., code), one can produce the same set of results and figures. Not almost the same set, the **SAME SET**.
+1. *Replicable* - Can one repeat the same experiment and reach the same conclusion?
 
 In this class, when we discuss reproducible research, this is what we will mean. Outside of this course, these terms are often used more generally or interchangeably. 
 
@@ -59,11 +58,12 @@ In this class, when we discuss reproducible research, this is what we will mean.
 Treat raw data like an endangered species. Don't mess with it!
 
 In data science speak, raw data should always be read-only.
-    - /Project
-        - /RawData
-        - /Data
-        - /Scripts
-        - /Plots
+
+- /Project
+    - /RawData
+    - /Data
+    - /Scripts
+    - /Plots
 
 - Store your data in its rawest form
     - Excel ok
@@ -97,7 +97,7 @@ In data science speak, raw data should always be read-only.
 
 - You probably won't have careers as biostatisticians (SAS, Stata)
 - Won't tie to you some non-free software (SAS, SPSS, Systat, Stata, NCSS/PASS, MATLAB)
-- Huge data (>$10^6$ observations) is rarely an issue (SAS, Stata, python, julia)
+- Huge data (>$10^8$ observations) is rarely an issue (SAS, Stata, python, julia)
 - Speed is rarely an issue for us (fortran, julia, MATLAB, python)
 - Python (NumPy/SciPy/pandas/statsmodel) is less mature as a general statistical programming language
 - R is open source
@@ -112,8 +112,8 @@ In data science speak, raw data should always be read-only.
 ## R will make you happy
 
 - Keeps a record of what you did for you
-- (Almost) Anything is possible in R
-- Beautiful, reproducible plots
+- (Almost) anything is possible in R
+- Beautiful, publication-ready, reproducible plots
 
 ## R $\neq$ RStudio
 

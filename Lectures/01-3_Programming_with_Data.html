@@ -216,9 +216,12 @@
 <pre class = 'prettyprint lang-r'>install.packages(&quot;tidyverse&quot;) # Once
 library(tidyverse)</pre>
 
-<p>Read <a href='https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html' title=''>The Tidy Tools Manifesto</a></p>
+<ul>
+<li>We will start using these tools next week.</li>
+<li>Read <a href='https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html' title=''>The Tidy Tools Manifesto</a></li>
+</ul>
 
-</article></slide><slide class=''><hgroup><h2>Kinds of data</h2></hgroup><article  id="kinds-of-data">
+</article></slide><slide class=''><hgroup><h2>Kinds of data in R</h2></hgroup><article  id="kinds-of-data-in-r">
 
 <ul>
 <li>Character (&quot;a&quot;, &quot;Female&quot;, &quot;The quick brown fox&quot;)</li>
@@ -226,6 +229,15 @@ library(tidyverse)</pre>
 <li>Logical (<code>TRUE</code> or <code>FALSE</code>)</li>
 <li>Factor (categorical)</li>
 </ul>
+
+</article></slide><slide class=''><hgroup><h2>Common R objects</h2></hgroup><article  id="common-r-objects">
+
+<ol>
+<li>Vectors</li>
+<li>Matrices</li>
+<li>data.frames</li>
+<li>Functions</li>
+</ol>
 
 </article></slide><slide class=''><hgroup><h2>Vectors</h2></hgroup><article  id="vectors">
 
@@ -329,13 +341,13 @@ M</pre>
 
 </article></slide><slide class=''><hgroup><h2><code>data.frame()</code>: a basic unit of storage</h2></hgroup><article  id="data.frame-a-basic-unit-of-storage">
 
-<p>Mixed data types</p>
+<p>Mixed data types per column</p>
 
 <ul>
 <li>Numeric</li>
 <li>Character</li>
 <li>Factor (categorical)</li>
-<li>Logical (TRUE and FALSE)</li>
+<li>Logical (<code>TRUE</code> and <code>FALSE</code>)</li>
 </ul>
 
 <p><code>read_excel()</code> produces <code>tbl_df</code>s, which print a little prettier but are otherwise equivalent and completely compatible.</p>
@@ -354,7 +366,7 @@ M</pre>
 
 </article></slide><slide class=''><hgroup><h2>Extracting from data.frames</h2></hgroup><article  id="extracting-from-data.frames">
 
-<p>Either <code>$</code> or <code>[, ]</code> notation (with &quot;&quot;).</p>
+<p>Either <code>$</code> or <code>[, ]</code> notation (with quoted column names).</p>
 
 <pre class = 'prettyprint lang-r'>M$x</pre>
 
@@ -407,7 +419,7 @@ M</pre>
 </article></slide><slide class=''><hgroup><h2>Analysis workflow</h2></hgroup><article  id="analysis-workflow" class="smaller">
 
 <ol>
-<li>Enter data (Excel, e.g.)</li>
+<li>Enter data (e.g., Excel)</li>
 <li>Load raw data and perform manipulations
 
 <ul>

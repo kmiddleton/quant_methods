@@ -95,14 +95,22 @@ install.packages("tidyverse") # Once
 library(tidyverse)
 ```
 
-Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)
+- We will start using these tools next week.
+- Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)
 
-## Kinds of data
+## Kinds of data in R
 
 - Character ("a", "Female", "The quick brown fox")
 - Numeric (1.25, 1e6) or integer (1)
 - Logical (`TRUE` or `FALSE`)
 - Factor (categorical)
+
+## Common R objects
+
+1. Vectors
+1. Matrices
+1. data.frames
+1. Functions
 
 ## Vectors
 
@@ -165,12 +173,12 @@ M[, 1]
 
 ## `data.frame()`: a basic unit of storage
 
-Mixed data types
+Mixed data types per column
 
   - Numeric
   - Character
   - Factor (categorical)
-  - Logical (TRUE and FALSE)
+  - Logical (`TRUE` and `FALSE`)
 
 `read_excel()` produces `tbl_df`s, which print a little prettier but are otherwise equivalent and completely compatible.
 
@@ -186,7 +194,7 @@ M
 
 ## Extracting from data.frames
 
-Either `$` or `[, ]` notation (with "").
+Either `$` or `[, ]` notation (with quoted column names).
 
 ```{r}
 M$x
@@ -221,7 +229,7 @@ Get help from the R command line with ?: `?sqrt` or `?log10`. Also try `help.sea
 
 ## Analysis workflow {.smaller}
 
-1. Enter data (Excel, e.g.)
+1. Enter data (e.g., Excel)
 1. Load raw data and perform manipulations
     * Recode variables
     * Create categorical variables where applicable
