@@ -22,8 +22,15 @@ blockquote {
   quotes: "\201C""\201D""\2018""\2019";
 }
 
+p ul ol {
+  text-align: left;
+  font-size: 80%;
+}
+
 blockquote p {
+  font-size: 80%;
   display: inline;
+  text-align: left;
 }
 
 <style>
