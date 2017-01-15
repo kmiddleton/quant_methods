@@ -28,13 +28,13 @@ blockquote p {
 
 <style>
   .col2 {
-    columns: 2 300px;         /* number of columns and width in pixels*/
     -webkit-columns: 2 300px; /* chrome, safari */
     -moz-columns: 2 300px;    /* firefox */
+    columns: 2 300px;         /* number of columns and width in pixels*/
   }
   .col3 {
-    columns: 3 100px;
     -webkit-columns: 3 100px;
     -moz-columns: 3 100px;
+    columns: 3 100px;
   }
 </style>
