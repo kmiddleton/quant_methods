@@ -1,2 +1,2 @@
-# anal_bio_data
-Analysis of Biological Data
+# Quantitative Methods in Life Sciences
+
