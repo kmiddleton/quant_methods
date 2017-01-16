@@ -31,6 +31,26 @@ bibliography: Multivariate.bib
 - Available Mondays (or sooner)
 - Watch, rewatch, take notes, look up things you don't understand, etc.
 
+## Grading
+
+Participation (50%): Your participation grade in the course will be a function of:
+
+- Quiz questions (completion)
+- Problem sets (completion)
+- Peer evaluations (both your own completion of and others' evaluation of you)
+- In class contributions
+
+## Grading
+
+Review Project (10%)
+
+## Grading
+
+Final Exam (40%)
+
+- The final exam will be distributed at the beginning of May and will be due on 5/10.
+- You can not work with other members of the class or anyone else on this exam. You will be able to use all other available resources (books, notes, lectures, internet, etc.).
+
 ## Quiz questions
 
 - In between some of the lectures
