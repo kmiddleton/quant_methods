@@ -15,6 +15,12 @@ Reminders:
 
 - How do you know something works?
 
+Path Analysis
+
+- http://pacha.hk/sem_r_part_1.html
+- http://pacha.hk/sem_r_part_2.html
+
+---
 
 Week 1: Reproducible research, programming with data
 	Goals:
