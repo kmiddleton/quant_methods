@@ -23,6 +23,7 @@ Path Analysis
 ---
 
 Week 1: Reproducible research, programming with data
+
 	Goals:
 		Introduction to R
 			dealing with errors/debugging
@@ -35,3 +36,65 @@ Week 1: Reproducible research, programming with data
 		Very basic operations
 		Installing packages
 		Rendering .rmd
+
+---
+
+Week 2: Data cleaning, organization, visualization
+
+---
+
+Week 3: Basic probability
+
+---
+
+Week 4: Likelihood, Bayesian concepts, frequentist framework
+
+---
+
+Week 5: Applications of three inference frameworks
+
+---
+
+Week 6: Parameter estimation, significance testing
+
+---
+
+Week 7: Randomization, multiple testing
+
+---
+
+Week 8: Generalized linear models
+
+---
+
+Week 9: Generalized linear models
+
+---
+
+Week 10: Model comparison, model based inference
+
+---
+
+Week 11: Kinship and phylogenetic methods
+
+---
+
+Week 12: Multiple comparisons procedures
+
+Nutrition data, 27000 correlation p values
+
+---
+
+Week 13: Composite variables
+
+---
+
+Week 14: Composite variables
+
+---
+
+Week 15: Experimental design
+
+Power analysis (formal)
+Power analysis (simulation)
+
