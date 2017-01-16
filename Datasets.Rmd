@@ -234,7 +234,37 @@ with(SAT, cor.test(`SAT Critical Reading Avg. Score`,
                    `SAT Math Avg. Score`))
 ```
 
-## Titanic passengers
-
 ## Fuel Economy
+
+```{r}
+library("tidyverse")
+M <- read_csv("data/Vehicle_Fuel_Economy.csv")
+glimpse(M)
+M %>% 
+  ggplot(aes(highway08)) +
+  geom_histogram()
+
+M %>% 
+  filter(highway08 > 75) %>% 
+  select(make, model, year, highway08) %>% 
+  arrange(year)
+```
+
+## fivethirtyeight
+
+https://cran.r-project.org/web/packages/fivethirtyeight/vignettes/fivethirtyeight.html
+
+```{r eval=FALSE}
+install_github("rudeboybert/fivethirtyeight")
+```
+
+```{r}
+library("tidyverse")
+library("fivethirtyeight")
+# http://fivethirtyeight.com/features/you-cant-trust-what-you-read-about-nutrition/
+glimpse(nutrition_pvalues)
+nutrition_pvalues %>% 
+  ggplot(aes(p_values)) +
+  geom_line(stat = "density")
+```
 
