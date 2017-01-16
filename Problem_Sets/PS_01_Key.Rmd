@@ -1,0 +1,312 @@
+---
+title: 'Problem Set 01'
+author: "Your Name Here"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+## How to use the problem sets
+
+Each problem set will contain narrative text interspersed with R code. Some of this code will already be completed for you, while some you will need to fill in. You should read through all of the text (just as you are doing right now). The exercises (**Activities**) are interspersed throughout the text.
+
+### Important
+
+As you work through the exercises, really think about what you are doing. In the upcoming problem sets, you will be learning how to think through analyses step by step, from loading data, to visualizing it, to actually carrying out statistical tests, and then interpreting the results.
+
+Read the code like you would a textbook (meaning studying and digesting as you go). It's easy to copy and paste or just run code chunks without really thinking about what the code is doing (we've done it too), but that's not a good way to learn.
+
+## R Markdown $\rightarrow$ HTML
+
+We will be working in R Markdown files. Markdown is a markup language that is designed to be no only readable in its text form, but also able to be converted into other formats. Markdown has a simple syntax which allows for things like bold ("**Activities**" above), *italics*, and facilities for including math notation ($\alpha, \beta, \gamma, x^2$). Even some pretty fancy math using [LaTeX](https://www.latex-tutorial.com/):
+
+$$\bar{Y} = \frac{\sum^{n}_{i = 1}Y_i}{n}$$
+
+R Markdown is the marriage of R and [markdown](https://en.wikipedia.org/wiki/Markdown), allowing you to write text and R code together that can include analysis, figures, and tables. R Markdown has been extended for making slides (like the ones we use in this class), adding references, bibliographies, and cross references.
+
+Our usage in this class will be fairly pedestrian, but you can do some really complex things, like writing entire manuscripts using the bookdown package. Read more about [R Markdown]( http://rmarkdown.rstudio.com/) and [bookdown](https://bookdown.org/yihui/bookdown/).
+
+R markdown (.Rmd) files can be converted to different formats. We will use HTML (PDF and Word are other options). 
+
+- Click "Knit HTML" at the top of this window right now.
+
+You might get a message about installing some packages. Click yes to install the required packages. After a few seconds, another window should open with this document rendered as a visually pleasing file.
+
+You have just compiled an R Markdown file into HTML. These Rmd and HTML files will be the basic currency of the problems sets you will do in this class.
+
+## Insert an R code chunk
+
+An Rmd file can include R code that is run at compile time.
+
+### Activity
+
+**Activity** means that you need to do something (i.e., be active). Before you submit your problem set, search (*Ctrl-f* / *Cmd-f*) for "Activity" and make sure you have answered all the questions.
+
+Place the cursor on the line below this text and press *Ctrl-Alt-i* (Windows) / *Cmd-Option-i* (Mac) to insert an R code chunk.
+
+
+
+Enter some R code into the chunk on the blank line: `sqrt(2)`. Then compile the HTML. Your file will show the R code that is run and R's output ($\sqrt{2} = 1.41$).
+
+You can also run code interactively from an Rmd file to the R console. To run a single line, press *Ctrl-Enter* / *Cmd-Return*. To run the current chunk, use *Ctrl-Alt-c* / *Cmd-Shift-Return*. This is a good way to test code that you are working on, rather then waiting to compile the Rmd to HTML (or whatever format you are using).
+
+You can also enter the code for code chunks manually, but I find it easier to use the insert code chunk shortcut.
+
+## Naming R objects
+
+There are not many restrictions on what you can name R objects. Unlike other languages, where some names are reserved and off-limits, in R, pretty much anything goes. Object names can't start with a number (no `1a <- 1`; that will give you an "unexpected symbol" error), but otherwise you are free to do what you want, even things you probably should not do. One of the main things to avoid is naming your objects the same as an R function.
+
+Some names to avoid: `c`, `mean`, `df`, `matrix`, `t`, `T`, `F`. The last two are acceptable abbreviations for `TRUE` and `FALSE`. To avoid ambiguity, we recommend writing out `TRUE` and `FALSE` explicitly, rather than using the abbreviations.
+
+If you want to take the mean of a vector `x`, we recommend using `mean_x`, `x_bar`, or `x_mean`.^[KMM prefers the latter because of RStudio's auto-completion feature.] There are two benefits of using one of these variable names over using `mean`.
+
+1. You don't confuse your `mean` object with the `mean()` function.
+2. What if you later want to take the mean of a different vector. Which one does `mean` refer to?
+
+You could do this, for example:
+
+```{r}
+sd <- sd(1:6)
+sd
+sd(4:10)
+```
+
+### Activity
+
+Execute the chunk above and look at the R console output. Explain what we have done here and what R must be doing without telling you. Write your answer after the ">" below. (">"" is the Rmd for a block quote, which will make finding your answers easier.)
+
+> The first line creates and object called `sd` that contains the standard deviation of the number 1, 2, 3, 4, 5, 6. The second line prints that value. The third line prints the standard deviation of the numbers 4 through 10. R must be somehow keeping our variable `sd` separate from its internal function `sd()`. If you were able to overwrite the `sd()` function, then the last line would not work correctly. Although R is good about not overwriting variables (in almost all cases), it is best practice to not use R function names for variables.
+
+## Vectors
+
+Vectors are one of the fundamental data structures in R. They consist of data of all the same type (numeric, character, etc.) in a 1 X n structure. You can manually create vectors using the combine function `c()`. Some functions like `seq()`, `rep()`, and the random number generators (`rnorm()`, `runif()`, etc.) produce vectors by default.
+
+### Activity
+
+Assign vectors with the following characteristics:
+
+1. 1, 6, 10, 14.75
+2. TRUE, TRUE, FALSE
+3. a, aa, aaa (as characters)
+4. The sequence 5 to 100 by 1
+5. The sequence 5 to 100 by 5
+6. The sequence starting with 5 and ending at 100 with a length of 60
+7. 17 repeated 10 times
+8. The sequence 1, 2, 3 where each is repeated 10 times in a row
+9. The sequence 1, 2, 3 repeated 10 times
+
+Choose names for these vectors. Add your code to the block below.
+
+```{r}
+v1 <- c(1, 6, 10, 14.75)
+v2 <- c(TRUE, TRUE, FALSE)
+v3 <- c("a", "aa", "aaa")
+v4_1 <- 5:100               # Using the : operator
+v4_2 <- seq(5, 100, by = 1) # This also works
+v5 <- seq(5, 100, by = 5)
+v6 <- seq(5, 100, length = 60)
+v7 <- rep(17, times = 10)
+v8 <- rep(c(1, 2, 3), each = 10)
+v9 <- rep(c(1, 2, 3), length = 3 * 10)
+```
+
+## Working with relational operators
+
+Binary operations are very important in R for selecting, subsetting, and choosing variables. The relational operators in R are:
+
+- `==` Equals
+- `!=` Does not equal
+- `>` Greater than
+- `<` Less than
+- `>=` Greater than or equal to
+- `>=` Less than or equal to
+- `%in%` Is the comparator in the set?
+
+When these operators are applied to vectors, the result is a vector of logicals (`TRUE`s and `FALSE`s).
+
+### Activity
+
+Use your vectors from above in the same order to test the following relational operators.
+
+1. Which values are greater than 5?
+2. Which values equal FALSE?
+3. Does this vector contain the string "a"?
+4. Which values are less than or equal to 10?
+5. Which values are greater than or equal to 10?
+6. Count the number of values less than 50 (hint, use `sum()`)
+7. Count the number of values equal to 17
+8. Which values equal 1?
+9. Which values do not equal 1?
+
+```{r}
+v1 > 5
+v2 == FALSE
+"a" %in% v3
+v4_1 <= 10
+v5 >= 10
+sum(v6 < 50)
+sum(v7 == 17)
+v8 == 1
+v9 != 1
+```
+
+## Perils of relational operators
+
+Computers only infrequently store numbers internally as integers ([computer algebra systems](https://en.wikipedia.org/wiki/Computer_algebra_system) do this), particularly after any kind of numeric operation.
+
+In contrast, numerics are often rounded to some level of accuracy (R uses about 53 decimal places). For example:
+
+```{r}
+a <- sqrt(2)
+a
+a * a
+a * a == 2
+all.equal(a * a, 2)
+```
+
+Line by line, explain what the statements above are doing and the R output of each. Look at the help for `all.equal()` if you need to. Enter your explanation after the `>` below.
+
+> 
+
+## Matrices
+
+Matrices are square objects (rows and columns) in which all of the cells have the same type of data. In most cases when you use matrices, you will have numbers only, however, matrices can hold characters, logicals, or factors as well.
+
+### Activity
+
+(a) Use the `matrix()` function and `rnorm(36, mean = 10, sd = 5)` to create a 6 X 6 matrix. The `rnorm()` draw random normally distributed numbers. By supplying the `mean` and `sd` arguments, we can specify the mean and standard deviation of the distribution.
+
+```{r}
+set.seed(37)
+M6x6 <- matrix(rnorm(36, mean = 10, sd = 5), nrow = 6)
+M6x6
+```
+
+(b) Use the `colMeans()` function to calculate the column means of your matrix.
+
+```{r}
+colMeans(M6x6)
+```
+
+(c) Use an inequality to find all values less than 10.
+
+```{r}
+M6x6 < 10
+```
+
+What kind of matrix is returned?
+
+> 
+
+(d) Use your inequality from part (c) and `colMeans()` to calculate the average proportion of values less than 10 in your matrix.
+
+```{r}
+colMeans(M6x6 < 10)
+```
+
+Compare the results of the column means with the results of part (c). What is R doing with the `TRUE` and `FALSE` values in order to be able to use `colMeans()`?
+
+> 
+
+## data.frames
+
+`data.frame`s are one of the most important objects that you will work with in R. They are the closest thing to an Excel spreadsheet in R (with the added restriction that a column must be all of one data type). When you read in files from csv or from Excel, you will almost always get a `data.frame` or its cousin the "tibble" (`tbl_df`).
+
+### Activity
+
+Create a data.frame with the following columns:
+
+- A character vector `Tx_Group` with the values "control" and "high", each repeated 10 times.
+- A numeric vector `Replicate` with values 1 and 2, each repeated 5 times for each of the 10 values of "control" and "high" in `Tx_Group`.
+- A numeric vector `Productivity`, where the first 10 values are normally distributed with a mean of 5 and standard deviation of 2 and the second 10 values are normally distributed with a mean of 8 and standard deviation of 2. `c()` will be useful here.
+
+Include the argument `stringsAsFactors = FALSE` to tell R not to convert the strings to factors.
+
+```{r}
+D <- data.frame(
+  Tx_Group = rep(c("control", "high"), each  = 10),
+  Replicate = rep(c(1, 2, 1, 2), each = 5),
+  Productivity = c(rnorm(10, 5, 2), rnorm(10, 7, 2)),
+  stringsAsFactors = FALSE
+)
+
+# This also works with c(5, 7) inside rnorm, but it's
+# less clear.
+D <- data.frame(
+  Tx_Group = rep(c("control", "high"), each  = 10),
+  Replicate = rep(c(1, 2, 1, 2), each = 5),
+  Productivity = rnorm(10, c(5, 7), 2),
+  stringsAsFactors = FALSE
+)
+```
+
+Use the `str()` function to get information about the data.frame. This will allow you to verify that `Tx_Group` has the type character. Note that even though `Replicate` only contains the integers 1 and 2, R treats it as a numeric.
+
+```{r}
+str(D)
+```
+
+## Indexing
+
+Taking subsets of objects in R is very common. This can include slicing or filtering rows, extracting one or more columns, and referencing columns in other functions.
+
+You can use standard bracket notation `[ ]` to subset vectors, matrices, and data.frames. The latter two require a comma to denote rows and columns: `[rows, columns]`. You can also take a single column of a data.frame with the `$` operator.
+
+### Activity
+
+Use your data.frame from the question above. Extract the following subsets:
+
+1. The column `Productivity` using bracket notation
+2. The column `Productivity` using `$` notation
+3. The second column (assume you don't know its name)
+4. Rows 1-10 of the entire data.frame
+5. Rows 1-10 of only the Productivity column
+
+```{r}
+# 1
+D[, "Productivity"]
+
+#2
+D$Productivity
+
+#3
+D[, 2]
+
+#4
+D[1:10, ]
+
+#5
+D[1:10, "Productivity"]
+D$Productivity[1:10] # Get column with $, then subset
+```
+
+We will do more complex filtering next week (e.g., only rows from replicate 1 where productivity is less than 5).
+
+## Basic calculations in R
+
+R can do basic (and not so basic) calculations. First set up a vector of numbers to work with.
+
+```{r r_calculator}
+# Set the random number generator seed
+set.seed(5)
+
+# Generate 10 random numbers between 0 and 1
+x <- runif(10)
+x
+```
+
+### Activity
+
+Try out some R functions: `mean(x)`, `sd(x)`, `median(x)`, `t(x)`. Type them into the code chunk below and compile.
+
+These functions take a vector or matrix and return a single value or a new matrix. Contrast this behavior with `x^2`. Enter that and see what you get.
+
+Try functions operating on the matrix you created above.
+
+```{r}
+
+```
