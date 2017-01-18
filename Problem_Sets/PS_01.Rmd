@@ -81,7 +81,7 @@ sd(4:10)
 
 Execute the chunk above and look at the R console output. Explain what we have done here and what R must be doing without telling you. Write your answer after the ">" below. (">"" is the Rmd for a block quote, which will make finding your answers easier.)
 
-> The first line creates and object called `sd` that contains the standard deviation of the number 1, 2, 3, 4, 5, 6. The second line prints that value. The third line prints the standard deviation of the numbers 4 through 10. R must be somehow keeping our variable `sd` separate from its internal function `sd()`. If you were able to overwrite the `sd()` function, then the last line would not work correctly. Although R is good about not overwriting variables (in almost all cases), it is best practice to not use R function names for variables.
+> 
 
 ## Vectors
 
@@ -104,16 +104,7 @@ Assign vectors with the following characteristics:
 Choose names for these vectors. Add your code to the block below.
 
 ```{r}
-v1 <- c(1, 6, 10, 14.75)
-v2 <- c(TRUE, TRUE, FALSE)
-v3 <- c("a", "aa", "aaa")
-v4_1 <- 5:100               # Using the : operator
-v4_2 <- seq(5, 100, by = 1) # This also works
-v5 <- seq(5, 100, by = 5)
-v6 <- seq(5, 100, length = 60)
-v7 <- rep(17, times = 10)
-v8 <- rep(c(1, 2, 3), each = 10)
-v9 <- rep(c(1, 2, 3), length = 3 * 10)
+
 ```
 
 ## Working with relational operators
@@ -145,15 +136,7 @@ Use your vectors from above in the same order to test the following relational o
 9. Which values do not equal 1?
 
 ```{r}
-v1 > 5
-v2 == FALSE
-"a" %in% v3
-v4_1 <= 10
-v5 >= 10
-sum(v6 < 50)
-sum(v7 == 17)
-v8 == 1
-v9 != 1
+
 ```
 
 ## Perils of relational operators
@@ -183,21 +166,19 @@ Matrices are square objects (rows and columns) in which all of the cells have th
 (a) Use the `matrix()` function and `rnorm(36, mean = 10, sd = 5)` to create a 6 X 6 matrix. The `rnorm()` draw random normally distributed numbers. By supplying the `mean` and `sd` arguments, we can specify the mean and standard deviation of the distribution.
 
 ```{r}
-set.seed(37)
-M6x6 <- matrix(rnorm(36, mean = 10, sd = 5), nrow = 6)
-M6x6
+
 ```
 
 (b) Use the `colMeans()` function to calculate the column means of your matrix.
 
 ```{r}
-colMeans(M6x6)
+
 ```
 
 (c) Use an inequality to find all values less than 10.
 
 ```{r}
-M6x6 < 10
+
 ```
 
 What kind of matrix is returned?
@@ -207,7 +188,7 @@ What kind of matrix is returned?
 (d) Use your inequality from part (c) and `colMeans()` to calculate the average proportion of values less than 10 in your matrix.
 
 ```{r}
-colMeans(M6x6 < 10)
+
 ```
 
 Compare the results of the column means with the results of part (c). What is R doing with the `TRUE` and `FALSE` values in order to be able to use `colMeans()`?
@@ -229,27 +210,13 @@ Create a data.frame with the following columns:
 Include the argument `stringsAsFactors = FALSE` to tell R not to convert the strings to factors.
 
 ```{r}
-D <- data.frame(
-  Tx_Group = rep(c("control", "high"), each  = 10),
-  Replicate = rep(c(1, 2, 1, 2), each = 5),
-  Productivity = c(rnorm(10, 5, 2), rnorm(10, 7, 2)),
-  stringsAsFactors = FALSE
-)
 
-# This also works with c(5, 7) inside rnorm, but it's
-# less clear.
-D <- data.frame(
-  Tx_Group = rep(c("control", "high"), each  = 10),
-  Replicate = rep(c(1, 2, 1, 2), each = 5),
-  Productivity = rnorm(10, c(5, 7), 2),
-  stringsAsFactors = FALSE
-)
 ```
 
 Use the `str()` function to get information about the data.frame. This will allow you to verify that `Tx_Group` has the type character. Note that even though `Replicate` only contains the integers 1 and 2, R treats it as a numeric.
 
 ```{r}
-str(D)
+
 ```
 
 ## Indexing
@@ -270,20 +237,19 @@ Use your data.frame from the question above. Extract the following subsets:
 
 ```{r}
 # 1
-D[, "Productivity"]
+
 
 #2
-D$Productivity
+
 
 #3
-D[, 2]
+
 
 #4
-D[1:10, ]
+
 
 #5
-D[1:10, "Productivity"]
-D$Productivity[1:10] # Get column with $, then subset
+
 ```
 
 We will do more complex filtering next week (e.g., only rows from replicate 1 where productivity is less than 5).

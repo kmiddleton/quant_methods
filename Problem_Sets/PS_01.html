@@ -275,7 +275,7 @@ sd</code></pre>
 <h3>Activity</h3>
 <p>Execute the chunk above and look at the R console output. Explain what we have done here and what R must be doing without telling you. Write your answer after the &quot;&gt;&quot; below. (&quot;&gt;&quot;&quot; is the Rmd for a block quote, which will make finding your answers easier.)</p>
 <blockquote>
-<p>The first line creates and object called <code>sd</code> that contains the standard deviation of the number 1, 2, 3, 4, 5, 6. The second line prints that value. The third line prints the standard deviation of the numbers 4 through 10. R must be somehow keeping our variable <code>sd</code> separate from its internal function <code>sd()</code>. If you were able to overwrite the <code>sd()</code> function, then the last line would not work correctly. Although R is good about not overwriting variables (in almost all cases), it is best practice to not use R function names for variables.</p>
+
 </blockquote>
 </div>
 </div>
@@ -297,16 +297,6 @@ sd</code></pre>
 <li>The sequence 1, 2, 3 repeated 10 times</li>
 </ol>
 <p>Choose names for these vectors. Add your code to the block below.</p>
-<pre class="r"><code>v1 &lt;- c(1, 6, 10, 14.75)
-v2 &lt;- c(TRUE, TRUE, FALSE)
-v3 &lt;- c(&quot;a&quot;, &quot;aa&quot;, &quot;aaa&quot;)
-v4_1 &lt;- 5:100               # Using the : operator
-v4_2 &lt;- seq(5, 100, by = 1) # This also works
-v5 &lt;- seq(5, 100, by = 5)
-v6 &lt;- seq(5, 100, length = 60)
-v7 &lt;- rep(17, times = 10)
-v8 &lt;- rep(c(1, 2, 3), each = 10)
-v9 &lt;- rep(c(1, 2, 3), length = 3 * 10)</code></pre>
 </div>
 </div>
 <div id="working-with-relational-operators" class="section level2">
@@ -336,37 +326,6 @@ v9 &lt;- rep(c(1, 2, 3), length = 3 * 10)</code></pre>
 <li>Which values equal 1?</li>
 <li>Which values do not equal 1?</li>
 </ol>
-<pre class="r"><code>v1 &gt; 5</code></pre>
-<pre><code>## [1] FALSE  TRUE  TRUE  TRUE</code></pre>
-<pre class="r"><code>v2 == FALSE</code></pre>
-<pre><code>## [1] FALSE FALSE  TRUE</code></pre>
-<pre class="r"><code>&quot;a&quot; %in% v3</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>v4_1 &lt;= 10</code></pre>
-<pre><code>##  [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE
-## [12] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [23] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [34] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [45] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [56] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [67] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [78] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [89] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</code></pre>
-<pre class="r"><code>v5 &gt;= 10</code></pre>
-<pre><code>##  [1] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
-## [12]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE</code></pre>
-<pre class="r"><code>sum(v6 &lt; 50)</code></pre>
-<pre><code>## [1] 28</code></pre>
-<pre class="r"><code>sum(v7 == 17)</code></pre>
-<pre><code>## [1] 10</code></pre>
-<pre class="r"><code>v8 == 1</code></pre>
-<pre><code>##  [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE
-## [12] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [23] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</code></pre>
-<pre class="r"><code>v9 != 1</code></pre>
-<pre><code>##  [1] FALSE  TRUE  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE FALSE  TRUE
-## [12]  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE FALSE
-## [23]  TRUE  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE</code></pre>
 </div>
 </div>
 <div id="perils-of-relational-operators" class="section level2">
@@ -393,34 +352,10 @@ a</code></pre>
 <div id="activity-4" class="section level3">
 <h3>Activity</h3>
 <ol style="list-style-type: lower-alpha">
-<li>Use the <code>matrix()</code> function and <code>rnorm(36, mean = 10, sd = 5)</code> to create a 6 X 6 matrix. The <code>rnorm()</code> draw random normally distributed numbers. By supplying the <code>mean</code> and <code>sd</code> arguments, we can specify the mean and standard deviation of the distribution.</li>
+<li><p>Use the <code>matrix()</code> function and <code>rnorm(36, mean = 10, sd = 5)</code> to create a 6 X 6 matrix. The <code>rnorm()</code> draw random normally distributed numbers. By supplying the <code>mean</code> and <code>sd</code> arguments, we can specify the mean and standard deviation of the distribution.</p></li>
+<li><p>Use the <code>colMeans()</code> function to calculate the column means of your matrix.</p></li>
+<li><p>Use an inequality to find all values less than 10.</p></li>
 </ol>
-<pre class="r"><code>set.seed(37)
-M6x6 &lt;- matrix(rnorm(36, mean = 10, sd = 5), nrow = 6)
-M6x6</code></pre>
-<pre><code>##           [,1]      [,2]      [,3]      [,4]       [,5]      [,6]
-## [1,] 10.623770  9.039202 17.124075 12.015376 13.6950113 11.785339
-## [2,] 11.910373 16.814914 14.911550  6.339636  7.7047631  7.392983
-## [3,] 12.896214 14.279772 11.552322  8.608195 10.4143249 13.276978
-## [4,]  8.531259 11.079977  1.662358 16.421153 10.1201182  8.895007
-## [5,]  5.858254  8.111489 -3.524248 14.120147 -0.5198454 11.549539
-## [6,]  8.336432 10.193468  1.315379 -1.922178 12.3153434 10.648575</code></pre>
-<ol start="2" style="list-style-type: lower-alpha">
-<li>Use the <code>colMeans()</code> function to calculate the column means of your matrix.</li>
-</ol>
-<pre class="r"><code>colMeans(M6x6)</code></pre>
-<pre><code>## [1]  9.692717 11.586470  7.173573  9.263722  8.954953 10.591404</code></pre>
-<ol start="3" style="list-style-type: lower-alpha">
-<li>Use an inequality to find all values less than 10.</li>
-</ol>
-<pre class="r"><code>M6x6 &lt; 10</code></pre>
-<pre><code>##       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]
-## [1,] FALSE  TRUE FALSE FALSE FALSE FALSE
-## [2,] FALSE FALSE FALSE  TRUE  TRUE  TRUE
-## [3,] FALSE FALSE FALSE  TRUE FALSE FALSE
-## [4,]  TRUE FALSE  TRUE FALSE FALSE  TRUE
-## [5,]  TRUE  TRUE  TRUE FALSE  TRUE FALSE
-## [6,]  TRUE FALSE  TRUE  TRUE FALSE FALSE</code></pre>
 <p>What kind of matrix is returned?</p>
 <blockquote>
 
@@ -428,8 +363,6 @@ M6x6</code></pre>
 <ol start="4" style="list-style-type: lower-alpha">
 <li>Use your inequality from part (c) and <code>colMeans()</code> to calculate the average proportion of values less than 10 in your matrix.</li>
 </ol>
-<pre class="r"><code>colMeans(M6x6 &lt; 10)</code></pre>
-<pre><code>## [1] 0.5000000 0.3333333 0.5000000 0.5000000 0.3333333 0.3333333</code></pre>
 <p>Compare the results of the column means with the results of part (c). What is R doing with the <code>TRUE</code> and <code>FALSE</code> values in order to be able to use <code>colMeans()</code>?</p>
 <blockquote>
 
@@ -448,27 +381,7 @@ M6x6</code></pre>
 <li>A numeric vector <code>Productivity</code>, where the first 10 values are normally distributed with a mean of 5 and standard deviation of 2 and the second 10 values are normally distributed with a mean of 8 and standard deviation of 2. <code>c()</code> will be useful here.</li>
 </ul>
 <p>Include the argument <code>stringsAsFactors = FALSE</code> to tell R not to convert the strings to factors.</p>
-<pre class="r"><code>D &lt;- data.frame(
-  Tx_Group = rep(c(&quot;control&quot;, &quot;high&quot;), each  = 10),
-  Replicate = rep(c(1, 2, 1, 2), each = 5),
-  Productivity = c(rnorm(10, 5, 2), rnorm(10, 7, 2)),
-  stringsAsFactors = FALSE
-)
-
-# This also works with c(5, 7) inside rnorm, but it's
-# less clear.
-D &lt;- data.frame(
-  Tx_Group = rep(c(&quot;control&quot;, &quot;high&quot;), each  = 10),
-  Replicate = rep(c(1, 2, 1, 2), each = 5),
-  Productivity = rnorm(10, c(5, 7), 2),
-  stringsAsFactors = FALSE
-)</code></pre>
 <p>Use the <code>str()</code> function to get information about the data.frame. This will allow you to verify that <code>Tx_Group</code> has the type character. Note that even though <code>Replicate</code> only contains the integers 1 and 2, R treats it as a numeric.</p>
-<pre class="r"><code>str(D)</code></pre>
-<pre><code>## 'data.frame':    20 obs. of  3 variables:
-##  $ Tx_Group    : chr  &quot;control&quot; &quot;control&quot; &quot;control&quot; &quot;control&quot; ...
-##  $ Replicate   : num  1 1 1 1 1 2 2 2 2 2 ...
-##  $ Productivity: num  1.67 5.01 8.05 5.72 5.35 ...</code></pre>
 </div>
 </div>
 <div id="indexing" class="section level2">
@@ -486,38 +399,18 @@ D &lt;- data.frame(
 <li>Rows 1-10 of only the Productivity column</li>
 </ol>
 <pre class="r"><code># 1
-D[, &quot;Productivity&quot;]</code></pre>
-<pre><code>##  [1]  1.669054  5.008458  8.048497  5.717460  5.349094  6.288283  1.626620
-##  [8] 10.758093  2.112263  9.242393  1.669054  5.008458  8.048497  5.717460
-## [15]  5.349094  6.288283  1.626620 10.758093  2.112263  9.242393</code></pre>
-<pre class="r"><code>#2
-D$Productivity</code></pre>
-<pre><code>##  [1]  1.669054  5.008458  8.048497  5.717460  5.349094  6.288283  1.626620
-##  [8] 10.758093  2.112263  9.242393  1.669054  5.008458  8.048497  5.717460
-## [15]  5.349094  6.288283  1.626620 10.758093  2.112263  9.242393</code></pre>
-<pre class="r"><code>#3
-D[, 2]</code></pre>
-<pre><code>##  [1] 1 1 1 1 1 2 2 2 2 2 1 1 1 1 1 2 2 2 2 2</code></pre>
-<pre class="r"><code>#4
-D[1:10, ]</code></pre>
-<pre><code>##    Tx_Group Replicate Productivity
-## 1   control         1     1.669054
-## 2   control         1     5.008458
-## 3   control         1     8.048497
-## 4   control         1     5.717460
-## 5   control         1     5.349094
-## 6   control         2     6.288283
-## 7   control         2     1.626620
-## 8   control         2    10.758093
-## 9   control         2     2.112263
-## 10  control         2     9.242393</code></pre>
-<pre class="r"><code>#5
-D[1:10, &quot;Productivity&quot;]</code></pre>
-<pre><code>##  [1]  1.669054  5.008458  8.048497  5.717460  5.349094  6.288283  1.626620
-##  [8] 10.758093  2.112263  9.242393</code></pre>
-<pre class="r"><code>D$Productivity[1:10] # Get column with $, then subset</code></pre>
-<pre><code>##  [1]  1.669054  5.008458  8.048497  5.717460  5.349094  6.288283  1.626620
-##  [8] 10.758093  2.112263  9.242393</code></pre>
+
+
+#2
+
+
+#3
+
+
+#4
+
+
+#5</code></pre>
 <p>We will do more complex filtering next week (e.g., only rows from replicate 1 where productivity is less than 5).</p>
 </div>
 </div>
