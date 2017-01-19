@@ -14,17 +14,22 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE}
 ```
 
-## General course information
+## About us
+
+## About you
 
 ## What you need
 
 - Laptop
-- Enthusiasm
+- Can do attitude
 
 ## Book, etc.
 
-- There is no one-size-fits-all statistics textbook. Any that we chose would be a compromise.
-- No official textbook. Many recommendations on Canvas if you are looking for a book.
+There is no one-size-fits-all statistics textbook.
+
+  - Any that we chose would be a compromise.
+  - Lots of free material online.
+  - Many recommendations on Canvas if you are looking for a book.
 
 ## Online lectures
 
@@ -40,19 +45,49 @@ Participation (50%): Your participation grade in the course will be a function o
 - Peer evaluations (both your own completion of and others' evaluation of you)
 - In class contributions
 
+Don't worry about what it says in the gradebook.
+
 ## Grading
 
 Review Project (10%)
+
+- Details in the coming weeks
 
 ## Grading
 
 Final Exam (40%)
 
 - The final exam will be distributed at the beginning of May and will be due on 5/10.
-- You can not work with other members of the class or anyone else on this exam. You will be able to use all other available resources (books, notes, lectures, internet, etc.).
+- You can not work with other members of the class or anyone else on this exam.
+- You will be able to use all other available resources (books, notes, lectures, internet, etc.).
 
 ## Quiz questions
 
 - In between some of the lectures
     - e.g., Watch a lecture, answer some questions
-- Not graded, but you do need to complete them.
+- Not graded, but you *do* need to complete them.
+    - Thoughtful reflection about any you get incorrect
+
+## Problem sets
+
+- Practical experience
+- Gradually less guidance
+
+## Groups
+
+## Peer evaluations
+
+## Reviewing your work
+
+- Problem sets not graded
+- You are responsible for checking
+
+## Typical weekly schedule
+
+*Monday*: Lectures online
+
+*Wednesday*: Problem set online, previous problem set due (midnight)
+
+*Thursday*: Quizzes due (midnight)
+
+*Friday*: class meeting, discuss any issues from that week, previous peer evaluations due (midnight)

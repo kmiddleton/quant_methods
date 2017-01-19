@@ -26,62 +26,100 @@ Windows rstan install: https://gist.github.com/ericnovik/ff7daab5c3eb0c839688711
 
 Week 1: Reproducible research, programming with data
 
-	Goals:
-		Introduction to R
-			dealing with errors/debugging
-		Introduction to programming/reproducibility
-		File organization
-		Demystifying programming
-			programming & learning a language
+Goals:
+	Introduction to R
+		dealing with errors/debugging
+	Introduction to programming/reproducibility
+	File organization
+	Demystifying programming
+		programming & learning a language
 
-	Problem set:
-		Very basic operations
-		Installing packages
-		Rendering .rmd
+Problem set:
+	Very basic operations
+	Installing packages
+	Rendering .rmd
+
+Discuss:
+
+  - About us
+  - About you - variation in levels
+  - Syllabus
+  - Typical weekly schedule
+  - Gradebook - don't worry about the total
+  - Problem sets, groups
+  - Peer evals, codes
 
 ---
 
 Week 2: Data cleaning, organization, visualization
 
+Goals:
+
+  -
+
 ---
 
 Week 3: Basic probability
+
+Goals:
+
+  -
 
 ---
 
 Week 4: Likelihood, Bayesian concepts, frequentist framework
 
+Goals:
+
+  - Probability to likelihood
+
 ---
 
 Week 5: Applications of three inference frameworks
+
+Goals:
 
 ---
 
 Week 6: Parameter estimation, significance testing
 
+Goals:
+
 ---
 
 Week 7: Randomization, multiple testing
+
+Goals:
 
 ---
 
 Week 8: Generalized linear models
 
+Goals:
+
 ---
 
 Week 9: Generalized linear models
+
+Goals:
 
 ---
 
 Week 10: Model comparison, model based inference
 
+Goals:
+
 ---
 
 Week 11: Kinship and phylogenetic methods
 
+Goals:
+
 ---
 
 Week 12: Multiple comparisons procedures
+
+Goals:
 
 Nutrition data, 27000 correlation p values
 
@@ -89,14 +127,20 @@ Nutrition data, 27000 correlation p values
 
 Week 13: Composite variables
 
+Goals:
+
 ---
 
 Week 14: Composite variables
+
+Goals:
 
 ---
 
 Week 15: Experimental design
 
-Power analysis (formal)
-Power analysis (simulation)
+Goals:
+
+- Power analysis (formal)
+- Power analysis (via simulation)
 
