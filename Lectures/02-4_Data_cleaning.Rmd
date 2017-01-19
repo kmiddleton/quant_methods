@@ -1,0 +1,105 @@
+---
+title: "Data Organization"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+## Notes
+
+Our standard setup chunk:
+
+```{r eval=FALSE}
+library(tidyverse)  # Load dplyr, ggplot2, readr, etc.
+library(readxl)     # Read Excel files
+library(cowplot)    # Prettier ggplot defaults
+```
+
+## Readings
+
+## Aggregating: dplyr
+
+Start by grouping data by some categorical variable:
+
+```{r}
+M %>% group_by(Sex)
+```
+
+## Aggregating: dplyr
+
+Pass the grouped data to `summarize()`. Return the mean and standard deviation.
+
+```{r}
+M %>% group_by(Sex) %>% summarize(mean(WnMass), sd(WnMass))
+```
+
+## Aggregating: dplyr
+
+```{r}
+M %>% group_by(Sex) %>% summarize(mass_mean = mean(WnMass),
+                                  mass_sd = sd(WnMass))
+```
+
+## What's going on with `NA`?
+
+```{r}
+sum(is.na(M$Sex))
+```
+
+- `is.na()` returns `TRUE` if the value is `NA`
+- Summing them converts `TRUE` to 1
+
+We should probably drop those rows
+
+## Filtering out unwanted rows
+
+```{r}
+M_no_NAs <- M %>% filter(!is.na(Sex))
+```
+
+`!is.na()` returns `TRUE` for the values of `Sex` _not_ `NA`.
+
+```{r}
+sum(is.na(M_no_NAs$Sex))
+```
+
+```{r}
+M_no_NAs %>% group_by(Sex) %>%
+  summarize(mass_mean = mean(WnMass),
+            mass_sd = sd(WnMass))
+```
+
+## Filtering out unwanted rows
+
+```{r}
+M_no_NAs <- M %>% drop_na(Sex)
+```
+
+```{r}
+sum(is.na(M_no_NAs$Sex))
+```
+
+```{r}
+M_no_NAs %>% group_by(Sex) %>%
+  summarize(mass_mean = mean(WnMass),
+            mass_sd = sd(WnMass))
+```
+
+## Quiz 02-4
+
+On Canvas, complete quiz 02-4.
+
+Problem Set 2 will be posted on Wednesday.
+
+See you Friday.

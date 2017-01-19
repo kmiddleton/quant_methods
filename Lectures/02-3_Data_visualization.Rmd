@@ -12,12 +12,27 @@ csl: evolution.csl
 bibliography: Multivariate.bib
 ---
 
-```{r setup, echo=FALSE}
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
 ```
 
 ## Notes
 
 ## Readings
+
+## R plotting systems
+
+Base R graphics (e.g., `plot()`)
+
+- Very verbose
+- Easy to do easy things, 
+
+Lattice (`library(lattice)`)
+
+- Largely overlappying functionality with ggplot
+- Much less friendly interface (really)
 
 ### Plotting: Get to know ggplot {.smaller}
 
@@ -31,18 +46,6 @@ bibliography: Multivariate.bib
 - https://github.com/jennybc/ggplot2-tutorial
 - https://speakerdeck.com/jennybc/ggplot2-tutorial
 - http://inundata.org/2013/04/10/a-quick-introduction-to-ggplot2/
-
-## Other R plotting systems
-
-Base R graphics (e.g., `plot()`)
-
-- Ugly
-- Very verbose
-
-Lattice (`library(lattice)`)
-
-- Largely overlappying functionality with ggplot
-- Much less friendly interface (really)
 
 ## Basics of ggplot
 
@@ -293,3 +296,9 @@ ggplot(iris, aes(x = Petal.Length)) +
 - `geom_boxplot()`
 - `geom_dotplot()`
 - More at http://docs.ggplot2.org/current/
+
+## Quiz 02-3
+
+On Canvas, complete quiz 02-3.
+
+Move on to lecture 02-4.

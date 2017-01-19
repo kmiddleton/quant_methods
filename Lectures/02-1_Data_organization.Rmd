@@ -1,0 +1,113 @@
+---
+title: "Data Organization"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+## Notes
+
+## Readings
+
+## Goal for this week
+
+**Take Care of Your Data**:
+
+- Storing
+- Loading
+- Visualizing
+- Validating
+
+## Opinionated rules for data files 
+
+- Garland [*How to Structure and Name Data Files*](http://biology.ucr.edu/people/faculty/Garland/How_to_Structure_and_Name_Data_Files_1.pdf)
+- Karl Broman's guide to data organization: http://kbroman.org/dataorg/
+- Leek research group's guide to sharing data: https://github.com/jtleek/datasharing
+- Wickham (2013): [Tidy Data](http://vita.had.co.nz/papers/tidy-data.pdf)
+- White et al. (2013): [Nine Simple Ways to Make It Easier to (Re)use Your Data](http://ojs.library.queensu.ca/index.php/IEE/article/view/4608)
+
+## Guidelines for data files
+
+- Think about how to store your data _before_ you have data to store
+    - Get it right the first time rather than to deal with bad decisions forever
+- Keep everything.
+    - Disk space is cheap.
+    - Dropbox / Box / Google Drive / Sync, etc.
+    - Iterate file names (or -- better -- use version control)
+- Be consistent
+    - File names, variable names, file formats, etc.
+    - No spaces in data file names
+
+## Guidelines for data files
+
+- Store data in rectangular format
+    - **No empty cells**, repeat values if necessary
+- Use only one header row
+    - Curse software that outputs more than one header row
+- Use `NA` for missing data
+- Use wide format
+    - Each unique observation unit is a row
+
+## Guidelines for data files
+
+- No spaces or units in column names
+    - `body_mass` or `BodyMass` but not "Body Mass" or "Body Mass (g)"
+- Store dates as three separate columns (`Year`, `Month`, `Day`)
+    - Excel does weird things with dates
+    - With concatentation, it is easy to make date columns if you need them
+    - We might be in the minority here.
+
+## Guidelines for data files
+
+- Create a data dictionary (explanations of what your columns represent)
+    - Cell comments, a separate Excel sheet, or separate file
+        - *Not in the column names*
+    - "Body mass in grams, measured to nearest 0.1 g."
+- Keep file sizes manageable
+    - Do you need 384 columns in that Excel file?
+    - Use shared numeric IDs so that you can match and merge data across files
+
+## Examples, bad and good
+
+![](images/data_storage_1.png)
+
+## Examples, bad and good
+
+![](images/data_storage_2.png)
+
+## It would be nice to store data in csv files and edit in Excel, but...
+
+<center><img src="images/excel_1.png" /></center>
+
+## and
+
+<center><img src="images/excel_2.png" /></center>
+
+Working with csv files in Excel _not_ a viable (i.e., non-aggravating) option.
+
+- If you are entering data, use .xls or .xlsx and trust that translators will be available for as long as you are a scientist
+- If you are outputting data from another program, use csv or tab-delimits (if your data has commas).
+
+## Some hope: Comma Chameleon
+
+- Simple, cross-platform csv editing.
+- http://comma-chameleon.io/
+
+<center><img src="http://comma-chameleon.io/img/icon.jpg" /></center>
+
+## Quiz 02-1
+
+On Canvas, complete quiz 02-1.
+
+Move on to lecture 02-2.
