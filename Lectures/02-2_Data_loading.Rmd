@@ -31,7 +31,7 @@ library(readxl)
 
 ## Beware of `stringsAsFactors` "feature"
 
-- Base R file readers (`read.csv()`, `read.table()`, etc.) automatically convert strings into factors (`stringsAsFactors = TRUE`).
+- Base R file readers (`read.csv()` and `read.table()`) automatically convert strings into factors (`stringsAsFactors = TRUE`).
 - *Probably* what you want, but it can be a giant pain if you don't.
     - You likely don't want your "Notes" column as a factor
 

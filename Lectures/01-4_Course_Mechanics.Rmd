@@ -63,7 +63,7 @@ Final Exam (40%)
 
 ## Quiz questions
 
-- In between some of the lectures
+- In between most of the lectures
     - e.g., Watch a lecture, answer some questions
 - Not graded, but you *do* need to complete them.
     - Thoughtful reflection about any you get incorrect
@@ -86,7 +86,7 @@ Final Exam (40%)
 
 *Monday*: Lectures online
 
-*Wednesday*: Problem set online, previous problem set due (midnight)
+*Wednesday*: Problem set online, previous problem set submitted through Canvas (midnight)
 
 *Thursday*: Quizzes due (midnight)
 
