@@ -77,6 +77,8 @@ Goals:
 
 Week 5: Applications of three inference frameworks
 
+Bayes intro: http://sumsar.net/files/posts/2017-01-15-bayesian-computation-with-stan-and-farmer-jons/stan_exercise.html
+
 Goals:
 
 ---
