@@ -4,10 +4,9 @@ subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
 output:
-  xaringan::moon_reader:
-    seal: yes
-    nature:
-      highlightStyle: github
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
 csl: evolution.csl
 bibliography: Multivariate.bib
 ---
@@ -24,28 +23,28 @@ library(cowplot)
 
 ## R plotting systems
 
-Base R graphics (e.g., `plot()`)
+Base R graphics (e.g., `plot()`, `hist()`)
 
-- Very verbose
-- Easy to do easy things, 
+- Easy to do easy things (bivariate scatterplot, histogram)
+- Difficult to do complex plots
 
 Lattice (`library(lattice)`)
 
-- Largely overlappying functionality with ggplot
+- Largely overlappying functionality with `ggplot`
 - Much less friendly interface (really)
 
-### Plotting: Get to know ggplot {.smaller}
+## Plotting: Get to know ggplot {.smaller}
 
-- ggplot documentation reference: http://docs.ggplot2.org/current/
+- `ggplot2` documentation reference: http://docs.ggplot2.org/current/
 - R Graphics Cookbook: http://www.cookbook-r.com/Graphs/
 - Quick-R: http://www.statmethods.net/advgraphs/ggplot2.html
 - Quick Introduction to ggplot: http://blog.echen.me/2012/01/17/quick-introduction-to-ggplot2/
 - ggplot Cheatsheet: http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/
 - Tutorial: http://www.ceb-institute.org/bbs/wp-content/uploads/2011/09/handout_ggplot2.pdf
-- Advanced: http://rpubs.com/hadley/97970
 - https://github.com/jennybc/ggplot2-tutorial
 - https://speakerdeck.com/jennybc/ggplot2-tutorial
 - http://inundata.org/2013/04/10/a-quick-introduction-to-ggplot2/
+- Advanced: http://rpubs.com/hadley/97970
 
 ## Basics of ggplot
 
@@ -64,7 +63,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
   geom_point() 
 ```
 
-- Load the `ggplot` package
+- Load the `ggplot2` package
 - `ggplot()` sets up the plot using `iris` data.frame.
 - `aes()` sets `x` and `y` variables
 - `geom_point()` adds `(x, y)` points corresponding to `Petal.Length` and `Petal.Width`
@@ -113,41 +112,37 @@ ggplot(iris, aes(x = Petal.Length)) +
 
 ## Building plots
 
-```{r echo=TRUE, eval=FALSE}
+```{r pt_color, echo=TRUE, eval=FALSE}
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
   geom_point()
 ```
 
-- `color = Species` colors points by the _Species_ column (a categorical variable)
+- `color = Species` colors points by the _Species_ column (a factor)
 
 ## Building plots
 
-```{r echo=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
-  geom_point()
+```{r pt_color, echo=FALSE}
 ```
 
 ## Building plots
 
-```{r eval=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
+```{r pt_shape, eval=FALSE}
+ggplot(iris, aes(x = Petal.Length,
+                 y = Petal.Width,
                  shape = Species)) + 
   geom_point()
 ```
 
-- `shape = Species` codes _Species_ by the point shape
+- `shape = Species` encodes _Species_ by the point shape
 
 ## Building plots
 
-```{r echo=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
-                 shape = Species)) + 
-  geom_point()
+```{r pt_shape, echo=FALSE}
 ```
 
 ## Building plots
 
-```{r echo=TRUE, eval=FALSE}
+```{r pt_size, echo=TRUE, eval=FALSE}
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
                  color = Species)) + 
   geom_point(size = 3)
@@ -157,14 +152,12 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 
 ## Building plots
 
-```{r echo=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
-  geom_point(size = 3)
+```{r pt_size, echo=FALSE}
 ```
 
 ## Building plots
 
-```{r echo=TRUE, eval=FALSE}
+```{r plot_colors, echo=TRUE, eval=FALSE}
 library("wesanderson")
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
                  color = Species)) + 
@@ -176,43 +169,33 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 
 ## Building plots
 
-```{r echo=FALSE}
-library("wesanderson")
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
-  geom_point(size = 3) + 
-  scale_color_manual(values = wes_palette("Moonrise2"))
+```{r plot_colors, echo=FALSE}
 ```
 
 ## Building plots
 
-```{r echo=TRUE, eval=FALSE}
+```{r better_axis_labels, echo=TRUE, eval=FALSE}
 library("wesanderson")
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
+ggplot(iris, aes(x = Petal.Length,
+                 y = Petal.Width,
                  color = Species)) + 
   geom_point(size = 3) + 
   scale_color_manual(values = wes_palette("Moonrise2")) +
-  xlab("Petal Length (cm)") +
-  ylab("Petal Width (cm)") +
-  ggtitle("Irises")
+  labs(x = "Petal Length (cm)",
+       y = "Petal Width (cm)",
+       title = "Irises")
 ```
 
 - Add some better axis labels
 
 ## Building plots
 
-```{r echo=FALSE}
-library("wesanderson")
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
-  geom_point(size = 3) + 
-  scale_color_manual(values = wes_palette("Moonrise2")) +
-  xlab("Petal Length (cm)") +
-  ylab("Petal Width (cm)") +
-  ggtitle("Irises")
+```{r better_axis_labels, echo=FALSE}
 ```
 
 ## Adding lines
 
-```{r echo=TRUE, eval=FALSE}
+```{r add_lm, echo=TRUE, eval=FALSE}
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) + 
   geom_point() +
   geom_smooth(method = "lm")
@@ -222,18 +205,16 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
 
 ## Adding lines
 
-```{r echo=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) + 
-  geom_point() +
-  geom_smooth(method = "lm")
+```{r add_lm, echo=FALSE}
 ```
 
 ## Adding lines
 
 What if you add a color aesthetic?
 
-```{r echo=TRUE, eval=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
+```{r lm_color, echo=TRUE, eval=FALSE}
+ggplot(iris, aes(x = Petal.Length,
+                 y = Petal.Width,
                  color = Species)) + 
   geom_point() +
   geom_smooth(method = "lm")
@@ -241,16 +222,14 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 
 ## Adding lines
 
-```{r echo=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
-  geom_point() +
-  geom_smooth(method = "lm")
+```{r lm_color, echo=FALSE}
 ```
 
 ## Log-log axes
 
-```{r eval=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
+```{r loglog, eval=FALSE}
+ggplot(iris, aes(x = Petal.Length, 
+                 y = Petal.Width,
                  color = Species)) + 
   geom_point() +
   geom_smooth(method = "lm") +
@@ -260,17 +239,12 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 
 ## Log-log axes
 
-```{r echo=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
-  geom_point() +
-  geom_smooth(method = "lm") +
-  scale_x_log10() +
-  scale_y_log10()
+```{r loglog, echo=FALSE}
 ```
 
 ## Facetting
 
-```{r eval=FALSE}
+```{r facets, eval=FALSE}
 ggplot(iris, aes(x = Petal.Length)) + 
   geom_histogram() +
   facet_grid(Species ~ .)
@@ -281,10 +255,7 @@ ggplot(iris, aes(x = Petal.Length)) +
 
 ## Facetting
 
-```{r echo=FALSE, message=FALSE}
-ggplot(iris, aes(x = Petal.Length)) + 
-  geom_histogram() +
-  facet_grid(Species ~ .)
+```{r facets, echo=FALSE, message=FALSE}
 ```
 
 ## `_geoms` we will use

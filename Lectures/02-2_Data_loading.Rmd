@@ -31,16 +31,17 @@ library(readxl)
 
 ## Beware of `stringsAsFactors` "feature"
 
-- Base R file readers (`read.csv()` and `read.table()`) automatically convert strings into factors (`stringsAsFactors = TRUE`).
+Base R file readers (`read.csv()` and `read.table()`) automatically convert strings into factors (`stringsAsFactors = TRUE`).
+
 - *Probably* what you want, but it can be a giant pain if you don't.
-    - You likely don't want your "Notes" column as a factor
+- You likely don't want your "Notes" column as a factor
 
 ## Beware of `stringsAsFactors` "feature"
 
 Options:
 
-- Pass `stringsAsFactors = FALSE` as a parameter.
-- Use `readr` functions `read_delim()` and `read_csv()`.
+- Pass `stringsAsFactors = FALSE` as an argument to `read.csv()`, `read.table()`, or `data.frame()`
+- Use `tidyverse` functions `read_delim()` and `read_csv()`.
 
 Fun reading:
 
@@ -59,7 +60,7 @@ library("readxl")
 M <- read_excel("MyFile.xlsx")
 ```
 
-## Load some data
+## Load data
 
 ```{r message=FALSE, warning=FALSE}
 M <- read_excel("../data/Mouse_Weaning_Data.xlsx",
@@ -69,7 +70,7 @@ M <- read_excel("../data/Mouse_Weaning_Data.xlsx",
 Read file and assign to an object `M`.
 
 - Look for it in the `data` directory, which is one level up from the working directory
-- Explicitly say that "NA" is `NA`
+- Explicitly define "NA" is `NA`
 
 Use `<-` for assign.
 
@@ -120,10 +121,16 @@ M[1:5, ]   # Rows 1-5, all columns
 
 ## Filtering rows: Base R
 
+```{r eval=FALSE}
+M[M$BYear == 2008, ]
+```
+
+## Filtering rows: Base R
+
 Use `head()` to get a peek at the first few rows. A second argument to `head()` specifies the number of rows to show.
 
 ```{r}
-head(M[, c("MouseID", "Sex")])
+head(M[, c("MouseID", "Sex")], n = 10)
 ```
 
 ## Select and filter simultaneously: Base R
@@ -168,12 +175,12 @@ _Note_:
 
 ## Aggregating: Base R
 
-- Mean of every column that is not `DamID`. `head()` gives the first few rows.
+- Mean of every column that is not `DamID`.
 - Replace `mean` with `sd` to get standard deviation.
 
 ```{r warning=FALSE}
 M_agr <- aggregate(M, by = list(M$DamID), FUN = "mean")
-head(M_agr)
+M_agr
 ```
 
 ## New tools: Selecting, filtering, aggregating
@@ -231,10 +238,10 @@ Functions can (should) be chained together with `%>%`
 
 ```{r eval=FALSE}
 M <- M %>%
-  mutate(log10DamMass = log10(DamMass))
+  mutate(log10_DamMass = log10(DamMass))
 ```
 
-- Assigning back to itself just adds the column `log10DamMass` to the end of the `data.frame`.
+- Assigning `M` back to itself just adds the column `log10DamMass` to the end of the `data.frame`.
 
 ## `mutate()` or not?
 
@@ -249,8 +256,8 @@ vs.
 
 ```{r}
 M <- M %>%
-  mutate(log10WnMass = log10(WnMass),
-         log10DamMass = log10(DamMass))
+  mutate(log10_WnMass = log10(WnMass),
+         log10_DamMass = log10(DamMass))
 ```
 
 ## `glimpse()` is like `str()`
