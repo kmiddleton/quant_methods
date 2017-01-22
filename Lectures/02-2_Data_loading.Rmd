@@ -33,7 +33,7 @@ library(readxl)
 
 Base R file readers (`read.csv()` and `read.table()`) automatically convert strings into factors (`stringsAsFactors = TRUE`).
 
-- *Probably* what you want, but it can be a giant pain if you don't.
+- *Could* be what you want, but it very often will cause problems.
 - You likely don't want your "Notes" column as a factor
 
 ## Beware of `stringsAsFactors` "feature"
@@ -69,7 +69,7 @@ M <- read_excel("../data/Mouse_Weaning_Data.xlsx",
 
 Read file and assign to an object `M`.
 
-- Look for it in the `data` directory, which is one level up from the working directory
+- Look for it in the `data` directory, which is one level up from the working directory (`../`)
 - Explicitly define "NA" is `NA`
 
 Use `<-` for assign.
@@ -175,7 +175,7 @@ _Note_:
 
 ## Aggregating: Base R
 
-- Mean of every column that is not `DamID`.
+- Mean per `DamID` of every column that is not `DamID`.
 - Replace `mean` with `sd` to get standard deviation.
 
 ```{r warning=FALSE}
@@ -210,12 +210,34 @@ Utility functions for existing variables:
 - `separate()`: splitting variables (1 column to >1)
 - `unite()`: joining variables (>1 columns to 1)
 
+## Wide data
+
+```{r echo=FALSE}
+set.seed(5)
+LS <- data_frame(
+  Line = rep(1:2, each = 2),
+  Diet = rep(c("C", "H"), times = 2),
+  Lifespan = rpois(4, 35),
+  Fecundity = rpois(4, 100)
+)
+```
+
+```{r}
+LS
+```
+
+## Long data
+
+```{r}
+LS %>% gather(variable, value, -Line, -Diet)
+```
+
 ## Combine existing variables: tidyr
 
 ```{r}
-M <- M %>% unite(col = "YearMo", WnYear, WnMonth,
+LS <- LS %>% unite(col = "ID", Diet, Line,
                  sep = "_", remove = FALSE)
-M %>% select(WnYear, WnMonth, YearMo) %>% head()
+LS
 ```
 
 `remove = FALSE` means that the pre-existing variables are not removed.
@@ -233,6 +255,12 @@ M %>% select(WnYear, WnMonth, YearMo) %>% head()
 Functions can (should) be chained together with `%>%`
 
 - "Pipe" the result of the lefthand expression to the righthand expression.
+
+## `glimpse()` is like `str()`
+
+```{r}
+glimpse(M)
+```
 
 ## Calculate new variables: dplyr
 
@@ -258,12 +286,6 @@ vs.
 M <- M %>%
   mutate(log10_WnMass = log10(WnMass),
          log10_DamMass = log10(DamMass))
-```
-
-## `glimpse()` is like `str()`
-
-```{r}
-glimpse(M)
 ```
 
 ## Selecting columns: dplyr

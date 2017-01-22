@@ -95,7 +95,7 @@
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
       <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
       <p data-config-presenter><!-- populated from slide_config.json --></p>
-            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-01-21</p>
+            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-01-22</p>
           </hgroup>
   </slide>
 
@@ -122,7 +122,7 @@
 <p>Base R file readers (<code>read.csv()</code> and <code>read.table()</code>) automatically convert strings into factors (<code>stringsAsFactors = TRUE</code>).</p>
 
 <ul>
-<li><em>Probably</em> what you want, but it can be a giant pain if you don&#39;t.</li>
+<li><em>Could</em> be what you want, but it very often will cause problems.</li>
 <li>You likely don&#39;t want your &quot;Notes&quot; column as a factor</li>
 </ul>
 
@@ -162,7 +162,7 @@ M &lt;- read_excel(&quot;MyFile.xlsx&quot;)</pre>
 <p>Read file and assign to an object <code>M</code>.</p>
 
 <ul>
-<li>Look for it in the <code>data</code> directory, which is one level up from the working directory</li>
+<li>Look for it in the <code>data</code> directory, which is one level up from the working directory (<code>../</code>)</li>
 <li>Explicitly define &quot;NA&quot; is <code>NA</code></li>
 </ul>
 
@@ -321,7 +321,7 @@ M$sqrt_WnMass &lt;- sqrt(M$WnMass)</pre>
 </article></slide><slide class=''><hgroup><h2>Aggregating: Base R</h2></hgroup><article  id="aggregating-base-r">
 
 <ul>
-<li>Mean of every column that is not <code>DamID</code>.</li>
+<li>Mean per <code>DamID</code> of every column that is not <code>DamID</code>.</li>
 <li>Replace <code>mean</code> with <code>sd</code> to get standard deviation.</li>
 </ul>
 
@@ -1208,21 +1208,47 @@ M_agr</pre>
 <li><code>unite()</code>: joining variables (&gt;1 columns to 1)</li>
 </ul>
 
+</article></slide><slide class=''><hgroup><h2>Wide data</h2></hgroup><article  id="wide-data">
+
+<pre class = 'prettyprint lang-r'>LS</pre>
+
+<pre >## # A tibble: 4 × 4
+##    Line  Diet Lifespan Fecundity
+##   &lt;int&gt; &lt;chr&gt;    &lt;int&gt;     &lt;int&gt;
+## 1     1     C       30        93
+## 2     1     H       31       101
+## 3     2     C       35        91
+## 4     2     H       45       101</pre>
+
+</article></slide><slide class=''><hgroup><h2>Long data</h2></hgroup><article  id="long-data">
+
+<pre class = 'prettyprint lang-r'>LS %&gt;% gather(variable, value, -Line, -Diet)</pre>
+
+<pre >## # A tibble: 8 × 4
+##    Line  Diet  variable value
+##   &lt;int&gt; &lt;chr&gt;     &lt;chr&gt; &lt;int&gt;
+## 1     1     C  Lifespan    30
+## 2     1     H  Lifespan    31
+## 3     2     C  Lifespan    35
+## 4     2     H  Lifespan    45
+## 5     1     C Fecundity    93
+## 6     1     H Fecundity   101
+## 7     2     C Fecundity    91
+## 8     2     H Fecundity   101</pre>
+
 </article></slide><slide class=''><hgroup><h2>Combine existing variables: tidyr</h2></hgroup><article  id="combine-existing-variables-tidyr">
 
-<pre class = 'prettyprint lang-r'>M &lt;- M %&gt;% unite(col = &quot;YearMo&quot;, WnYear, WnMonth,
+<pre class = 'prettyprint lang-r'>LS &lt;- LS %&gt;% unite(col = &quot;ID&quot;, Diet, Line,
                  sep = &quot;_&quot;, remove = FALSE)
-M %&gt;% select(WnYear, WnMonth, YearMo) %&gt;% head()</pre>
+LS</pre>
 
-<pre >## # A tibble: 6 × 3
-##   WnYear WnMonth  YearMo
-##    &lt;dbl&gt;   &lt;dbl&gt;   &lt;chr&gt;
-## 1   2008      10 2008_10
-## 2   2008      10 2008_10
-## 3   2008      10 2008_10
-## 4   2008      10 2008_10
-## 5   2008      10 2008_10
-## 6   2008      10 2008_10</pre>
+<pre >## # A tibble: 4 × 5
+##      ID  Line  Diet Lifespan Fecundity
+## * &lt;chr&gt; &lt;int&gt; &lt;chr&gt;    &lt;int&gt;     &lt;int&gt;
+## 1   C_1     1     C       30        93
+## 2   H_1     1     H       31       101
+## 3   C_2     2     C       35        91
+## 4   H_2     2     H       45       101</pre>
 
 <p><code>remove = FALSE</code> means that the pre-existing variables are not removed.</p>
 
@@ -1243,6 +1269,35 @@ M %&gt;% select(WnYear, WnMonth, YearMo) %&gt;% head()</pre>
 <ul>
 <li>&quot;Pipe&quot; the result of the lefthand expression to the righthand expression.</li>
 </ul>
+
+</article></slide><slide class=''><hgroup><h2><code>glimpse()</code> is like <code>str()</code></h2></hgroup><article  id="glimpse-is-like-str">
+
+<pre class = 'prettyprint lang-r'>glimpse(M)</pre>
+
+<pre >## Observations: 2,457
+## Variables: 22
+## $ WnBatch  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
+## $ WnOrder  &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16...
+## $ MouseID  &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -9, -9, 11, 12, -9, -9...
+## $ Sex      &lt;dbl&gt; 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,...
+## $ WnMass   &lt;dbl&gt; 15.26, 12.47, 17.37, 16.63, 16.76, 12.53, 10.89, 13.6...
+## $ DamID    &lt;chr&gt; &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;205x&quot;, &quot;205x...
+## $ DamMass  &lt;dbl&gt; 30.69, 30.69, 30.69, 30.69, 30.69, 36.85, 36.85, 36.8...
+## $ SireID   &lt;chr&gt; &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;207x&quot;, &quot;207x...
+## $ SireMass &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ Lineage  &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ WnYear   &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008,...
+## $ WnMonth  &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1...
+## $ WnDay    &lt;dbl&gt; 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 2...
+## $ BYear    &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008,...
+## $ BMonth   &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1...
+## $ BDay     &lt;dbl&gt; 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,...
+## $ SepYear  &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008,...
+## $ SepMonth &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1...
+## $ SepDay   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
+## $ Breeder  &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ Fate     &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+## $ Observ   &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...</pre>
 
 </article></slide><slide class=''><hgroup><h2>Calculate new variables: dplyr</h2></hgroup><article  id="calculate-new-variables-dplyr">
 
@@ -1265,38 +1320,6 @@ M$log10_DamMass &lt;- log10(M$DamMass)</pre>
 <pre class = 'prettyprint lang-r'>M &lt;- M %&gt;%
   mutate(log10_WnMass = log10(WnMass),
          log10_DamMass = log10(DamMass))</pre>
-
-</article></slide><slide class=''><hgroup><h2><code>glimpse()</code> is like <code>str()</code></h2></hgroup><article  id="glimpse-is-like-str">
-
-<pre class = 'prettyprint lang-r'>glimpse(M)</pre>
-
-<pre >## Observations: 2,457
-## Variables: 25
-## $ WnBatch       &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
-## $ WnOrder       &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1...
-## $ MouseID       &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -9, -9, 11, 12, -...
-## $ Sex           &lt;dbl&gt; 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, ...
-## $ WnMass        &lt;dbl&gt; 15.26, 12.47, 17.37, 16.63, 16.76, 12.53, 10.89,...
-## $ DamID         &lt;chr&gt; &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;205x&quot;, ...
-## $ DamMass       &lt;dbl&gt; 30.69, 30.69, 30.69, 30.69, 30.69, 36.85, 36.85,...
-## $ SireID        &lt;chr&gt; &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;207x&quot;, ...
-## $ SireMass      &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
-## $ Lineage       &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
-## $ YearMo        &lt;chr&gt; &quot;2008_10&quot;, &quot;2008_10&quot;, &quot;2008_10&quot;, &quot;2008_10&quot;, &quot;200...
-## $ WnYear        &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, ...
-## $ WnMonth       &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, ...
-## $ WnDay         &lt;dbl&gt; 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, ...
-## $ BYear         &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, ...
-## $ BMonth        &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, ...
-## $ BDay          &lt;dbl&gt; 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, ...
-## $ SepYear       &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, ...
-## $ SepMonth      &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, ...
-## $ SepDay        &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
-## $ Breeder       &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
-## $ Fate          &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
-## $ Observ        &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
-## $ log10_WnMass  &lt;dbl&gt; 1.1835545, 1.0958665, 1.2397998, 1.2208922, 1.22...
-## $ log10_DamMass &lt;dbl&gt; 1.486997, 1.486997, 1.486997, 1.486997, 1.486997...</pre>
 
 </article></slide><slide class=''><hgroup><h2>Selecting columns: dplyr</h2></hgroup><article  id="selecting-columns-dplyr">
 
@@ -1353,7 +1376,7 @@ M$log10_DamMass &lt;- log10(M$DamMass)</pre>
 
 <pre class = 'prettyprint lang-r'>M %&gt;% filter((WnMass &lt; 6 | WnMass &gt; 19) &amp; Sex == 0)</pre>
 
-<pre >## # A tibble: 14 × 25
+<pre >## # A tibble: 14 × 24
 ##    WnBatch WnOrder MouseID   Sex WnMass DamID DamMass SireID SireMass
 ##      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;chr&gt;    &lt;dbl&gt;
 ## 1        1      11      -9     0   5.69  205x   36.85   207x       NA
@@ -1370,17 +1393,17 @@ M$log10_DamMass &lt;- log10(M$DamMass)</pre>
 ## 12       2      63      -9     0  19.50  1327   38.48   1328       NA
 ## 13       4      71      -9     0   4.91  1932   31.29   1939       NA
 ## 14       4      72      -9     0   3.77  1932   31.29   1939       NA
-## # ... with 16 more variables: Lineage &lt;dbl&gt;, YearMo &lt;chr&gt;, WnYear &lt;dbl&gt;,
-## #   WnMonth &lt;dbl&gt;, WnDay &lt;dbl&gt;, BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;,
-## #   SepYear &lt;dbl&gt;, SepMonth &lt;dbl&gt;, SepDay &lt;dbl&gt;, Breeder &lt;dbl&gt;,
-## #   Fate &lt;dbl&gt;, Observ &lt;dbl&gt;, log10_WnMass &lt;dbl&gt;, log10_DamMass &lt;dbl&gt;</pre>
+## # ... with 15 more variables: Lineage &lt;dbl&gt;, WnYear &lt;dbl&gt;, WnMonth &lt;dbl&gt;,
+## #   WnDay &lt;dbl&gt;, BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;, SepYear &lt;dbl&gt;,
+## #   SepMonth &lt;dbl&gt;, SepDay &lt;dbl&gt;, Breeder &lt;dbl&gt;, Fate &lt;dbl&gt;, Observ &lt;dbl&gt;,
+## #   log10_WnMass &lt;dbl&gt;, log10_DamMass &lt;dbl&gt;</pre>
 
 </article></slide><slide class=''><hgroup><h2>Sorting: dplyr</h2></hgroup><article  id="sorting-dplyr">
 
 <pre class = 'prettyprint lang-r'>M %&gt;% filter((WnMass &lt; 6 | WnMass &gt; 19) &amp; Sex == 0) %&gt;%
   arrange(WnMass)</pre>
 
-<pre >## # A tibble: 14 × 25
+<pre >## # A tibble: 14 × 24
 ##    WnBatch WnOrder MouseID   Sex WnMass DamID DamMass SireID SireMass
 ##      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;chr&gt;    &lt;dbl&gt;
 ## 1        4      72      -9     0   3.77  1932   31.29   1939       NA
@@ -1397,10 +1420,10 @@ M$log10_DamMass &lt;- log10(M$DamMass)</pre>
 ## 12       2      63      -9     0  19.50  1327   38.48   1328       NA
 ## 13       6      58     338     0  19.86   236   33.95    238       NA
 ## 14       5      53     336     0  19.89   234   35.60    238       NA
-## # ... with 16 more variables: Lineage &lt;dbl&gt;, YearMo &lt;chr&gt;, WnYear &lt;dbl&gt;,
-## #   WnMonth &lt;dbl&gt;, WnDay &lt;dbl&gt;, BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;,
-## #   SepYear &lt;dbl&gt;, SepMonth &lt;dbl&gt;, SepDay &lt;dbl&gt;, Breeder &lt;dbl&gt;,
-## #   Fate &lt;dbl&gt;, Observ &lt;dbl&gt;, log10_WnMass &lt;dbl&gt;, log10_DamMass &lt;dbl&gt;</pre>
+## # ... with 15 more variables: Lineage &lt;dbl&gt;, WnYear &lt;dbl&gt;, WnMonth &lt;dbl&gt;,
+## #   WnDay &lt;dbl&gt;, BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;, SepYear &lt;dbl&gt;,
+## #   SepMonth &lt;dbl&gt;, SepDay &lt;dbl&gt;, Breeder &lt;dbl&gt;, Fate &lt;dbl&gt;, Observ &lt;dbl&gt;,
+## #   log10_WnMass &lt;dbl&gt;, log10_DamMass &lt;dbl&gt;</pre>
 
 </article></slide><slide class=''><hgroup><h2>Selecting and filtering</h2></hgroup><article  id="selecting-and-filtering-1">
 

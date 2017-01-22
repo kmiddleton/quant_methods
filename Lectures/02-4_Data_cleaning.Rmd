@@ -76,7 +76,7 @@ sum(is.na(M$Sex))
 
 We should probably drop those rows or go back to the original data sheets.
 
-## Filtering out unwanted rows
+## Filtering out unwanted rows {.smaller}
 
 ```{r}
 M_no_NAs <- M %>% filter(!is.na(Sex))
@@ -94,7 +94,7 @@ M_no_NAs %>% group_by(Sex) %>%
             mass_sd = sd(WnMass))
 ```
 
-## Filtering out unwanted rows
+## Filtering out unwanted rows {.smaller}
 
 ```{r}
 M_no_NAs <- M %>% drop_na(Sex)
@@ -112,13 +112,13 @@ M_no_NAs %>% group_by(Sex) %>%
 
 ## Visualizing data for checking
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 M_no_NAs <- read_excel("../data/Mouse_Weaning_Data_Bad.xlsx",
                 na = "NA") %>%
   drop_na(Sex)
 ```
 
-```{r}
+```{r message=FALSE, warning=FALSE, fig.height=3.5}
 ggplot(M_no_NAs, aes(x = WnMass)) +
   geom_histogram() +
   facet_grid(Sex ~ .)
@@ -126,7 +126,7 @@ ggplot(M_no_NAs, aes(x = WnMass)) +
 
 ## Finding suspect observations
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 M_no_NAs %>% 
   select(MouseID, DamID, WnMass) %>% 
   arrange(WnMass)
@@ -204,9 +204,14 @@ M_no_NAs %>%
   geom_boxplot()
 ```
 
+## Data integrity
+
+- Careful checking is the first step in your analysis.
+- Treat this as an imperative.
+
 ## Quiz 02-4
 
-On Canvas, complete quiz 02-4.
+There is no quiz for this lecture.
 
 Problem Set 2 will be posted on Wednesday.
 
