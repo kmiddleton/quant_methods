@@ -144,16 +144,59 @@ Use your vectors from above in the same order to test the following relational o
 8. Which values equal 1?
 9. Which values do not equal 1?
 
+> The following will just return a TRUE/FALSE vector:
+
 ```{r}
+# 1
 v1 > 5
+
+# 2
 v2 == FALSE
+
+# 3
 "a" %in% v3
+
+# 4
 v4_1 <= 10
+
+# 5
 v5 >= 10
+
+# 6
 sum(v6 < 50)
+
+# 7
 sum(v7 == 17)
+
+#7
 v8 == 1
+
+# 8
 v9 != 1
+```
+
+> Many students also found the `which()` function, that returns the indices of which elements are TRUE or FALSE. This works for some of the vectors above:
+
+```{r}
+# 1 
+
+# 2
+which(v1 > 5)
+
+# 3
+which(v2 == FALSE)
+
+# 4
+which(v4_1 <= 10)
+
+# 5
+which(v5 >= 10)
+
+# 8
+which(v8 == 1)
+
+# 9
+which(v9 != 1)
 ```
 
 ## Perils of relational operators
@@ -172,7 +215,11 @@ all.equal(a * a, 2)
 
 Line by line, explain what the statements above are doing and the R output of each. Look at the help for `all.equal()` if you need to. Enter your explanation after the `>` below.
 
-> 
+> 1. Assign the square root of 2 to `a`
+> 2. Print `a`
+> 3. Print `a` * `a`. 2 here. 
+> 4. Test whether `a` * `a` equals 2. FALSE. So R is storing a internally with some number of digits. So that when `a` is squared, it doesn't exactly equal 2. Because of #3, R must be rounding when it prints. Try `print(a * a, digits = 20)`.
+> 5. The `all.equal()` function compares two values and tests where they are equal to a certain level of certainty, called the `tolerance`. By default this value is $10^{-8}$.
 
 ## Matrices
 
@@ -202,7 +249,7 @@ M6x6 < 10
 
 What kind of matrix is returned?
 
-> 
+> A 6 X 6 matrix of TRUE and FALSE.
 
 (d) Use your inequality from part (c) and `colMeans()` to calculate the average proportion of values less than 10 in your matrix.
 
@@ -212,7 +259,7 @@ colMeans(M6x6 < 10)
 
 Compare the results of the column means with the results of part (c). What is R doing with the `TRUE` and `FALSE` values in order to be able to use `colMeans()`?
 
-> 
+> R is converting TRUE to 1 and FALSE to 0 and then using the 0's and 1's to take column means. This "coercion" is a very handy trick that we will use in the future.
 
 ## data.frames
 
@@ -310,5 +357,8 @@ These functions take a vector or matrix and return a single value or a new matri
 Try functions operating on the matrix you created above.
 
 ```{r}
-
+mean(x)
+sd(x)
+median(x)
+t(x)
 ```

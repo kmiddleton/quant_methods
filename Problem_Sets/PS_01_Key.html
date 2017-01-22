@@ -216,7 +216,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Problem Set 01</h1>
 <h4 class="author"><em>Your Name Here: Group X</em></h4>
-<h4 class="date"><em>Last updated: 2017-01-19</em></h4>
+<h4 class="date"><em>Last updated: 2017-01-22</em></h4>
 
 </div>
 
@@ -336,13 +336,20 @@ v9 &lt;- rep(c(1, 2, 3), length = 3 * 10)</code></pre>
 <li>Which values equal 1?</li>
 <li>Which values do not equal 1?</li>
 </ol>
-<pre class="r"><code>v1 &gt; 5</code></pre>
+<blockquote>
+<p>The following will just return a TRUE/FALSE vector:</p>
+</blockquote>
+<pre class="r"><code># 1
+v1 &gt; 5</code></pre>
 <pre><code>## [1] FALSE  TRUE  TRUE  TRUE</code></pre>
-<pre class="r"><code>v2 == FALSE</code></pre>
+<pre class="r"><code># 2
+v2 == FALSE</code></pre>
 <pre><code>## [1] FALSE FALSE  TRUE</code></pre>
-<pre class="r"><code>&quot;a&quot; %in% v3</code></pre>
+<pre class="r"><code># 3
+&quot;a&quot; %in% v3</code></pre>
 <pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>v4_1 &lt;= 10</code></pre>
+<pre class="r"><code># 4
+v4_1 &lt;= 10</code></pre>
 <pre><code>##  [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE
 ## [12] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 ## [23] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
@@ -352,21 +359,49 @@ v9 &lt;- rep(c(1, 2, 3), length = 3 * 10)</code></pre>
 ## [67] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 ## [78] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 ## [89] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</code></pre>
-<pre class="r"><code>v5 &gt;= 10</code></pre>
+<pre class="r"><code># 5
+v5 &gt;= 10</code></pre>
 <pre><code>##  [1] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
 ## [12]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE</code></pre>
-<pre class="r"><code>sum(v6 &lt; 50)</code></pre>
+<pre class="r"><code># 6
+sum(v6 &lt; 50)</code></pre>
 <pre><code>## [1] 28</code></pre>
-<pre class="r"><code>sum(v7 == 17)</code></pre>
+<pre class="r"><code># 7
+sum(v7 == 17)</code></pre>
 <pre><code>## [1] 10</code></pre>
-<pre class="r"><code>v8 == 1</code></pre>
+<pre class="r"><code>#7
+v8 == 1</code></pre>
 <pre><code>##  [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE
 ## [12] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 ## [23] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</code></pre>
-<pre class="r"><code>v9 != 1</code></pre>
+<pre class="r"><code># 8
+v9 != 1</code></pre>
 <pre><code>##  [1] FALSE  TRUE  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE FALSE  TRUE
 ## [12]  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE FALSE
 ## [23]  TRUE  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE</code></pre>
+<blockquote>
+<p>Many students also found the <code>which()</code> function, that returns the indices of which elements are TRUE or FALSE. This works for some of the vectors above:</p>
+</blockquote>
+<pre class="r"><code># 1 
+
+# 2
+which(v1 &gt; 5)</code></pre>
+<pre><code>## [1] 2 3 4</code></pre>
+<pre class="r"><code># 3
+which(v2 == FALSE)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code># 4
+which(v4_1 &lt;= 10)</code></pre>
+<pre><code>## [1] 1 2 3 4 5 6</code></pre>
+<pre class="r"><code># 5
+which(v5 &gt;= 10)</code></pre>
+<pre><code>##  [1]  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20</code></pre>
+<pre class="r"><code># 8
+which(v8 == 1)</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<pre class="r"><code># 9
+which(v9 != 1)</code></pre>
+<pre><code>##  [1]  2  3  5  6  8  9 11 12 14 15 17 18 20 21 23 24 26 27 29 30</code></pre>
 </div>
 </div>
 <div id="perils-of-relational-operators" class="section level2">
@@ -384,7 +419,13 @@ a</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <p>Line by line, explain what the statements above are doing and the R output of each. Look at the help for <code>all.equal()</code> if you need to. Enter your explanation after the <code>&gt;</code> below.</p>
 <blockquote>
-
+<ol style="list-style-type: decimal">
+<li>Assign the square root of 2 to <code>a</code></li>
+<li>Print <code>a</code></li>
+<li>Print <code>a</code> * <code>a</code>. 2 here.</li>
+<li>Test whether <code>a</code> * <code>a</code> equals 2. FALSE. So R is storing a internally with some number of digits. So that when <code>a</code> is squared, it doesn't exactly equal 2. Because of #3, R must be rounding when it prints. Try <code>print(a * a, digits = 20)</code>.</li>
+<li>The <code>all.equal()</code> function compares two values and tests where they are equal to a certain level of certainty, called the <code>tolerance</code>. By default this value is <span class="math inline">\(10^{-8}\)</span>.</li>
+</ol>
 </blockquote>
 </div>
 <div id="matrices" class="section level2">
@@ -423,7 +464,7 @@ M6x6</code></pre>
 ## [6,]  TRUE FALSE  TRUE  TRUE FALSE FALSE</code></pre>
 <p>What kind of matrix is returned?</p>
 <blockquote>
-
+<p>A 6 X 6 matrix of TRUE and FALSE.</p>
 </blockquote>
 <ol start="4" style="list-style-type: lower-alpha">
 <li>Use your inequality from part (c) and <code>colMeans()</code> to calculate the average proportion of values less than 10 in your matrix.</li>
@@ -432,7 +473,7 @@ M6x6</code></pre>
 <pre><code>## [1] 0.5000000 0.3333333 0.5000000 0.5000000 0.3333333 0.3333333</code></pre>
 <p>Compare the results of the column means with the results of part (c). What is R doing with the <code>TRUE</code> and <code>FALSE</code> values in order to be able to use <code>colMeans()</code>?</p>
 <blockquote>
-
+<p>R is converting TRUE to 1 and FALSE to 0 and then using the 0's and 1's to take column means. This &quot;coercion&quot; is a very handy trick that we will use in the future.</p>
 </blockquote>
 </div>
 </div>
@@ -537,6 +578,17 @@ x</code></pre>
 <p>Try out some R functions: <code>mean(x)</code>, <code>sd(x)</code>, <code>median(x)</code>, <code>t(x)</code>. Type them into the code chunk below and compile.</p>
 <p>These functions take a vector or matrix and return a single value or a new matrix. Contrast this behavior with <code>x^2</code>. Enter that and see what you get.</p>
 <p>Try functions operating on the matrix you created above.</p>
+<pre class="r"><code>mean(x)</code></pre>
+<pre><code>## [1] 0.5295264</code></pre>
+<pre class="r"><code>sd(x)</code></pre>
+<pre><code>## [1] 0.3313606</code></pre>
+<pre class="r"><code>median(x)</code></pre>
+<pre><code>## [1] 0.6065893</code></pre>
+<pre class="r"><code>t(x)</code></pre>
+<pre><code>##           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]    [,7]
+## [1,] 0.2002145 0.6852186 0.9168758 0.2843995 0.1046501 0.7010575 0.52796
+##           [,8]      [,9]    [,10]
+## [1,] 0.8079352 0.9565001 0.110453</code></pre>
 </div>
 </div>
 <div class="footnotes">
