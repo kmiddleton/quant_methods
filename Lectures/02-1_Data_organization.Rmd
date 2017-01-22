@@ -20,6 +20,14 @@ library(readxl)
 
 ## Readings
 
+Suggested:
+
+- Ted Garland [*How to Structure and Name Data Files*](http://biology.ucr.edu/people/faculty/Garland/How_to_Structure_and_Name_Data_Files_1.pdf)
+- Karl Broman's guide to data organization: http://kbroman.org/dataorg/
+- Jeff Leek research group's guide to sharing data: https://github.com/jtleek/datasharing
+- Hadley Wickham (2013): [Tidy Data](http://vita.had.co.nz/papers/tidy-data.pdf)
+- White et al. (2013): [Nine Simple Ways to Make It Easier to (Re)use Your Data](http://ojs.library.queensu.ca/index.php/IEE/article/view/4608)
+
 ## Goal for this week
 
 **Take Care of Your Data**:
@@ -28,14 +36,6 @@ library(readxl)
 - Loading
 - Visualizing
 - Validating
-
-## Opinionated rules for data files 
-
-- Garland [*How to Structure and Name Data Files*](http://biology.ucr.edu/people/faculty/Garland/How_to_Structure_and_Name_Data_Files_1.pdf)
-- Karl Broman's guide to data organization: http://kbroman.org/dataorg/
-- Leek research group's guide to sharing data: https://github.com/jtleek/datasharing
-- Wickham (2013): [Tidy Data](http://vita.had.co.nz/papers/tidy-data.pdf)
-- White et al. (2013): [Nine Simple Ways to Make It Easier to (Re)use Your Data](http://ojs.library.queensu.ca/index.php/IEE/article/view/4608)
 
 ## Guidelines for data files
 
