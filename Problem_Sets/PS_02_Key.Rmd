@@ -1,0 +1,175 @@
+---
+title: 'Problem Set 02'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+
+## Setup
+
+```{r echo=FALSE}
+# Silence some warnings
+options(warn = -1)
+```
+
+```{r setup, message=FALSE}
+# Load packages in this R code chunk
+# Come back here and include the commands to load all the packages
+# you will need to complete this problem set. I like to load all the
+# packages I will need for an analysis at the top.
+
+# FIXME
+library("tidyverse")
+library("readxl")
+library("cowplot")
+```
+
+## Working Directory
+
+By default, R will read and write files from its working directory. The status of the current directory can be found at the top of the Console window. You can also check the current working directory with the command `getwd()`.
+
+### Best practices
+
+Store all the files for an analysis (problem set) in a single directory. You might have the following directory structure:
+
+- Quant_Meth_LifeSci
+    - Lecture_Slides
+    - Docs
+    - Problem_Sets
+        - PS_01
+            - `PS_1.Rmd`
+            - other files
+        - PS_02
+            - `PS_02.Rmd`
+            - other files
+        - PS_03, etc.
+
+Then set the R working directory to the current active file using the RStudio menus: **Session $\rightarrow$ Set Working Directory $\rightarrow$ To Source File Location**.
+
+Setting the working directory to the location of the current files will ensure that you can directly access the data files from the local folder, and that any files which are written will be in that directory.
+
+As you get more comfortable with R, you can move files around, use sub-directories, etc. For now, keep it simple and store associated files in the same directory, even if this means duplicating files (which is something you definitely don't want to do in general practice).
+
+### Activity
+
+Organize your files and set the working directory to the directory where this file and the required data files for this problem set are located.
+
+```{r}
+getwd()
+```
+
+## Loading Packages
+
+> In R, the fundamental unit of shareable code is the package. A package bundles together code, data, documentation, and tests, and is easy to share with others. As of January 2015, there were over 6,000 packages available on the Comprehensive R Archive Network, or CRAN, the public clearing house for R packages. This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you’re working on, and you can benefit from their work by downloading their package. (http://r-pkgs.had.co.nz/intro.html)
+
+The `library()` function with the following syntax is used to load packages:
+
+```{r eval=FALSE}
+library("tidyverse")
+```
+
+Packages much be installed before they can be loaded. If you get a message like:
+
+> `Error in library("tidyverse") : there is no package called 'tidyverse'`
+
+It means that the package is not installed. First install the package (note that the quotes are required):
+
+```{r eval=FALSE}
+install.packages("tidyverse")
+```
+
+and then rerun the code chunk that includes the `library()` commands. cowplot is a package that changes some of the ggplot defaults to be a little more friendly.
+
+### Best practices (things to remember)
+
+- Packages only need to be installed once on each computer. They are stored locally.
+- Packages need to be loaded (`library()`) each time you restart R. Loaded packages are not persistent across R sessions.
+- Load all of the packages you need at the start of a document to keep track of what packages your analysis needs.
+
+### Activity
+
+In the *Setup* section at the beginning of this document, add code to load the following packages, which you will need for this problem set:
+
+1. `tidyverse`
+1. `readxl`
+1. `cowplot`
+
+Install these packages if you need to (see **Loading Packages** above for the installation syntax). 
+
+## Loading Data
+
+Sexual size dimorphism (SSD)
+
+The golden silk orb weaver (*Nephila clavipes*) is a spider that shows extreme SSD, in which males are about 2/3 smaller than females. This picture shows the size disparity:
+
+![](http://djringer.com/photos/d/8304-2/golden-silk-orbweaver-nephila-clavipes-female-male.jpg)
+
+In contrast, the (*Pardosa ramulosa*)
+
+![](http://crawford.tardigrade.net/journal/album/fordramulosa.jpg)
+
+The file `Size_Dimorphism.xlsx` contains data 
+
+Open the file in Excel and look at the columns. Here is a sample of what the columns represent:
+
+### Activity
+
+Using the `read_excel()` function, load the file `Size_Dimorphism.xlsx` in R. Assign it to the object, `M`.
+
+```{r}
+M <- read_excel("../data/Size_Dimorphism.xlsx")
+```
+
+## Exploring Data
+
+Any time you load data from an external source (which is almost every time you are working with data), you should check to make sure that the data has been correctly imported.
+
+You can use two functions to get a quick overview of the columns of a `data.frame` (any R object really), `str()` and `glimpse()`, each of which gives a list of the columns and their first few values.
+
+Type `str(M)` into the code chunk below and then compile
+
+```{r}
+str(M)
+```
+
+### Activity
+
+Using the output of `str(M)`, answer the following questions.
+
+- How many rows are in the `data.frame` `M`?
+
+> 200
+
+- Does this agree with the number of rows in the Excel file? Why or why not?
+
+> Excel has the header row separate. But the number of data rows matches.
+
+- How many columns are in the `data.frame` `M`? Does this agree with the number of columns in the Excel file? Why or why not?
+
+> 5. This matches. No header issues.
+
+## Finding typos
+
+
+## Filtering and Tally
+
+
+## Histograms & distributions & boxplot
+
+
+## Aggregating means by sex, by spp
+
+## bivariate plot
+-by spp
+-by sex
+-log
+-lines?
+
+##Create log columns
+

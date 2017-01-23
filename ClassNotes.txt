@@ -57,6 +57,10 @@ Goals:
 
   -
 
+Discuss:
+
+  - RStudio projects & working directories & file paths
+
 ---
 
 Week 3: Basic probability
