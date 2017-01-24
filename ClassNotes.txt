@@ -103,6 +103,8 @@ Week 8: Generalized linear models
 
 Goals:
 
+"Despite our best eﬀorts to include information, all models are approximate" Gelman et al.
+
 ---
 
 Week 9: Generalized linear models
