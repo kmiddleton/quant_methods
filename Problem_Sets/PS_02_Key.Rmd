@@ -104,25 +104,31 @@ Install these packages if you need to (see **Loading Packages** above for the in
 
 ## Loading Data
 
-Sexual size dimorphism (SSD)
+Sexual size dimorphism (SSD) refers to the difference in size between males and females of the same species. Spiders show some of the most dramatic cases where females are larger than males. 
 
 The golden silk orb weaver (*Nephila clavipes*) is a spider that shows extreme SSD, in which males are about 2/3 smaller than females. This picture shows the size disparity:
 
+<div style="width:350px">
 ![](http://djringer.com/photos/d/8304-2/golden-silk-orbweaver-nephila-clavipes-female-male.jpg)
+</div>
 
-In contrast, the (*Pardosa ramulosa*)
 
+In contrast, in the wolf spider (*Pardosa ramulosa*), males and females do not show large size differences.
+
+<div style="width:350px">
 ![](http://crawford.tardigrade.net/journal/album/fordramulosa.jpg)
+</div>
 
-The file `Size_Dimorphism.xlsx` contains data 
 
-Open the file in Excel and look at the columns. Here is a sample of what the columns represent:
+The file `Size_Dimorphism.xlsx` contains data on body mass and body length for males and females in these two species. 
+
 
 ### Activity
 
 Using the `read_excel()` function, load the file `Size_Dimorphism.xlsx` in R. Assign it to the object, `M`.
 
 ```{r}
+#FIXME
 M <- read_excel("../data/Size_Dimorphism.xlsx")
 ```
 
@@ -132,13 +138,15 @@ Any time you load data from an external source (which is almost every time you a
 
 You can use two functions to get a quick overview of the columns of a `data.frame` (any R object really), `str()` and `glimpse()`, each of which gives a list of the columns and their first few values.
 
+### Activity
+
 Type `str(M)` into the code chunk below and then compile
 
 ```{r}
+#FIXME
 str(M)
 ```
 
-### Activity
 
 Using the output of `str(M)`, answer the following questions.
 
@@ -154,22 +162,246 @@ Using the output of `str(M)`, answer the following questions.
 
 > 5. This matches. No header issues.
 
-## Finding typos
+## Number of Observations per Group
+
+This experiment is balanced, meaning there are equal numbers of males and females in each species (50 of each). 
+
+### Activity 
+
+Check that this is the case by creating a logical and summing it. i.e. how many female *Nephila clavipes* are there? 
+
+```{r}
+#FIXME
+sum(M$Sex=='F' & M$Species=='Nephila_clavipes')
+sum(M$Sex=='M' & M$Species=='Nephila_clavipes')
+sum(M$Sex=='F' & M$Species=='Pardosa_ramulosa')
+sum(M$Sex=='M' & M$Species=='Pardosa_ramulosa')
+
+```
+
+Looks like something is not right. There are a few ways to figure out what might be going on. Try using the unique function to check for typos in the Sex column. If you pass a vector to `unique()` it will return all unique values. The result should be just two values: "M", and "F". Use the which function to identify the obsevations with typos. (`%in%` might be useful here but there are other ways to do this)
+
+```{r}
+#FIXME
+unique(M$Sex)
+
+M[which(!(M$Sex %in% c('F','M'))),'ID']
+
+```
+
+You could use the results of your which functions to find and correct your excel file after making a back up copy just in case you make a mistake (or use version control!). If you were planning to do more editing in excel, this would be preferable. For this exercise will correct these within R here. We've given you the syntax for fixing one. Use this same format to fix the others. Run `unique()` again to make sure you got them all. 
+
+```{r}
+
+M$Sex[M$Sex=='F ']<-'F'
+#FIXME
+M$Sex[M$Sex=='M ']<-'M'
+M$Sex[M$Sex=='f ']<-'F'
+M$Sex[M$Sex=='f']<-'F'
+M$Sex[M$Sex=='m ']<-'M'
+M$Sex[M$Sex=='m']<-'M'
+
+```
+
+Now check the Species column in the same way. Fix any errors that you find.
+
+```{r}
+
+unique(M$Species)
+
+M$Species[M$Species=='Pardosa_ramuloso']<-'Pardosa_ramulosa'
+M$Species[M$Species=='Pardosa ramulosa']<-'Pardosa_ramulosa'
+M$Species[M$Species=='Pardosa_ramulosa ']<-'Pardosa_ramulosa'
+
+unique(M$Species)
 
 
-## Filtering and Tally
+```
+
+One big reason to be careful when you enter data!!
+
+One last step, let's write out your new, typo-free data. Look at the help for `write_csv()` and write out your data to a new csv file named, Size_Dimorphism_corrected.csv. 
+
+```{r}
+
+write_csv(M, "../data/Size_Dimorphism_corrected.csv")
+
+```
+
+Now read your new file back in as if this next section is a new script. Feel free to overwrite your previous object, `M`. This is a good idea to avoid confusion. Use `read_csv()`.
+
+```{r}
+M <- read_csv("../data/Size_Dimorphism_corrected.csv")
+```
+
+## Data Counts
+
+Another way to get counts by group uses `group_by()` and `tally()`. `group_by()` splits data by factors and tally adds the number of observations in each of those groups. 
+
+### Activity
+
+In the chunk below, pipe `M` to `group_by()`, grouping by both species and sex. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way.
+
+```{r}
+#FIXME
+M %>% group_by(Species, Sex) %>% tally()
+
+```
+
+You should now see 50 observations per sex within species. 
+
+## Data Filtering
+
+To give you some practice filtering, filter your data in the following ways using *both* base R and tidyverse functions. 
+
+1. All *Pardosa ramulosa* 
+2. All females of both species
+3. Body mass and sex for *Nephila clavipes*
+4. Rows 1-50
+5. Mass of the largest female in each species
+6. Male *Pardosa ramulosa* with body lengths less than 4 or greater than 6
+
+```{r}
+#FIXME
+# 1
+M[M$Species == "Pardosa_ramulosa", ]
+M %>% filter(Species == "Pardosa_ramulosa")
+
+# 2
+M[M$Sex == "F", ]
+M %>% filter(Sex == "F")
+
+# 3
+M[M$Species == "Nephila_clavipes", c("BodyMass", "Sex")]
+M %>% filter(Species == "Nephila_clavipes") %>% 
+  select(BodyMass, Sex)
+
+# 4
+M[1:50, ]
+M %>% slice(1:50)
+
+# 5
+max(M[M$Sex=='F' & M$Species=='Pardosa_ramulosa','BodyMass'])
+max(M[M$Sex=='F' & M$Species=='Nephila_clavipes','BodyMass'])
+M %>% filter(Sex == "F") %>% 
+  group_by(Species) %>%
+  summarize(max_BodyMass = max(BodyMass))
+
+# 6
+M[M$Species == "Pardosa_ramulosa" & 
+    M$Sex == "M" &
+    (M$BodyLength < 4 | M$BodyLength > 6), ]
+M %>% filter(Species == "Pardosa_ramulosa" & Sex == "M") %>% 
+  filter(BodyLength < 4 | BodyLength > 6)
+```
+
+## Plotting histograms
+
+To start looking at sexual size dimorphism, we will make some histograms. 
+
+###Activity
+
+Start with a histogram of body length overall. 
+
+```{r}
+
+#FIXME
+ggplot(M, aes(BodyLength))+
+  geom_histogram()
+
+```
+
+There are some obvious groupings here but we don't know which species or sex they represent. We need to separate both species and sex. One approach is to make a plot for each species with `fill` denoting sex. Try this.
+
+```{r}
+
+#FIXME
+M %>% 
+  filter(Species=='Pardosa_ramulosa') %>% 
+  ggplot(aes(BodyLength, fill=Sex)) +
+  geom_histogram()
+
+M %>% 
+  filter(Species=='Nephila_clavipes') %>% 
+  ggplot(aes(BodyLength, fill=Sex)) +
+  geom_histogram()
+  
+
+```
+
+We could also visualize all groups with `facet_grid()`. Here is an example:
+
+```{r}
+ggplot(M, aes(BodyLength)) +
+  geom_histogram()+
+  facet_grid(Sex~Species)
+```
+
+With this you can clearly see SSD in Nephila but not in Pardosa. 
+
+## Aggregating
+
+The simplest descriptive statistics are means and standard deviations. Calculate these for body length per each species per each sex. Use `group_by()` and `summarize()`. 
+
+```{r}
+
+M %>% group_by(Sex, Species) %>%
+  summarize(mean(BodyLength), sd(BodyLength))
+
+```
 
 
-## Histograms & distributions & boxplot
+## Scatterplot
+
+You might be interested in the relationship between body length and body mass. Create a scatterplot of these two variables. Use color to show Sex and facet by Species. Put body length on the x axis. 
+
+```{r}
+
+ggplot(M, aes(x=BodyLength, y=BodyMass, color=Sex)) +
+  geom_point()+
+  facet_grid(Species~.)
 
 
-## Aggregating means by sex, by spp
+```
 
-## bivariate plot
--by spp
--by sex
--log
--lines?
+Describe the patterns you observe. Do you think this is a useful visualization? Why or why not?
 
-##Create log columns
 
+> 
+
+
+Because body length and body mass are related by an exponential power, if we log transform the data, that will linearize the relationship. Make two new variables that are the log-10 transformations of body length and body mass using `mutate` and plot the data again. 
+
+```{r}
+
+M <- mutate(M, logMass = log10(BodyMass), logLength = log10(BodyLength)) 
+
+#or with a pipe
+
+M <- M %>% mutate(logMass = log10(BodyMass), logLength = log10(BodyLength)) 
+ggplot(M, aes(x=logLength, y=logMass, color=Sex)) +
+  geom_point()+
+  facet_grid(Species~.)
+
+
+```
+
+What does this plot tell you? Do you think this is a more effective visualization of the data? 
+
+> 
+
+Now add lines of best fit and transparency (`alpha`) to your points. 
+
+```{r}
+
+ggplot(M, aes(x=logLength, y=logMass, color=Sex)) +
+  geom_point(alpha=1/3)+
+  facet_grid(Species~.)+
+  geom_smooth(method='lm')
+
+
+```
+
+What do these regression lines tell you?
+
+> 
