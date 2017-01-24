@@ -60,12 +60,24 @@ Goals:
 Discuss:
 
   - RStudio projects & working directories & file paths
+  - Working as a group
 
 ---
 
 Week 3: Basic probability
 
 Goals:
+
+  - Definitions: information, uncertainty, probability, variation, explained/unexplained
+  - Samples vs. populations; Sampling error
+  - Univariate distributions: frequency (histogram) vs. probability (density). Every frequency distribution has an underlying probability distribution
+  - Shapes of distributions: uniform, bell-shaped, aymppetric, bimodal
+  - Randomness, random sampling, IID
+  - Probabilities are proportions
+  - Addition rule vs. multiplication rule
+  - Conditional probabilities and Bayes rule
+
+Discuss:
 
   -
 
@@ -84,6 +96,9 @@ Week 5: Applications of three inference frameworks
 Bayes intro: http://sumsar.net/files/posts/2017-01-15-bayesian-computation-with-stan-and-farmer-jons/stan_exercise.html
 
 Goals:
+
+  - Measures of central tendency (see 03 slide 28)
+  - Percentiles and quantiles, Quartiles and IQR, Boxplots
 
 ---
 
