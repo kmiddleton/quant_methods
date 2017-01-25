@@ -10,7 +10,6 @@ output:
     toc_float: true
 ---
 
-
 ## Setup
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -19,10 +18,6 @@ output:
 # you will need to complete this problem set. We like to load all the
 # packages we will need for an analysis at the top.
 
-# FIXME
-library("tidyverse")
-library("readxl")
-library("cowplot")
 ```
 
 ## Working Directory
@@ -120,8 +115,7 @@ The file `Size_Dimorphism.xlsx` contains data on body mass and body length for m
 Using the `read_excel()` function, load the file `Size_Dimorphism.xlsx` in R. Assign it to the object, `M`.
 
 ```{r}
-#FIXME
-M <- read_excel("../data/Size_Dimorphism.xlsx")
+
 ```
 
 ## Exploring Data
@@ -135,23 +129,22 @@ You can use two functions to get a quick overview of the columns of a `data.fram
 Type `str(M)` into the code chunk below and then compile or execute the code chunk in the R console.
 
 ```{r}
-#FIXME
-str(M)
+
 ```
 
 Using the output of `str(M)`, answer the following questions.
 
 - How many rows are in the `data.frame` `M`?
 
-> 200
+> 
 
 - Does this agree with the number of rows in the Excel file? Why or why not?
 
-> Excel has the header row separate. But the number of data rows matches.
+> 
 
 - How many columns are in the `data.frame` `M`? Does this agree with the number of columns in the Excel file? Why or why not?
 
-> 5. This matches. No header issues.
+> 
 
 ## Number of Observations per Group
 
@@ -162,47 +155,28 @@ This experiment is balanced, meaning there are equal numbers of males and female
 Check that this is the case by creating a logical and summing the resulting TRUE/FALSE vector. I.e. how many female *Nephila clavipes* are there? 
 
 ```{r}
-#FIXME
-sum(M$Sex == 'F' & M$Species == 'Nephila_clavipes')
-sum(M$Sex == 'M' & M$Species == 'Nephila_clavipes')
-sum(M$Sex == 'F' & M$Species == 'Pardosa_ramulosa')
-sum(M$Sex == 'M' & M$Species == 'Pardosa_ramulosa')
+
 ```
 
 It looks like something is not right. There are a few ways to figure out what might be going on. Try using the `unique()` function to check for typos in the Sex column. If you pass a vector to `unique()` it will return all unique values in that vector. If all of our data is coded correctly, the result *should* be just two values: "M", and "F". Use the `which()` function to identify the observations with typos. (`%in%` might be useful here but there are other ways to do this.)
 
 ```{r}
-#FIXME
-unique(M$Sex)
 
-M[which(!(M$Sex %in% c('F', 'M'))), 'ID']
 ```
 
 You could use the results of your `which()` calls to find and correct your excel file after making a back up copy just in case you make a mistake (or use version control!). If you were planning to do more editing in excel, this would be preferable. For this exercise will correct these within R here. We've given you the syntax for fixing one. Use this same format to fix the others. Run `unique()` again to make sure you got them all. 
 
 First change `eval=FALSE` to `eval=TRUE`.
 
-```{r eval=TRUE}
+```{r eval=FALSE}
 M$Sex[M$Sex == 'F '] <- 'F'
-#FIXME
-M$Sex[M$Sex == 'M '] <- 'M'
-M$Sex[M$Sex == 'f '] <- 'F'
-M$Sex[M$Sex == 'f'] <- 'F'
-M$Sex[M$Sex == 'm '] <- 'M'
-M$Sex[M$Sex == 'm'] <- 'M'
+
 ```
 
 Now check the `Species` column in the same way. Fix any errors that you find.
 
 ```{r}
-# FIXME
-unique(M$Species)
 
-M$Species[M$Species == 'Pardosa_ramuloso'] <- 'Pardosa_ramulosa'
-M$Species[M$Species == 'Pardosa ramulosa'] <- 'Pardosa_ramulosa'
-M$Species[M$Species == 'Pardosa_ramulosa '] <- 'Pardosa_ramulosa'
-
-unique(M$Species)
 ```
 
 Saving yourself the trouble of doing this exercise is one big reason to be careful when you enter data!!
@@ -210,15 +184,13 @@ Saving yourself the trouble of doing this exercise is one big reason to be caref
 One last step, let's write out your new, typo-free data. Look at the help for `write_csv()`, and write out your data to a new csv file named, `Size_Dimorphism_corrected.csv`. 
 
 ```{r}
-# FIXME
-write_csv(M, "../data/Size_Dimorphism_corrected.csv")
+
 ```
 
 Now read your new file back in as if this next section is a new script. Feel free to overwrite your previous object, `M`. This is a good idea to avoid confusion. Use `read_csv()`.
 
 ```{r}
-# FIXME
-M <- read_csv("../data/Size_Dimorphism_corrected.csv")
+
 ```
 
 ## Data Counts
@@ -230,8 +202,7 @@ Another way to get counts by group uses `group_by()` and `tally()`, which are pa
 In the chunk below, pipe `M` to `group_by()`, grouping by both species and sex. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way.
 
 ```{r}
-#FIXME
-M %>% group_by(Species, Sex) %>% tally()
+
 ```
 
 You should now see 50 observations per sex within species. 
@@ -252,37 +223,7 @@ To give you some practice filtering, filter your data in the following ways usin
 6. Male *Pardosa ramulosa* with body lengths less than 4 or greater than 6
 
 ```{r}
-#FIXME
-# 1
-M[M$Species == "Pardosa_ramulosa", ]
-M %>% filter(Species == "Pardosa_ramulosa")
 
-# 2
-M[M$Sex == "F", ]
-M %>% filter(Sex == "F")
-
-# 3
-M[M$Species == "Nephila_clavipes", c("BodyMass", "Sex")]
-M %>% filter(Species == "Nephila_clavipes") %>% 
-  select(BodyMass, Sex)
-
-# 4
-M[1:50, ]
-M %>% slice(1:50)
-
-# 5
-max(M[M$Sex == 'F' & M$Species == 'Pardosa_ramulosa', 'BodyMass'])
-max(M[M$Sex == 'F' & M$Species == 'Nephila_clavipes', 'BodyMass'])
-M %>% filter(Sex == "F") %>% 
-  group_by(Species) %>%
-  summarize(max_BodyMass = max(BodyMass))
-
-# 6
-M[M$Species == "Pardosa_ramulosa" & 
-    M$Sex == "M" &
-    (M$BodyLength < 4 | M$BodyLength > 6), ]
-M %>% filter(Species == "Pardosa_ramulosa" & Sex == "M") %>% 
-  filter(BodyLength < 4 | BodyLength > 6)
 ```
 
 ## Plotting Histograms
@@ -294,31 +235,21 @@ To start looking at sexual size dimorphism, we will make some histograms. This i
 Start with a histogram of body length overall. 
 
 ```{r}
-#FIXME
-ggplot(M, aes(BodyLength)) +
-  geom_histogram()
+
 ```
 
 There are some obvious groupings here, but we don't know which species or sex the clusters represent. We need to separate both species and sex. One approach is to make a plot for each species with `fill` coding for sex (this is analogous to using color, but works better with histograms). Try this.
 
 ```{r}
-#FIXME
-M %>% 
-  filter(Species == 'Pardosa_ramulosa') %>% 
-  ggplot(aes(BodyLength, fill = Sex)) +
-  geom_histogram()
 
-M %>% 
-  filter(Species == 'Nephila_clavipes') %>% 
-  ggplot(aes(BodyLength, fill = Sex)) +
-  geom_histogram()
 ```
 
 You will get a message saying that "`stat_bin()` using `bins = 30`. Pick better value with `binwidth`." That just means that you are using the default bin size for your histograms. In some situations, you would want to specify that value explicitly. For now, using the default value of 30 is fine.
 
 We could also visualize all groups with `facet_grid()`. Here is an example:
 
-```{r eval=TRUE}
+```{r eval=FALSE}
+# Change eval=FALSE to eval=TRUE
 ggplot(M, aes(BodyLength)) +
   geom_histogram() +
   facet_grid(Sex ~ Species)
@@ -337,9 +268,7 @@ Along with the minimum, maximum, and range, two of the simplest and most common 
 Calculate the mean and standard deviation for body length for each species per each sex. Use `group_by()` and `summarize()`. You should not have to separate the data into two `data.frame`s.
 
 ```{r}
-# FIXME
-M %>% group_by(Sex, Species) %>%
-  summarize(mean(BodyLength), sd(BodyLength))
+
 ```
 
 ## Scatterplot
@@ -351,16 +280,12 @@ You might be interested in the relationship between body length and body mass. S
 Create a scatterplot of body length and body mass. Use color to show Sex and facet by Species. Put body length on the x axis. Add axis labels, but don't worry about units for now.
 
 ```{r}
-# FIXME
-ggplot(M, aes(x = BodyLength, y = BodyMass, color = Sex)) +
-  geom_point() +
-  facet_grid(Species ~ .) +
-  labs(x = "Body Length", y = "BodyMass")
+
 ```
 
 Describe the patterns you observe. Do you think this is a useful visualization? Why or why not?
 
-> Not really that useful. The data for *Pardosa* is all smashed down to ~0 on the y axis, as is the male data for *Nephila*. The *Nephila* female are the only ones with any variation, which looks like it is increasing as body length increases. 
+> 
 
 Because body length and body mass are related by an exponential power, if we take advantage of the math of logarithms and log-transform the data, that will linearize the relationship. Ignoring the y-intercepts:
 
@@ -370,35 +295,19 @@ $$\log(Mass) \propto b \log(Length)$$
 Make two new variables that are the log10-transformations of body length and body mass using `mutate` and plot the data again. Add new axis labels.
 
 ```{r}
-#FIXME
-M <- mutate(M, logMass = log10(BodyMass), logLength = log10(BodyLength)) 
 
-# or with a pipe
-
-M <- M %>% mutate(logMass = log10(BodyMass), logLength = log10(BodyLength)) 
-
-# Scatterplot
-ggplot(M, aes(x = logLength, y = logMass, color = Sex)) +
-  geom_point() +
-  facet_grid(Species ~ .) +
-  labs(x = "log Body Length", y = "log Body Mass")
 ```
 
 What does this plot tell you? Do you think this is a more effective visualization of the data? 
 
-> There is a positive, linear relationship between log(mass) and log(body length). In *Pardosa*, the female and male distributions overlap almost completely. In *Nephila*, there is a large separation between the females and males.
+> 
 
 Now add lines of best fit and transparency (`alpha`) to your points. 
 
 ```{r}
-#FIXME
-ggplot(M, aes(x = logLength, y = logMass, color = Sex)) +
-  geom_point(alpha = 1/3) +
-  facet_grid(Species ~ .) +
-  geom_smooth(method = 'lm') +
-  labs(x = "log Body Length", y = "log Body Mass")
+
 ```
 
 What do these regression lines tell you?
 
-> The slopes of the lines are nearly identical, which suggests that the linear relationships between log length and log mass is probably equal across the four groups.
+> 
