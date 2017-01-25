@@ -1,0 +1,195 @@
+---
+title: "Distributions"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+```
+
+## Notes
+
+## Readings
+
+## Distributions most commonly encountered
+
+1. Frequency distribution
+    - Shows the number of times each measurement occurs in a sample (possibly "binned")
+1. Probability distribution:
+    - A probability distribution shows the probability that measurement occurs in a sample.
+    - Usually based on the observed data
+
+## Frequency distributions
+
+```{r}
+# Set the seed for the random number generator
+set.seed(5)
+
+# Random numbers with a mean of 0 and standard deviation of 1
+x <- rnorm(200)
+M <- data_frame(x)  # Make a data_frame for ggplot
+```
+
+## Histograms: Visualizing frequency distributions
+
+```{r eval=FALSE}
+ggplot(M, aes(x = x)) +
+  geom_histogram()
+```
+
+Use the `x` column from `M` to make a histogram.
+
+## Histograms: Visualizing frequency distributions
+
+```{r echo=FALSE, message=FALSE}
+ggplot(M, aes(x = x)) +
+  geom_histogram()
+```
+
+## Density plots: Visualizing probability distributions
+
+```{r eval=FALSE}
+ggplot(M, aes(x = x)) +
+  geom_density()
+```
+
+Note `geom_density()` here instead of `geom_histogram()`. ggplot makes it easy to switch between different kinds of visualizations of the data.
+
+## Density plots: Visualizing probability distributions
+
+```{r echo=FALSE}
+ggplot(M, aes(x = x)) +
+  geom_density()
+```
+
+## Frequency vs. probability distribution
+
+A frequency distribution has an underlying probability distribution.
+
+```{r eval=FALSE}
+ggplot(M, aes(x = x)) +
+  geom_histogram(aes(y = ..density..), fill = "gray") +
+  geom_density()
+```
+
+- `..density..` is needed to get the y scale correct. You don't need to understand why.
+
+## Frequency vs. probability distribution
+
+A frequency distribution has an underlying probability distribution.
+
+```{r echo=FALSE, message=FALSE}
+ggplot(M, aes(x = x)) +
+  geom_histogram(aes(y = ..density..), fill = "gray") +
+  geom_density()
+```
+
+## Frequency vs. probability distribution
+
+Generate the actual probability for $\mu = 0$ and $\sigma = 1$ using the normal distribution's probability density function.
+
+$$
+f\left(Y\right)=\frac{1}{\sqrt{2\pi\sigma^{2}}}e^{\frac{-\left(Y-\mu\right)^{2}}{2\sigma^{2}}}
+$$
+
+> "There is no avoiding mathematics when doing data analysis." [@kruschke_doing_2015]
+
+## Frequency vs. probability distribution
+
+Write a function to return the probability of an observation $Y$ for a given population mean ($\mu$) and standard deviation ($\sigma$):
+
+```{r}
+normal <- function(Y, mu = 0, sigma = 1){
+  1 / sqrt(2 * pi * sigma ^ 2) * 
+    exp((-(Y - mu) ^ 2 / (2 * sigma ^ 2)))
+}
+```
+
+Calculate the probability for a range of $Y$ from -3 to 3.
+
+```{r}
+Y <- seq(-3, 3, length = 200)
+prob <- normal(Y)
+M_prob <- data_frame(Y, prob)
+```
+
+
+## Frequency vs. probability distribution
+
+```{r eval=FALSE}
+ggplot(M, aes(x = x)) +
+  geom_histogram(aes(y = ..density..), fill = "gray") +
+  geom_line(data = M_prob, aes(x = Y, y = prob))
+```
+
+Note:
+
+- Main data comes from `M`, `..density..` to get y scale correct
+- New `data = M_prob` in `geom_line()`. Then use `Y` and `prob` for drawing the line.
+
+## Frequency vs. probability distribution
+
+```{r echo=FALSE, message=FALSE}
+ggplot(M, aes(x = x)) +
+  geom_histogram(aes(y = ..density..), fill = "gray") +
+  geom_line(data = M_prob, aes(x = Y, y = prob))
+```
+
+$n = 200$ here. What about $n = 2000$? $n = 200000$?
+
+## Shapes of distributions
+
+```{r echo=FALSE, fig.height=3.5, fig.width=8}
+set.seed(12)
+
+n <- 100000
+
+mytheme <-
+  theme(axis.title = element_blank(),
+        axis.text = element_blank())
+
+p1 <- data.frame(uni = runif(n, 0, 1)) %>% 
+  ggplot(aes(uni)) +
+  geom_histogram(binwidth = 0.05) +
+  ggtitle("Uniform") +
+  mytheme
+
+p2 <- data.frame(norm = rnorm(n, 0, 1)) %>% 
+  ggplot(aes(norm)) +
+  geom_histogram(binwidth = 0.05) +
+  ggtitle("Bell-Shaped") +
+  mytheme
+
+p3 <- data.frame(b = rbeta(n, 2, 8)) %>% 
+  ggplot(aes(b)) +
+  geom_histogram(binwidth = 0.05) +
+  ggtitle("Skewed") +
+  mytheme
+
+p4 <- data.frame(bi = c(rnorm(n, -2, 1),
+                  rnorm(n, 2, 1))) %>% 
+  ggplot(aes(bi)) +
+  geom_histogram(binwidth = 0.05) +
+  ggtitle("Bimodal") +
+  mytheme
+
+plot_grid(p1, p2, p3, p4, ncol = 4)
+```
+
+Bimodal distributions are particularly challenging for analysis.
+
+## Quiz 03-2
+
+FIXME
+
+## References

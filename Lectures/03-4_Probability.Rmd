@@ -1,0 +1,272 @@
+---
+title: "Probability"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+```
+
+## Notes
+
+## Readings
+
+## Basics of probability
+
+The probability of an event is the proportion of times the event would occur if a random trial is repeated infinitely under constant conditions.
+
+- Probabilities are proportions.
+- Pr[event] is the abbreviation for “the probability of
+even A occurring.”
+    - e.g., $Pr[heads] = 0.50$
+- The range of probabilities for an event is 0 $\rightarrow$ 1
+(including 0 and 1; $Pr[event] \in [0, 1]$).
+
+## Mutually exclusive events: Addition rule
+
+*Mutually exclusive* events are events that are not simultaneously possible due to constraints of physics, biology, development, evolution, etc.
+
+- $Pr[A~and~B] = 0$
+- Probability of A and B occurring simultaneously.
+- e.g., You can't flip a coin heads and tails in one trial
+    - $Pr[heads~and~tails] = 0$
+- $Pr[A~or~B] = Pr[A] + Pr[B]$
+
+## Independent events: Multiplication rule
+
+If events are *independent*, then their individual probabilities do no influence each other. The occurrence of one does not alter the probability of the other.
+
+- Successive coin flips
+- Successive dice rolls
+- Successive roulette wheel spins
+- Weekly lottery drawings
+- Child sex (in the absence of bad genes)
+
+## Independent events: Multiplication rule
+
+$$Pr[A~and~B] = Pr[A] \times Pr[B]$$
+
+<center>
+<img src="images/boy_girl.png" width="70%" />
+</center>
+
+## Should the Packers have tried a 2 point conversion?
+
+<center>
+<img src="images/packers.jpg" width="50%" />
+</center>
+
+## Should the Packers have tried a 2 point conversion?
+
+Two-point conversion + win:
+
+- League-wide success rate (since 2003): 431 of 913
+
+Extra point + overtime:
+
+- Extra point success rate (2015 only): 1,131 of 1,199
+- Expected winning percentage in overtime (since 2001): Away team has won 110 of 242 games
+
+## Conditional probability
+
+The **conditional probability** of a dependent event is the probability of that even occurring given that another condition or conditions is met.
+
+<center>
+<img src="images/cond_prob.png" width="40%" />
+</center>
+
+## Conditional probability
+
+<center>
+<img src="images/dec_tree.png" width="75%" />
+</center>
+
+## Bayes' Rule
+
+> "All decisions should be based on evidence, but the best decisions should also be based on previous experience." Stone (2012)
+
+$$Pr[A|B] = \frac{Pr[B|A] \times Pr[A]}{Pr[B]}$$
+
+The conditional probability of $A$ given $B$ relies not only on the probability of $A$, but also of $B$ and of $B$ given $A$.
+
+- Predicting events given prior knowledge of the probability of those events.
+- The human brain (usually) works this way in predicting events.
+
+## Bayes' Rule
+
+Suppose that you wake up one day with spots all over your face. The doctor tells you that 90% of people who have smallpox have the same symptoms as you have.
+
+<center>
+<img src="images/pox.jpg" width="70%" />
+</center>
+
+## Bayes' Rule
+
+<center>
+<img src="images/pox2.jpg" width="80%" />
+</center>
+
+Gentle introduction: http://bit.ly/1nfNZ9p
+
+## Bayes' Rule
+
+Choose a random person off the street and test them for HIV. The test is positive. What is the probability that they actually are HIV+?
+
+1. 95-100%
+2. 90-94%
+3. 80-89%
+4. 65-79%
+5. <65%
+
+## Bayes' Rule
+
+If you *have* HIV, the probability that the test is positive is 99.9%
+
+  - $Pr[T|H] = 0.999$
+
+If you *don't have* HIV, the probability that the test is negative is 99.99%
+
+  - $Pr[T'|H'] = 0.9999$
+
+Only about 13/100000 people have HIV.
+
+  - $P[H] = 13/100000 = 1.3 \times 10^{-4}$
+
+## Bayes' Rule
+
+$$Pr[H|T] = \frac{Pr[T|H] \times Pr[H]}{Pr[T]}$$
+
+- Find $P[H|T]$
+
+$Pr[T]$ is the challenge.
+
+- $Pr[T|H] \times P[H] + Pr[T'|H'] \times 1 - P[H]$
+- Independent probabilities of positive test given HIV and positive test given *not* HIV
+
+## Bayes' Rule
+
+```{r eval=TRUE}
+((0.999) * 1.3e-4) /
+  ((0.999 * 1.3e-4) + ((1 - 0.9999) * (1 - 1.3e-4)))
+```
+
+## Bayes' Rule
+
+Take 100000 people:
+
+- 13 have HIV
+- 100000 – 13 = 99987 do not
+
+Of the 13 with HIV:
+
+- 13 * 0.999 = 12.987 test positive
+- 13 * 0.001 = 0.013 do not
+
+Of the 99987 who do not:
+
+- 99987 * .0001 = 9.9987 test positive
+- 99987 * .9999 = 99977.0013 do not
+
+## Bayes' Rule
+
+So if:
+
+$Pr(H|T) = \frac{Pr(T|H) \times Pr(H)}{Pr(T)}$
+
+Then:
+
+$Pr(H|T) = \frac{0.999 \times (13/100000)}{(12.987 + 9.9987) / 100000} = 0.565$
+
+Or just $12.987 / (12.987 + 9.9987)$ because the 100000s cancel out, which is the number of true positives over the total positives.
+
+## Probability thought experiment
+
+A coin is tossed 100 times. Gamblers can bet on the total number of heads that will be thrown. They can do so at any time before or during the game.
+
+- Imagine that you're betting before the game starts. What is your best bet?
+
+Now imagine that you're betting after the coin was already tossed 10 times and came up heads all 10 times.
+
+- What is the best bet now?
+
+## Powerball
+
+Two pools:
+
+1. 69 balls in one pool: Choose 5
+1. 26 in the other pool: Choose 1
+
+Number of winning combinations in pool 1 is the **binomial coefficient**
+
+- the number of unique ordered sequences of successes that yield exactly $m$ successes in $n$ trials ("n choose m").
+- the "successes" can happen in any order
+
+$$\left({n\atop m}\right)=\frac{n!}{m!\left(n-m\right)!}$$
+
+## Powerball
+
+```{r}
+choose(69, 5)
+choose(26, 1)
+choose(69, 5) * choose(26, 1)
+```
+
+5 successes from 69 chances $\times$ 1 success from 26 chances.
+
+- What if the order had to be correct as well?
+
+## More fun with binomial probabilities
+
+My sister has 4 children of which 4 are girls. What is the probability if $Pr[girl]=0.488$.
+
+```{r}
+0.488 ^ 4
+dbinom(4, 4, 0.488)
+```
+
+## More fun with binomial probabilities
+
+About 10% of people are left handed.
+
+- What is the probability of 0 left handed people in a *sample* of 10?
+- What is the probabililty of exactly 1?
+- What is the probability of 1 or more?
+
+```{r eval=FALSE, echo=FALSE}
+dbinom(0, 10, prob = 0.1)
+dbinom(1, 10, prob = 0.1)
+sum(dbinom(1:10, 10, prob = 0.1))
+```
+
+## Binomial probabilities for Pr[left] = 0.1
+
+```{r echo=FALSE}
+M <- data_frame(Lefties = 0:10,
+                Probability = dbinom(0:10, 10, prob = 0.1))
+ggplot(M, aes(Lefties, Probability)) + 
+  geom_bar(stat = "identity") +
+  xlab("n Left-handers") +
+  scale_x_continuous(breaks = seq(0, 10, by = 1))
+```
+
+$n = 7-10$ have very low probabilities.
+
+## Uncertainty
+
+> "In scientific research, measurements are replete with randomness. Extraneous influences contaminate the measurements despite tremendous efforts to limit their intrusion." [@kruschke_doing_2015]
+
+## Quiz 03-4
+
+FIXME
+
+## References
