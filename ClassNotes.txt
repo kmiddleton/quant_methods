@@ -59,8 +59,10 @@ Goals:
 
 Discuss:
 
-  - RStudio projects & working directories & file paths
   - Working as a group
+  - Keeping up, getting things in
+  - data.frame question
+  - RStudio projects & working directories & file paths
 
 ---
 
