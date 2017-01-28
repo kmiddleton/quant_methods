@@ -123,7 +123,6 @@ prob <- normal(Y)
 M_prob <- data_frame(Y, prob)
 ```
 
-
 ## Frequency vs. probability distribution
 
 ```{r eval=FALSE}
@@ -187,6 +186,51 @@ plot_grid(p1, p2, p3, p4, ncol = 4)
 ```
 
 Bimodal distributions are particularly challenging for analysis.
+
+## Probability distributions
+
+Distribution of variables you might encounter
+
+1. Normal (Gaussian): (continuously varying) numerical values
+1. Binomial: success or failure
+1. Poisson: numbers of successes per unit time or space 
+1. Other less often encountered probability distributions
+    - **FIXME**
+
+## Normal (Gaussian)
+
+```{r echo=FALSE}
+M <- data_frame(
+  x = seq(-4, 4, length = 200),
+  y = dnorm(x)) 
+ggplot(M, aes(x, y)) + geom_line() +
+  labs(y = "Density")
+```
+
+## Binomial
+
+```{r echo=FALSE}
+M <- data_frame(Successes = 0:10,
+                Probability = dbinom(0:10, 10, prob = 0.5))
+ggplot(M, aes(Successes, Probability)) + 
+  geom_bar(stat = "identity") +
+  scale_x_continuous(breaks = seq(0, 10, by = 1))
+```
+
+$Pr[success] = 0.5$; Trial size = $10$.
+
+## Poisson
+
+```{r echo=FALSE}
+trials <- 20
+M <- data_frame(Successes = 0:trials,
+                Probability = dpois(0:trials, lambda = 5))
+ggplot(M, aes(Successes, Probability)) + 
+  geom_bar(stat = "identity") +
+  scale_x_continuous(breaks = seq(0, trials, by = 2))
+```
+
+$\lambda = 5$
 
 ## Quiz 03-2
 

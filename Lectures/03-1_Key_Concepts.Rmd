@@ -102,6 +102,45 @@ True temperature is 99.3°. Sampling error or bias?
 
 *What is the real challenge here?*
 
+## Randomness
+
+A repeatable process is random if its outcome is
+
+- unpredictable in the short run
+- predictable in the long run
+
+e.g., coin flipping (fair coin)
+
+- We don't know what the result of a single flip will be
+- We do know what the long run probability of heads will be
+
+## Random sampling
+
+Assumptions of most statistical analyses
+
+1. **Equal chance**: Each member of a population has an equal chance of being included in the sample
+2. **Independence**: No member that is chosen influences the others that are chosen *or* their outcomes (e.g., trait values)
+
+*Goals*:
+
+- Minimize bias
+- Allow an estimation of sampling error (an important concept)
+
+## Independent and identically distributed (IID)
+
+- All observations are independent of one another
+- All observations come from the same underlying probability distribution (normal, binomial, etc.)
+
+Standard assumption of most statistical tests.
+
+## Random sampling
+
+Randomly select 20 trees (left) or randomly select 20 square quadrats with 0 or more trees (right).
+
+ ![](images/sampling.png)
+
+How realistic is this?
+
 ## Quiz 03-1
 
 FIXME
