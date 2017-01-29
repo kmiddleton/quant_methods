@@ -17,12 +17,13 @@ library(readxl)
 library(cowplot)
 ```
 
-## Notes
-
 ## Readings
 
 - Curran-Everett [-@curran-everett_process_2000]: The process of scientific discovery: How certain can we be?
-- Curran-Everett [-@curran-everett_explorations_2009]: Explorations in statistics: confidence intervals
+
+## Assumptions of Science as a Way of Knowing
+- all ways of knowing make a set of assumptions
+- our knowledge is conditional on these assumptions being met
 
 ## Definitions of statistics
 
@@ -70,9 +71,9 @@ A **sample** is a representative subset of a population, ideally randomly chosen
 
 **Sampling error** is the deviation from the population parameter resulting from chance alone.
 
-- **Precision** is the departure of the estimate from the true population parameter resulting from sampling error.
+- **Precision** is the amount of spread among the observations around the true population parameter resulting from sampling error.
 
-**Bias** is the *systematic departure* of an estimate from the population parameter being estimated.
+**Bias/Inaccuracy** is the *systematic departure* of an estimate from the population parameter being estimated.
 
 ## Goals of data collection: Low sampling error and low bias
 
@@ -101,6 +102,11 @@ Consider the same physician's thermometer. The same patient's temperature 3 time
 True temperature is 99.3°. Sampling error or bias?
 
 *What is the real challenge here?*
+
+## Testing for bias
+- Standard curves
+- Calibration
+- Simulation
 
 ## Randomness
 
@@ -143,6 +149,8 @@ How realistic is this?
 
 ## Quiz 03-1
 
-FIXME
+On Canvas, complete quiz 03-1.
+
+Move on to lecture 03-2.
 
 ## References

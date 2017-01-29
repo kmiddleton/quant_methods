@@ -15,13 +15,19 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(readxl)
 library(cowplot)
+library(forcats)
 ```
 
 ## Notes
 
-Links to Khan Academy probability videos? FIXME
+[Khan Academy probability videos and exercises](https://www.khanacademy.org/math/statistics-probability/probability-library)
 
-## Readings
+
+## Uncertainty & Science
+
+> Scientific knowledge is a body of statements of varying degrees of certainty—some most unsure, some nearly sure, none absolutely certain (Feynman)
+> 
+
 
 ## Why learn probability?
 
@@ -55,12 +61,22 @@ The probability of an event is the **proportion** of times the event **would** o
 
 ## Basics of probability
 
+The probability of an event is the **proportion** of times the event **would** occur **if** a **random** trial is repeated **infinitely** under **constant conditions**.
+
+<center>
+<img src="images/weather1.png" width="100%" />
+</center>
+
+
+## Basics of probability
+
 Probabilities are proportions.
 
 Pr[event] is the abbreviation for “the probability of
 event A occurring.”
-    - $Pr[heads] = 0.50$: Heads
-    - $Pr[heads'] = 0.50$: *Not* heads
+
+- $Pr[heads] = 0.50$: Heads
+- $Pr[heads'] = 0.50$: *Not* heads
 
 The range of probabilities for an event is 0 $\rightarrow$ 1
 (including 0 and 1).
@@ -74,6 +90,13 @@ The range of probabilities for an event is 0 $\rightarrow$ 1
 - e.g., You can't flip a coin heads and tails in one trial
     - $Pr[H, T] = 0$
 - $Pr[A~or~B] = Pr[A] + Pr[B]$
+
+## Addition rule | Mutually exclusive events
+
+On a single dice roll, what is the probability of rolling *either* a 1 *or* a 2?
+
+On a single dice roll, what is the probability of rolling *either* a 1, a 2, *or* a 3?
+
 
 ## Multiplication rule | Independent events
 
@@ -89,16 +112,25 @@ If events are *independent*, then their individual probabilities do not influenc
 ## Multiplication rule | Independent events
 
 $$Pr[A, B] = Pr[A] \times Pr[B]$$
+In two successive dice rolls, what is the probability of rolling  a 1 *followed by* a 2?
+
+In three successive dice rolls, what is the probability of rolling  a 1 *followed by* a 2, *followed by* a 6?
+
+
+## Multiplication rule | Independent events
+
+$$Pr[A, B] = Pr[A] \times Pr[B]$$
 
 <center>
 <img src="images/boy_girl.png" width="70%" />
 </center>
 
+
 ## Binomial probabilities
 
 KM's sister has 4 children of which 4 are girls. 
 
-What is the probability of 4 girls from 4 children if $Pr[girl]=0.488$?
+What is the probability of having 4 children that are all girls if $Pr[girl]=0.488$?
 
 <center>
 <img src="images/boy_girl.png" width="60%" />
@@ -111,165 +143,114 @@ What is the probability of 4 girls from 4 children if $Pr[girl]=0.488$?
 dbinom(4, 4, 0.488)
 ```
 
+Imagine KM's sister really wants a boy. What is the probability her next child will be a boy?
 
-## Conditional probability
+## Binomial Distribution
 
-The **conditional probability** of a dependent event is the probability of that event occurring given that another condition or conditions is met.
+- Probability distributions are basically like counting the ways things can happen
+- In R, you can "flip a coin" using the binomial distribution. The function is `rbinom()`. Try one flip: `rbinom(1,1,0.5)`
 
-<center>
-<img src="http://scitechdaily.com/images/Leptopilina_boulardi.jpg" width="60%" />
+## Binomial Distribution
 
-*Leptopilina boulardi*
-</center>
+If we flip a coin once, possible outcomes are H or T. How many ways are there to get one H? One T?
 
-## Conditional probability
+```{r echo=FALSE, fig.height=4}
 
-<center>
-<img src="images/dec_tree.png" width="75%" />
-</center>
+flip1 <- data_frame(
+ Ways = c(1, 1),
+ Flips = c("1 Head", "1 Tail")
+)
 
-## Conditional probability
-
-<center>
-<img src="images/cond_prob.png" width="50%" />
-</center>
-
-## Bayes' Rule
-
-> "All decisions should be based on evidence, but the best decisions should also be based on previous experience." Stone (2012)
-
-$$Pr[A|B] = \frac{Pr[B|A] \times Pr[A]}{Pr[B]}$$
-
-The conditional probability of $A$ given $B$ relies not only on the probability of $A$, but also of $B$ and of $B$ given $A$.
-
-- Predicting events given prior knowledge of the probability of those events.
-- The human brain (usually) works this way in predicting events.
-
-## Bayes' Rule
-
-Suppose that you wake up one day with spots all over your face. The doctor tells you that 90% of people who have smallpox have the same symptoms as you.
-
-<center>
-<img src="images/pox.jpg" width="70%" />
-</center>
-
-## Bayes' Rule
-
-<center>
-<img src="images/pox2.jpg" width="80%" />
-</center>
-
-Gentle introduction: http://bit.ly/1nfNZ9p
-
-## Bayes' Rule
-
-<center>
-<img src="images/dec_tree.png" width="60%" />
-</center>
-
-$$Pr[M|P] = \frac{Pr[P|M] \times Pr[M]}{Pr[P]}$$
-
-## Bayes' Rule
-
-$$Pr[M|P] = \frac{Pr[P|M] \times Pr[M]}{Pr[P]}$$
-
-$$0.9 = \frac{Pr[P|M] \times (0.18 + 0.04)}{0.2}$$
-
-$$\frac{0.18}{0.22} = Pr[P|M] = 0.82$$
-
-## Bayes' Rule
-
-Choose a random person off the street and test them for HIV. The test is positive. What is the probability that they actually are HIV+?
-
-1. 95-100%
-2. 90-94%
-3. 80-89%
-4. 65-79%
-5. <65%
-
-## Bayes' Rule
-
-If you *have* HIV, the probability that the test is positive is 99.9% (sensitivity)
-
-  - $Pr[T|H] = 0.999$
-
-If you *don't have* HIV, the probability that the test is negative is 99.99% (specificity)
-
-  - $Pr[T'|H'] = 0.9999$
-
-Only about 13/100000 people have HIV.
-
-  - $P[H] = 13/100000 = 1.3 \times 10^{-4}$
-
-## Bayes' Rule
-
-$$Pr[H|T] = \frac{Pr[T|H] \times Pr[H]}{Pr[T]}$$
-
-- Find $P[H|T]$
-
-$Pr[T]$ is the challenge.
-
-- Independent probabilities of positive test given HIV and positive test given *not* HIV
-
-$$\left(Pr[T|H] \times P[H]\right) + \left(Pr[T'|H'] \times 1 - P[H]\right)$$
-
-## Bayes' Rule {.smaller}
-
-\[
-\begin{aligned}
-Pr[H|T] &= \frac{Pr[T|H] \times Pr[H]}{Pr[T]} \\
-&= \frac{Pr[T|H] \times Pr[H]}{\left(Pr[T|H] \times P[H]\right) + \left(Pr[T'|H'] \times 1 - P[H]\right)} \\
-&= \frac{0.999 \times 0.00013}{\left(0.999 \times 0.00013\right) + \left((1 - 0.9999) \times (1 - 0.00013)\right)}
-\end{aligned}
-\]
-
-```{r eval=FALSE}
-((0.999) * 1.3e-4) /
-  ((0.999 * 1.3e-4) + ((1 - 0.9999) * (1 - 1.3e-4)))
+flip1 %>% ggplot(aes(x = Flips, y = Ways)) +
+ geom_bar(stat = "Identity")
 ```
 
-## Bayes' Rule
+## Binomial Distribution
 
-```{r eval=TRUE}
-((0.999) * 1.3e-4) /
-  ((0.999 * 1.3e-4) + ((1 - 0.9999) * (1 - 1.3e-4)))
+If we flip a coin twice, what are the possible outcomes?
+
+1. HH
+1. HT, TH
+1. TT
+
+```{r echo=FALSE,fig.height=3}
+
+flip2 <- data_frame(
+ Ways = c(1, 2, 1),
+ Flips = c("2 Head", "1 Head, 1 Tail", "2 Tail")) %>% 
+ mutate(Flips = fct_inorder(Flips))
+
+flip2 %>% ggplot(aes(x = Flips, y = Ways)) +
+ geom_bar(stat = "Identity")
 ```
 
-## Bayes' Rule
+## Binomial Distribution
 
-Take 100000 people:
+If we flip a coin 3 times, what are the possible outcomes?
 
-- 13 have HIV
-- 100000 – 13 = 99987 do not
+1. HHH
+1. HHT, HTH, THH
+1. TTH, THT, HTT
+1. TTT
 
-Of the 13 with HIV:
+```{r echo=FALSE, fig.height=3}
 
-- 13 * 0.999 = 12.987 test positive
-- 13 * 0.001 = 0.013 do not
+flip3 <- data_frame(
+ Ways = c(1, 3, 3, 1),
+ Flips = c("3 Head", "2 Head, 1 Tail", "1 Head, 2 Tail",
+           "3 Tail")) %>% 
+ mutate(Flips = fct_inorder(Flips))
 
-Of the 99987 who do not:
+flip3 %>% ggplot(aes(x = Flips, y = Ways)) +
+ geom_bar(stat = "Identity")
+```
 
-- 99987 * .0001 = 9.9987 test positive
-- 99987 * .9999 = 99977.0013 do not
+## Binomial Distribution
 
-## Bayes' Rule
+If we flip a coin 4 times, what are the possible outcomes?
 
-So if:
+1. HHH
+1. HHHT, HHTH, HTHH, THHH
+1. HHTT, TTHH, HTHT, THTH, HTTH, THHT
+1. TTTH, TTHT, THTT, HTTT
+1. TTTT
 
-$Pr(H|T) = \frac{Pr(T|H) \times Pr(H)}{Pr(T)}$
+```{r echo=FALSE, fig.height=3}
 
-Then:
+flip4 <- data_frame(
+ Ways = c(1, 4, 6, 4, 1),
+ Flips = c("4 Head", "3 Head, 1 Tail", "2 Head, 2 Tail",
+           "1 Head, 3 Tail", "4 Tail")) %>% 
+ mutate(Flips = fct_inorder(Flips))
 
-$Pr(H|T) = \frac{0.999 \times (13/100000)}{(12.987 + 9.9987) / 100000} = 0.565$
+flip4 %>% ggplot(aes(x = Flips, y = Ways)) +
+ geom_bar(stat = "Identity")
+```
 
-Or just $12.987 / (12.987 + 9.9987)$ because the 100000s cancel out, which is the number of true positives over the total positives.
+## Binomial Distribution
 
-## Uncertainty
+If we flip a coin 6 times, what are the possible outcomes?
 
-> "In scientific research, measurements are replete with randomness. Extraneous influences contaminate the measurements despite tremendous efforts to limit their intrusion." [@kruschke_doing_2015]
 
-## Quiz 03-4
+```{r echo=FALSE, fig.height=5}
 
-FIXME
+flip6 <- data_frame(
+ Ways = c(1, 6, 15, 20, 15, 6, 1),
+ Flips = c("6 H", "5 H, 1 T", "4 H, 2 T",
+           "3 H, 3 T", "2 H, 4 T", 
+           "1 H, 5 T", "6 T")) %>% 
+ mutate(Flips = fct_inorder(Flips))
+
+flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
+ geom_bar(stat = "Identity")
+
+```
+
+
+## Quiz 03-2
+
+On Canvas, complete quiz 03-2.
+
+Move on to lecture 03-3.
 
 ## References

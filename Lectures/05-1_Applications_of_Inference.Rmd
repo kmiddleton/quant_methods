@@ -29,6 +29,8 @@ library(plot3D)
 # Notes
 
 ## Readings
+- Curran-Everett [-@curran-everett_explorations_2009]: Explorations in statistics: confidence intervals
+
 
 ## Three frameworks for inference
 
