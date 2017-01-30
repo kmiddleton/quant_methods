@@ -28,9 +28,9 @@ If we flip a coin 6 times, what are the possible outcomes?
 
 flip6 <- data_frame(
  Ways = c(1, 6, 15, 20, 15, 6, 1),
- Flips = c("6 H", "5 H, 1 T", "4 H, 2 T",
-           "3 H, 3 T", "2 H, 4 T", 
-           "1 H, 5 T", "6 T")) %>% 
+ Flips = c("0 H", "1 H, 5 T", "2 H, 4 T",
+           "3 H, 3 T", "4 H, 2 T", 
+           "5 H, 1 T", "6 H")) %>% 
  mutate(Flips = fct_inorder(Flips))
 
 flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
@@ -59,9 +59,9 @@ flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
 ```{r echo=FALSE, fig.height=4.5}
 flips <- data_frame(
   Ways = c(1, 6, 15, 20, 15, 6, 1),
-  Flips = c("6 H", "5 H", "4 H",
-            "3 H", "2 H", 
-            "1 H", "0 H")) %>% 
+  Flips = c("0 H", "1 H", "2 H",
+            "3 H", "4 H", 
+            "5 H", "6 H")) %>% 
   mutate(Flips = fct_inorder(Flips))
 
 flips %>% ggplot(aes(x = Flips, y = Ways)) +
@@ -94,9 +94,9 @@ flips$Ways / sum(flips$Ways)
 ```{r echo=FALSE, fig.height=4.5}
 flip6 <- data_frame(
   Ways = c(1, 6, 15, 20, 15, 6, 1),
-  Flips = c("6 H", "5 H", "4 H",
-            "3 H", "2 H", 
-            "1 H", "0 H"),
+  Flips = c("0 H", "1 H", "2 H",
+            "3 H", "4 H", 
+            "5 H", "6 H"),
   Prob = Ways / sum(Ways)) %>% 
   mutate(Flips = fct_inorder(Flips))
 
@@ -178,9 +178,10 @@ $$
 f\left(Y\right)=\frac{1}{\sqrt{2\pi\sigma^{2}}}e^{\frac{-\left(Y-\mu\right)^{2}}{2\sigma^{2}}}
 $$
 
+An equation is a sentence waiting to be translated.
+
 > "There is no avoiding mathematics when doing data analysis." [@kruschke_doing_2015]
 
-An equation is a sentence waiting to be translated.
 
 ## Frequency vs. probability distribution
 

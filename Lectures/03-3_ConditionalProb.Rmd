@@ -32,7 +32,7 @@ The **conditional probability** of a dependent event is the probability of that 
 <center>
 <img src="http://scitechdaily.com/images/Leptopilina_boulardi.jpg" width="60%" />
 
-*Leptopilina boulardi*
+<i>Leptopilina boulardi</i>
 </center>
 
 ## Conditional probability
