@@ -17,6 +17,12 @@ library(readxl)
 library(cowplot)
 ```
 
+## Measurement
+
+1. Accuracy & Precision
+
+  - they could make each situation using rnorm?
+  
 ## Samples vs. populations
 
 ## Independent and identically distributed (IID)
@@ -66,7 +72,7 @@ Extra point + overtime:
 <img src="images/packers2.png" width="100%" />
 </center>
 
-## More binomial probabilities
+## Binomial probabilities
 
 About 10% of people are left handed.
 
@@ -74,7 +80,7 @@ About 10% of people are left handed.
 - What is the probability of exactly 1?
 - What is the probability of 1 *or more*?
 
-## More binomial probabilities
+## Binomial probabilities
 
 Probability density functions in R: `dbinom()`, `dnorm()`, etc.
 
@@ -84,7 +90,7 @@ Probability density functions in R: `dbinom()`, `dnorm()`, etc.
 - `size` = Sample size
 - `prob` = Probability of success for each trial
 
-## More binomial probabilities
+## Binomial probabilities
 
 What is the probability of 0 left handed people in a *sample* of 25?
 
@@ -92,7 +98,7 @@ What is the probability of 0 left handed people in a *sample* of 25?
 dbinom(0, 25, prob = 0.1)
 ```
 
-## More binomial probabilities
+## Binomial probabilities
 
 What is the probability of 0 left handed people in a *sample* of 25?
 
@@ -100,11 +106,11 @@ What is the probability of 0 left handed people in a *sample* of 25?
 dbinom(0, 25, prob = 0.1)
 ```
 
-## More binomial probabilities
+## Binomial probabilities
 
 What is the probability of exactly 1?
 
-## More binomial probabilities
+## Binomial probabilities
 
 What is the probability of exactly 1?
 
@@ -112,11 +118,11 @@ What is the probability of exactly 1?
 dbinom(1, 25, prob = 0.1)
 ```
 
-## More binomial probabilities
+## Binomial probabilities
 
 What is the probability of 1 *or more*?
 
-## More binomial probabilities
+## Binomial probabilities
 
 What is the probability of 1 *or more*?
 
@@ -175,6 +181,24 @@ choose(69, 5) * choose(26, 1)
 5 successes from 69 chances $\times$ 1 success from 26 chances.
 
 - What if the order had to be correct as well?
+
+## Odds of one or more winners
+
+Imagine that 500000 tickets are sold. What is the probability of 1 or more winners?
+
+## Odds of one or more winners
+
+Imagine that 500000 *unique* tickets are sold. What is the probability of 1 or more winners?
+
+```{r}
+n <- 500000
+sum(dbinom(1:n, n, 1/choose(69, 5) * choose(26, 1)))
+```
+
+```{r echo=FALSE}
+
+```
+
 
 ## Conditional probability thought experiment
 
