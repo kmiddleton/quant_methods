@@ -188,3 +188,11 @@ Now imagine that you're betting after the coin was already tossed 10 times and c
 
 - What is the best bet now?
 
+#breast cancer
+
+1 in 100 have breast cancer women 40-50
+80% with cancer positive mammogram
+9.6% false positive
+
+
+
