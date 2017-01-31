@@ -1,0 +1,186 @@
+---
+title: 'Problem Set 03'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+```
+
+## Topics from lecture we might want to include
+
+1. Accuracy & Precision
+  -need to cover?
+  -they could make each situation using rnorm?
+  
+2. Take a random sample
+
+3. Addition rule & Multiplication rule
+    -simple practice
+    -powerball jackpot makes more people buy tickets - changes prob of winning set?
+4. Conditional probability & Bayes Rule
+    - Breast Cancer?
+5. Distributions
+    -frequency
+    -probability
+    -law of large numbers
+    -beginning of stats (probability of difference in means?)
+  
+## Topics to reinforce
+
+A. ggplot2 & visualization
+B. filtering, selecting data
+
+## Random Samples (item 2)
+
+R has a random number generator (as do many other programs). Being able to simulate randomness is a critical component of programming. However, how does one avoid getting slightly different results every time you run your program if it includes randomness? R's solution, and the way to make your code reproducible, is to set the seed using `set.seed()`. Imagine you run a power simulation by randomly generating data and claim your power is 84%. How would another research confirm your results? Let's explore this feature.
+
+### Activity
+
+Without setting the seed, generate two objects named AA and BB consisting of 5 numbers from the normal distribution with a mean of 0 and a standard deviation of 1 using  `rnorm()` and print AA and BB. Run this chunk more than once. Do you get the same answer each time? 
+
+```{r}
+
+AA <- rnorm(5)
+BB <- rnorm(5)
+cat(AA, "\n", BB)
+
+```
+Now, set the seed and do the same as above. Chose any number and place it in `set.seed()`. Run this chunk more than once. Do you get the same answer each time? Are AA and BB the same?
+
+```{r}
+set.seed(34288)
+AA <- rnorm(5)
+BB <- rnorm(5)
+cat(AA, "\n", BB)
+
+```
+
+What would happen if you set the seed, generate AA, set the seed again with the same number and then generate BB? Try this.
+
+
+```{r}
+set.seed(34288)
+AA <- rnorm(5)
+set.seed(34288)
+BB <- rnorm(5)
+cat(AA, "\n", BB)
+
+```
+
+One key feature for simulating randomness in R is the `sample()` function. Imagine you had a list of potential participants for a study (e.g. the list of likely voters in the U.S.). You could use `sample()` to choose a random set. Let's try this with a set of letters representing people and we will randomly assign each a sex by sampling `c('m','f')` with replacement. 
+
+```{r}
+set.seed(592777)
+pp_all <- data_frame('id'=letters[seq(1,26)], 'sex'=sample(c('m','f'),26,replace=TRUE))
+
+```
+
+Try the following:
+  1. Get a random sample of 5 letters without replacement
+  2. Get a random sample of 5 letters with their associated sex (hint: sample the set of row indicies (1 to 26) and grab those rows)
+
+  
+```{r}
+
+sample(pp_all$id,5)
+pp_all[sample(seq(1,nrow(pp_all)),5),]
+
+```
+
+One final note on `set.seed()`. You just need to set the seed once at the top of your script to anchor the random number generator. [[explain]]
+
+## Distributions (item 5)
+
+### Activity
+#coding could be better - not sure what to tell them is best way
+
+For each of the following, generate a set of values and plot a histogram. You may want to adjust the number of bins.
+  1. 5 values from a normal distribution with a mean of 5 and a standard deviation of 1
+  2. 100 values from a normal distribution with a mean of 5 and a standard deviation of 1
+  3. 100000 values from a normal distribution with a mean of 5 and a standard deviation of 1
+  4. 5 values from a normal distribution with a mean of 5 and a standard deviation of 5
+  5. 5 values from a normal distribution with a mean of 5 and a standard deviation of 5
+  6. 5 values from a normal distribution with a mean of 5 and a standard deviation of 5
+
+```{r}
+xx1 <- data_frame('num'=rnorm(5, 5, 1))
+ xx1 %>% ggplot(aes(num)) +
+  geom_histogram(bins = 4)
+
+xx2 <- data_frame('num'=rnorm(100, 5, 1))
+ xx2 %>% ggplot(aes(num)) +
+  geom_histogram(bins = 30)
+
+xx3 <- data_frame('num'=rnorm(100000, 5, 1))
+ xx3 %>% ggplot(aes(num)) +
+  geom_histogram(bins = 50)
+
+xx4 <- data_frame('num'=rnorm(5, 5, 5)) 
+xx4 %>% ggplot(aes(num)) +
+  geom_histogram(bins = 4)
+
+xx5 <- data_frame('num'=rnorm(100, 5, 5))
+ xx5 %>% ggplot(aes(num)) +
+  geom_histogram(bins = 30)
+
+xx6 <- data_frame('num'=rnorm(100000, 5, 5))
+ xx6 %>% ggplot(aes(num)) +
+  geom_histogram(bins = 50)
+
+```
+
+Create a density plot for #2 and #5 above on the same plot. First create a single data frame with both sets and a column identifying each group.
+
+```{r}
+xx.b <- data_frame('id'=rep(c('a','b'),each=100),'value'=c(rnorm(100, 5, 1), rnorm(100, 5, 5)))
+
+ggplot(xx.b, aes(x=value, color=id))+
+  geom_density()
+
+#or
+
+ggplot(xx.b, aes(x=value, color=id,fill=id))+
+  geom_density(alpha=1/5)
+
+
+```
+
+Consider #3 and #6 from above. What proportion of actual values from your set are above 7?
+
+```{r}
+
+#3 
+nrow(xx3[xx3$num>7,])/nrow(xx3)
+
+#6
+nrow(xx6[xx6$num>7,])/nrow(xx6)
+
+
+```
+
+
+
+Use `pnorm()` to calculate the probability of observing a value of 7 or greater for each distribution.
+
+
+
+  
+
+
+
+
+
+
+
+
+

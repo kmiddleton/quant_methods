@@ -213,20 +213,6 @@ ggplot(M, aes(x = x)) +
 
 $n = 200$ here. What about $n = 2000$? $n = 200000$?
 
-## Frequency vs. probability distribution
-
-Probability of observing exactly 1.7?
-
-```{r echo=FALSE, message=FALSE}
-ggplot(M, aes(x = x)) +
-  geom_histogram(aes(y = ..density..), fill = "gray") +
-  geom_line(data = M_prob, aes(x = Y, y = prob)) +
-  geom_point(aes(x = 1.7, y = normal(1.7)), color = "red") +
-  annotate("text", x = 2.1, y = normal(1.7) + 0.03,
-           label = round(normal(1.7), 3), color = "red") +
-  xlim(c(-3, 3))
-```
-
 ## Probability distributions
 
 Distribution of variables you might encounter
@@ -243,7 +229,7 @@ M <- data_frame(
   x = seq(-4, 4, length = 200),
   y = dnorm(x)) 
 ggplot(M, aes(x, y)) + geom_line() +
-  labs(y = "Probability")
+  labs(y = "Probability Density")
 ```
 
 ## Binomial
