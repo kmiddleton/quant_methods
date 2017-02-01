@@ -89,7 +89,11 @@ Week 4: Likelihood, Bayesian concepts, frequentist framework
 
 Goals:
 
+  - Key considerations
+      - Don't lose sight of why we do statistics
+      - Think about when you have no effect.
   - Probability to likelihood
+  - Example where mean is ML estimate of central tendency
 
 ---
 
@@ -100,13 +104,15 @@ Bayes intro: http://sumsar.net/files/posts/2017-01-15-bayesian-computation-with-
 Goals:
 
   - Measures of central tendency (see 03 slide 28)
-  - Percentiles and quantiles, Quartiles and IQR, Boxplots
+  - Percentiles and quantiles, quartiles and IQR, boxplots
 
 ---
 
 Week 6: Parameter estimation, significance testing
 
 Goals:
+
+    - OLS, t-test, ANOVA
 
 ---
 
