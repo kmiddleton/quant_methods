@@ -35,27 +35,27 @@ What are the probabilities that a randomly selected individual has:
 
 a. Type A+ blood
 
-> 0.27
+> 
 
 b. Type O blood
 
-> 0.39 + 0.01 = 0.40
+> 
 
 c. Type AB blood
 
-> 0.07 + 0.001 = 0.071
+> 
 
 d. Not Type AB blood
 
-> 1 - 0.071 = 0.929
+> 
 
 e. Type A *or* type B blood
 
-> 0.27 + 0.005 + 0.25 + 0.004 = 0.529
+> 
 
 f. Rh+ blood
 
-> 0.39 + 0.27 + 0.25 + 0.07 = 0.98
+> 
 
 ## PSA
 
@@ -65,33 +65,7 @@ Elevated prostate-specific antigen (PSA) can indicate prostate cancer but can al
 
 What is the probability that randomly tested man over 65 has prostate cancer, given that he has received a positive PSA test? Solve this however you would like.
 
-### FIXME
 
-#### Via Bayes' Rule
-
-$$Pr[Ca|Test] = \frac{Pr[Test|Ca] \times Pr[Ca]}{Pr[Test]}$$
-
-- $Pr[Test|Ca] = 0.75$
-- $Pr[Ca] = 0.04$
-- $Pr[Test] = 0.75 \times 0.04 + (1 - 0.04) \times 0.07$
-
-so
-
-```{r}
-(0.75 * 0.04) / (0.75 * 0.04 + (1 - 0.04) * 0.07)
-```
-
-#### Or intuitively using an arbitrary number of tests
-
-Assume that you carry out 1,000 tests.
-
-- Total men with cancer: 1000 $\times$ 0.04 = 40
-- Total men with no cancer: 1000 $\times$ (1 − 0.04) = 960
-- Positive tests among cancer group: 40 $\times$ 0.75 = 30
-- Positive tests among no cancer group: 960 $\times$ 0.07 = 67.2
-- Total positive tests: 30 + 67.2 = 97.2
-
-Ratio of true positives to total positives: $\frac{30}{97.3} = 0.309$
 
 ## Random Samples
 
@@ -102,48 +76,27 @@ R has a random number generator (actually a [pseudorandom number generator](http
 Without setting the seed, generate two objects named AA and BB consisting of 5 numbers from the normal distribution with a mean of 0 and a standard deviation of 1 using  `rnorm()` and print AA and BB. Run this chunk more than once. Do you get the same answer each time? 
 
 ```{r}
-# FIXME
-AA <- rnorm(5)
-BB <- rnorm(5)
-cat(AA, "\n", BB)
 
-AA <- rnorm(5)
-BB <- rnorm(5)
-cat(AA, "\n", BB)
 ```
 
-> No. You get different answers each time.
+> 
 
 Now, set the seed and do the same as above. Chose any number and place it in `set.seed()`. Run this chunk more than once. Do you get the same answer each time? Are AA and BB the same?
 
 ```{r}
-# FIXME
-set.seed(34288)
-AA <- rnorm(5)
-BB <- rnorm(5)
-cat(AA, "\n", BB)
 
-set.seed(34288)
-AA <- rnorm(5)
-BB <- rnorm(5)
-cat(AA, "\n", BB)
 ```
 
-> Yes. Now the sets are the same, but AA and BB are different.
+> 
 
 What would happen if you set the seed, generate AA, set the seed again with the same number and then generate BB? Try this.
 
 
 ```{r}
-# FIXME
-set.seed(34288)
-AA <- rnorm(5)
-set.seed(34288)
-BB <- rnorm(5)
-cat(AA, "\n", BB)
+
 ```
 
-> AA and BB are now equal.
+> 
 
 One key feature for simulating randomness in R is the `sample()` function. Imagine you had a list of potential participants for a study (e.g., the list of likely voters in the U.S.). You could use `sample()` to choose a random set. Let's try this with a set of letters representing people and we will randomly assign each a sex by sampling `c('m','f')` with replacement.
 
@@ -153,6 +106,7 @@ Look at the help file for `sample()` and see what the arguments below mean.
 set.seed(592777)
 pp_all <- data_frame(id = letters[1:26],
                      sex = sample(c('m', 'f'), 26, replace = TRUE))
+
 ```
 
 Try the following:
@@ -162,9 +116,7 @@ Try the following:
 
   
 ```{r}
-# FIXME
-sample(pp_all$id, 5)
-pp_all[sample(seq(1, nrow(pp_all)), 5), ]
+
 ```
 
 One final note on `set.seed()`. Typically, you just need to set the seed once at the top of your script to anchor the random number generator. However, any time you generate random numerics or sample, you should consider whether you need to set the seed.
@@ -183,88 +135,33 @@ For each of the following, generate a set of values and plot a histogram. You ma
 6. 5 values from a normal distribution with a mean of 5 and a standard deviation of 5
 
 ```{r}
-# 1
-xx1 <- data_frame(num = rnorm(5, 5, 1))
 
-xx1 %>% ggplot(aes(num)) +
-  geom_histogram(bins = 4)
-
-# 2
-xx2 <- data_frame(num = rnorm(100, 5, 1))
-
-xx2 %>% ggplot(aes(num)) +
-  geom_histogram(bins = 30)
-
-# 3
-xx3 <- data_frame(num = rnorm(100000, 5, 1))
-
-xx3 %>% ggplot(aes(num)) +
-  geom_histogram(bins = 50)
-
-# 4
-xx4 <- data_frame(num = rnorm(5, 5, 5)) 
-
-xx4 %>% ggplot(aes(num)) +
-  geom_histogram(bins = 4)
-
-# 5
-xx5 <- data_frame(num = rnorm(100, 5, 5))
-
-xx5 %>% ggplot(aes(num)) +
-  geom_histogram(bins = 30)
-
-# 6
-xx6 <- data_frame(num = rnorm(100000, 5, 5))
-
-xx6 %>% ggplot(aes(num)) +
-  geom_histogram(bins = 50)
 ```
 
 Create a density plot for #3 and #6 above on the same plot. First create a single data frame with both sets and a column identifying each group.
 
 ```{r}
-n <- 100000
-xx.b <- data_frame(id = rep(c('a', 'b'), each = n),
-                   value = c(rnorm(n, 5, 1), rnorm(n, 5, 5)))
 
-ggplot(xx.b, aes(x = value, color = id)) +
-  geom_density()
-
-#or
-
-ggplot(xx.b, aes(x = value, color = id, fill = id)) +
-  geom_density(alpha = 1/5)
 ```
 
 Add a vertical line to your plot at x = 7.
 
 ```{r}
-ggplot(xx.b, aes(x = value, color = id, fill = id)) +
-  geom_vline(xintercept = 7) +
-  geom_density(alpha = 1/5)
+
 ```
 
 Consider #3 and #6 from above. What proportion of values from each set are above 7?
 
 ```{r}
-xx.b %>% 
-  group_by(id) %>% 
-  summarize(pct = sum(value > 7) / n)
 
-#3 
-nrow(xx3[xx3$num > 7, ]) / nrow(xx3)
-
-#6
-nrow(xx6[xx6$num > 7, ]) / nrow(xx6)
 ```
 
 Use `pnorm()` to calculate the probability of observing a value of 7 or greater for each distribution.
 
 ```{r}
-pnorm(7, mean = 5, sd = 1, lower.tail = FALSE)
-pnorm(7, mean = 5, sd = 5, lower.tail = FALSE)
+
 ```
 
 Compare the values returned by `pnorm()` to those you calculated manually above.
 
-> They are nearly identical.
+> 
