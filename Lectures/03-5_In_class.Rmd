@@ -173,6 +173,14 @@ ggplot(M, aes(Lefties, log_Prob)) +
   scale_x_continuous(breaks = seq(0, 25, by = 5))
 ```
 
+## Reached Via a Mind-Reading Device...
+
+[... Deeply Paralyzed Patients Say They Want to Live](https://www.technologyreview.com/s/603512/reached-via-a-mind-reading-device-deeply-paralyzed-patients-say-they-want-to-live/?set=603545)
+
+> In response to the statement "I love to live" three of the four replied yes.
+
+> To verify the four could communicate, Birbaumer's team asked patients, over the course of about 10 days of testing, to respond yes or no to statements such as "You were born in Berlin" or "Paris is the capital of Germany" by modulating their thoughts and altering the blood-flow pattern. The answers relayed through the system were consistent about 70 percent of the time, substantially better than chance. 
+
 ## Powerball
 
 1. 69 balls in one pool: Choose 5
