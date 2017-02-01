@@ -25,6 +25,12 @@ library(cowplot)
   
 ## Samples vs. populations
 
+What are your populations of interest?
+
+What are your samples?
+
+How representative are your samples?
+
 ## Independent and identically distributed (IID)
 
 - All observations are independent of one another
@@ -32,13 +38,21 @@ library(cowplot)
 
 Standard assumption of most statistical tests.
 
-## Should the Packers have tried a 2 point conversion?
+## Thinking about probabilities
+
+Why learn probability?
+
+- You could learn all the statistical analyses/tests without really understanding probability.
+
+## Should the Packers have gone for 2? | 2015 NFL playoffs
+
+Packers score on a hail mary touchdown to trail by 1 point at the end of the game.
 
 <center>
 <img src="images/packers.jpg" width="50%" />
 </center>
 
-## Should the Packers have tried a 2 point conversion?
+## Should the Packers have gone for 2?
 
 Two-point conversion + win:
 
@@ -46,10 +60,10 @@ Two-point conversion + win:
 
 Extra point + overtime:
 
-- Extra point success rate (2015 only): 1,131 of 1,199
+- Extra point success rate (2015 only; after the extra point attempt was moved back): 1,131 of 1,199
 - Expected winning percentage in overtime (since 2001): Away team has won 110 of 242 games
 
-## Should the Packers have tried a 2 point conversion?
+## Should the Packers have gone for 2?
 
 ```{r}
 # 2-pt conversion
@@ -66,7 +80,7 @@ Extra point + overtime:
 (431/913) / ((1131 / 1199) * (110 / 242))
 ```
 
-## Should the Packers have tried a 2 point conversion?
+## Should the Packers have gone for 2?
 
 <center>
 <img src="images/packers2.png" width="100%" />
@@ -76,13 +90,13 @@ Extra point + overtime:
 
 About 10% of people are left handed.
 
-- What is the probability of 0 left handed people in a *sample* of 25?
+- What is the probability of exactly 0 left handed person in a *random sample* of 25?
 - What is the probability of exactly 1?
 - What is the probability of 1 *or more*?
 
 ## Binomial probabilities
 
-Probability density functions in R: `dbinom()`, `dnorm()`, etc.
+Probability density functions in R: `dbinom()`, `dnorm()`, `dpois()`, etc.
 
 `dbinom(x, size, prob)`
 
@@ -130,6 +144,10 @@ What is the probability of 1 *or more*?
 sum(dbinom(1:25, 25, prob = 0.1))
 ```
 
+*"or more"* is critical here for hypothesis testing:
+
+- Probability of the observed data or any *more extreme*
+
 ## Binomial probabilities for Pr[left] = 0.1
 
 ```{r echo=FALSE}
@@ -157,8 +175,6 @@ ggplot(M, aes(Lefties, log_Prob)) +
 
 ## Powerball
 
-Two pools:
-
 1. 69 balls in one pool: Choose 5
 1. 26 in the other pool: Choose 1
 
@@ -172,19 +188,27 @@ $$\left({n\atop k}\right)=\frac{n!}{k!\left(n - k\right)!}$$
 
 ## Powerball
 
+1. 69 balls in one pool: Choose 5
+1. 26 in the other pool: Choose 1
+
 ```{r}
 choose(69, 5)
 choose(26, 1)
-choose(69, 5) * choose(26, 1)
 ```
+
+## Powerball
 
 5 successes from 69 chances $\times$ 1 success from 26 chances.
 
-- What if the order had to be correct as well?
+```{r}
+choose(69, 5) * choose(26, 1)
+```
+
+What if the order had to be correct as well?
 
 ## Odds of one or more winners
 
-Imagine that 500000 tickets are sold. What is the probability of 1 or more winners?
+Imagine that 500000 *unique* tickets are sold. What is the probability of 1 or more winners?
 
 ## Odds of one or more winners
 
@@ -192,7 +216,8 @@ Imagine that 500000 *unique* tickets are sold. What is the probability of 1 or m
 
 ```{r}
 n <- 500000
-sum(dbinom(1:n, n, 1/choose(69, 5) * choose(26, 1)))
+p_win <- 1 / choose(69, 5) * choose(26, 1)
+sum(dbinom(1:n, n, p_win))
 ```
 
 ```{r echo=FALSE}
@@ -212,11 +237,41 @@ Now imagine that you're betting after the coin was already tossed 10 times and c
 
 - What is the best bet now?
 
-#breast cancer
+## Breast cancer screening
 
-1 in 100 have breast cancer women 40-50
-80% with cancer positive mammogram
-9.6% false positive
+Approximately correct numbers:
 
+1. 1 in 100 women in the age range 40-50 have breast cancer
+2. 80% with cancer have a positive mammogram (true positives)
+3. 10% without cancer have a positive mammogram (false positives)
 
+What is the probability of a randomly sampled woman having breast cancer, given a positive test?
+
+## Breast cancer screening
+
+$$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
+
+- $Pr[T|C] = 0.8$
+- $Pr[C] = 1/100 = 0.01$
+- $Pr[T]$ = ???
+
+## Breast cancer screening
+
+$$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
+
+- $Pr[T|C] = 0.8$
+- $Pr[C] = 1/100 = 0.01$
+- $Pr[T] = (0.8 \times 0.01) + (0.1 \times 0.99)$
+
+## Breast cancer screening
+
+$$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
+
+- $Pr[T|C] = 0.8$
+- $Pr[C] = 0.01$
+- $Pr[T] = (0.8 \times 0.01) + (0.1 \times 0.99)$
+
+```{r}
+(0.8 * 0.01) / ((0.8 * 0.01) + (0.1 * 0.99))
+```
 
