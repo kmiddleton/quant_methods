@@ -17,27 +17,6 @@ library(readxl)
 library(cowplot)
 ```
 
-## Measurement
-
-1. Accuracy & Precision
-
-  - they could make each situation using rnorm?
-  
-## Samples vs. populations
-
-What are your populations of interest?
-
-What are your samples?
-
-How representative are your samples?
-
-## Independent and identically distributed (IID)
-
-- All observations are independent of one another
-- All observations come from the same underlying probability distribution (normal, binomial, etc.)
-
-Standard assumption of most statistical tests.
-
 ## Thinking about probabilities
 
 Why learn probability?
@@ -214,25 +193,6 @@ choose(69, 5) * choose(26, 1)
 
 What if the order had to be correct as well?
 
-## Odds of one or more winners
-
-Imagine that 500000 *unique* tickets are sold. What is the probability of 1 or more winners?
-
-## Odds of one or more winners
-
-Imagine that 500000 *unique* tickets are sold. What is the probability of 1 or more winners?
-
-```{r}
-n <- 500000
-p_win <- 1 / choose(69, 5) * choose(26, 1)
-sum(dbinom(1:n, n, p_win))
-```
-
-```{r echo=FALSE}
-
-```
-
-
 ## Conditional probability thought experiment
 
 A coin is tossed 100 times. Gamblers can bet on the total number of heads that will be thrown. They can do so at any time before or during the game.
@@ -282,4 +242,3 @@ $$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
 ```{r}
 (0.8 * 0.01) / ((0.8 * 0.01) + (0.1 * 0.99))
 ```
-

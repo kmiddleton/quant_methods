@@ -99,34 +99,7 @@
           </hgroup>
   </slide>
 
-<slide class=''><hgroup><h2>Measurement</h2></hgroup><article  id="measurement">
-
-<ol>
-<li>Accuracy &amp; Precision</li>
-</ol>
-
-<ul>
-<li>they could make each situation using rnorm?</li>
-</ul>
-
-</article></slide><slide class=''><hgroup><h2>Samples vs. populations</h2></hgroup><article  id="samples-vs.-populations">
-
-<p>What are your populations of interest?</p>
-
-<p>What are your samples?</p>
-
-<p>How representative are your samples?</p>
-
-</article></slide><slide class=''><hgroup><h2>Independent and identically distributed (IID)</h2></hgroup><article  id="independent-and-identically-distributed-iid">
-
-<ul>
-<li>All observations are independent of one another</li>
-<li>All observations come from the same underlying probability distribution (normal, binomial, etc.)</li>
-</ul>
-
-<p>Standard assumption of most statistical tests.</p>
-
-</article></slide><slide class=''><hgroup><h2>Thinking about probabilities</h2></hgroup><article  id="thinking-about-probabilities">
+<slide class=''><hgroup><h2>Thinking about probabilities</h2></hgroup><article  id="thinking-about-probabilities">
 
 <p>Why learn probability?</p>
 
@@ -313,20 +286,6 @@
 <pre >## [1] 292201338</pre>
 
 <p>What if the order had to be correct as well?</p>
-
-</article></slide><slide class=''><hgroup><h2>Odds of one or more winners</h2></hgroup><article  id="odds-of-one-or-more-winners">
-
-<p>Imagine that 500000 <em>unique</em> tickets are sold. What is the probability of 1 or more winners?</p>
-
-</article></slide><slide class=''><hgroup><h2>Odds of one or more winners</h2></hgroup><article  id="odds-of-one-or-more-winners-1">
-
-<p>Imagine that 500000 <em>unique</em> tickets are sold. What is the probability of 1 or more winners?</p>
-
-<pre class = 'prettyprint lang-r'>n &lt;- 500000
-p_win &lt;- 1 / choose(69, 5) * choose(26, 1)
-sum(dbinom(1:n, n, p_win))</pre>
-
-<pre >## [1] 0.6854896</pre>
 
 </article></slide><slide class=''><hgroup><h2>Conditional probability thought experiment</h2></hgroup><article  id="conditional-probability-thought-experiment">
 
