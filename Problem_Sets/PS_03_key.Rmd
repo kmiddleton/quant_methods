@@ -179,8 +179,8 @@ For each of the following, generate a set of values and plot a histogram. You ma
 2. 100 values from a normal distribution with a mean of 5 and a standard deviation of 1
 3. 100000 values from a normal distribution with a mean of 5 and a standard deviation of 1
 4. 5 values from a normal distribution with a mean of 5 and a standard deviation of 5
-5. 5 values from a normal distribution with a mean of 5 and a standard deviation of 5
-6. 5 values from a normal distribution with a mean of 5 and a standard deviation of 5
+5. 100 values from a normal distribution with a mean of 5 and a standard deviation of 5
+6. 100000 values from a normal distribution with a mean of 5 and a standard deviation of 5
 
 ```{r}
 # 1
