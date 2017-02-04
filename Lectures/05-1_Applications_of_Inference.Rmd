@@ -328,6 +328,31 @@ coef(fm)
 logLik(fm)
 ```
 
+## Resampling inference
+
+```{r}
+set.seed(36428)
+reps <- 100000
+resampled_mean <- numeric(length = reps)
+
+for (i in 1:reps) {
+  resampled_mean[i] <- mean(sample(undulation_rate,
+                                   replace = TRUE))
+}
+```
+
+## Resampling inference
+
+```{r}
+data_frame(resampled_mean) %>% 
+  ggplot(aes(resampled_mean)) +
+  geom_histogram()
+
+mean(undulation_rate)
+mean(resampled_mean)
+```
+
+
 ## Bayesian inference of the mean
 
 Ranges of possible maximum likelihood values:

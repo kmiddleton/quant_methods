@@ -95,27 +95,68 @@ Controlling for body mass,
   
 </div>
 
-## Example: Template
+## Example: Predict the species of a new fossil
 
-> Do long-winged crickets have a higher resting metabolic rate than short-winged crickets?
+> Is this bone more like a chimpanzee, australopith, Neandertal, or modern human?
 
 <div class="columns-2">
 
 <center>
-<img src="images/GFIRMUS2.jpg" width="100%" />
+<br />
+<img src="images/metacarpal1.png" width="90%" />
 <br />
 <br />
 <br />
 </center>
 
-Controlling for body mass,
-
-- Metabolic rates do not differ
-- Average metabolic rate of long-wings is higher
-- Average  metabolic rate of long-wings is lower
+- Relative probabilities of new fossil being in one of four groups
+- What is the percent correct classification of known fossils?
 
 </div>
 
+## Example: What is the best model for growth in Alligators?
+
+> Do alligators exhibit determinate or indeterminate growth and does growth depend of atmospheric oxygen levels?
+
+<div class="columns-2">
+
+<center>
+<img src="images/Gator_Growth1.png" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+Determinate:
+
+- von Bertalanffy
+- Logistic
+
+Indeterminate:
+
+- Polynomial
+
+</div>
+
+## Example: What is the best model for growth in Alligators?
+
+von Bertalanffy:
+
+$$Femoral~Length\left(Age\right) = \theta_1 \left(1 - e^{-\theta_2 \left(Age - \theta_3\right)}\right)$$
+
+Logistic:
+
+$$Femoral~Length\left(Age\right) = \frac{\theta_1}{1 + e^{\frac{\theta_2 - Age}{\theta_3}}}$$
+
+Polynomial:
+
+$$Femoral~Length\left(Age\right) = a + b \cdot Age + c \cdot Age^2$$
+
+## Example: What is the best model for growth in Alligators?
+
+<center>
+<img src="images/Gator_Growth2.png" width="100%" />
+</center>
 
 ## Example: Your Research
 
@@ -137,11 +178,10 @@ Controlling for body mass,
 
 </div>
 
+## Quiz 04-1
 
+Complete quiz 04-1.
 
-
-
-
-
+Move on to Lecture 04-2.
 
 ## References
