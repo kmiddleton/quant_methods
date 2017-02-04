@@ -1,5 +1,5 @@
 ---
-title: "Likelihood, Bayesian concepts, frequentist framework"
+title: "Frameworks for Inference"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'

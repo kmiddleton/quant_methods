@@ -1,0 +1,147 @@
+---
+title: "Frameworks for Inference"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+```
+
+## Notes
+
+## Readings
+
+## Remember the Goal of Statistics
+
+> "a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@amabile_all_1989]
+
+
+- Success depends on evaluating the relative support for different models
+
+## Models?
+
+## Example: Wing Dimorphic Crickets
+
+> Do long-winged crickets have a higher resting metabolic rate than short-winged crickets?
+
+<div class="columns-2">
+
+<center>
+<img src="images/GFIRMUS2.jpg" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+Controlling for body mass,
+
+- Metabolic rates do not differ
+- Average metabolic rate of long-wings is higher
+- Average  metabolic rate of long-wings is lower
+
+</div>
+
+## Example: Genetics of Corn Oil Content
+
+> Which set of loci best predicts oil content in corn kernels?
+
+<div class="columns-2">
+
+<center>
+<br />
+<img src="images/corn_oil.jpg" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+- Heritability of corn oil content is 0
+- Different possible combinations of SNPs
+- All additive
+- Dominance
+- Epistasis
+- Structural variants
+
+</div>
+
+## Example: Canid relationships
+
+> What are the phylogenetic relationships between dog breeds & other canids?
+
+<div class="columns-2">
+
+<center>
+<img src="images/Dog_Tree.png" width="100%" />
+<br />
+<br />
+
+</center>
+
+
+
+- Star phylogeny
+- Single origin of dogs
+- Ancient breeds are monophyletic
+- Every possible tree....
+  
+</div>
+
+## Example: Template
+
+> Do long-winged crickets have a higher resting metabolic rate than short-winged crickets?
+
+<div class="columns-2">
+
+<center>
+<img src="images/GFIRMUS2.jpg" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+Controlling for body mass,
+
+- Metabolic rates do not differ
+- Average metabolic rate of long-wings is higher
+- Average  metabolic rate of long-wings is lower
+
+</div>
+
+
+## Example: Your Research
+
+> Your Question Here?
+
+<div class="columns-2">
+
+<center>
+<img src="images/GFIRMUS2.jpg" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+
+- Model 1
+- Model 2
+- Model 3
+
+</div>
+
+
+
+
+
+
+
+
+## References

@@ -91,9 +91,31 @@ Goals:
 
   - Key considerations
       - Don't lose sight of why we do statistics
-      - Think about when you have no effect.
+      		- We are trying to make conclusions from data
+      		- To do that, we need to evaluate the relative support for different models
+      		- Do long-winged crickets have a higher resting metabolic rate than short-winged crickets?
+      		- oxic alligators
+      		- Does an allele have an effect on a phenotype / which set of alleles & genetic architecture best predicts a phenotype
+      		- what are the phylogenetic relationships between dog breeds & other canids
+      		- what is the most likely species membership of a fossil 
+      		- your question here - what is your set of possible models?
+      		-the frameworks we are going to teach are the ways we figure out the support for the models
+      		
+      - The analytical solutions in frequentist are the max likelihood solutions (for set of assumptions)
+      - Lots of applications don't have analytical solutions
+      - Advantages of analytical solutions (computational advances)
+      - Randomization? 
+      	- solutions without computational 
+      	
+    - Potential examples
+    	-snake undulation
+    	-tree diameter
+    	- coin
+    	
+      
   - Probability to likelihood
-  - Example where mean is ML estimate of central tendency
+	- Example Binomial likelihood
+  	- Example where mean is ML estimate of central tendency
 
 ---
 
@@ -113,6 +135,7 @@ Week 6: Parameter estimation, significance testing
 Goals:
 
     - OLS, t-test, ANOVA
+    - Think about when you have no effect.
 
 ---
 
