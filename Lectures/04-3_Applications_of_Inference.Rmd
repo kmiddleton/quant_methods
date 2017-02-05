@@ -17,6 +17,8 @@ library(rstan)
 library(cowplot)
 library(plot3D)
 library(latex2exp)
+library(htmltools)
+library(vembedr)
 ```
 
 ## Readings
@@ -31,6 +33,24 @@ Optional:
 2. Maximum likelihood
 3. Resampling
 4. Bayesian
+
+## [Flying snake](https://www.youtube.com/playlist?list=PL1qTT-Q9lkEaw8eiGJOKOQjcYPIYYfvkL)
+
+```{r echo=FALSE}
+div(
+  align = "center",
+  embed_youtube("kwMWzlKnyiE")
+)
+```
+
+## [Flying snake](https://www.youtube.com/playlist?list=PL1qTT-Q9lkEaw8eiGJOKOQjcYPIYYfvkL)
+
+```{r echo=FALSE}
+div(
+  align = "center",
+  embed_youtube("sYiHbQvJZi4")
+)
+```
 
 ## Inferring a mean
 
