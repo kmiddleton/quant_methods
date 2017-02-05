@@ -437,8 +437,7 @@ fm_priors <- stan(
   data = list(undulation_rate = undulation_rate,
               N = length(undulation_rate)),
   iter = 10^4,
-  warmup = 10^3,
-  seed = 12)
+  warmup = 10^3)
 ```
 
 ## Inspecting the samples

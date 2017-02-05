@@ -86,7 +86,7 @@ Controlling for body mass,
   
 </div>
 
-## Example: Predict the species of a new fossil
+## Example: Predict the species of a fossil
 
 > Is this bone more like a chimpanzee, australopith, Neandertal, or modern human?
 
@@ -112,6 +112,7 @@ Controlling for body mass,
 <div class="columns-2">
 
 <center>
+<br />
 <img src="images/Gator_Growth1.png" width="100%" />
 <br />
 <br />

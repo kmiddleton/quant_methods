@@ -18,10 +18,6 @@ library(forcats)
 library(latex2exp)
 ```
 
-## Notes
-
-## Readings
-
 ## Frequency Distribution of Heads | 6 Flips
 
 ```{r echo=FALSE, fig.height=4.5}
