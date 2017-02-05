@@ -81,7 +81,7 @@ Goals:
 
 Discuss:
 
-  -
+  - Practice probability, esp. conditional probability / Bayes.
 
 ---
 
@@ -97,25 +97,31 @@ Goals:
       		- oxic alligators
       		- Does an allele have an effect on a phenotype / which set of alleles & genetic architecture best predicts a phenotype
       		- what are the phylogenetic relationships between dog breeds & other canids
-      		- what is the most likely species membership of a fossil 
+      		- what is the most likely species membership of a fossil
       		- your question here - what is your set of possible models?
       		-the frameworks we are going to teach are the ways we figure out the support for the models
-      		
+
       - The analytical solutions in frequentist are the max likelihood solutions (for set of assumptions)
       - Lots of applications don't have analytical solutions
       - Advantages of analytical solutions (computational advances)
-      - Randomization? 
-      	- solutions without computational 
-      	
+      - Randomization?
+      	- solutions without computational
+
     - Potential examples
-    	-snake undulation
-    	-tree diameter
+    	- snake undulation
+    	- tree diameter
     	- coin
-    	
-      
+
+
   - Probability to likelihood
 	- Example Binomial likelihood
   	- Example where mean is ML estimate of central tendency
+
+Problem Set:
+
+  - Base R vs. not base R
+  - CLT, skewed distribution, median
+  - for loop?
 
 ---
 

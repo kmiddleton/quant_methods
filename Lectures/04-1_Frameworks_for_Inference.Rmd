@@ -16,18 +16,11 @@ library(tidyverse)
 library(cowplot)
 ```
 
-## Notes
-
-## Readings
-
 ## Remember the Goal of Statistics
 
 > "a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@amabile_all_1989]
 
-
-- Success depends on evaluating the relative support for different models
-
-## Models?
+Success depends on evaluating the relative support for different *models*
 
 ## Example: Wing Dimorphic Crickets
 
@@ -86,8 +79,6 @@ Controlling for body mass,
 
 </center>
 
-
-
 - Star phylogeny
 - Single origin of dogs
 - Ancient breeds are monophyletic
@@ -114,7 +105,7 @@ Controlling for body mass,
 
 </div>
 
-## Example: What is the best model for growth in Alligators?
+## Example: Alligator growth
 
 > Do alligators exhibit determinate or indeterminate growth and does growth depend of atmospheric oxygen levels?
 
@@ -138,7 +129,7 @@ Indeterminate:
 
 </div>
 
-## Example: What is the best model for growth in Alligators?
+## Example: Alligator growth
 
 von Bertalanffy:
 
@@ -152,7 +143,7 @@ Polynomial:
 
 $$Femoral~Length\left(Age\right) = a + b \cdot Age + c \cdot Age^2$$
 
-## Example: What is the best model for growth in Alligators?
+## Example: Alligator growth
 
 <center>
 <img src="images/Gator_Growth2.png" width="100%" />
@@ -160,12 +151,12 @@ $$Femoral~Length\left(Age\right) = a + b \cdot Age + c \cdot Age^2$$
 
 ## Example: Your Research
 
-> Your Question Here?
+> Your Question Here
 
 <div class="columns-2">
 
 <center>
-<img src="images/GFIRMUS2.jpg" width="100%" />
+<img src="images/Biodiversity.jpg" width="100%" />
 <br />
 <br />
 <br />
@@ -175,12 +166,73 @@ $$Femoral~Length\left(Age\right) = a + b \cdot Age + c \cdot Age^2$$
 - Model 1
 - Model 2
 - Model 3
+- ...
 
 </div>
 
-## Quiz 04-1
+## Frameworks for Inference using Models
 
-Complete quiz 04-1.
+1. Analytical
+2. Maximum likelihood
+3. Resampling
+4. Bayesian
+
+## Analytical
+
+Algebraic (closed form) solutions for estimating parameters
+
+$$\bar{Y} = \frac{\sum_{i=1}^{n}Y_i}{n}$$
+
+- Historically, calculations had to be made by hand
+- We made and continue to make a lot of strong inference from these calculations
+    - The first ~75-100 years of experimental life sciences
+
+## Analytical
+
+Like the slope in bivariate regression, many are based of sums of squares (summed squared deviations).
+
+$$b = \frac{\sum\left(X_{i}-\bar{X}\right)\left(Y_{i}-\bar{Y}\right)}{\sum\left(X_{i}-\bar{X}\right)^{2}}$$
+
+## Formulas can get unwieldy
+
+<center>
+<img src="images/anova_formulas.png" width="100%" />
+</center>
+
+## Maximum likelihood
+
+For a given mean, how likely is observing my data?
+
+- Maximum likelihood searches for the value of the mean (or other parameter of interest) that maximizes this likelihood.
+
+Analytical solutions are generally equal to the maximum likelihood solutions (for set of assumptions).
+
+<center>
+<img src="http://blogs.sas.com/content/iml/files/2011/10/mlenormal.png" width="50%" />
+</center>
+
+## Resampling & randomization
+
+- Few constraints on data and assumptions on tests
+- Repeatedly sample from or shuffle the data many times, calculating a test statistic of interest each time
+- "Monte Carlo" methods
+
+<center>
+<img src="http://www.casinonewsdaily.com/wp-content/uploads/guides/illustrations/roulette/basics/roulette-wheel2.jpg" width="60%" />
+</center>
+
+## Bayesian
+
+What is the probability of these parameter estimates given the data and my prior knowledge?
+
+- Inferences from data conditioned on prior knowledge
+- Prior knowledge may be strong or weak
+
+$$Pr[\theta | Data] = \frac{Pr[Data | \theta] \times Pr[\theta]}{Pr[Data]}$$
+
+## Lecture 04-2
+
+No quiz for this lecture.
 
 Move on to Lecture 04-2.
 
