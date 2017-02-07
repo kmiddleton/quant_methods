@@ -20,6 +20,10 @@ Path Analysis
 - http://pacha.hk/sem_r_part_1.html
 - http://pacha.hk/sem_r_part_2.html
 
+Bayes examples:
+
+- http://www.maths.bath.ac.uk/~jjf23/stan/index.html
+
 Windows rstan install: https://gist.github.com/ericnovik/ff7daab5c3eb0c8396887110a9dbd6ac
 
 ---
