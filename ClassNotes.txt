@@ -138,6 +138,8 @@ Goals:
 
 Week 6: Parameter estimation, significance testing
 
+http://www.fharrell.com/2017/02/a-litany-of-problems-with-p-values.html
+
 Goals:
 
     - OLS, t-test, ANOVA
