@@ -1,0 +1,153 @@
+---
+title: 'Problem Set 04'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+```
+
+## Flow control: for loops 1
+
+For loops are one of the main methods for iterating through R objects (vectors, data.frames, etc.).^[do ... while constructions are much less common]. Study and run the following code:
+
+```{r}
+for (ii in 1:10) {
+  cat(ii, "\n")
+}
+```
+
+There are a few things to look at here:
+
+- The `for ()` part of the statement set up what will be iterated through (the sequence 1 to 10). At each iteration `ii` takes the next value and can be used within in the loop.
+- `ii` is a better choice of iterator name than `i`, because it is easier to search for later. Imagine trying to find `i` in your code.
+- `cat()` is a function ("concatenate") that you can use to print output to the screen. The statement here tells R to print each value of `ii` followed by a new line (`"\n"`).
+- Until you get comfortable with for loops, it's often useful to print out the values of the iterator and/or other critical data with each iteration so that you knoware certain of their values.
+
+### Activity
+
+Write you own for loop, choosing a new variable name for the iterator, which will start at 50 and end at 60. Within the loop, print the value of the iterator and add 10.
+
+```{r}
+# FIXME
+for (jj in 50:60) {
+  cat(jj + 10, "\n")
+}
+```
+
+Your output should be the sequence 60 to 70.
+
+## Flow control: for loops 2
+
+A common way to work with for loops is to iterate through a pre-existing R object. The for loop will take on the values starting with the first value and iterating through to the last value of the object. So far, we have used sequence by 1, but you can iterate through the values of a vector. Here you will just pass the vector name: `for (ii in myvector)`.
+
+### Activity
+
+Create a vector (`myvector`) that contains the sequence of the odd numbers 1 through 21.
+
+```{r}
+myvector <- seq(1, 21, by = 2)
+```
+
+Iterate through `myvector`, printing out the value of the iterator and the square of the iterator. Separate the values inside `cat()` with a tab (`"\t"`).
+
+```{r}
+# FIXME
+for (ij in myvector) {
+  cat(ij, "\t", ij ^ 2, "\n")
+}
+```
+
+Repeat the same loop, but iterate from 1 to the `length()` of `myvector`. Inside the loop, extract the element of `myvector` that corresponds to the value oft he iterator. This construction, where the first line inside the loop extracts a value from the iterator, is much more common, because more often than not, you will need the value of the iterator later in the loop.
+
+```{r}
+for (ji in 1:length(myvector)) {
+  x <- myvector[ji] ^ 2
+  cat(ji, "\t", x, "\n")
+}
+```
+
+Notice here that the value of the iterator goes from 1 to 11 (the length of `myvector`).
+
+## Functions
+
+Functions are reusable pieces of code that perform operations. Although functions can be very complex, best coding practice is to keep functions short and simple. In R, you create functions with the function `function()`.
+
+Below is a function to add 10 to whatever object is passed to it.
+
+```{r}
+add_10 <- function(x) {
+  y <- x + 10
+  return(y)
+}
+```
+
+There are a few things to note here:
+
+- Anything within the `()` after `function` are arguments that are passed to the function. In this function, we require an argument `x`. There are mechanisms for allowing optional arguments and specifying default values. You can read about them one (see the R programming resouces on Canvas).
+- The variable `y` exists inside the function only. It does not move outside the function, until you explicitly say so: `return(y)`.
+- We haven't done any kind of checking to see whether the argument `x` can be added to. If we pass a character vector as `x`, we will get an error. `non-numeric argument to binary operator`. Down the road, you might consider checking the incoming argument(s).
+
+```{r}
+zz <- 100
+add_10(x = zz)
+add_10(zz)
+
+add_10(seq(50, 60, by = 2))
+
+# y doesn't change due to the function
+y <- 5412
+add_10(y)
+y
+
+# y is reassigned to the result of the function
+y <- add_10(y)
+y
+```
+
+### Activity
+
+Write your own function below that takes two arguments. Multiply the arguments and return the value. Try out your function to make sure that it works for both single numerics and numeric vectors.
+
+```{r}
+# FIXME
+mult <- function(x, y) {
+  z <- x * y
+  return(z)
+}
+
+mult(2, 17.4)
+mult(1:3, 10:12)
+mult(10:15, 3.4)
+mult(1:3, 5:10) # Think about what is going on here
+```
+
+
+
+```{r}
+GL <- read_csv("../data/HumanGeneLengths.csv")
+GL$logLik <- NA
+
+GLS <- GL %>% sample_n(1000)
+
+mean(GLS$gene.length)
+median(GLS$gene.length)
+
+(mean_lik <- sum(log(dnorm(GLS$gene.length,
+                           mean = mean(GLS$gene.length),
+                           sd = sd(GLS$gene.length)))))
+(median_lik <- sum(log(dnorm(GLS$gene.length,
+                           mean = median(GLS$gene.length),
+                           sd = sd(GLS$gene.length)))))
+
+```
+
