@@ -67,7 +67,7 @@ Please use "mean" and not "average". The arithmetic mean is one kind of average,
 The median is the central measurement of a sample (the 50th percentile and the 0.50 quantile). If $n$ is even, then the median is the mean of the two middle observations.
 
 ```{r}
-undulation_rate
+undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
 median(undulation_rate)
 ```
 
@@ -81,7 +81,7 @@ Number of lateral plates (plates) in threespine sticklebacks (*Gasterosteus acul
 
 ## Mean vs. Median
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE}
 SticklebackPlates <- read_csv("../data/Stickleback_Plates.csv")
 ```
 
@@ -91,32 +91,12 @@ glimpse(SticklebackPlates)
 
 ## Mean vs. Median
 
-```{r eval=FALSE}
-ggplot(SticklebackPlates, aes(x = plates)) +
-  geom_histogram() +
-  facet_grid(genotype ~ .) +
-  xlab("Number of Lateral Body Plates") +
-  ylab("Count")
-```
-
-## Mean vs. Median
-
 ```{r echo=FALSE, message=FALSE}
 ggplot(SticklebackPlates, aes(x = plates)) +
   geom_histogram() +
   facet_grid(genotype ~ .) +
   xlab("Number of Lateral Body Plates") +
   ylab("Count")
-```
-
-## Mean vs. Median
-
-```{r echo=FALSE, message=FALSE}
-ggplot(SticklebackPlates, aes(x = plates)) +
-  geom_density() +
-  facet_grid(genotype ~ .) +
-  xlab("Number of Lateral Body Plates") +
-  ylab("Probability")
 ```
 
 ## Mean vs. Median
@@ -128,14 +108,23 @@ SticklebackPlates %>% group_by(genotype) %>%
 
 ## Mean is sensitive to extreme values
 
-<center>
-<img src="images/whitlock_3.3-2.png" width="100%" />
-<img src="images/whitlock_3.3-3.png" width="50%" />
-</center>
+```{r echo=FALSE, message=FALSE}
+M <- SticklebackPlates %>% group_by(genotype) %>% 
+  summarize(Mean = mean(plates),
+            Median = median(plates)) %>% 
+  gather(Value, x, -genotype)
 
-## When might you substitute the median for the mean?
+ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
+  geom_histogram(bins = 30) +
+  geom_vline(data = M, aes(xintercept = x, color = Value),
+             size = 2) +
+  scale_color_manual(values = c("red", "blue")) +
+  facet_grid(genotype ~ .) +
+  xlab("Number of Lateral Body Plates") +
+  ylab("Count")
+```
 
-(As a measure of central tendency)
+## When might you substitute the median for the mean? | (As a measure of central tendency)
 
 ## Why don't we always use the median?
 
@@ -152,24 +141,14 @@ The $X$th **percentile** of a sample is the value below which $X\%$ of the obser
 
 ## Quartiles and interquartile range
 
-Quartiles
+*Quartiles*
 
 - Divide a set of data into quarters
 - Minimum, maximum, 25th and 75th percentiles
 
-Interquartile range
+*Interquartile range*
 
 - Difference between the first and third quartiles
-
-## Quartiles and Interquartile Range
-
-The `favstats()` function from the mosaic package:
-
-```{r eval=FALSE}
-mosaic::favstats(plates, data = SticklebackPlates, groups = genotype)
-```
-
-IQR is used in boxplots, which are another way to look at distributions.
 
 ## Boxplots
 
@@ -182,18 +161,7 @@ Different variations, but the most standard recipe is:
 
 ## Boxplots
 
-```{r eval=FALSE}
-mosaic::IQR(plates, data = SticklebackPlates, groups = genotype)
-```
-
-```{r eval=FALSE}
-ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
-  geom_boxplot()
-```
-
-## Boxplots
-
-```{r echo=FALSE}
+```{r echo=TRUE, fig.height = 3.5}
 ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
   geom_boxplot()
 ```
@@ -234,32 +202,9 @@ ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
   geom_point(position = position_jitter(width = 0.2))
 ```
 
-## Boxplot and raw data
-
-```{r eval=FALSE}
-ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
-  geom_boxplot() +
-  geom_point(position = position_jitter(width = 0.2), alpha = 0.5)
-```
-
-## Boxplot and raw data
-
-```{r echo=FALSE}
-ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
-  geom_boxplot() +
-  geom_point(position = position_jitter(width = 0.2), alpha = 0.5)
-```
-
-## Violin plots
-
-```{r echo=FALSE}
-ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
-  geom_violin()
-```
-
 ## Deviates
 
-Lots of statistics have their basis in the deviation of an observation from the sample mean.
+Lots of statistics have their basis in the deviation of an observation from a mean.
 
 <center>
 <img src="images/deviates_1.png" width="50%" />
@@ -286,7 +231,7 @@ $$
 
 ## Mean deviates
 
-This is why we don't use something like the mean absolute deviation:
+This is why we don't use the mean absolute deviation:
 
 <center>
 <img src="images/deviates_2.png" width="75%" />
@@ -349,12 +294,32 @@ Means are always reported with standard errors (or standard deviations).
 ## Standard error of the sample mean
 
 ```{r}
-mean(undulation_rate)
-sd(undulation_rate)
-sd(undulation_rate) / sqrt(length(undulation_rate))
+SEM <- function(x) {sd(x) / sqrt(length(x))}
+
+SticklebackPlates %>% 
+  group_by(genotype) %>% 
+  summarise_all(SEM)
+  
+```
+
+## Raw data with summary stats
+
+```{r pt_errbar, eval=FALSE}
+ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
+  geom_point(position = position_jitter(width = 0.2), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 1)
+```
+
+## Boxplot and raw data
+
+```{r pt_errbar2, ref.label="pt_errbar", echo=FALSE}
 ```
 
 ## Confidence intervals
+
+**FIXME**
 
 A range of values surrounding the sample mean (of whatever statistic for which you are calculating the confidence interval) that is likely to contain the population parameter.
 
@@ -363,6 +328,8 @@ A range of values surrounding the sample mean (of whatever statistic for which y
 **Don't say**: "There is a 95% probability that the population mean lies between X and Y."
 
 ## Confidence intervals
+
+**FIXME**
 
 The 95% confidence interval for a mean can be estimated by the sample mean ± 2 \times $SE_{\bar{Y}}$.
 
