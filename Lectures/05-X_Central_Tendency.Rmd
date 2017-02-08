@@ -4,10 +4,11 @@ subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
 output:
-  xaringan::moon_reader:
-    seal: yes
-    nature:
-      highlightStyle: github
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -26,7 +27,7 @@ library(plot3D)
 #}
 ```
 
-# Notes
+## Notes
 
 ## Readings
 
@@ -425,3 +426,5 @@ CV
 ```
 
 The coefficient of variation of undulation rate was `r round(CV, 1)`%.
+
+## References
