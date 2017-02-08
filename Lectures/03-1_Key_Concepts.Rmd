@@ -19,7 +19,7 @@ library(cowplot)
 
 ## Readings
 
-- Curran-Everett [-@curran-everett_process_2000]: The process of scientific discovery: How certain can we be?
+- Curran-Everett [-@Curran-Everett2000-ng]: The process of scientific discovery: How certain can we be?
 
 ## Assumptions of Science as a Way of Knowing
 - all ways of knowing make a set of assumptions
@@ -27,13 +27,13 @@ library(cowplot)
 
 ## Definitions of statistics
 
-"a collection of procedures and principles for gaining **information** in order to make decisions when faced with **uncertainty**" [@utts_seeing_2005]
+"a collection of procedures and principles for gaining **information** in order to make decisions when faced with **uncertainty**" [@Utts2005-mg]
 
-"a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@amabile_all_1989]
+"a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@Amabile1989-pf]
 
-"the science of drawing conclusions from **data** with the aid of the mathematics of **probability**" [@garfunkel_statistics_1986]
+"the science of drawing conclusions from **data** with the aid of the mathematics of **probability**" [@Garfunkel1986-vv]
 
-"the **explanation** of **variation** in the context of what remains **unexplained**" [@kaplan_statistical_2009]
+"the **explanation** of **variation** in the context of what remains **unexplained**" [@Kaplan2009-zu]
 
 ## Key concepts in statistics
 

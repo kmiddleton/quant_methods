@@ -185,5 +185,3 @@ Or just $12.987 / (12.987 + 9.9987)$ because the 100000s cancel out, which is th
 On Canvas, complete quiz 03-3.
 
 Move on to lecture 03-4.
-
-## References

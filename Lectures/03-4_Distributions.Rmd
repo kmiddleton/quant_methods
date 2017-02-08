@@ -266,5 +266,3 @@ ggplot(M, aes(Successes, Probability)) +
 On Canvas, complete quiz 03-4.
 
 No more lectures this week.
-
-## References

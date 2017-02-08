@@ -18,7 +18,7 @@ library(cowplot)
 
 ## Remember the Goal of Statistics
 
-> "a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@amabile_all_1989]
+> "a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@Amabile1989-pf]
 
 Success depends on evaluating the relative support for different *models*
 

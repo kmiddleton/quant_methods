@@ -26,8 +26,6 @@ library(forcats)
 ## Uncertainty & Science
 
 > Scientific knowledge is a body of statements of varying degrees of certainty—some most unsure, some nearly sure, none absolutely certain (Feynman)
-> 
-
 
 ## Why learn probability?
 
@@ -252,5 +250,3 @@ flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
 On Canvas, complete quiz 03-2.
 
 Move on to lecture 03-3.
-
-## References
