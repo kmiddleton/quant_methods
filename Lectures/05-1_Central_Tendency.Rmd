@@ -31,11 +31,11 @@ library(plot3D)
 
 ## Readings
 
-- Curran-Everett [-@curran-everett_explorations_2009]: Explorations in statistics: confidence intervals. *AJP: Advances in Physiology Education* 2: 87-90.
+- Curran-Everett [-@Curran-Everett2009-zz]: Explorations in statistics: confidence intervals. *AJP: Advances in Physiology Education* 2: 87-90.
 
 ## Models
 
-> "... statisticians do not in general exactly agree on how to analyze anything but the simplest of problems. The fact that statistical inference uses mathematics does not imply that there is only one reasonable or useful way to conduct an analysis. Engineering uses math as well, but there are many ways to build a bridge." [@mcelreath_statistical_2015]
+> "... statisticians do not in general exactly agree on how to analyze anything but the simplest of problems. The fact that statistical inference uses mathematics does not imply that there is only one reasonable or useful way to conduct an analysis. Engineering uses math as well, but there are many ways to build a bridge." [@McElreath2015-no]
 
 ## Measures of central tendency (location)
 
