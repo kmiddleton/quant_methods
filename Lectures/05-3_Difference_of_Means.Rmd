@@ -1,0 +1,204 @@
+---
+title: "Difference of Means"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(rethinking)
+library(latex2exp)
+library(BEST)
+```
+
+## Notes
+
+## Readings
+
+## Frameworks for inference
+
+1. Analytical
+2. Maximum likelihood
+3. Resampling
+4. Bayesian
+
+## Horned lizard predation
+
+<center>
+<img src="http://ichef.bbci.co.uk/wwfeatures/wm/live/624_351/images/live/p0/37/4s/p0374s1q.jpg" width="100%" />
+</center>
+
+## Horned lizard predation
+
+```{r message=FALSE}
+HL <- read_csv("../data/HornedLizards.csv")
+glimpse(HL)
+HL %>% group_by(group) %>% tally()
+```
+
+## Horned lizard predation
+
+```{r echo=FALSE, warning=FALSE}
+HL %>% 
+  ggplot(aes(horn_length)) +
+  geom_histogram(bins = 30) +
+  facet_grid(group ~ .) +
+  labs(x = "Horn Length (mm", y = "Count")
+```
+
+## Summarize
+
+```{r}
+HL %>% group_by(group) %>% 
+  summarize(horn_mean = mean(horn_length),
+            horn_sd = sd(horn_length))
+sum(!complete.cases(HL))
+```
+
+## Summarize
+
+```{r}
+HL <- HL %>% drop_na()
+HL %>% group_by(group) %>% 
+  summarize(horn_mean = mean(horn_length),
+            horn_sd = sd(horn_length))
+```
+
+## Are the means different?
+
+```{r}
+HL %>% group_by(group) %>% 
+  summarize(horn_mean = mean(horn_length),
+            horn_sd = sd(horn_length))
+```
+
+## Difference of means
+
+```{r resampled_difference, cache=TRUE}
+set.seed(8734)
+reps <- 10000
+diffs <- numeric(length = reps)
+
+diffs[1] <- mean(HL$horn_length[HL$group == "alive"]) -
+  mean(HL$horn_length[HL$group == "dead"])
+
+for (i in 2:reps) {
+  HL$shuffle <- sample(HL$horn_length)
+  diffs[i] <- mean(HL$shuffle[HL$group == "alive"]) -
+  mean(HL$shuffle[HL$group == "dead"])
+}
+```
+
+## Difference of means
+
+```{r echo=FALSE}
+data_frame(diffs) %>% 
+  ggplot(aes(diffs)) + 
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = diffs[1], color = "red") +
+  labs(x = "Difference (mm)", y = "Count")
+```
+
+## Bayesian
+
+Prepare data
+
+```{r message=FALSE}
+HL <- read_csv("../data/HornedLizards.csv") %>% 
+  drop_na() %>% 
+  mutate(group = coerce_index(group)) %>% 
+  as.data.frame()
+str(HL)
+```
+
+## Bayesian
+
+```{r}
+mean(HL$horn_length)
+```
+
+*Priors*:
+
+- Groups (alive, dead): N(23.9, 5)
+- Estimate posterior distribution of each group simultaneously
+
+```{r echo=FALSE, fig.height = 2}
+data_frame(x = seq(10, 38, length = 100),
+           y = dnorm(x, 23.9, 5)) %>% 
+  ggplot(aes(x, y)) +
+  geom_line() +
+  labs(x = "Prior for Horn Length (mm)")
+```
+
+
+## Bayesian
+
+```{r bayes_mean_diff, cache=TRUE}
+fm <- map2stan(
+  alist(
+    horn_length ~ dnorm(mu, sigma),
+    mu <- a[group],
+    a[group] ~ dnorm(23.9, 5),
+    sigma ~ dcauchy(0, 2)
+  ),
+  data = HL,
+  iter = 1e5, warmup = 1e3,
+  WAIC = FALSE)
+```
+
+## Bayesian
+
+```{r echo=FALSE}
+plot(fm)
+```
+
+## Bayesian
+
+```{r echo=FALSE}
+post <- extract.samples(fm)
+alive <- post$a[, 1]
+dead <- post$a[, 2]
+
+data_frame(alive, dead) %>%
+  gather(group, horn) %>% 
+  ggplot(aes(horn, color = group)) +
+  geom_line(stat = "density", size = 1.5) +
+  labs(x = "Horn Length (mm)")
+```
+
+## Bayesian
+
+```{r}
+precis(fm, depth = 2, digits = 3)
+HL %>% group_by(group) %>% 
+  summarize(horn_mean = mean(horn_length))
+```
+
+## Bayesian
+
+```{r echo=FALSE, fig.height = 2}
+diff <- alive - dead
+hdint <- hdi(diff)
+
+data_frame(diff) %>% 
+  ggplot(aes(diff)) +
+  geom_line(stat = "density", size = 1.5) +
+  geom_vline(xintercept = hdint[1], color = "lightblue", size = 1.5) +
+  geom_vline(xintercept = hdint[2], color = "lightblue", size = 1.5) +
+  labs(x = "Difference (alive - dead; mm)")
+```
+
+95% credible interval of difference
+
+```{r}
+hdi(diff)
+```
+

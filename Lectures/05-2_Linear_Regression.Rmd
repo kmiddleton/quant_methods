@@ -18,7 +18,6 @@ library(RcppEigen)
 library(plot3D)
 library(rethinking)
 library(latex2exp)
-library(rethinking)
 
 ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE){
   n <- length(X)
