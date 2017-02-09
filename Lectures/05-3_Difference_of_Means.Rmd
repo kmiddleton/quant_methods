@@ -65,8 +65,15 @@ sum(!complete.cases(HL))
 
 ## Summarize
 
+Drop rows with any `NA`s:
+
 ```{r}
 HL <- HL %>% drop_na()
+```
+
+Summarize:
+
+```{r}
 HL %>% group_by(group) %>% 
   summarize(horn_mean = mean(horn_length),
             horn_sd = sd(horn_length))
@@ -74,13 +81,74 @@ HL %>% group_by(group) %>%
 
 ## Are the means different?
 
-```{r}
-HL %>% group_by(group) %>% 
-  summarize(horn_mean = mean(horn_length),
-            horn_sd = sd(horn_length))
-```
+Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "alive"]), 2)` mm
 
-## Difference of means
+Horn length in dead horned lizards: `r round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
+
+## Analytical???
+
+t-test??
+
+## ML Comparison
+
+*Model 1*: Data drawn from one distribution
+
+*Model 2*: Data drawn from distributions with 2 different means
+
+Compare the models with a likelihood ratio (Bayes Factor):
+
+$$BF = \frac{Pr[Model~2]}{Pr[Model~1]}$$
+
+## Sum of Squares and Variance
+
+Sum of the squared differences between each observation and the mean:
+
+$$SS = \sum^{n_1}_{i=1}\left(y_{i} - \bar{y}\right)^2$$
+
+Sample variance:
+
+$$s^2 = \frac{1}{n - 1}\left(\sum^{n_1}_{i=1} \left(y_i - \bar{y}\right)^2\right)$$
+
+
+## Data drawn from one distribution
+
+Single sample variance:
+
+$$s^2 = \frac{1}{n - 1}\left(\sum^{n_1}_{i=1} \left(y_i - \bar{y}\right)^2\right)$$
+
+Shared variance:
+
+$$\hat{\sigma}^2_1 = \frac{1}{n_1 + n_2}\left(\sum^{n_1}_{i=1}\left(y_{1i} - \bar{\bar{y}}\right)^2 +  \sum^{n_2}_{i=1} \left(y_{2i} - \bar{\bar{y}}\right)^2 \right)$$
+
+where $\bar{\bar{y}}$ is the grand mean.
+
+## Data drawn from one distribution
+
+Likelihood of the $y$s being drawn from the same distribution:
+
+$$\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|y\right) = \frac{1}{\left(2\pi \hat{\sigma}^2_1\right)^\left(\frac{n_1 + n_2}{2}\right)}e^{\left(-\frac{n_1 + n_2}{2}\right)}$$
+
+## Data drawn from distributions with 2 different means
+
+Assume equal variances but different means.
+
+$$\hat{\sigma}^2_2 = \frac{1}{n_1 + n_2}\left(\sum^{n_1}_{i=1}\left(y_{1i} - \bar{y}_1\right)^2 +  \sum^{n_2}_{i=1} \left(y_{2i} - \bar{y}_2\right)^2 \right)$$
+
+$$\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right) = \frac{1}{\left(2\pi \hat{\sigma}^2_2\right)^\left(\frac{n_1 + n_2}{2}\right)}e^{\left(-\frac{n_1 + n_2}{2}\right)}$$
+
+## ML Comparison
+
+*Model 1*: Data drawn from one distribution
+
+*Model 2*: Data drawn from distributions with 2 different means
+
+Compare the models with a likelihood ratio (Bayes Factor):
+
+$$BF = \frac{Pr[Model~2]}{Pr[Model~1]} = \frac{\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right)}{\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|y\right)} = \left(\frac{\hat{\sigma}^2_2}{\hat{\sigma}^2_1}\right)^{-\frac{n_1 + n_2}{2}}$$
+
+More in Problem Set 5.
+
+## Resampled difference of means
 
 ```{r resampled_difference, cache=TRUE}
 set.seed(8734)
@@ -125,9 +193,9 @@ str(HL)
 mean(HL$horn_length)
 ```
 
-*Priors*:
+Prior for group means (alive, dead) ~  $\mathcal{N}(\mu = 23.9, \sigma = 5)$
 
-- Groups (alive, dead): N(23.9, 5)
+- ~95% of probability lies between 13.9 and 33.9
 - Estimate posterior distribution of each group simultaneously
 
 ```{r echo=FALSE, fig.height = 2}
@@ -141,8 +209,8 @@ data_frame(x = seq(10, 38, length = 100),
 
 ## Bayesian
 
-```{r bayes_mean_diff, cache=TRUE}
-fm <- map2stan(
+```{r bayes_mean_2, cache=TRUE}
+fm2 <- map2stan(
   alist(
     horn_length ~ dnorm(mu, sigma),
     mu <- a[group],
@@ -150,20 +218,19 @@ fm <- map2stan(
     sigma ~ dcauchy(0, 2)
   ),
   data = HL,
-  iter = 1e5, warmup = 1e3,
-  WAIC = FALSE)
+  iter = 1e5, warmup = 1e3)
 ```
 
 ## Bayesian
 
 ```{r echo=FALSE}
-plot(fm)
+plot(fm2)
 ```
 
 ## Bayesian
 
 ```{r echo=FALSE}
-post <- extract.samples(fm)
+post <- extract.samples(fm2)
 alive <- post$a[, 1]
 dead <- post$a[, 2]
 
@@ -177,7 +244,7 @@ data_frame(alive, dead) %>%
 ## Bayesian
 
 ```{r}
-precis(fm, depth = 2, digits = 3)
+precis(fm2, depth = 2, digits = 4)
 HL %>% group_by(group) %>% 
   summarize(horn_mean = mean(horn_length))
 ```
@@ -201,4 +268,3 @@ data_frame(diff) %>%
 ```{r}
 hdi(diff)
 ```
-
