@@ -1,0 +1,55 @@
+---
+title: "In Class Discussion"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rstan)
+library(cowplot)
+library(plot3D)
+library(latex2exp)
+library(htmltools)
+library(vembedr)
+```
+
+## 1
+
+Why did you use mesh() in generating you maximum likelihood values when directly after that you used data_frame() to make an output file anyway? 
+
+Also was there not a way to write the Bayesian analysis in R and so you used Stan? Could another language be used, such as Python for that bit? 
+
+## 2
+
+Calculating log likelihood 
+
+## 3
+
+I'd like to work through the function you all defined for optimization and log likelihood.
+
+## 4
+
+Going back to lecture 4.2, how do you tell whether one model has more support than the other? Is it just if the log likelihood is less negative than the ones being compared to it?
+
+## 5
+
+it would be nice to go through some examples, like we did last week, where we predict our findings and you two walk us through the problem.
+
+## 6
+
+I am confused how the resampling code on slide 31 of lecture 3 works. My current understanding is it is making 100000 resampling efforts, but how large are each of those resampling efforts?
+
+I am also confused about the stan code, but if I understand correctly we aren't doing that in this class?
+
+## 7
+
+The material made sense in chunks, but a simplified workflow model for each method of inference would be helpful to confirm that I'm thinking about these methods correctly. The theoretical aspects are OK, but I get bogged down in the reasoning behind the particular pieces of code (e.g., using a for loop to complete a grid approximation in maximum likelihood inference).
+
