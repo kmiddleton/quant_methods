@@ -27,12 +27,12 @@ knit_hooks$set(webgl = hook_webgl)
 ## Themes
 
 - Loops and functions (many questions)
-    - Resamploing
+    - Resampling
     - This week's problem set
 - Grid approximation vs. optimization
 - Model comparison (many questions)
     - Some this and next week
-    - More exploicitly later in the course
+    - More explicitly later in the course
     - Models as hypotheses
 - Big picture of analytical vs. ML vs. resampling vs. Bayesian
     - Practical examples, phylogenetic
