@@ -15,10 +15,7 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(rstan)
 library(cowplot)
-library(plot3D)
 library(latex2exp)
-library(htmltools)
-library(vembedr)
 ```
 
 ## 1
@@ -52,4 +49,50 @@ I am also confused about the stan code, but if I understand correctly we aren't 
 ## 7
 
 The material made sense in chunks, but a simplified workflow model for each method of inference would be helpful to confirm that I'm thinking about these methods correctly. The theoretical aspects are OK, but I get bogged down in the reasoning behind the particular pieces of code (e.g., using a for loop to complete a grid approximation in maximum likelihood inference).
+
+## 8
+
+Applications of log likelihood
+
+What is the best way to determine competing models?
+
+Go over another example of model likelihood.
+
+## 9
+
+In what cases might one model be more appropriate than others?
+
+## 10
+
+I am still a bit confused about the purpose and syntax of the for loop. I've had to work with for loops briefly in the past, but I've never really understood what it's doing. Also, I think that I started to lose sight of the big picture with regards to maximum likelihood and Bayesian inference as I progressed through the lectures. What exactly are maximum likelihood values telling us?  
+
+## 11
+
+The topics I struggled with most were the maximum likelihood via optimization section (specifically the retol, optim, and glm functions) and the last part of 4-3, 'Sample the Bayesian model'. 
+
+## 12
+
+I would like to go over the third lecture again but apply it to a data set. I understand the basic definitions but I am not sure how to apply it. I also would like to talk about the different types of Bayesian methods.
+
+## 13
+
+Can we discuss how to build a for loop in a little more detail? (How a particular equation could be applied to a series of columns for all rows)
+
+Can we go over a few more examples of how grid approximation and optimization could be applied to data?
+
+## 14
+
+For clarity, one question I want to ask is if models are essentially synonymous with "hypotheses." Testing a model = testing a hypothesis?
+
+## 15
+
+I felt the processes of working with model likelihoods was a little rushed. It would be nice to go over the code for that again.
+
+## 16
+
+I think a couple of quick examples of Bayesian and ML would be helpful in person.  In addition, I think re-iterating how to write functions, and how to handle for loops would be very helpful as we move forward writing more complex code.  
+
+## 17
+
+I would like to go over is the concept of the prior within Bayesian inference. The first lecture describes that one can have a lot of information about the prior or very little. I was wondering if you run an analysis with a weak prior, does that effect the accuracy or reliability of the model created? Meaning if one has a prior with more information, is the overall model more accurate than having a weak prior or little information?
 
