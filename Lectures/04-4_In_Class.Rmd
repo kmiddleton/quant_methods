@@ -48,6 +48,164 @@ M <- read_excel("../data/Mouse_Weaning_Data.xlsx") %>%
 str(M)
 ```
 
+## Are the sex ratios equal?
+
+After 3 generations
+
+```{r}
+M_3 <- M %>%
+  filter(MouseID != -9) %>% 
+  filter(MouseID < 400) %>% 
+  mutate(Sex_f = factor(if_else(Sex == 0, "Female", "Male")))
+str(M_3)
+```
+
+## Are the sex ratios equal?
+
+```{r}
+M_3 %>% group_by(Sex_f) %>% tally()
+```
+
+## Model Likelihood ($\mathcal{L}$)
+
+For a set of observations ($Y_i$) and hypothesized parameters ($\Theta$) the model likelihood is the product of the observations' individual likelihoods:
+
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$
+
+Evaluate the likelihood function for different values of $\Theta$ to estimate $\mathcal{L}$ for different sets of $\Theta$.
+
+## Model Likelihood ($\mathcal{L}$)
+
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$
+
+$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(\phi\left(Y_{i};\Theta\right)\right)$$
+
+So we just need to sum the log-likelihoods of the observations to get the model likelihood.
+
+## Likelihood across the range of 0 to 1
+
+Generate a range of possible values for $\theta$:
+
+```{r}
+theta <- seq(0.001, 0.999, length = 200)
+```
+
+Calculate the probability for 91 female mice from 191 total mice for each value of $\theta$:
+
+```{r}
+pr <- dbinom(91, 191, prob = theta)
+```
+
+Convert to log-likelihoods:
+
+```{r}
+log_lik <- log(pr)
+log_liks <- data_frame(theta, log_lik)
+```
+
+---
+
+```{r}
+log_liks
+```
+
+## Likelihood across the range of 0 to 1
+
+```{r echo=FALSE}
+log_liks %>% 
+  ggplot(aes(theta, log_lik)) +
+  geom_line(size = 1.5) +
+  labs(x = TeX("$\\theta$"), y = "log-Likelihood")
+```
+
+## Maximum likelihood
+
+```{r echo=FALSE}
+log_liks %>% 
+  ggplot(aes(theta, log_lik)) +
+  geom_line(size = 1.5) +
+  geom_point(aes(x = theta[which.max(log_lik)], y = max(log_lik)),
+             color = "red", size = 3) +
+  labs(x = TeX("$\\theta$"), y = "log-Likelihood")
+```
+
+## Maximum likelihood
+
+```{r}
+max(log_lik)
+theta[which.max(log_lik)]
+91 / 191
+```
+
+## Probability of 91 or fewer female mice
+
+Assuming $\theta = 0.5$
+
+```{r}
+sum(dbinom(0:91, 191, 0.5))
+```
+
+## Pr[Female] for all mice
+
+```{r}
+M %>% group_by(Sex_f) %>% tally()
+```
+
+```{r}
+pr <- dbinom(1202, 1202 + 1227, prob = theta)
+```
+
+Convert to log-likelihoods:
+
+```{r}
+log_lik <- log(pr)
+log_liks <- data_frame(theta, log_lik)
+```
+
+---
+
+```{r}
+log_liks
+```
+
+## Likelihood across the range of 0 to 1
+
+```{r echo=FALSE}
+log_liks %>% 
+  ggplot(aes(theta, log_lik)) +
+  geom_line(size = 1.5) +
+  labs(x = TeX("$\\theta$"), y = "log-Likelihood")
+```
+
+## Maximum likelihood
+
+```{r echo=FALSE}
+log_liks %>% 
+  ggplot(aes(theta, log_lik)) +
+  geom_line(size = 1.5) +
+  geom_point(aes(x = theta[which.max(log_lik)], y = max(log_lik)),
+             color = "red", size = 3) +
+  labs(x = TeX("$\\theta$"), y = "log-Likelihood")
+```
+
+## Maximum likelihood
+
+```{r}
+max(log_lik)
+theta[which.max(log_lik)]
+1202 / (1202 + 1227)
+```
+
+## Mouse weaning data
+
+```{r warning=FALSE}
+M <- read_excel("../data/Mouse_Weaning_Data.xlsx") %>% 
+  select(MouseID, Sex, WnMass) %>% 
+  drop_na() %>% 
+  mutate(Sex_f = factor(if_else(Sex == 0, "Female", "Male")))
+str(M)
+```
+
 ## Mouse weaning data
 
 ```{r mass_plot, echo=TRUE, eval=FALSE}
