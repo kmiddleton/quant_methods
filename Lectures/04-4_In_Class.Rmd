@@ -13,86 +13,409 @@ bibliography: Multivariate.bib
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
+library(readxl)
 library(rstan)
 library(cowplot)
 library(latex2exp)
+library(plot3D)
+library(rethinking)
+library(rgl)
+library(knitr)
+knit_hooks$set(webgl = hook_webgl)
 ```
 
-## 1
+## Themes
 
-Why did you use mesh() in generating you maximum likelihood values when directly after that you used data_frame() to make an output file anyway? 
+- Loops and functions (many questions)
+    - Resamploing
+    - This week's problem set
+- Grid approximation vs. optimization
+- Model comparison (many questions)
+    - Some this and next week
+    - More exploicitly later in the course
+    - Models as hypotheses
+- Big picture of analytical vs. ML vs. resampling vs. Bayesian
+    - Practical examples, phylogenetic
+- Fine tuning plots in ggplot
 
-Also was there not a way to write the Bayesian analysis in R and so you used Stan? Could another language be used, such as Python for that bit? 
+## Mouse weaning data
 
-## 2
+```{r warning=FALSE}
+M <- read_excel("../data/Mouse_Weaning_Data.xlsx") %>% 
+  select(MouseID, Sex, WnMass) %>% 
+  drop_na() %>% 
+  mutate(Sex_f = factor(if_else(Sex == 0, "Female", "Male")))
+str(M)
+```
 
-Calculating log likelihood 
+## Mouse weaning data
 
-## 3
+```{r mass_plot, echo=TRUE, eval=FALSE}
+M %>% 
+  ggplot(aes(WnMass, color = Sex_f)) +
+  geom_density(size = 1.5) +
+  facet_grid(Sex_f ~ .) +
+  scale_color_manual(values = c("Orange", "Purple"), name = "Sex") +
+  labs(x = "Wean Mass (g)", y = "Density", title = "Weaning Mass")
+```
 
-I'd like to work through the function you all defined for optimization and log likelihood.
+## Mouse weaning data
 
-## 4
+```{r mass_plot, echo=FALSE, eval=TRUE}
+```
 
-Going back to lecture 4.2, how do you tell whether one model has more support than the other? Is it just if the log likelihood is less negative than the ones being compared to it?
+## What is the weaning mass of male mice?
 
-## 5
+Analytical mean:
 
-it would be nice to go through some examples, like we did last week, where we predict our findings and you two walk us through the problem.
+```{r}
+Males <- M %>% filter(Sex_f == "Male")
+Males %>%
+  summarize(mean_mass = mean(WnMass))
+```
 
-## 6
+## Likelihood for each observed value
 
-I am confused how the resampling code on slide 31 of lecture 3 works. My current understanding is it is making 100000 resampling efforts, but how large are each of those resampling efforts?
+$$\phi\left(Y_i; \mu, \sigma\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$
 
-I am also confused about the stan code, but if I understand correctly we aren't doing that in this class?
+- For any $\mu$ and $\sigma$ we can calculate the likelihood of *that* observation
+- Some values of $\mu$ and $\sigma$ will maximize the likelhood for *that* observation
 
-## 7
+What values of $\mu$ and $\sigma$ maximize the likelihood for *all* the observations?
 
-The material made sense in chunks, but a simplified workflow model for each method of inference would be helpful to confirm that I'm thinking about these methods correctly. The theoretical aspects are OK, but I get bogged down in the reasoning behind the particular pieces of code (e.g., using a for loop to complete a grid approximation in maximum likelihood inference).
+## Model Likelihood ($\mathcal{L}$)
 
-## 8
+For a set of observations ($Y_i$) and hypothesized parameters ($\Theta$, here $\mu$ and $\sigma$) the model likelihood is the product of the observations' individual likelihoods:
 
-Applications of log likelihood
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$
 
-What is the best way to determine competing models?
+$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(\phi\left(Y_{i};\Theta\right)\right)$$
 
-Go over another example of model likelihood.
+## General ML procedure
 
-## 9
+Search the parameter space of $\Theta$ (here $\mu$ and $\sigma$) for the values that maxmimize the likelihood. For each possible $\mu$ and $\sigma$:
 
-In what cases might one model be more appropriate than others?
+1. Calculate the likelihood for each *observation*
+2. Sum the log-likelihoods
+3. Search until log-likelihood is maximized
 
-## 10
+The analytical mean *equals* the ML estimate of the mean.
 
-I am still a bit confused about the purpose and syntax of the for loop. I've had to work with for loops briefly in the past, but I've never really understood what it's doing. Also, I think that I started to lose sight of the big picture with regards to maximum likelihood and Bayesian inference as I progressed through the lectures. What exactly are maximum likelihood values telling us?  
+- Why not just use the analytical solution in all cases?
 
-## 11
+## Searching the parameter space
 
-The topics I struggled with most were the maximum likelihood via optimization section (specifically the retol, optim, and glm functions) and the last part of 4-3, 'Sample the Bayesian model'. 
+1. Grid approximation
+    - Slow, coarse, doesn't scale well
+2. Optimization
+    - Harder to set up
+    - General solution
 
-## 12
+## Likelihood function
 
-I would like to go over the third lecture again but apply it to a data set. I understand the basic definitions but I am not sure how to apply it. I also would like to talk about the different types of Bayesian methods.
+```{r}
+log_lik <- function(x, Y){
+  liks <- dnorm(Y, mean = x[1], sd = x[2])
+  return(sum(log(liks)))
+}
+```
 
-## 13
+- Pass a vector of `x <- (mu, sigma)` and vector of `Y`
+- Return the sum of log-likelihoods
 
-Can we discuss how to build a for loop in a little more detail? (How a particular equation could be applied to a series of columns for all rows)
+## Grid approximation
 
-Can we go over a few more examples of how grid approximation and optimization could be applied to data?
+For combinations of $\mu$ and $\sigma$, calculate the model likelihood. Pick the largest log-likelihood as the maximum likelihood estimates.
 
-## 14
+Set up the grid:
 
-For clarity, one question I want to ask is if models are essentially synonymous with "hypotheses." Testing a model = testing a hypothesis?
+```{r}
+n <- 100 # How fine is the grid
+mus <- seq(5, 20, length = n) # Vector of mu
+sigmas <- seq(0.1, 5, length = n) # Vector of sigma
 
-## 15
+grid_mu_sigma <- plot3D::mesh(mus, sigmas) # mesh() generates grid
 
-I felt the processes of working with model likelihoods was a little rushed. It would be nice to go over the code for that again.
+# To hold the output
+grid_approx <- data_frame(
+  mu = as.numeric(grid_mu_sigma$x),
+  sigma = as.numeric(grid_mu_sigma$y),
+  log_lik = rep(NA, length = n ^ 2)
+)
+```
 
-## 16
+---
 
-I think a couple of quick examples of Bayesian and ML would be helpful in person.  In addition, I think re-iterating how to write functions, and how to handle for loops would be very helpful as we move forward writing more complex code.  
+```{r}
+grid_approx
+```
 
-## 17
+## Grid approximation
 
-I would like to go over is the concept of the prior within Bayesian inference. The first lecture describes that one can have a lot of information about the prior or very little. I was wondering if you run an analysis with a weak prior, does that effect the accuracy or reliability of the model created? Meaning if one has a prior with more information, is the overall model more accurate than having a weak prior or little information?
+```{r grid_approx, cache=TRUE}
+for (i in 1:nrow(grid_approx)) {
+  grid_approx[i, "log_lik"] <- 
+    sum(log(dnorm(Males$WnMass,
+                  mean = grid_approx$mu[i],
+                  sd = grid_approx$sigma[i])))
+}
+```
 
+- Iterate through the rows ($i$) of `grid_approx`
+- For each row, assign the model log-likelihood calculated for that `mu` and `sigma` to `log_lik`
+
+---
+
+```{r}
+head(grid_approx)
+```
+
+This approach is coarse, time consuming, and not feasible for fine grids or many parameters.
+
+- For a 100 X 100 grid, there are 10,000 calculations.
+- If there were 3 parameters, there would be 1,000,000.
+
+## Grid approximation
+
+```{r echo=FALSE}
+grid_approx <- do.call(data.frame,
+                       lapply(grid_approx,
+                              function(x) replace(x, is.infinite(x), NA)))
+scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
+          labels = c("mu", "sigma", "log-likelihood"))
+```
+
+## Grid approximation
+
+```{r testgl, webgl=TRUE, echo=FALSE}
+x <- sort(rnorm(1000))
+y <- rnorm(1000)
+z <- rnorm(1000) + atan2(x,y)
+plot3d(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik,
+       xlab = "mu", ylab = "sigma", zlab = "log-likelihood",
+       col = "red")
+```
+
+## Grid approximation
+
+On this grid, the maximum likelihood estimate of $\mu$ is:
+
+```{r}
+grid_approx[which.max(grid_approx$log_lik), ]
+```
+
+The analytical estimate is:
+
+```{r}
+mean(Males$WnMass)
+```
+
+## Maximum likelihood via optimization
+
+`reltol` says to stop when the improvement is $<10^{-100}$.
+
+- Default tolerance is $10^{-8}$, so we will get a very precise estimate.
+
+```{r ML_optim, cache = TRUE}
+MLE <- optim(c(13, 1), # Start at mu = 13, sigma = 1
+             log_lik,
+             Y = Males$WnMass,
+             control = list(fnscale = -1,
+                            reltol = 10^-100))
+```
+
+## Maximum likelihood via optimization
+
+```{r}
+mean(Males$WnMass)
+print(MLE)
+```
+
+## ML considerations
+
+- `glm()` uses an optimization routine
+- Custom likelihood function
+- Phylogenetic estimation models
+
+## Resampling inference of the mean {.smaller}
+
+```{r}
+set.seed(36428)
+reps <- 100000
+resampled_mean <- numeric(length = reps)
+for (i in 1:reps) {
+  resampled_mean[i] <- mean(sample(Males$WnMass,
+                                   replace = TRUE))
+}
+```
+
+Each iteration:
+
+- Resample `Males$WnMass` *with replacement*. Yields a vector equal in length to `Males$WnMass` but where each value can appear more than once.
+- Calculate the mean of this resampled vector. Assign to the *i*th position in `resampled_mean`.
+
+The mean of these means is the estimate of the population mean (via central limit theorem).
+
+## Resampling inference of the mean
+
+```{r echo=FALSE, message = FALSE}
+data_frame(resampled_mean) %>% 
+  ggplot(aes(resampled_mean)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Resampled Mean", y = "Count") +
+  geom_vline(xintercept = mean(resampled_mean), color = "red",
+             size = 1.5)
+```
+
+## Resampling inference of the mean
+
+```{r}
+mean(Males$WnMass)
+mean(resampled_mean)
+```
+
+**Given enough iterations, the resampled mean equals the analytical mean (and equals the ML mean).**
+
+## Bayesian inference of the mean
+
+Ranges of possible maximum likelihood values:
+
+1. $\mu$: $-\infty < \mu < \infty$
+2. $\sigma$: $0 < \sigma < \infty$
+
+Drawbacks:
+
+1. $\mu$ can't be negative (no negative masses) and probably isn't very small either (biology)
+2. $\sigma$ is also probably not huge either
+
+Can we do better? Yes, Bayesian priors.
+
+## Prior for the mean
+
+```{r, echo=FALSE, message=FALSE}
+Males %>% 
+  ggplot(aes(WnMass)) +
+  geom_histogram(bins = 30)
+```
+
+## Prior for the mean
+
+```{r, echo=FALSE, message=FALSE}
+data_frame(
+  x = seq(5, 25, length = 100),
+  y = dnorm(x, mean = 14, sd = 5)) %>% 
+  ggplot(aes(x, y)) + geom_line() +
+  labs(y = "Relative Likelihood", x = "Mass")
+```
+
+## Bayesian MCMC sampling
+
+1. Write your own (not recommended)
+2. WinBUGS / OpenBUGS
+3. JAGS
+4. stan
+
+R, Python, MATLAB, etc. interfaces to samplers #2-4.
+
+## In R
+
+- `rstan`: Build your own models
+- `rethinking`: Convenience interface to `rstan`.
+
+## Bayesian model for mean $\mathcal{N}(14, 5)$
+
+```{r, echo=FALSE}
+Males_sub <- Males %>% 
+  select(WnMass) %>% 
+  as.data.frame()
+```
+
+```{r fm_sd5, cache=TRUE}
+fm_sd5 <- map2stan(
+  alist(
+    WnMass ~ dnorm(mu, sigma),
+    mu ~ dnorm(14, 5),
+    sigma ~ dcauchy(0, 3)
+  ),
+  data = Males_sub
+)
+```
+
+## Bayesian model for mean $\mathcal{N}(14, 5)$
+
+```{r}
+mean(Males_sub$WnMass)
+precis(fm_sd5)
+```
+
+## Bayesian model for mean $\mathcal{N}(14, 10)$
+
+```{r fm_sd10, cache=TRUE}
+fm_sd10 <- map2stan(
+  alist(
+    WnMass ~ dnorm(mu, sigma),
+    mu ~ dnorm(14, 10),
+    sigma ~ dcauchy(0, 3)
+  ),
+  data = Males_sub
+)
+```
+
+## Bayesian model for mean $\mathcal{N}(14, 10)$
+
+```{r}
+mean(Males_sub$WnMass)
+precis(fm_sd10)
+```
+
+## Bayesian model for mean $\mathcal{N}(10, 5)$
+
+```{r fm_mu10, cache=TRUE}
+fm_mu10 <- map2stan(
+  alist(
+    WnMass ~ dnorm(mu, sigma),
+    mu ~ dnorm(10, 5),
+    sigma ~ dcauchy(0, 3)
+  ),
+  data = Males_sub
+)
+```
+
+## Bayesian model for mean $\mathcal{N}(10, 5)$
+
+```{r}
+mean(Males_sub$WnMass)
+nrow(Males)
+precis(fm_mu10)
+```
+
+## Bayesian model for mean $\mathcal{N}(14, 0.1)$
+
+```{r fm_sd0.1, cache=TRUE}
+fm_sd0.1 <- map2stan(
+  alist(
+    WnMass ~ dnorm(mu, sigma),
+    mu ~ dnorm(14, 0.1),
+    sigma ~ dcauchy(0, 3)
+  ),
+  data = Males_sub
+)
+```
+
+## Bayesian model for mean $\mathcal{N}(14, 0.1)$
+
+```{r}
+mean(Males_sub$WnMass)
+precis(fm_sd0.1)
+```
+
+## Bayes priors
+
+- How much information do you have?
+- Try different priors
+    - What is the effect?
+- Explicit model comparison
+
+## Are male mice heavier at weaning than female mice?
+
+Wait until Week 5...

@@ -297,8 +297,8 @@ Define a function that takes a vector of values to optimize `x` ($\mu$ and $\sig
 
 ```{r}
 log_lik <- function(x, Y){
-  probs <- dnorm(Y, mean = x[1], sd = x[2])
-  return(sum(log(probs)))
+  liks <- dnorm(Y, mean = x[1], sd = x[2])
+  return(sum(log(liks)))
 }
 ```
 
