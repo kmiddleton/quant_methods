@@ -124,7 +124,6 @@ Goals:
 Problem Set:
 
   - Base R vs. not base R
-  - CLT, skewed distribution, median
   - for loop?
 
 ---
@@ -138,6 +137,21 @@ Goals:
   - Measures of central tendency (see 03 slide 28)
   - Percentiles and quantiles, quartiles and IQR, boxplots
 
+  - Remind that:
+      - Set up 6 cages w/ 6 F in each cage. Weigh all in 1st 3, all in 2nd 3. Do you expect them to be the same? How different?
+
+  - Simulate groups with same mean. Show distribution of difference of means.
+  - Simulate groups with different means. Repeat.
+  - It's more complicated, but lots of questions like this follow t.
+
+  - Simulate t dist via sampling. Show df this way.
+  - There is an analytical solution
+
+  - Think about when you have no effect. t-test randomization.
+  - Distributions of test statistics: t, F, Chisq
+  - Bivariate regression
+  - Comparison of two means
+
 ---
 
 Week 6: Parameter estimation, significance testing
@@ -147,13 +161,21 @@ http://www.fharrell.com/2017/02/a-litany-of-problems-with-p-values.html
 Goals:
 
     - OLS, t-test, ANOVA
-    - Think about when you have no effect.
+    - Philosophical aspects of NHST
 
 ---
 
 Week 7: Randomization, multiple testing
 
 Goals:
+
+    - Churchill paper
+    - Storey
+
+Problem set:
+
+    - Simple permutation test
+
 
 ---
 
