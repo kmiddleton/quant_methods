@@ -23,13 +23,6 @@ library(BEST)
 
 ## Readings
 
-## Frameworks for inference
-
-1. Analytical
-2. Maximum likelihood
-3. Resampling
-4. Bayesian
-
 ## Horned lizard predation
 
 <center>
@@ -85,9 +78,100 @@ Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "al
 
 Horn length in dead horned lizards: `r round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
 
-## Analytical???
+Imagine you collected 100 live horned lizards and randomly assigned 50 to each of two groups. Do you think they would have the same mean horn length? How different do you think the means would be? Think about how the variability among individual horn length measuremnts would affect your intuition here.
 
-t-test??
+> The first principle is that you must not fool yourself – and you are the easiest person to fool. -Feynman
+
+## How large of a difference do we expect to see from sampling error?
+
+<div class="columns-2">
+<center>
+<img src="images/garland_liz.jpg" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+- Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 3)
+- Pull out two groups of 50 from this same distribution
+- How different are they?
+
+
+</div>
+
+## How large of a difference do we expect to see from sampling error?
+
+```{r}
+set.seed(883231)
+mu.horn <- 24 #mean
+sd.horn <- 3 #standard deviation
+n.iter <- 10000 #number of iterations
+n.samp <- 50 #number in each sample
+sim.diff <- data_frame(dd=numeric(length=n.iter)) #set up vector to hold output  
+
+for (zz in 1:n.iter){
+  s1 <- rnorm(n.samp, mu.horn, sd.horn) #sample 1
+  s2 <- rnorm(n.samp, mu.horn, sd.horn) #sample 2
+  sim.diff[zz,'dd'] <- mean(s1) - mean(s2) #difference in means
+}
+
+```
+
+## How large of a difference do we expect to see from sampling error?
+
+<div class="columns-2">
+
+```{r message=FALSE, fig.width=3.5, fig.height=3.5}
+ggplot(sim.diff, aes(x=dd)) +
+  geom_histogram()
+
+```
+
+- Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 3)
+- Pull out two groups of 50 from this same distribution
+- How different are they?
+</div>
+
+## How large of a difference do we expect to see from sampling error?
+
+<div class="columns-2">
+```{r message=FALSE, fig.width=3.5, fig.height=3.5}
+ggplot(sim.diff, aes(x=dd)) +
+  geom_histogram()
+```
+
+Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "alive"]), 2)` mm
+
+Horn length in dead horned lizards: `r round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
+
+Difference: `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(HL$horn_length[HL$group == "dead"]), 2)`
+
+Are the means different?
+</div>
+
+## Frameworks for inference
+
+1. Analytical
+2. Maximum likelihood
+3. Resampling
+4. Bayesian
+
+## Analytical: T-test
+
+<div class="columns-2">
+<center>
+<img src="images/tdist.gif" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+- Test statistic based on means, standard deviations, and sample size 
+- Follows a $t$ distribution
+- Like a normal distribution that accounts for sample size
+- We won't derive the $t$ distribution
+
+</div>
 
 ## ML Comparison
 

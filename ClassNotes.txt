@@ -141,7 +141,7 @@ Goals:
       - Set up 6 cages w/ 6 F in each cage. Weigh all in 1st 3, all in 2nd 3. Do you expect them to be the same? How different?
 
   - Simulate groups with same mean. Show distribution of difference of means.
-  - Simulate groups with different means. Repeat.
+  - Simulate groups with different means. Problem set? Repeat.
   - It's more complicated, but lots of questions like this follow t.
 
   - Simulate t dist via sampling. Show df this way.
