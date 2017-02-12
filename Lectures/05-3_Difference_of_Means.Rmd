@@ -17,6 +17,7 @@ library(cowplot)
 library(rethinking)
 library(latex2exp)
 library(BEST)
+library(wesanderson)
 ```
 
 ## Notes
@@ -44,7 +45,7 @@ HL %>%
   ggplot(aes(horn_length)) +
   geom_histogram(bins = 30) +
   facet_grid(group ~ .) +
-  labs(x = "Horn Length (mm", y = "Count")
+  labs(x = "Horn Length (mm)", y = "Count")
 ```
 
 ## Summarize
@@ -86,58 +87,59 @@ Imagine you collected 100 live horned lizards and randomly assigned 50 to each o
 
 <div class="columns-2">
 <center>
-<img src="images/garland_liz.jpg" width="100%" />
+<img src="http://3.bp.blogspot.com/_6dWrARvFLx4/TFo-Vo1cdyI/AAAAAAAABqg/ITJBYWI8q3s/s1600/horned+lizard+4.JPG" width="100%" />
 <br />
 <br />
 <br />
 </center>
 
 - Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 3)
-- Pull out two groups of 50 from this same distribution
+- Randomly catch two groups of $n = 50$ from this population
 - How different are they?
-
-
 </div>
 
 ## How large of a difference do we expect to see from sampling error?
 
 ```{r}
 set.seed(883231)
-mu.horn <- 24 #mean
-sd.horn <- 3 #standard deviation
-n.iter <- 10000 #number of iterations
-n.samp <- 50 #number in each sample
-sim.diff <- data_frame(dd=numeric(length=n.iter)) #set up vector to hold output  
+mu.horn <- 24 # mean
+sd.horn <- 3 # standard deviation
+n.iter <- 10000 # number of iterations
+n.samp <- 50 # number in each sample
+sim.diff <- data_frame(dd = numeric(length = n.iter)) # vector for output  
 
-for (zz in 1:n.iter){
-  s1 <- rnorm(n.samp, mu.horn, sd.horn) #sample 1
-  s2 <- rnorm(n.samp, mu.horn, sd.horn) #sample 2
-  sim.diff[zz,'dd'] <- mean(s1) - mean(s2) #difference in means
+for (zz in 1:n.iter) {
+  s1 <- rnorm(n.samp, mu.horn, sd.horn) # sample 1
+  s2 <- rnorm(n.samp, mu.horn, sd.horn) # sample 2
+  sim.diff[zz, 'dd'] <- mean(s1) - mean(s2) # difference in means
 }
-
 ```
 
 ## How large of a difference do we expect to see from sampling error?
 
 <div class="columns-2">
 
-```{r message=FALSE, fig.width=3.5, fig.height=3.5}
-ggplot(sim.diff, aes(x=dd)) +
-  geom_histogram()
-
+```{r message=FALSE, fig.width=3.5, fig.height=3.5, echo=FALSE}
+ggplot(sim.diff, aes(x = dd)) +
+  geom_histogram(bins = 30) +
+  labs(x = "Difference of Means", y = "Count")
 ```
 
 - Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 3)
-- Pull out two groups of 50 from this same distribution
+- Randomly catch two groups of $n = 50$ from this population
 - How different are they?
 </div>
 
 ## How large of a difference do we expect to see from sampling error?
 
 <div class="columns-2">
-```{r message=FALSE, fig.width=3.5, fig.height=3.5}
-ggplot(sim.diff, aes(x=dd)) +
-  geom_histogram()
+
+```{r message=FALSE, fig.width=3.5, fig.height=3.5, echo=FALSE}
+HL %>% 
+  ggplot(aes(horn_length)) +
+  geom_histogram(bins = 30) +
+  facet_grid(group ~ .) +
+  labs(x = "Horn Length (mm)", y = "Count")
 ```
 
 Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "alive"]), 2)` mm
@@ -149,6 +151,30 @@ Difference: `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(
 Are the means different?
 </div>
 
+## How large of a difference do we expect to see from sampling error?
+
+```{r message=FALSE, fig.height=3.5, echo=FALSE}
+p1 <- ggplot(sim.diff, aes(x = dd)) +
+  geom_histogram(bins = 30) +
+  labs(x = "Difference of Means", y = "Count")
+
+HL_mean <- HL %>% group_by(group) %>% 
+  summarize(Mean = mean(horn_length)) %>% 
+  gather(Value, x, -group)
+
+p2 <- HL %>% 
+  ggplot(aes(horn_length)) +
+  geom_histogram(bins = 30) +
+  geom_vline(data = HL_mean, aes(xintercept = x, color = Value),
+             size = 2) +
+  facet_grid(group ~ .) +
+  labs(x = "Horn Length (mm)", y = "Count")
+
+plot_grid(p2, p1, ncol = 2)
+```
+
+Difference: `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(HL$horn_length[HL$group == "dead"]), 2)`
+
 ## Frameworks for inference
 
 1. Analytical
@@ -156,22 +182,45 @@ Are the means different?
 3. Resampling
 4. Bayesian
 
-## Analytical: T-test
+## Analytical: *t*-test
 
-<div class="columns-2">
-<center>
-<img src="images/tdist.gif" width="100%" />
-<br />
-<br />
-<br />
-</center>
+```{r t_plot, message=FALSE, fig.height=2.5, echo=FALSE, warning=FALSE}
+x <- seq(-3, 3, by = 0.001)
+
+sim <- data_frame(df = c(2, 10, 50)) %>%
+  group_by(df) %>%
+  do(data_frame(x = x, y = dt(x, .$df))) %>%
+  mutate(Parameters = paste0("df = ", df)) %>%
+  ungroup() %>%
+  mutate(Parameters = factor(Parameters, levels = unique(Parameters)))
+
+norm <- data_frame(
+  x = x,
+  y = dnorm(x, 0, 1)
+)
+
+pal <- wes_palette("Moonrise3", 3, type = "discrete")
+
+ggplot() +
+  geom_line(data = sim, aes(x, y, color = Parameters), size = 1.5) +
+  geom_line(data = norm, aes(x, y)) +
+  scale_color_manual(values = pal, name = "Degrees of\nFreedom") +
+  labs(x = "x", y = "Relative Likelihood") +
+  theme(legend.position = c(0.9, 0.75))
+```
 
 - Test statistic based on means, standard deviations, and sample size 
-- Follows a $t$ distribution
+- Follows a *t* distribution
 - Like a normal distribution that accounts for sample size
-- We won't derive the $t$ distribution
+- We won't derive the *t* distribution
 
 </div>
+
+## *t*-test
+
+```{r}
+t.test(horn_length ~ group, data = HL, var.equal = TRUE)
+```
 
 ## ML Comparison
 
@@ -181,18 +230,7 @@ Are the means different?
 
 Compare the models with a likelihood ratio (Bayes Factor):
 
-$$BF = \frac{Pr[Model~2]}{Pr[Model~1]}$$
-
-## Sum of Squares and Variance
-
-Sum of the squared differences between each observation and the mean:
-
-$$SS = \sum^{n_1}_{i=1}\left(y_{i} - \bar{y}\right)^2$$
-
-Sample variance:
-
-$$s^2 = \frac{1}{n - 1}\left(\sum^{n_1}_{i=1} \left(y_i - \bar{y}\right)^2\right)$$
-
+$$BF = \frac{\mathcal{L}[Model~2]}{\mathcal{L}[Model~1]}$$
 
 ## Data drawn from one distribution
 
@@ -228,7 +266,7 @@ $$\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right) = \frac{1
 
 Compare the models with a likelihood ratio (Bayes Factor):
 
-$$BF = \frac{Pr[Model~2]}{Pr[Model~1]} = \frac{\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right)}{\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|y\right)} = \left(\frac{\hat{\sigma}^2_2}{\hat{\sigma}^2_1}\right)^{-\frac{n_1 + n_2}{2}}$$
+$$BF = \frac{\mathcal{L}[Model~2]}{\mathcal{L}[Model~1]} = \frac{\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right)}{\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|y\right)} = \left(\frac{\hat{\sigma}^2_2}{\hat{\sigma}^2_1}\right)^{-\frac{n_1 + n_2}{2}}$$
 
 More in Problem Set 5.
 
@@ -236,16 +274,16 @@ More in Problem Set 5.
 
 ```{r resampled_difference, cache=TRUE}
 set.seed(8734)
-reps <- 10000
+reps <- 50000
 diffs <- numeric(length = reps)
 
 diffs[1] <- mean(HL$horn_length[HL$group == "alive"]) -
   mean(HL$horn_length[HL$group == "dead"])
 
 for (i in 2:reps) {
-  HL$shuffle <- sample(HL$horn_length)
-  diffs[i] <- mean(HL$shuffle[HL$group == "alive"]) -
-  mean(HL$shuffle[HL$group == "dead"])
+  shuffle <- sample(HL$horn_length)
+  diffs[i] <- mean(shuffle[HL$group == "alive"]) -
+    mean(shuffle[HL$group == "dead"])
 }
 ```
 
@@ -259,9 +297,17 @@ data_frame(diffs) %>%
   labs(x = "Difference (mm)", y = "Count")
 ```
 
+## What proportion of resampled differences are equal to or more extreme than the observed?
+
+```{r}
+p <- sum(diffs[1] <= diffs) / length(diffs)
+sprintf("%.5f", p)
+sprintf("%.5f", 3 / 50000)
+```
+
 ## Bayesian
 
-Prepare data
+Prepare data:
 
 ```{r message=FALSE}
 HL <- read_csv("../data/HornedLizards.csv") %>% 
@@ -270,6 +316,8 @@ HL <- read_csv("../data/HornedLizards.csv") %>%
   as.data.frame()
 str(HL)
 ```
+
+`coerce_index(group)` converts factors into integers.
 
 ## Bayesian
 
@@ -322,7 +370,7 @@ data_frame(alive, dead) %>%
   gather(group, horn) %>% 
   ggplot(aes(horn, color = group)) +
   geom_line(stat = "density", size = 1.5) +
-  labs(x = "Horn Length (mm)")
+  labs(x = "Horn Length (mm)", y = "Relative Likelihood")
 ```
 
 ## Bayesian
@@ -330,10 +378,13 @@ data_frame(alive, dead) %>%
 ```{r}
 precis(fm2, depth = 2, digits = 4)
 HL %>% group_by(group) %>% 
-  summarize(horn_mean = mean(horn_length))
+  summarize(horn_mean = mean(horn_length),
+            horn_sem = sd(horn_length) / sqrt(length(horn_length)))
 ```
 
 ## Bayesian
+
+95% credible interval of difference:
 
 ```{r echo=FALSE, fig.height = 2}
 diff <- alive - dead
@@ -346,8 +397,6 @@ data_frame(diff) %>%
   geom_vline(xintercept = hdint[2], color = "lightblue", size = 1.5) +
   labs(x = "Difference (alive - dead; mm)")
 ```
-
-95% credible interval of difference
 
 ```{r}
 hdi(diff)
