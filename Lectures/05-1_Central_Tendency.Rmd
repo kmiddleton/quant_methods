@@ -1,5 +1,5 @@
 ---
-title: "Applications of Inference Frameworks"
+title: "Applications of Inference Frameworks: More Basics"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -13,21 +13,9 @@ bibliography: Multivariate.bib
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(rstan)
 library(cowplot)
-library(plot3D)
-#library(rgl)
-#setupKnitr <- function() {
-#  if (requireNamespace("knitr")) {
-#    knitr::knit_hooks$set(webgl = hook_webgl)
-#    knitr::knit_hooks$set(rgl = hook_rgl)
-#    environment(hook_webgl)$commonParts <- TRUE
-#    environment(hook_webgl)$reuse <- TRUE
-#  }
-#}
 ```
 
-## Notes
 
 ## Readings
 
@@ -35,7 +23,11 @@ library(plot3D)
 
 ## Models
 
-> "... statisticians do not in general exactly agree on how to analyze anything but the simplest of problems. The fact that statistical inference uses mathematics does not imply that there is only one reasonable or useful way to conduct an analysis. Engineering uses math as well, but there are many ways to build a bridge." [@McElreath2015-no]
+- Comparing models will require covering a few more basics
+    - Concepts of central tendency
+    - Concepts of spread
+    - Deviations & sums of squares
+    - Introduction to confidence intervals
 
 ## Measures of central tendency (location)
 
@@ -51,16 +43,9 @@ Sample (arithmetic) mean:
 
 $$\bar{Y} = \frac{\sum^n_{i=1}Y_i}{n}$$
 
-Please use "mean" and not "average". The arithmetic mean is one kind of average, but there are others (as there are other types of means).
+The term "mean" is preferred to "average". The arithmetic mean is one kind of average, but there are others (as there are other types of means).
 
 - One argument: "Average" is a statistic determined by an arithmetic procedure. "Mean" is a parameter.
-
-## Sample Mean vs. Population Mean
-
-- The sample mean ($\bar{Y}$) is an estimation of the population mean ($\mu$).
-    - What is the population of interest?
-- If the sample is a *sufficiently large* random sample from the population (equal opportunity, independent), the the sample mean is an unbiased estimator of the population mean.
-    - Sufficiently large suggests that small sample sizes are problematic. They are.
 
 ## Median
 
@@ -138,6 +123,14 @@ ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
 The $X$th **percentile** of a sample is the value below which $X\%$ of the observations lie. Percentiles are reported as percent.
 
  **Quantile** = Percentile / 100%. The range of quantiles is $0 \rightarrow 1$.
+
+```{r}
+
+xx <- rnorm(100000)
+quantile(xx, 0.84)
+quantile(xx, 0.975)
+
+```
 
 ## Quartiles and interquartile range
 
@@ -250,37 +243,18 @@ $$
 - Mean squared deviation of the observations from the mean.
 - Measures the dispersion of a distribution away from the sample mean.
 
-## Sample variance
-
-Another way to think about the dartboard analogy:
-
-<center>
-<img src="images/variance.png" width="100%" />
-</center>
-
 ## Sample standard deviation
 
 $$
 s = \sqrt{\frac{\sum \left(Y_i - \bar{Y}\right)^2}{n - 1}}
 $$
 
-- Think of $s$ as the "mean" for deviation.
 - Square root of the sample variance.
-- Root mean squared deviation
+- Think of $s$ as the "mean" for deviation.
 - About 68% of the observations are $\pm 1$ standard deviation from the mean.
 
-## Sample vs. population
+- When sample size is not low, the sample variance ($s^2$) is an *unbiased estimator* of the population variance ($\sigma^2$), though the calculation is a little different (divide by $n$ rather than $n − 1$) See [explanation of $n$ vs. $n-1$](http://stats.stackexchange.com/q/3931/597) 
 
-If the sample is a sufficiently large random sample from the population, then:
-
-1. the sample variance ($s^2$) is an *unbiased estimator* of the population variance ($\sigma^2$), though the calculation is a little different (divide by $n$ rather than $n − 1$)
-2. the sample standard deviation is an *unbiased estimator* of the population standard deviation ($\sigma$)
-
-Explanation of $n$ vs. $n-1$: http://stats.stackexchange.com/q/3931/597
-
-## Sampling demo
-
-http://www.zoology.ubc.ca/~whitlock/kingfisher/SamplingNormal.htm
 
 ## Standard error of the sample mean
 
@@ -319,22 +293,22 @@ ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
 
 ## Confidence intervals
 
-**FIXME**
+> A confidence interval is a range that we expect, with some level of conﬁdence, to include the true value of a population parameter such as the mean. [@Curran-Everett2009-zz]
 
-A range of values surrounding the sample mean (of whatever statistic for which you are calculating the confidence interval) that is likely to contain the population parameter.
+Our calculation is based on our expectation from sampling the true population distribution repeatedly. Let's try these: 
 
-**Say**: "We are 95% confident that the true mean lies between X and Y."
+- [Sampling](http://www.zoology.ubc.ca/~whitlock/kingfisher/SamplingNormal.htm)
+- [Confidence Intervals](http://www.zoology.ubc.ca/~whitlock/kingfisher/CIMean.htm)
 
-**Don't say**: "There is a 95% probability that the population mean lies between X and Y."
 
 ## Confidence intervals
-
-**FIXME**
 
 The 95% confidence interval for a mean can be estimated by the sample mean ± 2 \times $SE_{\bar{Y}}$.
 
 - This is a reasonable approximation.
 - We'll cover the exact calculation (what you would use in press) later
+
+
 
 ## Confidence intervals
 
@@ -351,7 +325,7 @@ Mean undulation rate was `r round(y_bar, 2)` Hz ($n$ = `r length(undulation_rate
 
 ## Coefficient of variation
 
-Coefficient of variation represents the standard deviation as a percentage of the mean.
+Coefficient of variation represents the standard deviation as a percentage of the mean. Elephant mass has an inherently higher standard deviation than mouse mass.
 
 $$
 CV = 100\% \times \frac{s}{\bar{Y}}

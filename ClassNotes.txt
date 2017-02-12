@@ -130,6 +130,9 @@ Problem Set:
 
 Week 5: Applications of three inference frameworks
 
+http://www.zoology.ubc.ca/~whitlock/kingfisher/SamplingNormal.htm
+
+
 Bayes intro: http://sumsar.net/files/posts/2017-01-15-bayesian-computation-with-stan-and-farmer-jons/stan_exercise.html
 
 Goals:
