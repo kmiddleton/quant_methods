@@ -155,6 +155,10 @@ Goals:
   - Bivariate regression
   - Comparison of two means
 
+Problem set:
+
+  - Optim for regression??
+
 ---
 
 Week 6: Parameter estimation, significance testing

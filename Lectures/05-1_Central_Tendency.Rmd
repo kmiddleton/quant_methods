@@ -343,4 +343,10 @@ CV
 
 The coefficient of variation of undulation rate was `r round(CV, 1)`%.
 
+## Quiz 05-1
+
+Complete quiz 05-1.
+
+Watch lecture 05-2 on Canvas.
+
 ## References
