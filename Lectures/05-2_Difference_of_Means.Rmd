@@ -75,7 +75,7 @@ Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "al
 
 Horn length in dead horned lizards: `r round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
 
-Imagine you collected 100 live horned lizards and randomly assigned 50 to each of two groups. Do you think they would have the same mean horn length? How different do you think the means would be? Think about how the variability among individual horn length measuremnts would affect your intuition here.
+Imagine you collected 100 live horned lizards and randomly assigned 50 to each of two groups. Do you think they would have the same mean horn length? How different do you think the means would be? Think about how the variability among individual horn length measurements would affect your intuition here.
 
 > The first principle is that you must not fool yourself – and you are the easiest person to fool. -Feynman
 

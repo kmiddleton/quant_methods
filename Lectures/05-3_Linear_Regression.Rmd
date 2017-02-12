@@ -50,7 +50,7 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE){
 3. Resampling
 4. Bayesian
 
-## For examples...
+## For example...
 
 1. Calibration curves
 2. Metabolic rate vs. Body mass
@@ -90,7 +90,7 @@ M %>% head()
 ggplot(M, aes(X, Y)) + geom_point()
 ```
 
-## Analytical solution 1
+## Analytical solution
 
 An infinite range of possible slopes ($\theta_1$)
 
