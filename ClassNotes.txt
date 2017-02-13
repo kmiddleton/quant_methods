@@ -157,8 +157,19 @@ Goals:
 
 Problem set:
 
-  - Optim for regression??
+	-stalk eyed flies
+	-Give data with 2 groups
+	- plot boxplot  
+	- Plot with points and summaries
+    - do a t test
+    - likelihood calculation & bayes factor    
+    -calculate real CI
+    -95% CI simulation
 
+	-lm and summary
+	-do lm for t test
+	
+	
 ---
 
 Week 6: Parameter estimation, significance testing
@@ -235,6 +246,8 @@ Goals:
 ---
 
 Week 15: Experimental design
+
+mouse example subsample n 
 
 Goals:
 
