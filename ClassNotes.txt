@@ -159,17 +159,17 @@ Problem set:
 
 	-stalk eyed flies
 	-Give data with 2 groups
-	- plot boxplot  
+	- plot boxplot
 	- Plot with points and summaries
     - do a t test
-    - likelihood calculation & bayes factor    
+    - likelihood calculation & bayes factor
     -calculate real CI
     -95% CI simulation
 
 	-lm and summary
 	-do lm for t test
-	
-	
+
+
 ---
 
 Week 6: Parameter estimation, significance testing
@@ -184,6 +184,8 @@ Goals:
 ---
 
 Week 7: Randomization, multiple testing
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC379178/
 
 Goals:
 
@@ -247,7 +249,7 @@ Goals:
 
 Week 15: Experimental design
 
-mouse example subsample n 
+mouse example subsample n
 
 Goals:
 

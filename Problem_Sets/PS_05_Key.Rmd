@@ -1,0 +1,143 @@
+---
+title: 'Problem Set 05'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+```
+
+## Comparing Models: Differences between Groups
+
+Stalk-eyed flies are a clade of flies whose eyes are at the ends of long projections (stalks) on either side of their head. Shortly after emerging from a pupae, these flies ingest air through their mouth in order to pump it into these stalks to elongate them (watch this craziness here: https://www.youtube.com/watch?v=bGX7zZk0Eo4). Females prefer males with wider eye spans. Photo below:
+<div style="width:350px">
+![](https://i1.wp.com/invorma.com/wp-content/uploads/2015/06/The-Stalk-Eyed-Fly.jpg)
+
+</div>
+
+The Stalkies.csv data file contains data for an experiment in which male stalk-eyed flies were reared on different food sources (corn and cotton). The hypothesis is that food type affects eye span. In the next few exercises, you will try to answer this question using different approaches.
+
+### Activity
+
+Load the Stalkies.csv file. 
+
+```{r}
+stalk <- read_csv("data/Stalkies.csv")
+
+```
+
+Visualize your dataset in two ways: 
+
+1) Make a boxplot showing each food type on the x axis. 
+2) Plot the raw data (points) for the two groups. For the points, include jitter and transparancy. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparancy is most appropriate. Change the axis labels to what you would expect on a publication ready figure. 
+
+```{r }
+
+ggplot(stalk, aes(x = food_source, y = eye_span)) +
+  geom_boxplot()
+
+ggplot(stalk, aes(x = food_source, y = eye_span)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x="Food Source", y="Eye Span")
+```
+
+What do these plots tell you? Do you have a prediction for what your statistical tests will show? 
+
+> The average eye span is higher for flies reared on corn than on cotton. The variance also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups. 
+
+We will first use the analytical method to determine if the groups are different. In this case, a t-test is most appropriate. By default, the `t.test` function will perform a test that does not assume equal variances. You may specify equal variances with `var.equal = TRUE` if you decide that is appropriate here. 
+
+### Activity
+
+Perform a t-test using the formula method to specify the groups to test. Print the results. 
+
+```{r }
+
+myT <- t.test(eye_span ~ food_source, data = stalk) 
+
+print(myT)
+
+```
+
+What can you conclude from these results?
+
+> The hypothesis that the means for the two groups are equal is very unlikely. There is a statistically significant difference between the groups. 
+
+LIKELIHOOD STUFF GOES IN HERE.
+
+```{r }
+
+```
+
+## Confidence intervals
+
+Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture mu +/- 2*se.   
+
+# FIXME
+
+```{r }
+#could make them write a function for this
+
+mean(stalk$eye_span[stalk$food_source=='Cotton']) - 2*sd(stalk$eye_span[stalk$food_source=='Cotton']/sqrt(length(stalk$eye_span[stalk$food_source=='Cotton'])))
+
+mean(stalk$eye_span[stalk$food_source=='Cotton']) + 2*sd(stalk$eye_span[stalk$food_source=='Cotton']/sqrt(length(stalk$eye_span[stalk$food_source=='Cotton'])))
+
+mean(stalk$eye_span[stalk$food_source=='Corn']) - 2*sd(stalk$eye_span[stalk$food_source=='Corn']/sqrt(length(stalk$eye_span[stalk$food_source=='Corn'])))
+
+mean(stalk$eye_span[stalk$food_source=='Corn']) + 2*sd(stalk$eye_span[stalk$food_source=='Corn']/sqrt(length(stalk$eye_span[stalk$food_source=='Corn'])))
+
+```
+
+We can simulate what we would expect assuming the means and standard deviation are true. Do the following:
+1. generate simulated data pulling from a normal distribution matching the number of observations, mean, and standard deviation (note sd not se) for each group
+2. calculate the mean for each group and the upper and lower bounds of the confidence interval
+3. put these values into a `data_frame`
+4. repeat this 1000 times
+5. calculate the proportion of times the mean for each group falls within the confidence interval
+
+
+```{r }
+niter <- 1000
+mu.corn <- mean(stalk$eye_span[stalk$food_source=='Corn'])
+mu.cotton <- mean(stalk$eye_span[stalk$food_source=='Cotton'])
+sd.corn <- sd(stalk$eye_span[stalk$food_source=='Corn'])
+sd.cotton <- sd(stalk$eye_span[stalk$food_source=='Cotton'])
+n.corn <- length(stalk$eye_span[stalk$food_source=='Corn'])
+n.cotton <- length(stalk$eye_span[stalk$food_source=='Cotton'])
+
+
+corn.cis <- data_frame(mm = numeric(length=niter), ll = numeric(length=niter), uu = numeric(length=niter))
+cotton.cis <- data_frame(mm = numeric(length=niter), ll = numeric(length=niter), uu = numeric(length=niter))
+
+for ( jj in 1:niter){
+    
+  corn.s <- rnorm(n.corn, mu.corn, sd.corn)
+  cotton.s <- rnorm(n.cotton, mu.cotton, sd.cotton)
+  
+  corn.cis[jj,] <- c(mean(corn.s), mean(corn.s) - 2*(sd(corn.s)/sqrt(n.corn)), mean(corn.s) + 2*(sd(corn.s)/sqrt(n.corn))) 
+  cotton.cis[jj,] <- c(mean(cotton.s), mean(cotton.s) - 2*(sd(cotton.s)/sqrt(n.cotton)), mean(cotton.s) + 2*(sd(cotton.s)/sqrt(n.cotton))) 
+
+}
+#USE T DIST?
+
+(sum(mu.corn < corn.cis$ll) + sum(mu.corn > corn.cis$uu))/niter
+
+(sum(mu.cotton < cotton.cis$ll) + sum(mu.cotton > cotton.cis$uu))/niter
+
+```
+
+QUESTION ABOUT PROBABILITY - WHAT CIS MEAN?
+
+
