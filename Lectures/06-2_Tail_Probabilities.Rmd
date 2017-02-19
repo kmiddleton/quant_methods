@@ -12,6 +12,79 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+```
+
+```{r shading_functions, echo=FALSE}
+shade_normal <- function(q, tail = "both", mean = 0, sd = 1) {
+  crit <- qnorm(q, mean, sd)
+  M <- data_frame(x = seq(-4, 4, length = 200),
+                  y = dnorm(x))
+  p <- ggplot(M, aes(x, y)) +
+    geom_line() +
+    labs(x = "Value", y = "Relative Likelihood")
+  lower <- geom_ribbon(data = subset(M, x < crit),
+                       aes(ymax = y), ymin = 0,
+                       fill = "red", alpha = 0.5)
+  upper <- geom_ribbon(data = subset(M, x > abs(crit)),
+                       aes(ymax = y), ymin = 0,
+                       fill = "red", alpha = 0.5)
+  if (tail == "both") p <- p + lower + upper
+  if (tail == "lower") p <- p + lower
+  if (tail == "upper") p <- p + upper
+  return(p)
+}
+
+shade_t <- function(q, df, tail = "both") {
+  require(latex2exp, quietly = TRUE)
+  crit <- qt(q, df)
+  M <- data_frame(x = seq(-4, 4, length = 200),
+                  y = dt(x, df))
+  p <- ggplot(M, aes(x, y)) +
+    geom_line() +
+    labs(x = TeX("$t$"), y = "Relative Likelihood")
+  lower <- geom_ribbon(data = subset(M, x < crit),
+                       aes(ymax = y), ymin = 0,
+                       fill = "red", alpha = 0.5)
+  upper <- geom_ribbon(data = subset(M, x > abs(crit)),
+                       aes(ymax = y), ymin = 0,
+                       fill = "red", alpha = 0.5)
+  if (tail == "both") p <- p + lower + upper
+  if (tail == "lower") p <- p + lower
+  if (tail == "upper") p <- p + upper
+  return(p)
+}
+
+shade_F <- function(q, df1, df2) {
+  require(latex2exp, quietly = TRUE)
+  crit <- qf(q, df1, df2, lower.tail = FALSE)
+  M <- data_frame(x = seq(0.001, crit * 1.5, length = 200),
+                  y = df(x, df1, df2))
+  p <- ggplot(M, aes(x, y)) +
+    geom_line() +
+    geom_ribbon(data = subset(M, x > crit),
+                       aes(ymax = y), ymin = 0,
+                       fill = "red", alpha = 0.5) +
+    ylim(c(0, 1.1 * max(M$y))) +
+    labs(x = TeX("$F$"), y = "Relative Likelihood")
+  return(p)
+}
+
+shade_chisq <- function(q, df) {
+  require(latex2exp, quietly = TRUE)
+  crit <- qchisq(q, df, lower.tail = FALSE)
+  M <- data_frame(x = seq(0.1, crit * 1.5, length = 200),
+                  y = dchisq(x, df))
+  p <- ggplot(M, aes(x, y)) +
+    geom_line() +
+    geom_ribbon(data = subset(M, x > crit),
+                       aes(ymax = y), ymin = 0,
+                       fill = "red", alpha = 0.5) +
+    ylim(c(0, 1.1 * max(M$y))) +
+    labs(x = TeX("$\\chi^2"), y = "Relative Likelihood")
+  return(p)
+}
 ```
 
 ## Notes
@@ -23,22 +96,73 @@ bibliography: Multivariate.bib
 
 ## Readings
 
-## Example from problem set
+## Recall from Problem Set 3
+
+- Generate 100000 values from a normal distribution with a mean of 5 and a standard deviation of 1
+- Generate 100000 values from a normal distribution with a mean of 5 and a standard deviation of 5
+
+```{r}
+set.seed(832476)
+# 3
+xx3 <- data_frame(num = rnorm(100000, 5, 1))
+
+# 6
+xx6 <- data_frame(num = rnorm(100000, 5, 5))
+```
+
+## Plots of random normal values
+
+```{r echo=FALSE}
+p1 <- xx3 %>% ggplot(aes(num)) +
+  geom_histogram(bins = 50)
+p2 <- xx6 %>% ggplot(aes(num)) +
+  geom_histogram(bins = 50)
+
+plot_grid(p1, p2, ncol = 2)
+```
+
+
+## What proportion of values from each set are above 7?
+
+```{r}
+#3 
+nrow(xx3[xx3$num > 7, ]) / nrow(xx3)
+
+#6
+nrow(xx6[xx6$num > 7, ]) / nrow(xx6)
+```
+
+## Use `pnorm()` to calculate the probability of observing a value of 7 or greater for each distribution.
+
+```{r}
+pnorm(7, mean = 5, sd = 1, lower.tail = FALSE)
+pnorm(7, mean = 5, sd = 5, lower.tail = FALSE)
+```
+
+Compare the values returned by `pnorm()` to those you calculated manually above.
 
 ## Tail probabilities
 
 ```{r}
-x <- seq(0.0, 0.1699, 0.0001)   
-ytop <- dnorm(0.12, 0.08, 0.02)
-MyDF <- data.frame(x = x, y = dnorm(x, 0.08, 0.02))
-shade <- rbind(c(0.12, 0), subset(MyDF, x > 0.12),
-               c(MyDF[nrow(MyDF), "X"], 0))
+shade_normal(0.025, tail = "both")
+qt(0.025, 5)
+```
 
-#Then use this new data.frame with geom_polygon
-ggplot(MyDF, aes(x, y)) +
-  geom_line() +
-  geom_segment(aes(x=0.12,y=0,xend=0.12,yend=ytop)) +
-     geom_polygon(data = shade, aes(x, y))
- 
+## t
+
+```{r}
+shade_t(0.025, 5)
+```
+
+## F
+
+```{r}
+shade_F(0.05, 2, 10)
+```
+
+## $\chi^2$
+
+```{r}
+shade_chisq(0.05, 2)
 ```
 
