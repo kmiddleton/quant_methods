@@ -95,35 +95,11 @@
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
       <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
       <p data-config-presenter><!-- populated from slide_config.json --></p>
-            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-02-18</p>
+            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-02-19</p>
           </hgroup>
   </slide>
 
-<slide class=''><hgroup><h2>Notes</h2></hgroup><article  id="notes">
-
-<ol>
-<li>Understand distinction between parameter estimate and interval estimate and hypothesis test
-
-<ul>
-<li>Parameter estimation, interval estimation, hypothesis testing</li>
-<li>Real world examples</li>
-<li>Back to t-test / lm example for parameter estimation only
-
-<ul>
-<li>Equality of estimates</li>
-</ul></li>
-</ul></li>
-</ol>
-
-<p>Examples</p>
-
-<ul>
-<li>BC screening/deaths</li>
-</ul>
-
-</article></slide><slide class=''><hgroup><h2>Readings</h2></hgroup><article  id="readings">
-
-</article></slide><slide class=''><hgroup><h2>Estimation</h2></hgroup><article  id="estimation">
+<slide class=''><hgroup><h2>Estimation</h2></hgroup><article  id="estimation">
 
 <ol>
 <li>Parameter (point) estimation
@@ -134,7 +110,7 @@
 <li>Interval estimation
 
 <ul>
-<li>How do we quantify the incertainty associated with parameter estimates?</li>
+<li>How do we quantify the uncertainty associated with parameter estimates?</li>
 </ul></li>
 <li>Hypothesis testing
 
@@ -241,7 +217,7 @@
 <p>Using Mean \(\pm\) 2 \(\times\) SEM:</p>
 
 <ul>
-<li>Alive: 24.28 (95% CI = 24.246 &#8211; 24.314)</li>
+<li>Alive: 24.28 (95% CI = 24.25 &#8211; 24.31)</li>
 <li>Dead: 21.99 (95% CI = 21.81 &#8211; 22.17)</li>
 </ul>
 
@@ -275,15 +251,23 @@ summary(fm)</pre>
 ## -11.1812  -1.2812   0.2688   1.7188   6.0188 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)  24.2812     0.2130 113.987  &lt; 2e-16
-## groupdead    -2.2945     0.5275  -4.349 2.27e-05
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  24.2812     0.2130 113.987  &lt; 2e-16 ***
+## groupdead    -2.2945     0.5275  -4.349 2.27e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.643 on 182 degrees of freedom
 ## Multiple R-squared:  0.09415,    Adjusted R-squared:  0.08918 
 ## F-statistic: 18.92 on 1 and 182 DF,  p-value: 2.27e-05</pre>
 
-<p>Each line contains a hypothesis test of estimate = 0.</p></article></slide>
+<p>Each line contains a hypothesis test of estimate = 0.</p>
+
+</article></slide><slide class=''><hgroup><h2>Quiz 06-1</h2></hgroup><article  id="quiz-06-1">
+
+<p>Complete Quiz 06-1 (a littler longer than usual)</p>
+
+<p>Watch Lecture 06-2</p></article></slide>
 
 
   <slide class="backdrop"></slide>

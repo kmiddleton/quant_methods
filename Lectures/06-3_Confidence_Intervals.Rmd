@@ -19,21 +19,10 @@ library(rethinking)
 source("Shade_Distributions.R")
 ```
 
-## Notes
-
-3. Calculate precise CIs
-    
-    - Bayes credible intervals
-        - ?? MCMC sampling?
-        - King Markov
-    - What does this mean?
-    
-## Readings
-
 ## Confidence intervals measure the uncertainty in a parameter estimate
 
 - Analytical  
-    - Approximate calculation relying on 2 * SE 
+    - Approximate calculation relying on 2 $\times$ SE 
     - Exact calculate using a critical *t*-value
 - Maximum Likelihood 
     - Iterate over possible parameter values 
@@ -256,13 +245,12 @@ p +
   geom_vline(xintercept = cred, color = "coral", size = 1.5)
 ```
 
-
 ## Interpreting Intervals
 
 Frequentist interval: `r round(lower, 2)` -- `r round(upper, 2)`
 
 - Future similar experiments and samples
-- Does not indicate the probablity of the parameter
+- Does not indicate the probability of the parameter
 
 Bayesian interval: `r round(cred[1], 2)` -- `r round(cred[2], 2)`
 
@@ -271,6 +259,6 @@ Bayesian interval: `r round(cred[1], 2)` -- `r round(cred[2], 2)`
 
 ## Quiz 06-3
 
-Complete quiz 06-3.
+Complete quiz 06-4.
 
 Move on to Lecture 06-4.

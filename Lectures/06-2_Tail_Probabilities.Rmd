@@ -17,11 +17,6 @@ library(cowplot)
 source("Shade_Distributions.R")
 ```
 
-## Notes
-
-
-## Readings
-
 ## Recall from Problem Set 3
 
 - Generate 100000 values from a normal distribution with a mean of 5 and a standard deviation of 1

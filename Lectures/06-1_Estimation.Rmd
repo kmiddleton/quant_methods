@@ -16,26 +16,12 @@ library(tidyverse)
 library(cowplot)
 ```
 
-## Notes
-
-1. Understand distinction between parameter estimate and interval estimate and hypothesis test
-    - Parameter estimation, interval estimation, hypothesis testing
-    - Real world examples
-    - Back to t-test / lm example for parameter estimation only
-        - Equality of estimates
-
-Examples
-
-- BC screening/deaths
-
-## Readings
-
 ## Estimation
 
 1. Parameter (point) estimation
     - Given a model, with unknown parameters ($\theta_0$, $\theta_1$, ..., $\theta_k$), how do we estimate values of those parameters?
 2. Interval estimation
-    - How do we quantify the incertainty associated with parameter estimates?
+    - How do we quantify the uncertainty associated with parameter estimates?
 3. Hypothesis testing
     - How do we test a hypothesis about a parameter estimate?
 
@@ -137,8 +123,8 @@ HL %>% group_by(group) %>%
 
 Using Mean $\pm$ 2 $\times$ SEM:
 
-- Alive: 24.28 (95% CI = `r 24.28 - 2 * 0.017` -- `r 24.28 + 2 * 0.017`)
-- Dead: 21.99 (95% CI = `r 21.99 - 2 * 0.09` -- `r 21.99 + 2 * 0.09`)
+- Alive: 24.28 (95% CI = `r round(24.28 - 2 * 0.017, 2)` -- `r round(24.28 + 2 * 0.017, 2)`)
+- Dead: 21.99 (95% CI = `r round(21.99 - 2 * 0.09, 2)` -- `r round(21.99 + 2 * 0.09, 2)`)
 
 ## 3a. *t*-test for equality of means {.smaller}
 
@@ -154,3 +140,9 @@ summary(fm)
 ```
 
 Each line contains a hypothesis test of estimate = 0.
+
+## Quiz 06-1
+
+Complete Quiz 06-1 (a littler longer than usual)
+
+Watch Lecture 06-2

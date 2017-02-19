@@ -331,7 +331,7 @@ The modern idea is traced to these statisticians, but has been warped into somet
 
 ## Problem with *P*-values
 
-- Originally an informal concept that got co-opted for what became null hypothesis sigificance testing (NHST)
+- Originally an informal concept that got co-opted for what became null hypothesis significance testing (NHST)
 - Apparent objectivity but actually arbitrary and dependent on the data collected and not collected
 - Experimental biases (experimenter introduced, sample size)
 - Science-wide publication bias
