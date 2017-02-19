@@ -20,6 +20,11 @@ bibliography: Multivariate.bib
     - What is a hypothesis test in each framework?
     - A priori hypotheses, one/two tailed
     - Back to summary(lm())
+  
+      - Output of summary(lm())
+        - t-test equation
+        - Tests of slopes in allometry
+  
     - Understand philosophical and practical aspects of NHST
         - Ioannidis
         - Selection bias

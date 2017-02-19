@@ -12,20 +12,106 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(cowplot)
+library(wesanderson)
+
 ```
 
 ## Notes
 
 3. Calculate precise CIs
-    - t-test equation
-    - Precise CI
-        - What does this mean?
-    - Output of summary(lm())
-        - Tests of slopes in allometry
+    
     - Bayes credible intervals
         - ?? MCMC sampling?
         - King Markov
-    - Mention ML intervals??
-
+    - What does this mean?
+    
 ## Readings
+
+## Confidence Intervals are a Measure of the Uncertainty Associated with a Parameter Estimate
+
+- Analytical  
+    - approximate calculation relying on SE 
+- Maximum Likelihood 
+    - iterate over possible parameter values 
+    - identify the range of likelihoods summing to 0.95
+- Bayesian Credible Intervals
+    - region including highest 95% of posterior density
+
+
+## Calculating True Confidence Intervals
+
+<div class="columns-2">
+
+INSERT DISRIBUTION WITH TWO TAILS SHADED
+
+- 2 is an approximation
+- True value is 1.96 for a normal distribution (infinite sample size/true population distribution)
+- Samples rely on the *t*-distribution
+- Increase width of CI for smaller sample size
+
+
+</center>
+
+## Calculating True Confidence Intervals
+
+- Multiply the SE by the value of *t* encompassing 95% for a *t* distribution with a given # of degrees of freedom (e.g. a given sample size).
+
+```{r t_plot, message=FALSE, fig.height=3.5, echo=FALSE, warning=FALSE}
+x <- seq(-3, 3, by = 0.001)
+
+sim <- data_frame(df = c(2, 10, 50)) %>%
+  group_by(df) %>%
+  do(data_frame(x = x, y = dt(x, .$df))) %>%
+  mutate(Parameters = paste0("df = ", df)) %>%
+  ungroup() %>%
+  mutate(Parameters = factor(Parameters, levels = unique(Parameters)))
+
+norm <- data_frame(
+  x = x,
+  y = dnorm(x, 0, 1)
+)
+
+pal <- wes_palette("Moonrise3", 3, type = "discrete")
+
+ggplot() +
+  geom_line(data = sim, aes(x, y, color = Parameters), size = 1.5) +
+  geom_line(data = norm, aes(x, y)) +
+  scale_color_manual(values = pal, name = "Degrees of\nFreedom") +
+  labs(x = "x", y = "Relative Likelihood") +
+  theme(legend.position = c(0.9, 0.75))
+```
+
+
+
+## Calculating True Confidence Intervals
+
+
+```{r}
+
+qt(0.975, 10-1)
+
+qt(0.975, 100-1)
+
+qt(0.975, 1000000000-1)
+
+qnorm(0.975,0,1)
+
+```
+
+
+## Bayesian Credible Intervals
+
+- Bayesian methods sample parameter space
+    - MCMC is most common
+- Propose a change
+- Calculate the Likelihood of current & proposed
+- Move there with probability --
+
+
+
+## Interpreting Intervals
+
 
