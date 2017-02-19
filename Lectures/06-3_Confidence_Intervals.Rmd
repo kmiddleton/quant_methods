@@ -12,11 +12,11 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
-
 library(tidyverse)
 library(cowplot)
 library(wesanderson)
-
+library(rethinking)
+source("Shade_Distributions.R")
 ```
 
 ## Notes
@@ -30,34 +30,44 @@ library(wesanderson)
     
 ## Readings
 
-## Confidence Intervals are a Measure of the Uncertainty Associated with a Parameter Estimate
+## Confidence intervals measure the uncertainty in a parameter estimate
 
 - Analytical  
-    - approximate calculation relying on SE 
+    - Approximate calculation relying on 2 * SE 
+    - Exact calculate using a critical *t*-value
 - Maximum Likelihood 
-    - iterate over possible parameter values 
-    - identify the range of likelihoods summing to 0.95
+    - Iterate over possible parameter values 
+    - Identify the range of likelihoods summing to 0.95
 - Bayesian Credible Intervals
-    - region including highest 95% of posterior density
+    - Region including highest 95% of posterior density
 
-
-## Calculating True Confidence Intervals
+## Calculating exact confidence intervals
 
 <div class="columns-2">
 
-INSERT DISRIBUTION WITH TWO TAILS SHADED
+```{r, echo=FALSE, fig.width = 4}
+shade_normal(0.025)
+```
 
 - 2 is an approximation
-- True value is 1.96 for a normal distribution (infinite sample size/true population distribution)
+- True value is ~1.96 for a normal distribution (infinite sample size/true population distribution)
 - Samples rely on the *t*-distribution
 - Increase width of CI for smaller sample size
 
-
 </center>
 
-## Calculating True Confidence Intervals
+## Calculating exact confidence intervals
 
-- Multiply the SE by the value of *t* encompassing 95% for a *t* distribution with a given # of degrees of freedom (e.g. a given sample size).
+```{r echo=FALSE}
+shade_t(0.025, 5) +
+  ggtitle(TeX("$t$-distribution with df = 5"))
+```
+
+Need the critical value that marks the 2.5% cutoff at either end.
+
+## Calculating exact confidence intervals
+
+Multiply the SE by the *t*-value encompassing 95% for a *t* distribution with a given # of degrees of freedom (e.g., a given sample size).
 
 ```{r t_plot, message=FALSE, fig.height=3.5, echo=FALSE, warning=FALSE}
 x <- seq(-3, 3, by = 0.001)
@@ -84,34 +94,183 @@ ggplot() +
   theme(legend.position = c(0.9, 0.75))
 ```
 
-
-
-## Calculating True Confidence Intervals
-
+## Calculating exact confidence intervals
 
 ```{r}
+qt(0.975, 10 - 1)
 
-qt(0.975, 10-1)
+qt(0.975, 100 - 1)
 
-qt(0.975, 100-1)
+qt(0.975, 1000000000 - 1)
 
-qt(0.975, 1000000000-1)
-
-qnorm(0.975,0,1)
-
+qnorm(0.975, 0, 1)
 ```
 
+## 95% CI for snake undulation (*n* = 8)
+
+```{r}
+undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
+undulation_mean <- mean(undulation_rate)
+undulation_SEM <- sd(undulation_rate) / sqrt(length(undulation_rate))
+(crit <- qt(0.025, df = 7, lower.tail = FALSE))
+lower <- undulation_mean - crit * undulation_SEM
+upper <- undulation_mean + crit * undulation_SEM
+c(lower, undulation_mean, upper)
+```
 
 ## Bayesian Credible Intervals
 
-- Bayesian methods sample parameter space
-    - MCMC is most common
-- Propose a change
-- Calculate the Likelihood of current & proposed
-- Move there with probability --
+- Summarize the posterior distributions of Bayesian analyses
+- Range of the most plausible estimates given the model
+- XX% highest density interval
+- XX% quantile
 
+## MCMC sampling
+
+- Most general way to do Bayesian inference
+- No complicated integrals
+- Requires time and computational power
+
+## MCMC sampling
+
+```{r echo=TRUE, cache=TRUE}
+fm <- map2stan(
+  alist(
+    undulation_rate ~ dnorm(mu, sigma),
+    mu ~ cauchy(0, 5),
+    sigma ~ cauchy(0, 5)
+  ),
+  data = list(undulation_rate = undulation_rate),
+  iter = 1e4,
+  warmup = 1e3,
+  WAIC = FALSE
+)
+```
+
+## MCMC sampling output
+
+```{r echo=FALSE, fig.height = 3}
+rstan::traceplot(fm@stanfit, pars = c("mu", "sigma"))
+```
+
+## MCMC sampling
+
+```{r echo=FALSE}
+post <- as.data.frame(extract.samples(fm)) %>% 
+  mutate(Sample = 1:length(mu))
+
+post %>% 
+  slice(1:20) %>% 
+  gather(variable, value, -Sample) %>% 
+  ggplot(aes(Sample, value)) +
+  geom_line() +
+  facet_grid(variable ~ ., scales = "free")
+```
+
+## MCMC method
+
+- Current position (has a likelihood)
+- Propose a change (has a likelihood)
+- Move to proposed values with probability proportional to their ratio
+- "Bad" jumps are possible with some non-zero probability
+
+## Current estimates
+
+Sample 1:
+
+```{r}
+post[1, ]
+rel_liks <- dnorm(undulation_rate, mean = post$mu[1],
+                  sd = post$sigma[1])
+(current_ll <- sum(log(rel_liks)))
+```
+
+## Proposed estimates
+
+```{r}
+mu_prop <- 1.37
+sigma_prop <- 0.3
+rel_liks <- dnorm(undulation_rate, mean = mu_prop,
+                  sd = sigma_prop)
+(proposed_ll <- sum(log(rel_liks)))
+```
+
+```{r}
+exp(proposed_ll) / exp(current_ll)
+```
+
+Ratio > 1, so definitely move.
+
+```{r}
+current_ll <- proposed_ll
+```
+
+## Proposed estimates
+
+```{r}
+rel_liks <- dnorm(undulation_rate, mean = 1.5, sd = 0.22)
+proposed_ll <- sum(log(rel_liks))
+exp(proposed_ll) / exp(current_ll)
+```
+
+Ratio < 1, so the probability of moving equal the ratio (here ~10%).
+
+- This allows moves to lower likelihood estimates (as long as the probability of moving is not too small).
+
+## MCMC sampling
+
+The samples will oscillate around the most probable estimates, in proportion to their probabilities.
+
+```{r echo=FALSE, fig.height = 4}
+post <- as.data.frame(extract.samples(fm)) %>% 
+  mutate(Sample = 1:length(mu))
+
+post %>% 
+  slice(1:100) %>% 
+  gather(variable, value, -Sample) %>% 
+  ggplot(aes(Sample, value)) +
+  geom_line() +
+  facet_grid(variable ~ ., scales = "free")
+```
+
+## Bayesian credible intervals
+
+Posterior distribution of mean undulation, given, the model (including priors) and data:
+
+```{r, echo=FALSE}
+p <- post %>% 
+  select(mu) %>% 
+  ggplot(aes(mu)) +
+  geom_line(stat = "density") +
+  labs(y = "Relative Likelihood")
+p
+```
+
+## Bayesian credible intervals
+
+95% Highest density interval is the most probable location for the mean (given the model and the data).
+
+```{r echo=FALSE, fig.height=3.5}
+(cred <- HPDI(post$mu, prob = 0.95))
+p + 
+  geom_vline(xintercept = cred, color = "coral", size = 1.5)
+```
 
 
 ## Interpreting Intervals
 
+Frequentist interval: `r round(lower, 2)` -- `r round(upper, 2)`
 
+- Future similar experiments and samples
+- Does not indicate the probablity of the parameter
+
+Bayesian interval: `r round(cred[1], 2)` -- `r round(cred[2], 2)`
+
+- These data and this model
+- Relative probability within a region
+
+## Quiz 06-3
+
+Complete quiz 06-3.
+
+Move on to Lecture 06-4.
