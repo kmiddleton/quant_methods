@@ -1,5 +1,5 @@
 ---
-title: "Difference of Means"
+title: "Applications of Inference Frameworks: Difference of Means"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -16,7 +16,6 @@ library(tidyverse)
 library(cowplot)
 library(rethinking)
 library(latex2exp)
-library(BEST)
 library(wesanderson)
 ```
 
@@ -385,7 +384,7 @@ HL %>% group_by(group) %>%
 
 ```{r echo=FALSE, fig.height = 2}
 diff <- alive - dead
-hdint <- hdi(diff)
+hdint <- HPDI(diff)
 
 data_frame(diff) %>% 
   ggplot(aes(diff)) +
@@ -396,7 +395,7 @@ data_frame(diff) %>%
 ```
 
 ```{r}
-hdi(diff)
+HPDI(diff, prob = 0.95)
 ```
 
 ## Quiz 05-2
