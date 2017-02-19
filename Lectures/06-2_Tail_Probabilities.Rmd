@@ -1,0 +1,44 @@
+---
+title: "Hypothesis Testing"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+```
+
+## Notes
+
+2. Understand tail probabilities
+    - Pull from problem set (PS 3)
+    - Quantile and critical values for t
+    - F, Chisq
+
+## Readings
+
+## Example from problem set
+
+## Tail probabilities
+
+```{r}
+x <- seq(0.0, 0.1699, 0.0001)   
+ytop <- dnorm(0.12, 0.08, 0.02)
+MyDF <- data.frame(x = x, y = dnorm(x, 0.08, 0.02))
+shade <- rbind(c(0.12, 0), subset(MyDF, x > 0.12),
+               c(MyDF[nrow(MyDF), "X"], 0))
+
+#Then use this new data.frame with geom_polygon
+ggplot(MyDF, aes(x, y)) +
+  geom_line() +
+  geom_segment(aes(x=0.12,y=0,xend=0.12,yend=ytop)) +
+     geom_polygon(data = shade, aes(x, y))
+ 
+```
+

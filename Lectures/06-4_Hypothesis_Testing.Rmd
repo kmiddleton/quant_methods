@@ -1,0 +1,30 @@
+---
+title: "Hypothesis Testing"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+```
+
+## Notes
+
+4. Hypotheses
+    - What is a hypothesis test in each framework?
+    - A priori hypotheses, one/two tailed
+    - Back to summary(lm())
+    - Understand philosophical and practical aspects of NHST
+        - Ioannidis
+        - Selection bias
+        - "Researcher" df
+        - Stopping rules
+
+## Readings
+

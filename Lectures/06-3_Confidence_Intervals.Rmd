@@ -1,0 +1,31 @@
+---
+title: "Confidence Intervals"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+```
+
+## Notes
+
+3. Calculate precise CIs
+    - t-test equation
+    - Precise CI
+        - What does this mean?
+    - Output of summary(lm())
+        - Tests of slopes in allometry
+    - Bayes credible intervals
+        - ?? MCMC sampling?
+        - King Markov
+    - Mention ML intervals??
+
+## Readings
+

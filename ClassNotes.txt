@@ -178,9 +178,33 @@ http://www.fharrell.com/2017/02/a-litany-of-problems-with-p-values.html
 
 Goals:
 
-    - OLS, t-test, ANOVA
-    - Philosophical aspects of NHST
-
+1. Understand distinction between parameter estimate and interval estimate and hypothesis test
+    - Parameter estimation, interval estimation, hypothesis testing
+    - Real world examples
+    - Back to t-test / lm example for parameter estimation only
+        - Equality of estimates
+2. Understand tail probabilities
+    - Pull from problem set
+    - Quantile and critical values for t
+    - F, Chisq
+3. Calculate precise CIs
+    - t-test equation
+    - Precise CI
+        - What does this mean?
+    - Output of summary(lm())
+    - Bayes credible intervals
+        - ?? MCMC sampling?
+        - King Markov
+    - Mention ML intervals??
+4. Hypotheses
+    - What is a hypothesis test in each framework?
+    - A priori hypotheses, one/two tailed
+    - Back to summary(lm())
+    - Understand philosophical and practical aspects of NHST
+        - Ioannidis
+        - Selection bias
+        - "Researcher" df
+        - Stopping rules
 ---
 
 Week 7: Randomization, multiple testing
@@ -189,12 +213,15 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC379178/
 
 Goals:
 
+    - Example of when it didn't work: randomizing reads
     - Churchill paper
     - Storey
+    - glht, tukey HSD
 
 Problem set:
 
     - Simple permutation test
+    -
 
 
 ---
@@ -250,6 +277,8 @@ Goals:
 Week 15: Experimental design
 
 mouse example subsample n
+
+Chisq goodness of fit vs. sample size
 
 Goals:
 
