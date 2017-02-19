@@ -12,6 +12,10 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+source("Shade_Distributions.R")
+
 ```
 
 ## Notes
@@ -32,4 +36,172 @@ bibliography: Multivariate.bib
         - Stopping rules
 
 ## Readings
+
+## Hypotheses
+
+**Hypothesis**: a statement that can be either true or false
+
+**Statistical hypothesis**: a hypothesis about about a parameter (or parameters) of a population or process
+
+- Many statistical analyses have the goal of performing a hypothesis test.
+
+**Three Frameworks** : Analytical, Maximum Likelihood, Bayesian
+
+## Analytical
+
+- Calculate test statistic
+- Determine P - value (area under tail(s))
+
+<div class="columns-2">
+
+```{r, echo=FALSE, fig.height=3.7,fig.width=3.5}
+shade_t(0.025, 10,tail = "both")
+```
+
+```{r, echo=FALSE, fig.height=3.7,fig.width=3.5}
+shade_t(0.05, 10,tail = "upper")
+```
+
+</center>
+
+## One sided or two-sided tests
+
+Data will always be on one side of H~0~ or the other.
+
+**One-sided test** ("one-tailed"):
+
+- Appropriate when we have an *a priori* hypothesis of the direction of change
+
+- You need justification and to be explicit about it, when you report a one-sided test.
+
+**Two-sided test** ("two-tailed"):
+
+- *Appropriate at all other times.*
+- Multiply the one-sided *P* by 2.
+    - Don't forget to do this.
+
+## Analytical
+
+- Calculate test statistic
+- Determine P - value (area under tail(s))
+
+<div class="columns-2">
+
+```{r, echo=FALSE, fig.height=3.7,fig.width=3.5}
+shade_t(0.15, 10,tail = "both") +
+  ggtitle("P = 0.3")
+```
+
+```{r, echo=FALSE, fig.height=3.7,fig.width=3.5}
+shade_t(0.005, 10,tail = "both") +
+    ggtitle("P = 0.01")
+
+```
+
+</center>
+
+
+
+## Maximum Likelihood
+
+- Does a given model explain significantly more variation than a model with fewer parameters?
+
+- Likelihood ratios
+    - Likelihood of Model 2 (more parameters)/Likelihood of Model 1 (fewer parameters)
+    - Follow a $\chi^2$ Distribution (df = difference in number of parameters)
+
+*Stay Tuned for Model Comparisons*
+
+## Bayesian Inference
+
+- Does the Credible Interval of a given parameter estimate encompass the value in question. e.g.:
+    -  Does the credible interval for the difference in means include zero?
+    -  Does the credible interval for the parameter estimate include 98.6?
+
+
+## Example: Scaling Relationships
+
+
+
+
+
+
+
+## Types of errors and statistical power
+
+|               | Reject H~0~    | Fail to reject H~0~   |
+|--------------:|:--------------:|:---------------------:|
+|H~0~ is true   | Type I error   | *Correct*             |
+|H~0~ is false  | *Correct*      | Type II error         |
+
+Type I error occurs when:
+
+- *P* is small by *random chance*, given that $\alpha$ is chosen ahead of the test
+
+Type II error probability depends on:
+
+- The value of $\alpha$
+- How "wrong" H~0~ is
+
+## Power
+
+- Probability that a random sample will lead to a rejection of H~0~
+- Dependent on how different the truth is from the null hypothesis
+- Inversely related to type II errors
+    - High power $\rightarrow$ low type II errors
+    - Low power $\rightarrow$ high type II errors
+- Power analysis will come later (Experimental Design, etc.)
+
+## Controversy
+
+Philosophical and practical problems have been raised since the 1960's.
+
+- In 1986, the *American Journal of Public Health* told all researchers wanting to publish in the journal that he would no longer accept results based on *P*-values (and then backed down 2 years later)
+- *Basic and Applied Social Psychology* banned *P*-values in 2015
+- Increased interest in Bayesian inference (as opposed to frequentist inference)
+    - Our desire to make hard conclusions is not solved simply by using Bayesian approaches
+
+## History
+
+- K. Pearson: Pearson's correlation, $\chi^2$, eugenics
+- Fisher: Fisher's exact test, "null hypothesis", ANOVA (*F*)
+- Gosset: *t* distribution, Student's *t*-tests, Guinness
+- Neyman and E. Pearson: "null hypothesis" testing, confidence intervals
+
+The modern idea is traced to these statisticians, but has been warped into something different:
+
+- Test statistics (*F*, *t*, $\chi^2$) applied to Neyman-Pearson "null hypotheses"
+- H~0~ becomes a straw man hypothesis of no difference or no effect
+
+## Problem with *P*-values
+
+- Originally an informal concept that got co-opted for what became null hypothesis sigificance testing
+- Apparent objectivity but actually arbitrary and dependent on the data collected and not collected
+- Experimental biases (experimenter introduced, sample size)
+- Science-wide publication bias
+
+## Science-wide publication bias | Ioannidis [-@ioannidis_why_2005] {.smaller}
+
+Corollary 1: The smaller the studies conducted in a scientific field, the less likely the research findings are to be true.
+
+Corollary 2: The smaller the effect sizes in a scientific field, the less likely the research findings are to be true.
+
+Corollary 3: The greater the number and the lesser the selection of tested relationships in a scientific field, the less likely the research findings are to be true.
+
+Corollary 4: The greater the flexibility in designs, definitions, outcomes, and analytical modes in a scientific field, the less likely the research findings are to be true.
+
+Corollary 5: The greater the financial and other interests and prejudices in a scientific field, the less likely the research findings are to be true.
+
+Corollary 6: The hotter a scientific field (with more scientific teams involved), the less likely the research findings are to be true.
+
+## Other approaches
+
+1. Report parameter estimates & confidence intervals only 
+1. Model selection  
+1. Either of above could be done in a Likelihood or Bayesian Framework
+
+
+
+
+
 
