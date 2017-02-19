@@ -18,24 +18,20 @@ source("Shade_Distributions.R")
 
 ```
 
-## Notes
-
-4. Hypotheses
-    - What is a hypothesis test in each framework?
-    - A priori hypotheses, one/two tailed
-    - Back to summary(lm())
-  
-      - Output of summary(lm())
-        - t-test equation
-        - Tests of slopes in allometry
-  
-    - Understand philosophical and practical aspects of NHST
-        - Ioannidis
-        - Selection bias
-        - "Researcher" df
-        - Stopping rules
-
 ## Readings
+
+- Gelman and Loken [-@Gelman2014-ng]: The statistical crisis in science
+- Nuzzo [-@Nuzzo2014-ey]: Statistical errors
+
+## Additional (not required) resources (see Canvas) {.smaller}
+
+- Curran-Everett and Benos [-@Curran-Everett2007-nk]: Guidelines for reporting statistics in journals published by the *American Physiological Society*: the sequel
+- Gelman and Stern [-@Gelman2006-xj]: The difference between "significant" and "not significant" is not itself statistically significant
+- Ioannidis [-@Ioannidis2005-od]: Why most published research findings are false
+- Jager and Leek [-@Jager2013-lw]: An estimate of the science-wise false discovery rate and application to the top medical literature
+- Kruschke [-@Kruschke2010-xg]: What to believe: Bayesian methods for data analysis
+- Leek and Peng [-@Leek2015-xj]: *P* values are just the tip of the iceberg
+- Young et al. [-@Young2008-gy]: Why current publication practices may distort science
 
 ## Hypotheses
 
@@ -108,24 +104,185 @@ shade_t(0.005, 10,tail = "both") +
 
 - Likelihood ratios
     - Likelihood of Model 2 (more parameters)/Likelihood of Model 1 (fewer parameters)
-    - Follow a $\chi^2$ Distribution (df = difference in number of parameters)
+    - Follow a $\chi^2$ Distribution (df = difference in number of estimated parameters)
 
 *Stay Tuned for Model Comparisons*
 
 ## Bayesian Inference
 
-- Does the Credible Interval of a given parameter estimate encompass the value in question. e.g.:
+- Does the Credible Interval of a given parameter estimate encompass the value in question. e.g.,:
     -  Does the credible interval for the difference in means include zero?
     -  Does the credible interval for the parameter estimate include 98.6?
 
 
-## Example: Scaling Relationships
+## Tests of arbitrary slopes and intercepts
 
+$$t = \frac{b - \beta_{0}}{\mbox{SE}_{b}}$$
 
+is a general equation that can be used to test any null hypothesized parameter estimate.
 
+- $b$ is the parameter estimate, $\beta_0$ is the null hypothesized value (often and by default $\beta_0 = 0$)
+- Analyses of allometry: the study of scaling relationships
 
+## PanTHERIA: Database of mammal life history data
 
+Data from Jones et al [-@Jones2009-vg]
 
+```{r load_mammals, echo=FALSE, message=FALSE}
+# Load mammals data
+mammals <- read_delim("../data/mammals.txt", delim = "\t")
+names(mammals) <- sub("^[0-9]*-[0-9]*_", "", names(mammals))
+names(mammals) <- sub("MSW05_", "", names(mammals))
+mammals <- mammals %>%
+  dplyr::select(Order, Binomial, AdultBodyMass_g, 
+                AdultForearmLen_mm)
+names(mammals) <- gsub("([A-Z])", "_\\L\\1", names(mammals),
+                       perl = TRUE)
+names(mammals) <- gsub("^_", "", names(mammals),
+                       perl = TRUE)
+mammals[mammals == -999] <- NA
+names(mammals)[names(mammals) == "binomial"] <- "species"
+
+# Drop a bunch of incomplete cases
+mammals <- mammals %>% drop_na()
+names(mammals) <- c("Order", "Species", "Mass", "Forearm")
+```
+
+*AdultBodyMass_g*: Mass of adult (or age unspecified) live or freshly-killed specimens (excluding pregnant females) using captive, wild, provisioned, or unspecified populations; male, female, or sex unspecified individuals; primary, secondary, or extrapolated sources; all measures of central tendency; in all localities.
+
+*AdultForearmLen_mm*: Total length from elbow to wrist of adult (or age unspecified) live, freshly-killed, or museum specimens using captive, wild, provisioned, or unspecified populations; male, female, or sex unspecified individuals; primary, secondary, or extrapolated sources; all measures of central tendency; in all localities.
+
+## Examine the data
+
+```{r}
+glimpse(mammals)
+```
+
+## Preliminary plotting
+
+```{r mammals_raw_plot, eval=TRUE, echo=FALSE}
+ggplot(mammals, aes(x = Mass, y = Forearm, color = Order)) +
+  geom_point() +
+  xlab("Adult Body Mass (g)") +
+  ylab("Adult Forearm Length (mm)")
+```
+
+## Drop the really large mammals
+
+Observations:
+
+1. Very few large mammals in the sample
+1. "Large" mammals (> 5 kg) might have a different scaling pattern from the smaller ones (at least in the sample)
+1. Only bats remain
+
+```{r}
+# Drop all rows with Mass >= 5000 g
+mammals <- mammals %>% filter(Mass <= 5000)
+```
+
+## Replot
+
+```{r echo=FALSE}
+ggplot(mammals, aes(x = Mass, y = Forearm)) +
+  geom_point() +
+  xlab("Adult Body Mass (g)") +
+  ylab("Adult Forearm Length (mm)")
+```
+
+## Scaling relationships
+
+> "In biology, constancy in shape with change in size is termed *isometric growth* (or *isometry*), the usual null hypothesis in morphological scaling studies." LaBarbera [-@LaBarbera1989-hn]
+
+Lengths are linearly proportional to lengths:
+
+$$L_1 \propto L_2$$
+
+Area is proportional to a length squared:
+
+$$A \propto L^2$$
+
+Volume (mass) is proportional to a length cubed:
+
+$$V \propto L^3$$
+
+## Log transformation
+
+The power law relationship:
+
+$$Y = a \centerdot M^b$$
+
+Can be linearized by logging (natural or otherwise) both sides of the equation:
+
+$$\log{Y} = \log{a} + b \log{M}$$
+
+## Plotting on log-log scale
+
+```{r mammals_log_plot, eval=FALSE}
+ggplot(mammals, aes(x = Mass, y = Forearm)) +
+  geom_point() +
+  xlab("Adult Body Mass (g)") +
+  ylab("Adult Forearm Length (mm)") +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+## Plotting on log-log scale
+
+```{r ref.label="mammals_log_plot", echo=FALSE}
+```
+
+## Caution about working in log space
+
+In this case log~10~:
+
+> "It is probably difficult, for example, to appreciate that points quite close together, such as with log values of 4.90 and 4.60, are the difference on a linear scale between about 79,000 and 40,000." Smith [-@Smith1984-gp]
+
+## Log-transformation
+
+```{r}
+mammals <- mammals %>%
+  mutate(log_Mass = log10(Mass),
+         log_Forearm = log10(Forearm))
+glimpse(mammals)
+```
+
+## OLS regression on logged data {.smaller}
+
+```{r}
+fm <- lm(log_Forearm ~ log_Mass, data = mammals)
+summary(fm)
+```
+
+## Test of a specific slope
+
+Isometric slope $= \beta_0 = Mass^{1/3}$
+
+$$t = \frac{b - \beta_0}{SE_b}$$
+
+```
+            Estimate Std. Error t value Pr(>|t|)
+log_Mass    0.307339   0.004427   69.42   <2e-16
+```
+
+```{r}
+(t_value <- (0.307339 - (1 / 3)) / 0.004427)
+2 * pt(t_value, df = 658 - 2)
+```
+
+## Caveats
+
+Think about your power to detect an effect.
+
+- Context for "not significant" results.
+- Context for "significant" results.
+
+Think about error in measurement of Body Mass
+
+- OLS regression assumes $x$ measured with no error.
+
+Think about independence of observations
+
+- Bats are phylogenetically closely related
 
 ## Types of errors and statistical power
 
@@ -158,15 +315,14 @@ Philosophical and practical problems have been raised since the 1960's.
 
 - In 1986, the *American Journal of Public Health* told all researchers wanting to publish in the journal that he would no longer accept results based on *P*-values (and then backed down 2 years later)
 - *Basic and Applied Social Psychology* banned *P*-values in 2015
-- Increased interest in Bayesian inference (as opposed to frequentist inference)
-    - Our desire to make hard conclusions is not solved simply by using Bayesian approaches
+- In 2016, the American Statistical Association published a "Statement on p-Values: Context, Process, and Purpose" which critiqued the (mis)use of *P*-values.
 
 ## History
 
 - K. Pearson: Pearson's correlation, $\chi^2$, eugenics
 - Fisher: Fisher's exact test, "null hypothesis", ANOVA (*F*)
 - Gosset: *t* distribution, Student's *t*-tests, Guinness
-- Neyman and E. Pearson: "null hypothesis" testing, confidence intervals
+- Neyman and E. Pearson: "null hypothesis" testing, confidence intervals, decision theory
 
 The modern idea is traced to these statisticians, but has been warped into something different:
 
@@ -175,33 +331,33 @@ The modern idea is traced to these statisticians, but has been warped into somet
 
 ## Problem with *P*-values
 
-- Originally an informal concept that got co-opted for what became null hypothesis sigificance testing
+- Originally an informal concept that got co-opted for what became null hypothesis sigificance testing (NHST)
 - Apparent objectivity but actually arbitrary and dependent on the data collected and not collected
 - Experimental biases (experimenter introduced, sample size)
 - Science-wide publication bias
 
-## Science-wide publication bias | Ioannidis [-@ioannidis_why_2005] {.smaller}
+## Science-wide publication bias {.smaller}
 
-Corollary 1: The smaller the studies conducted in a scientific field, the less likely the research findings are to be true.
+Corollaries proposed by Ioannidis [-@Ioannidis2005-od]:
 
-Corollary 2: The smaller the effect sizes in a scientific field, the less likely the research findings are to be true.
+1. The smaller the studies conducted in a scientific field, the less likely the research findings are to be true.
+2. The smaller the effect sizes in a scientific field, the less likely the research findings are to be true.
+3. The greater the number and the lesser the selection of tested relationships in a scientific field, the less likely the research findings are to be true.
+4. The greater the flexibility in designs, definitions, outcomes, and analytical modes in a scientific field, the less likely the research findings are to be true.
+5. The greater the financial and other interests and prejudices in a scientific field, the less likely the research findings are to be true.
+6. The hotter a scientific field (with more scientific teams involved), the less likely the research findings are to be true.
 
-Corollary 3: The greater the number and the lesser the selection of tested relationships in a scientific field, the less likely the research findings are to be true.
+## Alternative suggested approaches
 
-Corollary 4: The greater the flexibility in designs, definitions, outcomes, and analytical modes in a scientific field, the less likely the research findings are to be true.
+Preregistration of experimental designs
 
-Corollary 5: The greater the financial and other interests and prejudices in a scientific field, the less likely the research findings are to be true.
+1. Report parameter estimates and confidence intervals only 
+1. Model selection
 
-Corollary 6: The hotter a scientific field (with more scientific teams involved), the less likely the research findings are to be true.
+Either of above could be done in a Likelihood or Bayesian Framework
 
-## Other approaches
+## Quiz 06-3
 
-1. Report parameter estimates & confidence intervals only 
-1. Model selection  
-1. Either of above could be done in a Likelihood or Bayesian Framework
+Complete Quiz 06-3 on Canvas.
 
-
-
-
-
-
+## References {.references}
