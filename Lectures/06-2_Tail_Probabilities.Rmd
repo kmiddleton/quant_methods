@@ -1,5 +1,5 @@
 ---
-title: "Hypothesis Testing"
+title: "Tail Probabilities"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -19,10 +19,6 @@ source("Shade_Distributions.R")
 
 ## Notes
 
-2. Understand tail probabilities
-    - Pull from problem set (PS 3)
-    - Quantile and critical values for t
-    - F, Chisq
 
 ## Readings
 
@@ -78,21 +74,47 @@ shade_normal(0.025, tail = "both")
 qt(0.025, 5)
 ```
 
-## t
+## *t* Distribution
 
 ```{r}
 shade_t(0.025, 5)
 ```
 
-## F
+## *F* Distribution
 
 ```{r}
 shade_F(0.05, 2, 10)
 ```
 
-## $\chi^2$
+## $\chi^2$ Distribution
 
 ```{r}
 shade_chisq(0.05, 2)
 ```
+
+## Why do we always use 0.05 or 0.025?
+
+5% is a special number  - the consensus threshold for statistical significance
+
+<div class="columns-2">
+
+```{r, echo=FALSE, fig.height=3.5,fig.width=3.5}
+shade_normal(0.025, tail = "both")
+```
+
+```{r, echo=FALSE, fig.height=3.5,fig.width=3.5}
+shade_normal(0.05, tail = "upper")
+```
+
+</center>
+
+## We could choose any probability for any distribution
+
+```{r, fig.height=3.5}
+shade_normal(0.34, tail='upper')
+```
+
+## No Quiz
+
+Watch Lecture 06-3
 
