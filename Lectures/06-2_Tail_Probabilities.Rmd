@@ -64,27 +64,30 @@ Compare the values returned by `pnorm()` to those you calculated manually above.
 
 ## Tail probabilities
 
-```{r}
+```{r fig.height = 3}
 shade_normal(0.025, tail = "both")
-qt(0.025, 5)
+qnorm(0.025)
 ```
 
 ## *t* Distribution
 
-```{r}
-shade_t(0.025, 5)
+```{r fig.height = 3}
+shade_t(0.025, df = 5)
+qt(0.025, df = 5)
 ```
 
 ## *F* Distribution
 
-```{r}
-shade_F(0.05, 2, 10)
+```{r fig.height = 3}
+shade_F(0.05, df1 = 2, df2 = 10)
+qf(0.05, df1 = 2, df2 = 10, lower.tail = FALSE)
 ```
 
 ## $\chi^2$ Distribution
 
-```{r}
-shade_chisq(0.05, 2)
+```{r fig.height = 3}
+shade_chisq(0.05, df = 2)
+qchisq(0.05, df = 2, lower.tail = FALSE)
 ```
 
 ## Why do we always use 0.05 or 0.025?

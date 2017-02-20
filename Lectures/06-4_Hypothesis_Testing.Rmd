@@ -356,8 +356,10 @@ Preregistration of experimental designs
 
 Either of above could be done in a Likelihood or Bayesian Framework
 
-## Quiz 06-3
+## Quiz 06-4
 
-Complete Quiz 06-3 on Canvas.
+Complete Quiz 06-4 on Canvas.
+
+This is the final lecture of the week.
 
 ## References {.references}

@@ -259,6 +259,6 @@ Bayesian interval: `r round(cred[1], 2)` -- `r round(cred[2], 2)`
 
 ## Quiz 06-3
 
-Complete quiz 06-4.
+Complete quiz 06-3.
 
 Move on to Lecture 06-4.
