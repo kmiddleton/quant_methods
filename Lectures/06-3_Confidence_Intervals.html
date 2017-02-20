@@ -95,7 +95,7 @@
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
       <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
       <p data-config-presenter><!-- populated from slide_config.json --></p>
-            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-02-19</p>
+            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-02-20</p>
           </hgroup>
   </slide>
 
@@ -273,8 +273,8 @@ c(lower, undulation_mean, upper)</pre>
 ## 1 1.38262 0.3348651      1</pre>
 
 <pre class = 'prettyprint lang-r'>rel_liks &lt;- dnorm(undulation_rate, mean = post$mu[1],
-                  sd = post$sigma[1])
-(current_ll &lt;- sum(log(rel_liks)))</pre>
+                  sd = post$sigma[1], log = TRUE)
+(current_ll &lt;- sum(rel_liks))</pre>
 
 <pre >## [1] -1.87867</pre>
 
@@ -283,8 +283,8 @@ c(lower, undulation_mean, upper)</pre>
 <pre class = 'prettyprint lang-r'>mu_prop &lt;- 1.37
 sigma_prop &lt;- 0.3
 rel_liks &lt;- dnorm(undulation_rate, mean = mu_prop,
-                  sd = sigma_prop)
-(proposed_ll &lt;- sum(log(rel_liks)))</pre>
+                  sd = sigma_prop, log = TRUE)
+(proposed_ll &lt;- sum(rel_liks))</pre>
 
 <pre >## [1] -1.80417</pre>
 
@@ -298,13 +298,14 @@ rel_liks &lt;- dnorm(undulation_rate, mean = mu_prop,
 
 </article></slide><slide class=''><hgroup><h2>Proposed estimates</h2></hgroup><article  id="proposed-estimates-1">
 
-<pre class = 'prettyprint lang-r'>rel_liks &lt;- dnorm(undulation_rate, mean = 1.5, sd = 0.22)
-proposed_ll &lt;- sum(log(rel_liks))
+<pre class = 'prettyprint lang-r'>proposed_ll &lt;- sum(dnorm(undulation_rate,
+                         mean = 1.5, sd = 0.22,
+                         log = TRUE))
 exp(proposed_ll) / exp(current_ll)</pre>
 
 <pre >## [1] 0.09840992</pre>
 
-<p>Ratio &lt; 1, so the probability of moving equal the ratio (here ~10%).</p>
+<p>Ratio &lt; 1, so the probability of moving is equal the ratio (here ~10%).</p>
 
 <ul>
 <li>This allows moves to lower likelihood estimates (as long as the probability of moving is not too small).</li>

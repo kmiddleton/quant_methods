@@ -170,8 +170,8 @@ Sample 1:
 ```{r}
 post[1, ]
 rel_liks <- dnorm(undulation_rate, mean = post$mu[1],
-                  sd = post$sigma[1])
-(current_ll <- sum(log(rel_liks)))
+                  sd = post$sigma[1], log = TRUE)
+(current_ll <- sum(rel_liks))
 ```
 
 ## Proposed estimates
@@ -180,8 +180,8 @@ rel_liks <- dnorm(undulation_rate, mean = post$mu[1],
 mu_prop <- 1.37
 sigma_prop <- 0.3
 rel_liks <- dnorm(undulation_rate, mean = mu_prop,
-                  sd = sigma_prop)
-(proposed_ll <- sum(log(rel_liks)))
+                  sd = sigma_prop, log = TRUE)
+(proposed_ll <- sum(rel_liks))
 ```
 
 ```{r}
@@ -197,12 +197,13 @@ current_ll <- proposed_ll
 ## Proposed estimates
 
 ```{r}
-rel_liks <- dnorm(undulation_rate, mean = 1.5, sd = 0.22)
-proposed_ll <- sum(log(rel_liks))
+proposed_ll <- sum(dnorm(undulation_rate,
+                         mean = 1.5, sd = 0.22,
+                         log = TRUE))
 exp(proposed_ll) / exp(current_ll)
 ```
 
-Ratio < 1, so the probability of moving equal the ratio (here ~10%).
+Ratio < 1, so the probability of moving is equal the ratio (here ~10%).
 
 - This allows moves to lower likelihood estimates (as long as the probability of moving is not too small).
 
