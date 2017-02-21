@@ -205,6 +205,18 @@ Goals:
         - Selection bias
         - "Researcher" df
         - Stopping rules
+
+Problem Set
+
+  - Analysis and get just signifcant result. Change and have be not significant. Write up results.
+      - Discussion of parameter estimates
+  - critial t vs. df plot
+  - Exact CI
+  - Regression with outliers
+  - -1 to estimate means for groups
+  - Relevel factor
+  - Loop through columns, make plots, plot_grid
+
 ---
 
 Week 7: Randomization, multiple testing
