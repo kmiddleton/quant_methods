@@ -1,0 +1,78 @@
+---
+title: 'Problem Set 06'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+# FIXME
+library(tidyverse)
+library(readxl)
+library(cowplot)
+```
+
+  - Analysis and get just signifcant result. Change and have be not significant. Write up results.
+      - Discussion of parameter estimates
+  - critial t vs. df plot
+  - Exact CI
+  - Regression with outliers
+  - -1 to estimate means for groups
+  - Relevel factor
+  - Loop through columns, make plots, plot_grid
+
+```{r}
+data("BrookTrout", package = "abd")
+summary(lm(proportion.surviving ~ trout, data = BrookTrout))
+
+ggplot(BrookTrout, aes(x = trout, y = proportion.surviving)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Trout", y = "Survival")
+
+# P = 0.0495
+n <- 15
+set.seed(1064)
+M1 <- data_frame(
+  Proportion_Surviving = c(rnorm(n, 0.28, 0.07),
+                           rnorm(n, 0.242, 0.07)),
+  Trout = factor(rep(c("Absent", "Present"), each = n))
+)
+
+ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Trout", y = "Survival")
+
+summary(lm(Proportion_Surviving ~ Trout, M1))
+
+# P = 0.0536
+n <- 15
+set.seed(1064)
+M1 <- data_frame(
+  Proportion_Surviving = c(rnorm(n, 0.282, 0.07),
+                           rnorm(n, 0.245, 0.07)),
+  Trout = factor(rep(c("Absent", "Present"), each = n))
+)
+
+ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Trout", y = "Survival")
+
+summary(lm(Proportion_Surviving ~ Trout, M1))
+
+```
+
+## 
