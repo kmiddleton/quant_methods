@@ -15,6 +15,8 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
+
+library(knitr)
 ```
 
   - Analysis and get just signifcant result. Change and have be not significant. Write up results.
@@ -26,17 +28,7 @@ library(cowplot)
   - Relevel factor
   - Loop through columns, make plots, plot_grid
 
-```{r}
-data("BrookTrout", package = "abd")
-summary(lm(proportion.surviving ~ trout, data = BrookTrout))
-
-ggplot(BrookTrout, aes(x = trout, y = proportion.surviving)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival")
-
+```{r echo=FALSE, eval=FALSE}
 # P = 0.0495
 n <- 15
 set.seed(1064)
@@ -45,34 +37,127 @@ M1 <- data_frame(
                            rnorm(n, 0.242, 0.07)),
   Trout = factor(rep(c("Absent", "Present"), each = n))
 )
+write_csv(M1, path = "../data/BrookTrout1.csv")
 
 ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
   stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival")
+  labs(x = "Trout", y = "Survival", title = "BrookTrout1")
 
 summary(lm(Proportion_Surviving ~ Trout, M1))
 
 # P = 0.0536
 n <- 15
 set.seed(1064)
-M1 <- data_frame(
+M2 <- data_frame(
   Proportion_Surviving = c(rnorm(n, 0.282, 0.07),
                            rnorm(n, 0.245, 0.07)),
   Trout = factor(rep(c("Absent", "Present"), each = n))
 )
+write_csv(M2, path = "../data/BrookTrout2.csv")
 
-ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
+ggplot(M2, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
   stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival")
+  labs(x = "Trout", y = "Survival", title = "BrookTrout2")
 
-summary(lm(Proportion_Surviving ~ Trout, M1))
-
+summary(lm(Proportion_Surviving ~ Trout, M2))
 ```
 
-## 
+## Brook trout
+
+You and a collaborator are studying the role of an introduced species (brook trout, *Salvelinus fontinalis*) on survival of native chinook salmon (*Oncorhynchus tshawytscha*). Because you are located at different universities, you each have a different set of streams to sample. Independently, each of you measures survivorship of chinook salmon in 15 streams that have introduced brook trout and in 15 streams that are free of brook trout. To estimate survivorship (percent alive), you released an equal number of tagged juvenile chinook salmon into each stream and then resampled over the course of a year.
+
+The two data files are:
+
+1. Your data: `BrookTrout1.csv`
+2. You collaborator's data: `BrookTrout2.csv`
+
+### Activity
+
+Load each of the files into R.
+
+```{r}
+# FIXME
+BT1 <- read_csv("../data/BrookTrout1.csv")
+BT2 <- read_csv("../data/BrookTrout2.csv")
+```
+
+Make a plot of each data set using the same ggplot code you used to visualized the stalk-eyed fly data in Problem Set 5. Plot the raw data (points) for the two groups (trout `Absent` and `Present`). For the points, include jitter and transparancy. Include means and standard errors plotted in a different color.
+
+Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plot 2). Then use the `plot_grid()` function in the `cowplot` package to stack the two plots on top of one another. You code for the last step will look something like: `plot_grid(p1, p2, nrow = 2)`. If you used `ncol = 2` instead, you would get plots side by side.
+
+`plot_grid()` is a really handy function for combining different ggplots into a single figure. It has facilities for adding labels ("a.", "b.", etc.), changing the spacing between plots, and much more. For us, it is indispensable for making publication-ready figures.
+
+```{r}
+# FIXME
+p1 <- ggplot(BT1, aes(x = Trout, y = Proportion_Surviving)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Trout", y = "Survival", title = "My Data")
+p2 <- ggplot(BT2, aes(x = Trout, y = Proportion_Surviving)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Trout", y = "Survival", title = "My Collaborator's Data")
+
+plot_grid(p1, p2, nrow = 2)
+```
+
+Considering the plot you just made, do you think that mean survivorship is significantly different in the Absent/Present treatment groups? Do you think that the two sets of data are different from one another?
+
+> There is much variability, but survival does appear to be higher in the trout absent treatment group. The SEMs don't overlap it seems. There might be a significant different between treatments. The patterns look the same across locations.
+
+First, fit a linear model to your data, in which the proportion of salmon surviving is modeled by presence or absence of trout. Print out the `summary()` of this linear model.
+
+```{r}
+# FIXME
+fm1 <- lm(Proportion_Surviving ~ Trout, BT1)
+summary(fm1)
+```
+
+How do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
+
+> At $\alpha = 0.05$, there is a significant difference between the groups with lower salmon survivorship in the presence of trout (mean difference = 0.055; P = 0.0495).
+
+Now fit the same model to your collaborator's data.
+
+```{r}
+# FIXME
+fm2 <- lm(Proportion_Surviving ~ Trout, BT2)
+summary(fm2)
+```
+
+What do you conclude about your collaborator's data?
+
+> $P = 0.054$ here. So we conclude, based on $\alpha = 0.05$, that there is not a significant difference in means.
+
+How do you feel about the results of these two studies?
+
+> They are nearly identical, but the arbitrarily chosen $\alpha$ level comes to two different conclusions.
+
+Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the aggregate data, which might look something like this table:
+
+```{r echo=FALSE}
+M <- data_frame(Survival = c("Survived", "Did not survive"),
+                `Trout absent` = c(946, 3470),
+                `Trout present` = c(919, 3876))
+knitr::kable(M)
+```
+
+Why is this test not advisable in this case?
+
+> The observations (whether an individual salmon juvenile was alive or not) are not independent of one another, streams add a level of structure to the data (all salmon in a stream are more likely to have the same survival probability).
+
+## Calculate exact CI
+
+## Relevel factor
+
+## Loop through columns
