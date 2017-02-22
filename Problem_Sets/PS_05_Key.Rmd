@@ -39,7 +39,7 @@ stalk <- read_csv("../data/Stalkies.csv")
 Visualize the dataset in two ways: 
 
 1. Make a boxplot showing each food type on the x axis. 
-2. Plot the raw data (points) for the two groups. For the points, include jitter and transparancy. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparancy is most appropriate. Change the axis labels to what you would expect on a publication ready figure. 
+2. Plot the raw data (points) for the two groups. For the points, include jitter and transparency. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate. Change the axis labels to what you would expect on a publication ready figure. 
 
 ```{r }
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
@@ -267,7 +267,7 @@ What do you conclude based on this simulation?
 
 > The true mean is within about 95% of the resampled confidence intervals.
 
-Is it correct to say that there is a 95% probabiliity that the true mean is within a 95% confidence interval? Why or why not? Think about what you just showed with your simulation.
+Is it correct to say that there is a 95% probability that the true mean is within a 95% confidence interval? Why or why not? Think about what you just showed with your simulation.
 
 > No, it is not correct. CIs tell us about a range of values that we have some confidence in for future samples.
 
@@ -320,6 +320,6 @@ See if you can figure out what the coefficients represent. You will find estimat
 
 > The OLS line is Proportion_Forceps = 0.07 + 0.013(Density). The standard errors are 0.18 and 0.008. The *t*-statistics are the estimates divided by their SEs. Neither the intercept nor the slope is significantly different from 0.
 
-The data we gave you here is a proportion. What is anoter format that the data could have been in? Think about the source of the portion values.
+The data we gave you here is a proportion. What is another format that the data could have been in? Think about the source of the portion values.
 
 > A proportion could also be represented as a binomial (where "has forceps" is a "success").
