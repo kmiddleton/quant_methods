@@ -214,7 +214,6 @@ Problem Set
   - Exact CI
   - Regression with outliers
   - -1 to estimate means for groups
-  - Relevel factor
   - Loop through columns, make plots, plot_grid
 
 ---
@@ -225,15 +224,15 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC379178/
 
 Goals:
 
-    - Example of when it didn't work: randomizing reads
-    - Churchill paper
-    - Storey
-    - glht, tukey HSD
+  - Example of when it didn't work: randomizing reads
+  - Churchill paper
+  - Storey
+  - glht, tukey HSD
 
 Problem set:
 
-    - Simple permutation test
-    -
+  - Simple permutation test
+  - Relevel factor
 
 
 ---
