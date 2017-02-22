@@ -11,53 +11,10 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-# FIXME
+# Add other libraries here
+
 library(tidyverse)
-library(readxl)
-library(cowplot)
-
 library(knitr)
-```
-
-```{r echo=FALSE, eval=FALSE}
-# Generate data for question 1.
-# P = 0.0495
-n <- 15
-set.seed(1064)
-M1 <- data_frame(
-  Proportion_Surviving = c(rnorm(n, 0.28, 0.07),
-                           rnorm(n, 0.242, 0.07)),
-  Trout = factor(rep(c("Absent", "Present"), each = n))
-)
-write_csv(M1, path = "../data/BrookTrout1.csv")
-
-ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival", title = "BrookTrout1")
-
-summary(lm(Proportion_Surviving ~ Trout, M1))
-
-# P = 0.0536
-n <- 15
-set.seed(1064)
-M2 <- data_frame(
-  Proportion_Surviving = c(rnorm(n, 0.282, 0.07),
-                           rnorm(n, 0.245, 0.07)),
-  Trout = factor(rep(c("Absent", "Present"), each = n))
-)
-write_csv(M2, path = "../data/BrookTrout2.csv")
-
-ggplot(M2, aes(x = Trout, y = Proportion_Surviving)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival", title = "BrookTrout2")
-
-summary(lm(Proportion_Surviving ~ Trout, M2))
 ```
 
 ## Brook trout
@@ -74,9 +31,7 @@ The two data files are:
 Load each of the files into R.
 
 ```{r}
-# FIXME
-BT1 <- read_csv("../data/BrookTrout1.csv")
-BT2 <- read_csv("../data/BrookTrout2.csv")
+
 ```
 
 Make a plot of each data set using the same ggplot code you used to visualized the stalk-eyed fly data in Problem Set 5. Plot the raw data (points) for the two groups (trout `Absent` and `Present`). For the points, include jitter and transparency. Include means and standard errors plotted in a different color.
@@ -86,54 +41,36 @@ Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plo
 `plot_grid()` is a really handy function for combining different ggplots into a single figure. It has facilities for adding labels ("a.", "b.", etc.), changing the spacing between plots, and much more. For us, it is indispensable for making publication-ready figures.
 
 ```{r}
-# FIXME
-p1 <- ggplot(BT1, aes(x = Trout, y = Proportion_Surviving)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival", title = "My Data")
-p2 <- ggplot(BT2, aes(x = Trout, y = Proportion_Surviving)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival", title = "My Collaborator's Data")
 
-plot_grid(p1, p2, nrow = 2)
 ```
 
 Considering the plot you just made, do you think that mean survivorship is significantly different in the Absent/Present treatment groups? Do you think that the two sets of data are different from one another?
 
-> There is much variability, but survival does appear to be higher in the trout absent treatment group. The SEMs don't overlap it seems. There might be a significant different between treatments. The patterns look the same across locations.
+> 
 
 First, fit a linear model to **your data** (from `BrookTrout1.csv`), in which the proportion of salmon surviving is modeled by presence or absence of trout. Print out the `summary()` of this linear model.
 
 ```{r}
-# FIXME
-fm1 <- lm(Proportion_Surviving ~ Trout, BT1)
-summary(fm1)
+
 ```
 
 How do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
 
-> At $\alpha = 0.05$, there is a significant difference between the groups with lower salmon survivorship in the presence of trout (mean difference = 0.055; P = 0.0495).
+> 
 
 Now fit the same model to your **collaborator's data** (from `BrookTrout2.csv`).
 
 ```{r}
-# FIXME
-fm2 <- lm(Proportion_Surviving ~ Trout, BT2)
-summary(fm2)
+
 ```
 
 What do you conclude about your collaborator's data?
 
-> $P = 0.054$ here. So we conclude, based on $\alpha = 0.05$, that there is not a significant difference in means.
+> 
 
 How do you feel about the results of these two studies?
 
-> They are nearly identical, but the arbitrarily chosen $\alpha$ level comes to two different conclusions.
+> 
 
 Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the aggregate data, which might look something like this table:
 
@@ -146,7 +83,7 @@ knitr::kable(M)
 
 Why is this test not advisable in this case?
 
-> The observations (whether an individual salmon juvenile was alive or not) are not independent of one another, streams add a level of structure to the data (all salmon in a stream are more likely to have the same survival probability).
+> 
 
 ## Exact confidence intervals
 
@@ -157,42 +94,13 @@ We ultimately want to calculate exact confidence intervals for the proportion su
 Make a plot of the critical value for a *t*-distribution for the 0.975 quantile (upper tail of 2.5%) where the degrees of freedom ranges from 2 to 100. First set up the vector of degrees of freedom (don't call it df, because that is the name of an R function). Then calculate the critical values. Make a data.frame and plot the results. Then add a differently colored horizontal line at the critical value for the 0.975 quantile for a standard normal distribution. Note that the critical value approaches the asymptotic limit as the degrees of freedom increases.
 
 ```{r}
-# FIXME
-CVs <- data_frame(dfs = seq(2, 100, by = 1),
-                  crit_vals = qt(0.975, df = dfs,
-                                 lower.tail = TRUE))
 
-CVs %>% 
-  ggplot(aes(dfs, crit_vals)) +
-  geom_line() +
-  geom_hline(yintercept = qnorm(0.025, lower.tail = FALSE),
-             color = "blue") +
-  labs(x = "Degrees of Freedom", y = "Critical value (0.975)")
 ```
 
 Now calculate the exact 95% confidence intervals for the two groups in your data (from `BrookTrout1.csv`). Either pull the critical value from your data.frame or just calculate anew.
 
 ```{r}
-# Let's just adapt the approximate CI function from
-# Problem Set 5. We will make it a little more flexible
-# by allowing us to specify the desired interval with
-# `prob`. Default to 95% CI.
-SEM <- function(x) return(sd(x) / sqrt(length(x)))
 
-exact_CI <- function(x, prob = 0.95) {
-  t_crit <- qt((1 - prob) / 2,
-               df = length(x) - 1,
-               lower.tail = FALSE)
-  Upper <- mean(x) + t_crit * SEM(x)
-  Lower <- mean(x) - t_crit * SEM(x)
-  return(data_frame(Lower, Mean = mean(x), Upper))
-}
-
-CIs <- BT1 %>% 
-  group_by(Trout) %>% 
-  do(exact_CI(.$Proportion_Surviving))
-
-knitr::kable(CIs)
 ```
 
 ## Working with lists
@@ -242,22 +150,7 @@ Rather than creating separate plots, we want to make them inside a loop, where w
 This is all we need for the setup. At this point, you have the data, two vectors (one of columns names and one of y axis labels), and an empty list.
 
 ```{r warning=FALSE}
-# FIXME
-M <- read_excel("../data/mammals.xlsx", na = "NA") %>% 
-  mutate(log_Mass = log10(adult_body_mass_g),
-         log_BMR = log10(basal_met_rate_m_l_o2hr))
 
-cols_analyze <- c("ageat_eye_opening_d",
-                  "log_BMR",
-                  "gestation_len_d",
-                  "litter_size")
-
-axis_labels <- c("Age at Eye Opening",
-                 "log10 BMR",
-                 "Gestation Length",
-                 "Litter Size")
-
-pp <- list()
 ```
 
 No we can work on a loop to iterate through the columns, making a plot for each column. Here is the pseudocode:
@@ -271,17 +164,7 @@ No we can work on a loop to iterate through the columns, making a plot for each 
 5. Assign the plot to the *i*th element of your list.
 
 ```{r warning=FALSE}
-# FIXME
-for (ii in 1:length(cols_analyze)) {
-  col <- cols_analyze[ii]
-  lab <- axis_labels[ii]
-  p <- ggplot(M, aes_string("log_Mass", col)) +
-    geom_point(alpha = 0.5, size = 0.5) +
-    labs(x = "log10 Body Mass (g)", y = lab) +
-    theme(axis.text = element_text(size = 10),
-          axis.title = element_text(size = 10))
-  pp[[ii]] <- p
-}
+
 ```
 
 At the end of the loop you will have a list that contains 4 plots. Try printing a plot by running `pp[[1]]` at the command line. If you get warnings saying something like `Removed 4948 rows containing missing values (geom_point).`, that is just ggplot saying that there are `NA`s in the data.
@@ -289,9 +172,7 @@ At the end of the loop you will have a list that contains 4 plots. Try printing 
 Now you can make a 2x2 grid of plots. The cowplot function `plot_grid()` can take a list of plots as an argument: `plotlist = ...`. Pass your list of plots, and specify 2 columns and 2 rows (check the help for `plot_grid()`).
 
 ```{r warning=FALSE}
-# FIXME
-plot_grid(plotlist = pp, ncol = 2, nrow = 2,
-          labels = c("a", "b", "c", "d"))
+
 ```
 
 Now you can fine tune the plots:
