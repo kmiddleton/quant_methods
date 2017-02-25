@@ -218,7 +218,32 @@ Problem Set
 
 ---
 
-Week 7: Randomization, multiple testing
+Week 7: Generalized linear models
+
+Goals:
+
+General(ized) linear model
+
+Understand what multiple regression is doing: x1 after accounting for x2 vs. unbalanced ANOVA
+
+ANOVA
+
+ANCOVA
+
+Multiple regression
+
+---
+
+Week 8: Generalized linear models
+
+Goals:
+
+  - Interactions
+  - Binomial (= Chisq)
+
+---
+
+Week 9: Randomization, multiple testing
 
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC379178/
 
@@ -236,22 +261,11 @@ Problem set:
 
 
 ---
-
-Week 8: Generalized linear models
-
-Goals:
-
-"Despite our best eﬀorts to include information, all models are approximate" Gelman et al.
-
----
-
-Week 9: Generalized linear models
-
-Goals:
-
----
-
 Week 10: Model comparison, model based inference
+
+"Despite our best eﬀorts to include information, all models are approximate" Gelman et al. ABD
+
+"The most that can be expected from any model is that it can supply a useful approximation to reality: All models are wrong; some models are useful." Box, Hunter and Hunter (2005; and Box many times previously)
 
 "In comparing nested models, the larger model typically has the advantage of making more sense and ﬁtting the data better but the disadvantage of being more diﬃcult to understand and compute. The key questions of model comparison are typically: (1) is the improvement in ﬁt large enough to justify the additional diﬃculty in ﬁtting, and (2) is the prior distribution on the additional parameters reasonable?" Gelman ARM Book
 

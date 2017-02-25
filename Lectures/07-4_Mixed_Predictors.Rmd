@@ -1,0 +1,27 @@
+---
+title: "Linear Models: Mixed Predictors"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+```
+
+## Reading
+
+## Notes
+
+## Quiz 07-4
+
+Complete Quiz 07-4
+
+Last lecture for this week
