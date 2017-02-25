@@ -222,15 +222,37 @@ Week 7: Generalized linear models
 
 Goals:
 
-General(ized) linear model
+1. General(ized) linear model
 
-Understand what multiple regression is doing: x1 after accounting for x2 vs. unbalanced ANOVA
+  - Prediction
+  - What are we predicting?
+  - Perils
 
-ANOVA
+2. ANOVA
 
-ANCOVA
+  - Show design matrix
+  - What single question does ANOVA answer?
+  - Post-hoc testing
+  - Assumptions
 
-Multiple regression
+3. Multiple regression
+
+  - Understand what multiple regression is doing: x1 after accounting for x2 vs. unbalanced ANOVA
+  - Assumptions
+
+4. ANCOVA
+
+  - How is this is mix of ANOVA and OLS regression?
+  - Assumptions
+
+Connections to ML and Bayesian
+
+Problem set
+
+  - Making factors with forcats
+  - Relevel factor
+  - No intercept
+  - Multicollinearity
 
 ---
 
@@ -240,6 +262,9 @@ Goals:
 
   - Interactions
   - Binomial (= Chisq)
+  - Mixed
+  - Variance components
+  - Perils
 
 ---
 

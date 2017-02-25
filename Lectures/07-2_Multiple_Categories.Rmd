@@ -14,6 +14,7 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+library(multcomp)
 source("Shade_Distributions.R")
 ```
 
@@ -59,8 +60,12 @@ FIXME more intro here
 
 ## Does bright light treatment alleviate jet lag symptoms?
 
-```{r echo=FALSE}
-JL <- read_csv("../data/JetLag.csv")
+```{r message=FALSE}
+JL <- read_csv("../data/JetLag.csv") %>% 
+  mutate(Treatment = factor(Treatment))
+```
+
+```{r echo=FALSE, fig.height = 3.5}
 set.seed(2)
 ggplot(JL, aes(x = Treatment, y = Shift)) +
   geom_point(position = position_jitter(width = 0.1)) +
@@ -77,7 +82,7 @@ JL %>% group_by(Treatment) %>%
 
 ## Compare group means and standard errors
 
-```{r}
+```{r echo=FALSE}
 ggplot(JL, aes(x = Treatment, y = Shift)) +
   geom_point(position = position_jitter(width = 0.1)) +
   xlab("Light Treatment") +
@@ -197,7 +202,7 @@ We'll use the Tukey-Kramer test
 ## Tukey-Kramer test in R
 
 ```{r}
-TukeyHSD(fm_lm)
+# TukeyHSD(fm_lm)
 ```
 
 ## Alternate Tukey-Kramer: `multcomp` library {.smaller}

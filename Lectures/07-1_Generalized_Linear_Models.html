@@ -103,6 +103,10 @@
 
 </article></slide><slide class=''><hgroup><h2>Notes</h2></hgroup><article  id="notes">
 
+</article></slide><slide class=''><hgroup><h2>Problem</h2></hgroup><article  id="problem">
+
+</article></slide><slide class=''><hgroup><h2>Prediction</h2></hgroup><article  id="prediction">
+
 </article></slide><slide class=''><hgroup><h2><em>Generalized</em> linear models</h2></hgroup><article  id="generalized-linear-models">
 
 <ul>
@@ -111,7 +115,7 @@
 <ul>
 <li>Predictors can be categorical (factors) or continuous</li>
 </ul></li>
-<li>&quot;Named&quot; tests (<em>t</em>, ANOVA, OLS, etc.) are really just specific kinds of linear models.
+<li>Almost all &quot;named&quot; tests (<em>t</em>, ANOVA, OLS, etc.) are really just specific kinds of linear models.
 
 <ul>
 <li>Learn a general framework for fitting, and don&#39;t worry as much about names</li>
@@ -150,7 +154,7 @@
 <p>Distribution of the outcome variable(s) can be:</p>
 
 <ol>
-<li>Normal (Gaussian)</li>
+<li>Normal (Gaussian): Most often in life sciences</li>
 <li>Binomial</li>
 <li>Poisson</li>
 <li>Lots and lots of others</li>
@@ -163,10 +167,9 @@
 <p>\(Y\) follows some distribution (e.g., normal or binomial)</p>
 
 <ul>
-<li>Most often normal in life sciences</li>
 <li>\(X_k\) are some combination of continuous and categorical predictors.</li>
-<li>\(\beta_0\) is the intercept term (optional), the value when all other \(\beta = 0\).</li>
 <li>\(\beta_k\) are the parameter estimates for the \(X\).</li>
+<li>\(\beta_0\) is the intercept term (optional), the value when all other \(\beta_k = 0\).</li>
 <li>Relationship between \(Y\) and \(X\)s is linearized by a <em>link function</em>.</li>
 </ul>
 
