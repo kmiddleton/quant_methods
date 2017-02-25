@@ -41,12 +41,17 @@ shade_t <- function(q, df, tail = "both") {
   return(p)
 }
 
-shade_F <- function(q, df1, df2) {
+shade_F <- function(q, df1, df2, vline = NULL) {
   require(tidyverse, quietly = TRUE)
   require(cowplot)
   require(latex2exp, quietly = TRUE)
   crit <- qf(q, df1, df2, lower.tail = FALSE)
-  M <- data_frame(x = seq(0.001, crit * 1.5, length = 200),
+  if (!is.null(vline)) {
+    x_max <- max(vline * 1.05, crit * 1.5)
+  } else {
+    x_max <- crit * 1.5
+  }
+  M <- data_frame(x = seq(0.001, x_max, length = 200),
                   y = df(x, df1, df2))
   p <- ggplot(M, aes(x, y)) +
     geom_line() +
