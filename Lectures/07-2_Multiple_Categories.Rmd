@@ -18,15 +18,43 @@ library(multcomp)
 source("Shade_Distributions.R")
 ```
 
-## Reading
-
-## Notes
-
 ## Hierarchy of GLMs
 
 <center>
 <img src="images/GeneralizedLinearModels.png" width="100%" />
 </center>
+
+## Problem
+
+<center>
+<img src="images/reddeer.png" width="90%" />
+</center>
+
+## Prediction
+
+> Outcome: Juvenile Survival
+
+<div class="columns-2">
+
+Possible predictors:
+
+- Birth date  
+- Birth mass
+- Year
+- Sex
+- Maternal fecundity
+- Maternal reproductive status
+
+<br />
+
+- Maternal age
+- Population size
+- Temperature (min, max, ave...)
+- Rainfall
+- Wind speed
+- ...
+
+</div>
 
 ## Prediction with categorical variables
 

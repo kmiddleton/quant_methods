@@ -66,7 +66,7 @@ Possible predictors:
 
 Determine the association of each predictor while "controlling" for the other predictors.
 
-How? **FIXME Tabachnick and Fidell**
+How?
 
 - Allow the other variables to account for variation *in the predictor of interest*
     - Multiple regression of the predictor of interest on the remaining predictors (response variable not involved)

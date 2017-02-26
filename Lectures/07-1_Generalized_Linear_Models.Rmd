@@ -154,9 +154,7 @@ $Y$ follows some distribution (e.g., normal or binomial)
 <img src="images/GeneralizedLinearModels.png" width="100%" />
 </center>
 
-## Quiz 07-1
-
-Complete Quiz 07-1
+## No quiz for this lecture
 
 Watch Lecture 07-2
 

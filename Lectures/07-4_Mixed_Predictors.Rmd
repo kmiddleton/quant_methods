@@ -20,6 +20,38 @@ knitr::opts_chunk$set(cache = TRUE)
 library(rethinking)
 ```
 
+## Problem
+
+<center>
+<img src="images/reddeer.png" width="90%" />
+</center>
+
+## Prediction
+
+> Outcome: Juvenile Survival
+
+<div class="columns-2">
+
+Possible predictors:
+
+- Birth date  
+- Birth mass
+- Year
+- Sex
+- Maternal fecundity
+- Maternal reproductive status
+
+<br />
+
+- Maternal age
+- Population size
+- Temperature (min, max, ave...)
+- Rainfall
+- Wind speed
+- ...
+
+</div>
+
 ## Hierarchy of GLMs
 
 <center>
@@ -131,7 +163,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## 2: ANOVA
+## 2: ANOVA {.smaller}
 
 ```{r}
 summary(fm2)
@@ -154,7 +186,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## 3: OLS regression
+## 3: OLS regression {.smaller}
 
 ```{r}
 summary(fm3)

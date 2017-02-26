@@ -261,6 +261,7 @@ Week 8: Generalized linear models
 
 Goals:
 
+  - R^2
   - Interactions
   - Binomial (= Chisq)
   - Mixed
