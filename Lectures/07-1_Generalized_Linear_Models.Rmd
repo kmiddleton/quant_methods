@@ -16,9 +16,15 @@ library(tidyverse)
 library(cowplot)
 ```
 
-## Reading
+## Resources
 
-## Notes
+- ABD FIXME
+- Tabachnick and Fidell [-@tabachnick_using_2013]: *Using Multivariate Statistics*
+- Sokal and Rohlf [-@sokal_biometry_2011]: *Biometry*
+- Zar [-@zar_biostatistical_2009]: *Biostatistical Analysis*
+- Fox [-@fox_applied_2015]: *Applied Regression Analysis and Generalized Linear Models*
+- Harrell [-@harrell_regression_2010]: *Regression Modeling Strategies: With Applications to Linear Models, Logistic Regression, and Survival Analysis*
+- Kutner et al. [-@kutner_applied_2004]: *Applied Linear Statistical Models*
 
 ## Problem
 
@@ -69,6 +75,17 @@ Possible predictors:
 <img src="images/deerpath.png" width="80%" />
 </center>
 
+
+## Issues in Prediction
+
+1. How many predictors do I include?
+    - Overfitting & Underfitting
+    - **Addressed by model comparision**
+    
+2. How are my predictors related to *each other*?
+    - Multicollinearity
+    - Masking
+    - **Addressed by active analysis & visualization**
 
 ## *Generalized* linear models
 

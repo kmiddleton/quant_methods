@@ -22,6 +22,12 @@ source("Shade_Distributions.R")
 
 ## Notes
 
+## Hierarchy of GLMs
+
+<center>
+<img src="images/GeneralizedLinearModels.png" width="100%" />
+</center>
+
 ## Prediction with categorical variables
 
 We have done prediction with only two groups (levels)
@@ -33,6 +39,28 @@ Now predict with three or more groups
 
 - Is *at least* one mean different?
 - Then, *which* mean(s) is/are different
+
+## Does bright light treatment alleviate jet lag symptoms?
+
+<div class="columns-2">
+
+<center>
+<img src="https://s-media-cache-ak0.pinimg.com/736x/ec/0c/7a/ec0c7a667bd469ca26ca42aedeb36446.jpg" width="100%" />
+<br />
+<br />
+<br />
+
+</center>
+
+
+- 3 groups
+    - No light (control)
+    - Bright light in eyes
+    - Bright light in knees
+- Outcome
+    - Shift in circadian pattern (hours)
+
+</div>
 
 ## ANOVA
 
@@ -54,9 +82,39 @@ Some total variability in *Y*:
 
 $F$-statistic is the ratio of the two.
 
+## Assumptions of ANOVA
+
+1. The measurments in every group represent a random sample from the corresponding population 
+1. The variable is normally distributed in each population 
+1. The variance is the same in all populations
+
+- ANOVA is very robust to violations of these assumptions
+    - Central limit theorem!
+    - Equal sample sizes helps with violations of equal variances
+- ANOVA is the *Maximum Likelihood Solution* given these assumptions
+
 ## Does bright light treatment alleviate jet lag symptoms?
 
-FIXME more intro here
+<div class="columns-2">
+
+<center>
+<img src="https://s-media-cache-ak0.pinimg.com/736x/ec/0c/7a/ec0c7a667bd469ca26ca42aedeb36446.jpg" width="100%" />
+<br />
+<br />
+<br />
+
+</center>
+
+
+- 3 groups
+    - No light (control)
+    - Bright light in eyes
+    - Bright light in knees
+- Outcome
+    - Shift in circadian pattern (hours)
+
+</div>
+
 
 ## Does bright light treatment alleviate jet lag symptoms?
 
@@ -135,6 +193,27 @@ It is possible to have a significant parameter estimate an a non-significant ove
 
 $$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
 
+## Model Matrix
+
+```{r, eval=FALSE}
+fm_lm <- lm(Shift ~ Treatment, data = JL)
+```
+
+`model.matrix()` will give you the model for the predictors
+
+```{r, echo=FALSE}
+set.seed(5)
+mm <- as.data.frame(model.matrix( ~ Treatment, data=JL))
+mm$Category <- JL$Treatment
+mm$Shift <- JL$Shift
+mm<-mm[,c(5,1,2,3,4)]
+mm<-mm[sample(1:nrow(mm)),]
+rownames(mm)<-seq(1,nrow(mm))
+mm
+
+```
+
+
 ## *F* distribution
 
 Two different degrees of freedom:
@@ -174,6 +253,19 @@ $$F = \frac{\mbox{MS}_{group}}{\mbox{MS}_{error}}$$
 
 What role does within vs. between group variation have in determining $F$?
 
+## If you perfomed pairwise t-tests for all pairs of groups, how often would you expect to get a signficant result by chance?
+
+## If you perfomed pairwise t-tests for all pairs of groups, how often would you expect to get a signficant result by chance?
+
+- 1 out of every 20 tests
+- $\alpha$ for a single comparison?
+- $\alpha$ for a single test?
+- $\alpha$ for an experiment?
+- What do you feel comfortable with?
+
+*Stay tuned for multiple comparisons*
+
+
 ## Post hoc tests for ANOVA
 
 Significant ANOVA (*P* = 0.004) only says that at least one mean is different.
@@ -187,8 +279,7 @@ Many options are available for post hoc (unplanned) comparisons:
 - Tukey-Kramer test (Tukey's Honestly Significant
 Difference)
 
-We'll use the Tukey-Kramer test
-- `TukeyHSD()` in R
+We'll use the Tukey-Kramer test (only one you need to know right now)
 
 ## Tukey-Kramer test
 
@@ -199,20 +290,20 @@ We'll use the Tukey-Kramer test
 - Tukey-Kramer test makes all the same assumptions as ANOVA.
     - Defaults to all pairwise combinations of levels
 
-## Tukey-Kramer test in R
 
-```{r}
-# TukeyHSD(fm_lm)
-```
+## Tukey-Kramer test: `multcomp` library {.smaller}
 
-## Alternate Tukey-Kramer: `multcomp` library {.smaller}
+- Alternative but less general: `TukeyHSD()` in R
+    - Only takes an object from `aov()`
 
 ```{r}
 tukey <- glht(fm_lm, linfct = mcp(Treatment = "Tukey"))
 summary(tukey)
 ```
 
-## More fine-grained tests {.smaller}
+
+
+## Selective Set of Comparisons {.smaller}
 
 ```{r}
 post_hoc <- glht(fm_lm,
@@ -220,8 +311,6 @@ post_hoc <- glht(fm_lm,
                                    "knee - control = 0")))
 summary(post_hoc)
 ```
-
-## Post-hoc tests
 
 ## Quiz 07-2
 
