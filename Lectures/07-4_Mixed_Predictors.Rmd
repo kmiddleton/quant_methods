@@ -20,6 +20,12 @@ knitr::opts_chunk$set(cache = TRUE)
 library(rethinking)
 ```
 
+## Hierarchy of GLMs
+
+<center>
+<img src="images/GeneralizedLinearModels.png" width="100%" />
+</center>
+
 ## Problem
 
 <center>
@@ -52,12 +58,6 @@ Possible predictors:
 
 </div>
 
-## Hierarchy of GLMs
-
-<center>
-<img src="images/GeneralizedLinearModels.png" width="100%" />
-</center>
-
 ## Mixed predictors
 
 Ultimately we will mix arbitrary numbers of categorical and continuous predictors:
@@ -68,7 +68,7 @@ Ultimately we will mix arbitrary numbers of categorical and continuous predictor
 For now:
 
 - One categorical predictor
-- One continuous prodictor ("covariate")
+- One continuous predictor ("covariate")
 
 ## Energy expenditure in naked mole rats
 
@@ -226,7 +226,7 @@ CasteWorker  0.39334    0.14611   2.692   0.0112
 
 - `(Intercept)`: Intercept for non-workers
 - `Mass`: Slope for both groups
-- `CastWorker`: *Offset* for the Worker group (difference in intercepts)
+- `CasteWorker`: *Offset* for the Worker group (difference in intercepts)
 
 ## Fit different models to these data
 
