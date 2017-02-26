@@ -14,11 +14,159 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+library(wesanderson)
+library(knitr)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ## Reading
 
 ## Notes
+
+## Energy expenditure in naked mole rats
+
+<center>
+<img src="images/NMR.jpg" width="80%" />
+</center>
+
+## Energy expenditure in naked mole rats
+
+```{r echo=FALSE}
+data(MoleRats, package = "abd")
+M <- MoleRats
+M$caste <- factor(as.numeric(M$caste), labels = c("Non-worker", "Worker"))
+names(M) <- c("Caste", "Mass", "Energy")
+ggplot(M, aes(x = Mass, y = Energy)) +
+  geom_point(size = 4) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+## Energy expenditure in naked mole rats
+
+```{r echo=FALSE}
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+## Energy expenditure in naked mole rats
+
+*ANOVA*:
+
+- Compare mean energy expenditure for non-workers vs. workers
+- Ignores the linear relationships with body mass
+
+*Linear regression*:
+
+- Predicts energy expenditure from body mass alone
+- Ignores castes, which appear to have different mass-specific energy expenditure
+
+**Account for *both* body mass and caste in predicting energy expenditure**
+
+## Analysis of covariance
+
+1. One categorical predictor
+1. One continuous predictor (the *covariate*): allowed to covary with the response variable
+
+## Fit and compare all the different models of these data
+
+1. Mean
+1. ANOVA
+1. OLS regression
+1. ANCOVA, intercepts varying
+1. ANCOVA, intercepts and slopes varying: Numerically equivalent to separating the data and fitting OLS regressions on each (but no test of the interaction term)
+
+## 1: Mean
+
+```{r}
+fm1 <- lm(Energy ~ 1, data = M)
+```
+
+```{r echo=FALSE}
+M <- M %>% mutate(pred1 = predict(fm1))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred1), lwd = 2,
+            color = wes_palette("Cavalcanti")[5]) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+## 1: Mean
+
+```{r}
+summary(fm1)
+```
+
+## 2: ANOVA
+
+```{r}
+fm2 <- lm(Energy ~ Caste, data = M)
+```
+
+```{r echo=FALSE}
+M <- M %>% mutate(pred2 = predict(fm2))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred2, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+## 2: ANOVA
+
+```{r}
+summary(fm2)
+```
+
+## 3: OLS regression
+
+```{r}
+fm3 <- lm(Energy ~ Mass, data = M)
+```
+
+```{r echo=FALSE}
+M <- M %>% mutate(pred3 = predict(fm3))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred3, group = 1), lwd = 2,
+            color = wes_palette("Cavalcanti")[5]) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+## 3: OLS regression
+
+```{r}
+summary(fm3)
+```
+
+## 4: ANCOVA, intercepts varying
+
+```{r}
+fm4 <- lm(Energy ~ Mass + Caste, data = M)
+```
+
+```{r echo=FALSE}
+M <- M %>% mutate(pred4 = predict(fm4))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred4, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+## 4: ANCOVA, intercepts varying
+
+```{r}
+summary(fm4)
+```
 
 ## Quiz 07-4
 

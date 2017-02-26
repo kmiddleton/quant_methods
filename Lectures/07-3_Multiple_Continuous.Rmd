@@ -14,11 +14,310 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+library(readxl)
+library(GGally)
+library(ggrepel)
+library(rgl)
+library(knitr)
+knit_hooks$set(webgl = hook_webgl)
+library(wesanderson)
 ```
 
 ## Reading
 
 ## Notes
+
+## What is multiple regression *really* doing?
+
+Determine the association of each predictor while "controlling" for the other predictors.
+
+How?
+
+- Allow the other variables to account for as much variation as they account for
+    - Multiple regression of the predictor of interest on the remaining predictors (response variable not involved)
+- Regress the response on the *residual* variance of the predictor of interest
+    - Does this sound like Type III sums of squares?
+
+## What is multiple regression *really* doing?
+
+$$Y = \beta_0 + \beta_1 A + \beta_2 B + \beta_3 C + \beta_4 D$$
+
+To estimate the coefficient of $A$:
+
+- Regress $A$ on $B + C + D$
+
+$$A = \gamma_0 + \gamma_1 B + \gamma_2 C + \gamma_3 D$$
+
+- Calculate residuals for the model.
+- Regress $Y$ on the residuals.
+- The estimated coefficient is $\beta_1$.
+
+## Real world multicollinearity {.smaller}
+
+Milk investment across mammalian species:
+
+```{r}
+milk <- read_excel("../data/Milk.xlsx", na = "NA")
+glimpse(milk)
+```
+
+Ignore for now that these are comparative species-level data.
+
+## Wrangling data {.smaller}
+
+Keep:
+
+- `species`: Species
+- `kcal.per.g`: Kilocalories of energy per gram of milk
+- `mass`: Mean body mass (kg)
+- `neocortex.perc`: Percent of brain mass that is neocortex
+
+Filter complete cases (drop rows with `NA`).
+
+```{r}
+M <- milk %>% select(species, kcal.per.g, perc.fat, perc.lactose) %>%
+  drop_na()
+names(M) <- c("Species", "Milk_Energy", "Fat", "Lactose")
+glimpse(M)
+```
+
+## Visualizing
+
+```{r}
+ggscatmat(as.data.frame(M), columns = 2:4)
+```
+
+## Multiple regression {.smaller}
+
+```{r}
+fm <- lm(Milk_Energy ~ Fat + Lactose, data = M)
+summary(fm)
+```
+
+## Visualizing multiple regression
+
+```{r webgl=TRUE, echo=FALSE}
+plot3d(M$Fat, M$Lactose, M$Milk_Energy,
+       type = "s", col = "red", size = 1,
+       xlab = "Fat Percent",
+       ylab = "Lactose Percent",
+       zlab = "Milk Energy")
+coefs <- coef(fm)
+a <- coefs["Fat"]
+b <- coefs["Lactose"]
+c <- -1
+d <- coefs["(Intercept)"]
+planes3d(a, b, c, d, alpha = 0.5)
+```
+
+## Estimate `Fat` coefficient
+
+1. Use `Lactose` to predict `Fat`, which will take the effect of `Lactose` out of the model when we predict `Milk_Energy`
+1. Extract the residuals and add them onto the data.frame `M`.
+
+```{r}
+fm_Lact <- lm(Fat ~ Lactose, data = M)
+M$resid_Lact <- residuals(fm_Lact)
+```
+
+## Estimate `Fat` coefficient
+
+```{r echo=FALSE}
+F_v_L <- ggplot(M, aes(Lactose, Fat, label = Species)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point() +
+  labs(x = "Percent Lactose", y = "Percent Fat")
+print(F_v_L + geom_text_repel(size = 3, force = 15))
+```
+
+## Estimate `Fat` coefficient
+
+```{r echo=FALSE}
+milk_res_lact <- ggplot(M, aes(resid_Lact, Milk_Energy,
+                               label = Species)) +
+  geom_vline(xintercept = 0, lty = "dotted") +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point() +
+  labs(x = "Residual Lactose Percent", y = "Milk Energy")
+print(milk_res_lact + geom_text_repel(size = 3, force = 15))
+```
+
+## Estimate `Fat` coefficient
+
+```{r}
+coef(lm(Milk_Energy ~ resid_Lact, data = M))
+coef(fm)
+```
+
+## Estimate `Lactose` coefficient
+
+1. Use `Fat` to predict `Lactose`, which will take the effect of `Fat` out of the model when we predict `Milk_Energy`
+1. Extract the residuals and add them onto the data.frame `M`.
+
+```{r}
+fm_Fat <- lm(Lactose ~ Fat, data = M)
+M$resid_Fat <- residuals(fm_Fat)
+```
+
+## Estimate `Lactose` coefficient
+
+```{r echo=FALSE}
+L_v_F <- ggplot(M, aes(Fat, Lactose, label = Species)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point() +
+  labs(y = "Percent Lactose", x = "Percent Fat")
+print(L_v_F + geom_text_repel(size = 3, force = 15))
+```
+
+## Estimate `Lactose` coefficient
+
+```{r echo=FALSE}
+milk_res_fat <- ggplot(M, aes(resid_Fat, Milk_Energy,
+                              label = Species)) +
+  geom_vline(xintercept = 0, lty = "dotted") +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point() +
+  labs(x = "Residual Fat Percent", y = "Milk Energy")
+print(milk_res_fat + geom_text_repel(size = 3, force = 15))
+```
+
+## Estimate `Lactose` coefficient
+
+```{r}
+coef(lm(Milk_Energy ~ resid_Fat, data = M))
+coef(fm)
+```
+
+## Compare
+
+```{r echo=FALSE}
+plot_grid(F_v_L, L_v_F, ncol = 2)
+```
+
+## Compare
+
+```{r echo=FALSE}
+plot_grid(milk_res_lact, milk_res_fat, ncol = 2)
+```
+
+## Peril 2: Masking
+
+Multiple predictors are useful for predicting outcomes when bivariate relationships with the response variable is not strong.
+
+But:
+
+- Associative relationships can be obscured when two predictors are negatively correlated with one another.
+
+## Mammal milk data in a different context
+
+Milk is a big energetic investment
+
+- Is there a significant association between energy content of milk while controlling for neocortex size and body size?
+- Do primates with larger brains produce significantly more nutritious milk so their offspring can grow quickly (because they must grow quickly) ?
+
+## Wrangling data {.smaller}
+
+Keep:
+
+- `species`: Species
+- `kcal.per.g`: Kilocalories of energy per gram of milk
+- `mass`: Mean body mass (kg)
+- `neocortex.perc`: Percent of brain mass that is neocortex
+
+Drop incomplete cases
+
+```{r}
+M <- milk %>% select(species, kcal.per.g, mass, neocortex.perc) %>%
+  filter(complete.cases(.))
+names(M) <- c("Species", "Milk_Energy", "Mass", "Neocortex")
+glimpse(M)
+```
+
+## Visualizing
+
+```{r echo=FALSE}
+p1 <- ggplot(M, aes(Mass, Milk_Energy, label = Species)) + geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Mass (kg)", y = "Milk Energy (kcal/g)") +
+  geom_text_repel(size = 3, force = 15)
+p2 <- ggplot(M, aes(Neocortex, Milk_Energy, label = Species)) + geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Percentage Neocortex", y = "Milk Energy (kcal/g)") +
+  geom_text_repel(size = 3, force = 15)
+plot_grid(p2, p1, ncol = 2)
+```
+
+## Visualizing
+
+```{r echo=FALSE}
+M <- M %>% mutate(log_Mass = log(Mass))
+p1 <- ggplot(M, aes(log_Mass, Milk_Energy, label = Species)) + geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "log Mass (kg)", y = "Milk Energy (kcal/g)") +
+  geom_text_repel(size = 3, force = 15)
+p2 <- ggplot(M, aes(Neocortex, Milk_Energy, label = Species)) + geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Percentage Neocortex", y = "Milk Energy (kcal/g)") +
+  geom_text_repel(size = 3, force = 15)
+plot_grid(p2, p1, ncol = 2)
+```
+
+## Bivariate model of Neocortex {.smaller}
+
+```{r}
+fm_Neo <- lm(Milk_Energy ~ Neocortex, data = M)
+summary(fm_Neo)
+```
+
+## Bivariate model of log Mass {.smaller}
+
+```{r}
+fm_Mass <- lm(Milk_Energy ~ log_Mass, data = M)
+summary(fm_Mass)
+```
+
+## Multivariate model {.smaller}
+
+```{r}
+fm_Multi <- lm(Milk_Energy ~ Neocortex + log_Mass, data = M)
+summary(fm_Multi)
+```
+
+## Interpretation
+
+- Both coefficients go up
+    - Neocortex: $0.005 \rightarrow 0.03$ (*P* = 0.004)
+    - log Mass: $-0.03 \rightarrow -0.1$ (*P* = 0.002)
+
+Regression asks (and answers):
+
+1. Do species that have high neocortex percentage *for their mass* have higher energy milk?
+1. Do species with high body mass *for their neocortex percentage* have higher energy milk?
+
+## Neocortex vs. log Mass
+
+```{r echo=FALSE}
+ggplot(M, aes(log_Mass, Neocortex, label = Species)) + geom_point() +
+  labs(x = "log Mass (kg)", y = "Neocortex Percentage") +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_text_repel(size = 3, force = 15)
+```
+
+## Milk Energy vs. Residual Mass
+
+```{r echo=FALSE}
+M$resid_Mass <- residuals(lm(Neocortex ~ log_Mass, data = M))
+ggplot(M, aes(resid_Mass, Milk_Energy, label = Species)) + geom_point() +
+  labs(x = "Residual log Mass (kg)", y = "Milk Energy") +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_text_repel(size = 3, force = 15)
+```
+
+```{r echo=FALSE}
+# Coefficients for the regression of Milk_Energy on residual Mass
+# to estimate the Neocortex coefficient.
+coef(lm(Milk_Energy ~ resid_Mass, data = M))
+```
 
 ## Quiz 07-3
 
