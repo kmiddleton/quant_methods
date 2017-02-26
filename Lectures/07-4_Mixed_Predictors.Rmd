@@ -17,11 +17,26 @@ library(cowplot)
 library(wesanderson)
 library(knitr)
 knitr::opts_chunk$set(cache = TRUE)
+library(rethinking)
 ```
 
-## Reading
+## Hierarchy of GLMs
 
-## Notes
+<center>
+<img src="images/GeneralizedLinearModels.png" width="100%" />
+</center>
+
+## Mixed predictors
+
+Ultimately we will mix arbitrary numbers of categorical and continuous predictors:
+
+- Start thinking beyond "slopes" for continuous predictors
+    - How many units of change in the outcome results from a 1 unit increase in the predictor?
+    
+For now:
+
+- One categorical predictor
+- One continuous prodictor ("covariate")
 
 ## Energy expenditure in naked mole rats
 
@@ -70,13 +85,12 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
 1. One categorical predictor
 1. One continuous predictor (the *covariate*): allowed to covary with the response variable
 
-## Fit and compare all the different models of these data
+## Fit different models to these data
 
-1. Mean
-1. ANOVA
-1. OLS regression
+1. Mean (overall mean, no body mass)
+1. ANOVA (group mean, no body mass)
+1. OLS regression (body mass only, no grouping)
 1. ANCOVA, intercepts varying
-1. ANCOVA, intercepts and slopes varying: Numerically equivalent to separating the data and fitting OLS regressions on each (but no test of the interaction term)
 
 ## 1: Mean
 
@@ -162,10 +176,92 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## 4: ANCOVA, intercepts varying
+## 4: ANCOVA, intercepts varying {.smaller}
 
 ```{r}
 summary(fm4)
+```
+
+## 4: ANCOVA, intercepts varying
+
+```
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept) -0.09687    0.94230  -0.103   0.9188
+Mass         0.89282    0.19303   4.625 5.89e-05
+CasteWorker  0.39334    0.14611   2.692   0.0112
+```
+
+- `(Intercept)`: Intercept for non-workers
+- `Mass`: Slope for both groups
+- `CastWorker`: *Offset* for the Worker group (difference in intercepts)
+
+## Fit different models to these data
+
+1. Mean (overall mean, no body mass)
+1. ANOVA (group mean, no body mass)
+1. OLS regression (body mass only, no grouping)
+1. ANCOVA, intercepts varying
+
+> Which model is best?
+
+Model comparison in a few weeks...
+
+## Bayesian approach
+
+Data setup:
+
+```{r echo=FALSE}
+# Drop predicted data columns
+M <- M %>% 
+  select(-contains("pred"))
+```
+
+```{r}
+M_bayes <- M %>% 
+  mutate(Caste_Worker = if_else(Caste == "Worker", 1, 0)) %>% 
+  select(-Caste) %>% 
+  as.data.frame()
+head(M_bayes)
+```
+
+## Bayesian approach
+
+```{r}
+fm_Bayes <- rethinking::map(
+  alist(
+    Energy ~ dnorm(mu, sigma),
+    mu <- 
+      a +
+      aWorker * Caste_Worker + # 0 when Caste == Non-worker
+      bMass * Mass,
+    a ~ dnorm(0, 5),
+    aWorker ~ dnorm(0, 5),
+    bMass ~ dnorm(0, 2),
+    sigma ~ dcauchy(0, 2)
+  ),
+  data = M_bayes,
+  start = list(bMass = 0.1, a = 0, aWorker = 0, sigma = 0.1)
+)
+```
+
+## Bayesian approach
+
+```{r echo=FALSE}
+post <- extract.samples(fm_Bayes, n = 1e5) %>% 
+  select(-sigma)
+post %>% 
+  gather(Parameter, Estimate) %>% 
+  ggplot(aes(Estimate)) +
+  geom_line(stat = "density") +
+  facet_grid(. ~ Parameter, scales = "free")
+```
+
+## Bayesian approach
+
+```{r}
+coef(fm4)
+precis(fm_Bayes)
 ```
 
 ## Quiz 07-4

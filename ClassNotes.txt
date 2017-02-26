@@ -253,6 +253,7 @@ Problem set
   - Relevel factor
   - No intercept
   - Multicollinearity
+  - Simulation of w/in and between group variation -> effect on F
 
 ---
 
@@ -315,6 +316,10 @@ Nutrition data, 27000 correlation p values
 Week 13: Composite variables
 
 Goals:
+
+Notes:
+
+  - Multiple regression tries to figure out which variable is the important one. e.g., shape doesn't make sense
 
 ---
 

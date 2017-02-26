@@ -18,13 +18,13 @@ library(cowplot)
 
 ## Resources
 
-- ABD FIXME
-- Tabachnick and Fidell [-@tabachnick_using_2013]: *Using Multivariate Statistics*
-- Sokal and Rohlf [-@sokal_biometry_2011]: *Biometry*
-- Zar [-@zar_biostatistical_2009]: *Biostatistical Analysis*
-- Fox [-@fox_applied_2015]: *Applied Regression Analysis and Generalized Linear Models*
-- Harrell [-@harrell_regression_2010]: *Regression Modeling Strategies: With Applications to Linear Models, Logistic Regression, and Survival Analysis*
-- Kutner et al. [-@kutner_applied_2004]: *Applied Linear Statistical Models*
+- Whitlock and Schluter [-@Whitlock2014-nj]: *Analysis of Biological Data*
+- Tabachnick and Fidell [-@Tabachnick2013-yo]: *Using Multivariate Statistics*
+- Sokal and Rohlf [-@Sokal2011-if]: *Biometry*
+- Zar [-@Zar2009-am]: *Biostatistical Analysis*
+- Fox [-@Fox2010-eu]: *Applied Regression Analysis and Generalized Linear Models*
+- Harrell [-@Harrell2010-ql]: *Regression Modeling Strategies: With Applications to Linear Models, Logistic Regression, and Survival Analysis*
+- Kutner et al. [-@Kutner2004-oo]: *Applied Linear Statistical Models*
 
 ## Problem
 
@@ -159,3 +159,6 @@ $Y$ follows some distribution (e.g., normal or binomial)
 Complete Quiz 07-1
 
 Watch Lecture 07-2
+
+## References {.references}
+
