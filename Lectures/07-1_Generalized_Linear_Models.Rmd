@@ -22,7 +22,53 @@ library(cowplot)
 
 ## Problem
 
+<center>
+<img src="images/reddeer.png" width="90%" />
+</center>
+
 ## Prediction
+
+> Outcome: Juvenile Survival <br />
+> Predictor: Birth Date
+
+<center>
+<img src="images/deersurv.png" width="75%" />
+</center>
+
+## Prediction
+
+> Outcome: Juvenile Survival
+
+<div class="columns-2">
+
+Possible predictors:
+
+- Birth date  
+- Birth mass
+- Year
+- Sex
+- Maternal fecundity
+- Maternal reproductive status
+
+<br />
+
+- Maternal age
+- Population size
+- Temperature (min, max, ave...)
+- Rainfall
+- Wind speed
+- ...
+
+</div>
+
+## Prediction
+
+> Outcome: Juvenile Survival
+
+<center>
+<img src="images/deerpath.png" width="80%" />
+</center>
+
 
 ## *Generalized* linear models
 
@@ -88,7 +134,7 @@ $Y$ follows some distribution (e.g., normal or binomial)
 ## Hierarchy of GLMs
 
 <center>
-<img src="images/GLM.jpg" width="100%" />
+<img src="images/GeneralizedLinearModels.png" width="100%" />
 </center>
 
 ## Quiz 07-1
