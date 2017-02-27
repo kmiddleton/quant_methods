@@ -173,8 +173,10 @@ ggplot(JL, aes(x = Treatment, y = Shift)) +
   geom_point(position = position_jitter(width = 0.1)) +
   xlab("Light Treatment") +
   ylab("Shift in Circadian Rhythm (h)") +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+  stat_summary(fun.y = mean, geom = "point", size = 3,
+               color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar",
+               width = 0.1,
                color = "red", size = 0.7)
 ```
 
@@ -231,16 +233,14 @@ fm_lm <- lm(Shift ~ Treatment, data = JL)
 
 ```{r, echo=FALSE}
 set.seed(5)
-mm <- as.data.frame(model.matrix( ~ Treatment, data=JL))
+mm <- as.data.frame(model.matrix( ~ Treatment, data = JL))
 mm$Category <- JL$Treatment
 mm$Shift <- JL$Shift
-mm<-mm[,c(5,1,2,3,4)]
-mm<-mm[sample(1:nrow(mm)),]
-rownames(mm)<-seq(1,nrow(mm))
+mm <- mm[ , c(5, 1, 2, 3, 4)]
+mm <- mm[sample(1:nrow(mm)), ]
+rownames(mm) <- seq(1, nrow(mm))
 mm
-
 ```
-
 
 ## *F* distribution
 
@@ -293,7 +293,6 @@ What role does within vs. between group variation have in determining $F$?
 
 *Stay tuned for multiple comparisons*
 
-
 ## Post hoc tests for ANOVA
 
 Significant ANOVA (*P* = 0.004) only says that at least one mean is different.
@@ -318,7 +317,6 @@ We'll use the Tukey-Kramer test (only one you need to know right now)
 - Tukey-Kramer test makes all the same assumptions as ANOVA.
     - Defaults to all pairwise combinations of levels
 
-
 ## Tukey-Kramer test: `multcomp` library {.smaller}
 
 - Alternative but less general: `TukeyHSD()` in R
@@ -328,8 +326,6 @@ We'll use the Tukey-Kramer test (only one you need to know right now)
 tukey <- glht(fm_lm, linfct = mcp(Treatment = "Tukey"))
 summary(tukey)
 ```
-
-
 
 ## Selective Set of Comparisons {.smaller}
 
