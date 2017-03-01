@@ -1,0 +1,208 @@
+---
+title: 'Problem Set 07'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+# FIXME
+library(tidyverse)
+library(readxl)
+library(cowplot)
+
+library(knitr)
+```
+
+## Predicting height from limb lengths
+
+```{r}
+# FIXME
+set.seed(921)
+N <- 100
+height <- rnorm(N, 175, 2)
+limb_prop <- runif(N, 0.4, 0.5)
+left_limb <- limb_prop * height + rnorm(N, 0, 0.02)
+right_limb <- limb_prop * height + rnorm(N, 0, 0.02)
+M <- data.frame(height, left_limb, right_limb)
+# write_csv(round(M), "../data/Limb_Lengths.csv")
+```
+
+Data:
+
+- *n* = 100 heights (cm), left limb lengths (cm), right limb lengths (cm)
+- Limb length is 40-50% of height, with random left vs. right variation
+
+
+```{r}
+# FIXME
+M <- read_csv("../data/Limb_Lengths.csv")
+M %>% summarise_each(c("mean", "sd")) %>% round(1)
+M %>% head()
+```
+
+Visualizing
+
+```{r echo=FALSE}
+# FIXME
+p1 <- ggplot(M, aes(left_limb, height)) + geom_point() +
+  labs(x = "Limb Length (cm)", y = "Height (cm)") +
+  ggtitle("Left Limb")
+p2 <- ggplot(M, aes(right_limb, height)) + geom_point() +
+  labs(x = "Limb Length (cm)", y = "Height (cm)") +
+  ggtitle("Right Limb")
+plot_grid(p1, p2, ncol = 2)
+```
+
+Correlations
+
+```{r}
+# FIXME
+cor(M$height, M$left_limb)
+cor(M$height, M$right_limb)
+```
+
+```{r}
+# FIXME
+fm_LR <- lm(height ~ left_limb + right_limb, data = M)
+summary(fm_LR)
+```
+
+## Heart Transplant Survivorship
+
+The data in `Heart_Transplants.xlsx` contains data on survivorship (in days; `Survival_Days`) for three groups of heart transplant patients. Patients were groups by the severity of the mismatch between donor and recipient (`Mismatch_Degree`). 1 is a good match, 3 is a bad match, and 2 is intermediate.
+
+### Activity
+
+a. Load the data. Convert `Mismatch_Degree` into a categorical variable. You can recode 1, 2, and 3 into something easier to remember if you want. I'll leave that up to you.
+
+```{r}
+# FIXME
+# Use the labels option to supply labels to the factors.
+M <- read_excel("../data/Heart_Transplants.xlsx")
+M$Mismatch_Degree <- factor(M$Mismatch_Degree,
+                            labels = c("Good", "Medium", "Poor"))
+```
+
+b. There are only 39 observations total, so we may as well plot the raw data (using `geom_point()`). Code for this is in the slide "Does bright light treatment alleviate jet lag symptoms?" in the lecture 7 Rmd file.
+
+Describe what do you see in the plots? You would like to be able to use an ANOVA to compare the mean survival days between groups. In what way does the data not appear to satisfy the assumptions of ANOVA?
+
+```{r}
+# FIXME
+set.seed(2)
+ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
+  geom_point(position = position_jitter(width = 0.1)) +
+  xlab("Quality of Match") +
+  ylab("Survival (d)")
+```
+
+> The good and medium quality match groups are strongly right skewed. One of the assumptions of ANOVA is equal variance across the groups. We could explicitly thest this assuption, but there isn't any reason to. The test will be significant for inequality. So we should just transform and go from there.
+
+c. Find a transformation of `Survival_Days` that corrects the problems observed above. Plot your data each time with the transform. Briefly explain why you chose what you chose.
+
+```{r}
+# FIXME
+M <- M %>% mutate(log_Survival = log(Survival_Days))
+set.seed(2)
+ggplot(M, aes(x = Mismatch_Degree, y = log_Survival)) +
+  geom_point(position = position_jitter(width = 0.1)) +
+  xlab("Mismatch Degree") +
+  ylab("Square Root of Survival (d)")
+```
+
+> To handle the right skew, I tried square-root first. It didn't rein in the large values enough. log (here, natural), seems to do the trick. The variances look pretty similar.
+
+d. Using `lm()`, carry out an ANOVA comparing the means of the three groups for your transformed data. Use `anova()` to get the ANOVA table for the model you just fit.
+
+```{r}
+# FIXME
+fm <- lm(log_Survival ~ Mismatch_Degree, data = M)
+anova(fm)
+```
+
+e. Write a brief description of the analysis you performed, including results of the ANOVA.
+
+> We were interested in survival times (days) in heart transplant recipients with varying quality level of match between donor and recipient (a qualitative scale of good, medium, poor). Survival times in the medium and good categories were strongly right skewed, so we log-transformed survival times to better meet the statistical assumptions of our analyses. We fit a linear model where log-survival times were modeled by quality of transplant match. We found no significant effect of match quality on log-survival time (F~2,36~ = 1.56; *P* = 0.22).
+
+## Bird abundance
+
+The file `Birds.xlsx` contains data from Vuilleumier, F. (1970) Insular Biogeography in Continental Regions. I. The Northern Andes of South America. *American Naturalist* 104:373-388. This paper explores the numbers of bird species in isolated "islands" of paramo vegetation in the Andes. The Missouri Botanical Garden can explain it better than me (http://bit.ly/1PNWfsq):
+
+> Within the tropical regions of Mexico, Central and South America, Africa, Malesia including New Guinea, and Hawaii, there is a vegetation type that occurs between the upper limit of continuous, closed-canopy forest (i.e., forest line or timberline) and the upper limit of plant life (i.e., snow line) that is characterized by tussock grasses, large rosette plants, shrubs with evergreen, coriaceous and sclerophyllous leaves, and cushion plants.  This vegetation type is scattered along the crests of the highest mountain ranges or on isolated mountaintops between about 3000 meters (m) and 5000 m, like islands in a sea of forest.
+
+We would like to use these data to see what the best predictors of bird abundance are. The data contain species abundance (`N_Species`) and geographical information for 14 "islands". Other data include:
+
+1. `Area`: "Island" size (thousands of square km)
+1. `Elevation`: Elevation (thousands of meters)
+1. `Dist_to_Equador`: Distance to Ecuador (km)
+1. `Dist_to_Island`: Distance to nearest island (km)
+
+### Activity
+
+We will use multiple regression to find the relative importance of each of these variables in predicting species abundance.
+
+a. Start by loading the data and plotting histograms of the variables. You can make 5 different plots. Think about any variables that might need transformation. There are only 14 observations, so it's going to be hard to discern normality. Here you are just looking for really obviously right or left skewed distributions.
+
+```{r message=FALSE}
+# FIXME
+M <- read_excel("../data/Birds.xlsx")
+ggplot(M, aes(x = N_Species)) + geom_histogram()
+ggplot(M, aes(x = Area)) + geom_histogram()
+ggplot(M, aes(x = Elevation)) + geom_histogram()
+ggplot(M, aes(x = Dist_to_Equador)) + geom_histogram()
+ggplot(M, aes(x = Dist_to_Island)) + geom_histogram()
+```
+
+> Area might be right skewed, but there really isn't any way to tell for certain with so few observations. We could do some kind of normality test, but it would be terribly underpowered and thus not terribly informative. Square-root transforming area doesn't appear to do much. Let's just use the data as is, aware that we'll have trouble drawing meaningful conclusions.
+
+> We will tackle this same problem later in the course and explore ways to deal with the small sample size.
+
+b. When you have multivariate data like this, it's usually a good idea to look at all the pairwise correlations between variables. You can do this with `cor()`. If I have a data.frame called `M` and data in columns 2 to 5, `print(cor(M[, 2:6]), digits = 3)` will give the correlation table. Wrapping the call to `cor()` in `print()` with `digits = 3` just make R print fewer digits.
+
+Insert a code chunk below and calculate the correlation table for the numeric variables.
+
+```{r}
+# FIXME
+print(cor(M[, 2:6]), digits = 3)
+```
+
+What patterns do you see in the correlations? Note that 1's run along the diagonal (a variable correlated to itself is 1), and that the upper and lower triangles are symmetrical. Also note that you haven't done any tests of significance, so you can't say anything definitive about "significant correlations".
+
+> There are both positive and negative correlations. Some are moderately large ($\pm0.5-0.7$) and some are quite small (distance to the nearest island and elevation). Nothing really stands out good or bad.
+
+c. Fit a linear model wherein species abundance is predicted by the other four variables. Save this model to an R object.
+
+```{r}
+# FIXME
+fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Equador, data = M)
+```
+
+d. Use `summary()` to get information about the model fit.
+
+```{r}
+# FIXME
+summary(fm)
+```
+
+- What is the R^2^ for the regression model?
+
+> *R*^2^ = 0.73
+
+- Overall, are the four variables able to predict species abundance in combination (overall ANOVA)?
+
+> Yes, the overall ANOVA for the linear model is *F*~4,9~ = 6.1 and *P* = 0.011. So the combination of these four variables is able to predict species abundance.
+
+- What variable or variables are significantly different from 0? Does species abundance increase or decrease with a one unit increase in this/these variable(s)?
+
+> The only significant predictor is distance to Equador: *P* = 0.01. As distance to Equador increases, species abundance decreases. For each 1 km farther from Equador, species abundance drops by 0.02 species.
+
+e. Write a few sentences describing your analysis.
+
+> To determine what geographic and environmental factors were predictors of species abundance in 14 paramo regions, we fit a linear model wherein abundance was modeled by (1) distance to the nearest paramo "island", (2) elevation, (3) area, and (4) distance from Equador. Overall these four factors were collective significant predictors of species abundance (*F*~4,9~ = 6.1; *P* = 0.01). Among the factors, only the distance from Equador was a significant predictor ($\alpha$ = 0.05). For each 1 km increase in distance from Equador, species abundance decreases by 0.02 (*P* = 0.01).
+
