@@ -11,13 +11,7 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-# FIXME
 library(tidyverse)
-library(readxl)
-library(cowplot)
-library(forcats)
-
-library(knitr)
 ```
 
 ## Variation Within and Between Groups
@@ -65,65 +59,22 @@ Now let's try our simulation. We will simulate two groups that have different me
 5) There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Return to your function and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value.
 
 ```{r}
-set.seed(2351222)
 
-getF <- function(mu1, mu2, sd_both, nobs) {
-  niter <- 100
-  f.out <- numeric(length = niter)
-  for (ii in 1:niter) {
-    sim.dat <- data.frame(
-      outcome = c(rnorm(nobs, mu1, sd_both),
-                  rnorm(nobs, mu2, sd_both)), 
-      predictor = rep(c(1, 2),each = nobs))
-    f.out[ii] <- anova(lm(outcome ~ predictor,
-                          data = sim.dat))$F[1]
-  }
-  return(mean(f.out))
-}
-
-sds <- seq(1, 5, by = 0.25)  
-sim.param <- data.frame(sds = sds, 
-                        mu1s = rep(0, length(sds)), 
-                        mu2s = rep(1, length(sds)), 
-                        nobss = rep(100, length(sds)))
-
-ff <- apply(sim.param, 1, function(x) getF(x[2], x[3], x[1], x[4]))
-
-sim.param$Fval <- ff
-
-fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
-
-ggplot(sim.param, aes(x = sds, y = Fval)) +
-  geom_point() +
-  geom_hline(yintercept = fcrit, color = 'coral')
 ```
 
 What do you observe in the plot?
 
-> As the standard deviation increases, the F-value decreases.
+> 
 
 Think of all the variables in this simulation. Which should be altered to change the within-group variance, and which to change the between-group variance?
 
-> Within-group variance == standard deviation (what we have done here). Between-group variance == mean value for each group.
+> 
 
 What do you think is the lower limit of F (i.e., if you increased the standard deviation difference to a very large number)?
 
-> F assymtotes at 0.
+> 
 
 ## Predicting height from limb lengths
-
-```{r}
-# FIXME
-# Simulate data
-set.seed(921)
-N <- 100
-height <- rnorm(N, 175, 2)
-limb_prop <- runif(N, 0.4, 0.5)
-left_limb <- limb_prop * height + rnorm(N, 0, 0.02)
-right_limb <- limb_prop * height + rnorm(N, 0, 0.02)
-M <- data.frame(height, left_limb, right_limb)
-# write_csv(round(M, 1), "../data/Limb_Lengths.csv")
-```
 
 We should be able to predict someone's height from the lengths of their limbs. The file `Limb_Lengths.csv` contains data for 100 heights and associated left and right limb lengths. We know that limb length is about 40-50% of total height, but we can develop a linear model for prediction.
 
@@ -132,55 +83,38 @@ We should be able to predict someone's height from the lengths of their limbs. T
 Load the data for limb lengths. Use `summarize_each()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
 
 ```{r}
-# FIXME
-M <- read_csv("../data/Limb_Lengths.csv")
-M %>% head()
-M %>% summarize_each(funs = c("mean", "sd"))
+
 ```
 
 Make two plots, one for left limb length vs. height and one for right limb length vs. height. Use `plot_grid()` to put them side by side.
 
 ```{r echo=FALSE}
-# FIXME
-p1 <- ggplot(M, aes(left_limb, height)) + geom_point() +
-  labs(x = "Limb Length (cm)", y = "Height (cm)") +
-  ggtitle("Left Limb")
-p2 <- ggplot(M, aes(right_limb, height)) + geom_point() +
-  labs(x = "Limb Length (cm)", y = "Height (cm)") +
-  ggtitle("Right Limb")
-plot_grid(p1, p2, ncol = 2)
+
 ```
 
 Fit a single linear model in which height is predicted by both left and right limb lengths (this is an "additive" model). Print out the summary of the model.
 
 ```{r}
-# FIXME
-fm_LR <- lm(height ~ left_limb + right_limb, data = M)
-summary(fm_LR)
+
 ```
 
 Explain the results that you find. Why do you think that neither left nor right limb length is a good predictor of height in the model you fit?
 
 ```{r}
-# FIXME
-cor(M$left_limb, M$right_limb)
+
 ```
 
-> When we fit a model that includes both limb lengths, there is severe multicollinearity. Separately each is probably a good predictor, but together, they are not good. The correlation between them is > 0.99.
+> 
 
 Fit separate linear models in which height is predicted by left and then right limb length.
 
 ```{r}
-# FIXME
-fm_L <- lm(height ~ left_limb, data = M)
-summary(fm_L)
-fm_R <- lm(height ~ right_limb, data = M)
-summary(fm_R)
+
 ```
 
 Do these models make more sense?
 
-> Yes, for each limb length is a significant predictor of height. This result is what we expect to see.
+> 
 
 ## Heart Transplant Survivorship
 
@@ -191,9 +125,7 @@ The data in `Heart_Transplants.xlsx` contains data on survivorship (in days; `Su
 Load the data from the Excel file and look at the structure with either `str()` or `glimpse()` (from tidyverse).
 
 ```{r}
-# FIXME
-M <- read_excel("../data/Heart_Transplants.xlsx")
-str(M)
+
 ```
 
 Notice that `Mismatch_Degree` is currently a character vector. To use it in a linear model, we need to convert it to a factor. We could do this with R's built-in function `factor()`. The drawback is that, by default, `factor()` will order the factors in alphabetical order. For these data, the alphabetical order will put the `High` mismatch first, which is not ideal. We want to have `Low` come first.
@@ -207,70 +139,52 @@ Because the data or organized so that the `Low` group is first, we can use `fct_
 Use `mutate()` and `fct_inorder()` to make `Mismatch_Degree` into a factor. 
 
 ```{r}
-# FIXME
-M <- M %>% 
-  mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
+
 ```
 
 There are only 39 observations total, so we may as well plot the raw data. Modify the code from the last two problem sets for plotting the points with the group means and standard errors.
 
 ```{r}
-ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Mismatch Degree", y = "Survival (days)")
+
 ```
 
 Describe what you see in the plots. You would like to be able to use a linear model (ANOVA) to compare the mean survival days between groups. In what way does the data not appear to satisfy the assumptions of ANOVA?
 
-> The good and medium quality match groups are strongly right skewed. One of the assumptions of ANOVA is equal variance across the groups. We could explicitly thest this assuption, but there isn't any reason to. The test will be significant for inequality. So we should just transform and go from there.
+> 
 
 Find a transformation of `Survival_Days` that corrects the problems observed above. Plot your data each time with the transform. Briefly explain why you chose what you chose.
 
 ```{r}
-# FIXME
-M <- M %>% mutate(log_Survival = log(Survival_Days))
-ggplot(M, aes(x = Mismatch_Degree, y = log_Survival)) +
-  geom_point(position = position_jitter(width = 0.1)) +
-  xlab("Mismatch Degree") +
-  ylab("log Survival (d)")
+
 ```
 
-> To handle the right skew, we tried square-root first. It didn't rein in the large values enough. log (here, natural), seems to do the trick. The variances look pretty similar.
+> 
 
 Using `lm()`, fit a linear model in which transformed survival is modeled by the degree of mismatch. Save this to an object. Use `anova()` on that object to get the ANOVA table for the model you just fit.
 
 ```{r}
-# FIXME
-fm <- lm(log_Survival ~ Mismatch_Degree, data = M)
-anova(fm)
+
 ```
 
 What do the results of this linear model show?
 
-> Log-transformed survival (days) is not significantly different in the the three groups.
+> 
 
 Fit another linear model just like the one above, but remove the intercept term by including `- 1` in the model: `lm(... ~ ... - 1)`. Compare the `summary()` of this model to the group means for each `Mismatch_Degree` (using `group_by()` and `summarize()`).
 
 ```{r}
-fm2 <- lm(log_Survival ~ Mismatch_Degree - 1, data = M)
-summary(fm2)
 
-M %>% group_by(Mismatch_Degree) %>%
-  summarize(mean_survival = mean(log_Survival))
 ```
 
 What does removing the intercept term from an ANOVA linear model do?
 
-> It forces R to estimate separate means for each group separately. This can be a useful technique.
+> 
 
 ## Bird abundance
 
 The file `Birds.xlsx` contains data from Vuilleumier, F. (1970) Insular Biogeography in Continental Regions. I. The Northern Andes of South America. *American Naturalist* 104:373-388. This paper explores the numbers of bird species in isolated "islands" of paramo vegetation in the Andes. The Missouri Botanical Garden can explain it better than me (http://bit.ly/1PNWfsq):
 
-> Within the tropical regions of Mexico, Central and South America, Africa, Malesia including New Guinea, and Hawaii, there is a vegetation type that occurs between the upper limit of continuous, closed-canopy forest (i.e., forest line or timberline) and the upper limit of plant life (i.e., snow line) that is characterized by tussock grasses, large rosette plants, shrubs with evergreen, coriaceous and sclerophyllous leaves, and cushion plants.  This vegetation type is scattered along the crests of the highest mountain ranges or on isolated mountaintops between about 3000 meters (m) and 5000 m, like islands in a sea of forest.
+> 
 
 We would like to use these data to see what the best predictor(s) of bird abundance is/are. The data contain species abundance (`N_Species`) and geographical information for 14 "islands". Other data include:
 
@@ -286,58 +200,47 @@ We will use multiple regression to find the relative importance of each of these
 Start by loading the data and plotting histograms of the variables. You can make 5 different plots. Think about any variables that might need transformation. There are only 14 observations, so it's going to be hard to discern normality. Here you are just looking for really obviously right or left skewed distributions.
 
 ```{r message=FALSE}
-# FIXME
-M <- read_excel("../data/Birds.xlsx")
-ggplot(M, aes(x = N_Species)) + geom_histogram()
-ggplot(M, aes(x = Area)) + geom_histogram()
-ggplot(M, aes(x = Elevation)) + geom_histogram()
-ggplot(M, aes(x = Dist_to_Ecuador)) + geom_histogram()
-ggplot(M, aes(x = Dist_to_Island)) + geom_histogram()
+
 ```
 
 Describe any patterns you see in the raw data.
 
-> Area might be right skewed, but there really isn't any way to tell for certain with so few observations. We could do some kind of normality test, but it would be terribly underpowered and thus not terribly informative. Square-root transforming area doesn't appear to do much. Let's just use the data as is, aware that we'll have trouble drawing meaningful conclusions.
-
-> We will tackle this same problem later in the course and explore ways to deal with the small sample size.
+> 
 
 When you have multivariate data like this, it's usually a good idea to look at all the pairwise correlations between variables. You can do this with `cor()`. If you have a data.frame called `M` and data in columns 2 to 5, `print(cor(M[, 2:6]), digits = 3)` will give the correlation table. Wrapping the call to `cor()` in `print()` with `digits = 3` just make R print fewer digits.
 
 Insert a code chunk below and calculate the correlation table for the numeric variables.
 
 ```{r}
-# FIXME
-print(cor(M[, 2:6]), digits = 3)
+
 ```
 
 What patterns do you see in the correlations? Note that 1's run along the diagonal (a variable correlated to itself is 1), and that the upper and lower triangles are symmetrical. Also note that you haven't done any tests of significance, so you can't say anything definitive about "significant correlations".
 
-> There are both positive and negative correlations. Some are moderately large ($\pm0.5-0.7$) and some are quite small (distance to the nearest island and elevation). Nothing really stands out good or bad.
+> 
 
 Fit a linear model wherein species abundance is predicted by the other four variables. Save this model to an R object.
 
 ```{r}
-# FIXME
-fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador, data = M)
+
 ```
 
 Use `summary()` to get information about the model fit.
 
 ```{r}
-# FIXME
-summary(fm)
+
 ```
 
 R^2^ is a measure of how much of the variation in the outcome variable (`N_Species`) is explained by the predictors. R^2^ for linear models in R is "Multiple R-squared" (ignore "Adjusted R-squared") in the summary.
 
 What is the R^2^ for the regression model?
 
-> *R*^2^ = 0.73
+> 
 
 Overall, are the four variables able to predict species abundance in combination (overall ANOVA)?
 
-> Yes, the overall ANOVA for the linear model is *F*~4,9~ = 6.1 and *P* = 0.011. So the combination of these four variables is able to predict species abundance.
+> 
 
 What variable or variables are significantly different from 0? Does species abundance increase or decrease with a one unit increase in this/these variable(s)?
 
-> The only significant predictor is distance to Ecuador: *P* = 0.01. As distance to Ecuador increases, species abundance decreases. For each 1 km farther from Ecuador, species abundance drops by 0.02 species.
+> 
