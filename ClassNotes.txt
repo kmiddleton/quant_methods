@@ -280,6 +280,7 @@ Goals:
 
   - Categorical
   - Continuous
+  - Type III SS, order matters
   - Mixed
 
 3. Mixed models
