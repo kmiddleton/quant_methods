@@ -68,32 +68,35 @@ Now let's try our simulation. We will simulate two groups that have different me
 set.seed(2351222)
 
 getF <- function(mu1, mu2, sd_both, nobs) {
-  niter <- 100
-  f.out <- numeric(length = niter)
-  for (ii in 1:niter) {
-    sim.dat <- data.frame(
-      outcome = c(rnorm(nobs, mu1, sd_both),
-                  rnorm(nobs, mu2, sd_both)), 
-      predictor = rep(c(1, 2),each = nobs))
-    f.out[ii] <- anova(lm(outcome ~ predictor,
-                          data = sim.dat))$F[1]
-  }
-  return(mean(f.out))
+  x <- factor(rep(c(1, 2), each = nobs))
+  y1 <- rnorm(nobs, mu1, sd_both)
+  y2 <- rnorm(nobs, mu2, sd_both)
+  y <- c(y1, y2)
+  M <- data.frame(x, y)
+  fm <- anova(lm(y ~ x, data = M))
+  F_val <- fm$"F value"[1]
+  return(F_val)
 }
+getF(mu1 = 0, mu2 = 1, sd_both = 1, nobs = 100)
 
-sds <- seq(1, 5, by = 0.25)  
-sim.param <- data.frame(sds = sds, 
-                        mu1s = rep(0, length(sds)), 
-                        mu2s = rep(1, length(sds)), 
-                        nobss = rep(100, length(sds)))
+sds <- seq(1, 5, by = 0.25)
+sims <- data.frame(
+  sd_both = sds,
+  mu1 = rep(0, length = length(sds)),
+  mu2 = rep(1, length = length(sds)),
+  nobs = rep(100, length = length(sds))
+)
 
-ff <- apply(sim.param, 1, function(x) getF(x[2], x[3], x[1], x[4]))
+Fs <- apply(sims, 1, function(x) {getF(x[2], x[3], x[1], x[4])})
+sims$Fs <- Fs
 
-sim.param$Fval <- ff
+ggplot(sims, aes(sd_both, Fs)) +
+  geom_point()
+
 
 fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
 
-ggplot(sim.param, aes(x = sds, y = Fval)) +
+ggplot(sims, aes(x = sds, y = Fval)) +
   geom_point() +
   geom_hline(yintercept = fcrit, color = 'coral')
 ```
