@@ -1,0 +1,268 @@
+---
+title: "Linear Models: In Class"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggrepel)
+library(cowplot)
+library(readxl)
+library(knitr)
+library(rgl)
+library(GGally)
+library(knitr)
+knit_hooks$set(webgl = hook_webgl)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## Multiple regression
+
+```{r, fig.height = 4, echo=FALSE}
+milk <- read_excel("../data/Milk.xlsx", na = "NA")
+M <- milk %>% select(species, kcal.per.g, perc.fat, perc.lactose) %>%
+  drop_na()
+names(M) <- c("Species", "Milk_Energy", "Fat", "Lactose")
+ggscatmat(as.data.frame(M), columns = 2:4)
+```
+
+## Multiple regression {.smaller}
+
+```{r}
+fm <- lm(Milk_Energy ~ Fat + Lactose, data = M)
+summary(fm)
+```
+
+## Estimate `Fat` coefficient
+
+1. Use `Lactose` to predict `Fat`, which will take the effect of `Lactose` out of the model when we predict `Milk_Energy`
+1. Extract the residuals and add them onto the data.
+
+```{r}
+fm_Lact <- lm(Fat ~ Lactose, data = M)
+M$resid_Lact <- residuals(fm_Lact)
+head(M)
+```
+
+## Estimate `Fat` coefficient
+
+```{r echo=FALSE}
+F_v_L <- ggplot(M, aes(Lactose, Fat, label = Species)) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  geom_point() +
+  labs(x = "Percent Lactose", y = "Percent Fat")
+print(F_v_L + geom_text_repel(size = 3, force = 15))
+```
+
+## Estimate `Fat` coefficient
+
+```{r echo=FALSE}
+milk_res_lact <- ggplot(M, aes(resid_Lact, Milk_Energy,
+                               label = Species)) +
+  geom_vline(xintercept = 0, color = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+  geom_point() +
+  labs(x = "Residual Fat Percent", y = "Milk Energy")
+print(milk_res_lact + geom_text_repel(size = 3, force = 15))
+```
+
+## Estimate `Fat` coefficient
+
+```{r}
+coef(lm(Milk_Energy ~ resid_Lact, data = M))
+coef(fm)
+```
+
+## Estimate `Lactose` coefficient
+
+1. Use `Fat` to predict `Lactose`, which will take the effect of `Fat` out of the model when we predict `Milk_Energy`
+1. Extract the residuals and add them onto the data.frame `M`.
+
+```{r}
+fm_Fat <- lm(Lactose ~ Fat, data = M)
+M$resid_Fat <- residuals(fm_Fat)
+```
+
+## Estimate `Lactose` coefficient
+
+```{r echo=FALSE}
+L_v_F <- ggplot(M, aes(Fat, Lactose, label = Species)) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  geom_point() +
+  labs(y = "Percent Lactose", x = "Percent Fat")
+print(L_v_F + geom_text_repel(size = 3, force = 15))
+```
+
+## Estimate `Lactose` coefficient
+
+```{r echo=FALSE}
+milk_res_fat <- ggplot(M, aes(resid_Fat, Milk_Energy,
+                              label = Species)) +
+  geom_vline(xintercept = 0, color = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+  geom_point() +
+  labs(x = "Residual Lactose Percent", y = "Milk Energy")
+print(milk_res_fat + geom_text_repel(size = 3, force = 15))
+```
+
+## Estimate `Lactose` coefficient
+
+```{r}
+coef(lm(Milk_Energy ~ resid_Fat, data = M))
+coef(fm)
+```
+
+## Compare
+
+```{r echo=FALSE}
+plot_grid(F_v_L, L_v_F, ncol = 2)
+```
+
+## Compare
+
+```{r echo=FALSE, fig.height = 4}
+plot_grid(milk_res_lact, milk_res_fat, ncol = 2)
+coef(fm)
+```
+
+## Relationshps between variables
+
+<div class="columns-2">
+
+<center>
+<br />
+<br />
+<br />
+<br />
+<img src="images/semi1.png" width="75%" />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+</center>
+
+What is the independent contribution of X1 to Y?
+
+How much variation does X1 alone explain in Y?
+
+*Experimental control*
+
+- Eliminate variation in Y due to X2
+- For continuous variables, if X2 sampled randomly – same in both groups
+- For categorical variables, if you have a balanced design
+
+</div>
+
+## Statistical control
+
+$$\frac{Variation~in~Y~explained~by~X1}{Total~Variation~in~Y}$$
+
+<div class="columns-2">
+
+What regression does:
+
+<center>
+<img src="images/semi2.png" width="50%" />
+</center>
+
+<br />
+<br />
+<br />
+
+If X1 and X2 are uncorrelated:
+
+- Y ~ X1 *and*
+- Y ~ X1 + X2
+
+will give the same coefficient for X1.
+
+With categorical variables, a balanced design produced uncorrelated (orthogonal) Xs.
+
+</div>
+
+## Statistical control
+
+<div class="columns-2">
+
+```{r echo=FALSE}
+yy <- data.frame(SoilType = c(1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
+                 LightLevel = c(1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0))
+knitr::kable(head(yy))
+```
+
+<br />
+<br />
+
+```{r echo=FALSE, message = FALSE, fig.width = 4, warning=FALSE}
+ggplot(yy, aes(LightLevel, SoilType)) +
+  geom_jitter(width=0.05, height=0.05, alpha=0.5) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+</div>
+
+## Statistical control
+
+<div class="columns-2">
+
+```{r echo=FALSE}
+yy <- data.frame(SoilType = c(0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0),
+                 LightLevel = c(0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0))
+knitr::kable(head(yy))
+```
+
+<br />
+<br />
+
+```{r echo=FALSE, message = FALSE, fig.width = 4, warning=FALSE}
+ggplot(yy, aes(LightLevel, SoilType)) +
+  geom_jitter(width=0.05, height=0.05, alpha=0.5) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+</div>
+
+## Statistical control
+
+$$\frac{Variation~in~Y~explained~by~X1}{Variation~not~explained~by~X2}$$
+
+<div class="columns-2">
+
+Another method:
+
+<center>
+<img src="images/semi3.png" width="50%" />
+</center>
+
+<br />
+<br />
+<br />
+
+1) Perform:
+
+- Y ~ X2
+
+2) Get residuals
+
+3) Perform:
+
+- Residuals ~ X1
+
+</div>
+
+## Want to know more?
+
+- Tabachnick and Fidell (2001)
+- Search terms: Partial vs. Semi-partial Correlation

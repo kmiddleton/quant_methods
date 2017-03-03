@@ -240,7 +240,7 @@ milk_res_lact <- ggplot(M, aes(resid_Lact, Milk_Energy,
   geom_vline(xintercept = 0, color = "blue") +
   geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
   geom_point() +
-  labs(x = "Residual Lactose Percent", y = "Milk Energy")
+  labs(x = "Residual Fat Percent", y = "Milk Energy")
 print(milk_res_lact + geom_text_repel(size = 3, force = 15))
 ```
 
@@ -279,7 +279,7 @@ milk_res_fat <- ggplot(M, aes(resid_Fat, Milk_Energy,
   geom_vline(xintercept = 0, color = "blue") +
   geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
   geom_point() +
-  labs(x = "Residual Fat Percent", y = "Milk Energy")
+  labs(x = "Residual Lactose Percent", y = "Milk Energy")
 print(milk_res_fat + geom_text_repel(size = 3, force = 15))
 ```
 
