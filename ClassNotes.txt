@@ -255,6 +255,10 @@ Problem set
   - Multicollinearity
   - Simulation of w/in and between group variation -> effect on F
 
+In class:
+
+  - Partial and semi-partial (multiple regression) correlation
+
 ---
 
 Week 8: Generalized linear models
@@ -266,13 +270,29 @@ Goals:
   - Binomial (= Chisq)
   - Mixed
   - Variance components
-  - Perils
+  - Repeatability
+
+1. Variance components & R^2
+
+  - Repeatability
+
+2. Interactions
+
+  - Categorical
+  - Continuous
+  - Mixed
+
+3. Mixed models
+
+4. Binomial and others
 
 ---
 
 Week 9: Randomization, multiple testing
 
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC379178/
+
+Look at Stevens material
 
 Goals:
 
@@ -284,8 +304,6 @@ Goals:
 Problem set:
 
   - Simple permutation test
-  - Relevel factor
-
 
 ---
 Week 10: Model comparison, model based inference
@@ -300,7 +318,7 @@ Goals:
 
 ---
 
-Week 11: Kinship and phylogenetic methods
+Week 11: Kinship, phylogenetic methods, mixed models
 
 Goals:
 
