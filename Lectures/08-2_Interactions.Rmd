@@ -1,0 +1,304 @@
+---
+title: "General(ized) Linear Models: Interactions"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+library(cowplot)
+library(car)
+library(multcomp)
+library(lsmeans)
+
+```
+
+## Factorial designs and interactions
+
+**Factorial designs** all combinations of treatments are included:
+
+|            | $X_1$ Tx A       | $X_1$ Tx B       |
+|-----------:|:----------------:|:----------------:|
+|$X_2$ Tx A  | $X_1$ A, $X_2$ A | $X_1$ B, $X_1$ A |
+|$X_2$ Tx B  | $X_1$ A, $X_2$ B | $X_1$ B, $X_1$ B |
+
+- Allow you to explore *interactions* (multiplicative effects)
+
+If you have multiple categorical variables, you should *always* do factorial designs (unless you know why you aren't).
+
+## Interaction model
+
+Add a new predictor ($\beta_3$) that is the product of $X_1$ and $X_2$:
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 (X_1 X_2) + \epsilon$$
+
+The value of $X_1$ varies with change in the value of $X_2$ (and vice versa - these are not really separable).
+
+## Factorial data
+
+Weight gain in rats fed two diets with high and low protein from two different sources.
+
+```{r}
+data("weightgain", package = "HSAUR3")
+WG <- weightgain
+str(WG)
+```
+
+## Factorial data
+
+Balanced data: Equal *n* in each group
+
+```{r}
+WG %>% group_by(source, type) %>% tally()
+```
+
+Balanced data is the best to work with.
+
+## Visualizing factorial data
+
+```{r}
+ggplot(WG, aes(x = source, y = weightgain, color = type)) +
+  geom_point(position = position_jitter(width = 0.1))
+```
+
+## Interaction plot
+
+```{r int_plot1, eval=FALSE}
+ggplot(WG, aes(x = source,
+               y = weightgain,
+               color = type,
+               group = type)) +
+  geom_point(position = position_jitter(width = 0.1)) +
+  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
+  stat_summary(fun.y = mean, geom = "line")
+```
+
+## Interaction plot
+
+```{r ref.label="int_plot1", echo=FALSE, eval=TRUE}
+```
+
+## Interaction plot
+
+```{r int_plot2, echo=FALSE}
+ggplot(WG, aes(x = type,
+               y = weightgain,
+               color = source,
+               group = source)) +
+  geom_point(position = position_jitter(width = 0.1)) +
+  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
+  stat_summary(fun.y = mean, geom = "line")
+```
+
+## Group means
+
+```{r}
+WG %>% group_by(source, type) %>%
+  summarize(mean = mean(weightgain))
+```
+
+## Two-way factorial ANOVA
+
+```{r}
+fm <- lm(weightgain ~ source * type, data = WG)
+```
+
+`source * type` expands to:
+
+```{r eval=FALSE}
+fm <- lm(weightgain ~ source + type + source:type, data = WG)
+```
+
+`source:type` is the interaction term
+
+## Two-way factorial ANOVA {.smaller}
+
+```{r}
+summary(fm)
+```
+
+## ANOVA table
+
+```{r}
+fm2 <- lm(weightgain ~ type * source, data = WG)
+anova(fm2)
+```
+
+## Interpretations
+
+```{r ref.label="int_plot1", echo=FALSE, eval=TRUE}
+```
+
+## Power to detect interactions is low [@wahlsten_insensitivity_1990]
+
+For a 2 X 2 design
+
+- Power to detect a main effect is 87%
+- Power to detect the interaction is 16% 
+
+ANOVA will suggest additivity of effects when in fact they are multiplicative
+
+## Under the hood
+
+Numeric representations of `source` and `type`:
+
+```{r}
+WG$source_num <- ifelse(WG$source == "Beef", 0, 1)
+WG$type_num <- ifelse(WG$type == "High", 0, 1)
+```
+
+Numeric representation of the interaction (multiple the other two numeric representations):
+
+```{r}
+WG$interact <- WG$source_num * WG$type_num
+```
+
+1's only for the "Cereal" & "Low" groups. 0's for all others.
+
+## 4 parameters define 4 groups
+
+1. $\beta_0$ = `(Intercept)` = "Beef" & "High" group mean
+1. $\beta_1$ = `source_num` = "Cereal" & "High" addition
+1. $\beta_2$ = `type_num` = "Beef" & "Low" addition
+1. $\beta_3$ = `interact` = #2 + #3 + "Cereal" & "Low" addition
+
+## Under the hood {.smaller}
+
+```{r}
+summary(lm(weightgain ~ source_num + type_num + interact, data = WG))
+```
+
+## Model matrix {.smaller}
+
+R does the factor $\rightarrow$ numeric conversion behind the scenes:
+
+```{r}
+model.matrix(weightgain ~ source * type, data = WG)
+```
+
+## Into the abyss...
+
+ANOVA tables, sums of squares, and hypothesis tests.
+
+- As soon as there are interactions with an unbalanced design, variables can share variance.
+
+Questions get complicated:
+
+1. What is the effect of variable 1 on y, ignoring variable 2?
+2. What is the effect of variable 2 on y, ignoring variable 1?
+3. What is the effect of variable 1 on y, controlling for variable 2?
+4. What is the effect of variable 2 on y, controlling for variable 1?
+
+## Partitioning variance
+
+Different ways to partition variance has a cascading effect:
+
+- Determines sums of squares, which
+- Determines mean squares, which
+- Determines *P* values
+
+Thus you should be aware of how your ANOVA table is calculated.
+
+## Types of sums of squares
+
+**Type I**: "sequential", "unweighted", ordering of factors in the model matters, the R default, probably not what you want *if you have unbalanced sample sizes*
+
+**Type II**: main effects allowed to overlap with their interaction terms, useful if interaction is weak
+
+**Type III**: "weighted", each reported effect controls for all the others (including interactions)
+
+## Types of sums of squares
+
+Each type tests subtly different hypotheses.
+
+- I almost never test your intentions (though it is the mathematical statistician's preference)
+- I == III if the groups are balanced (ideal situation - you don't have to choose)
+- III matches the output of `summary(lm())` (so that's nice)
+
+## Unbalanced groups
+
+Randomly drop 5 rows:
+
+```{r}
+set.seed(15)
+WG_ub <- WG %>% slice(sample(1:nrow(.), nrow(.) - 5))
+WG_ub %>% group_by(source, type) %>% tally()
+```
+
+## ANOVA Model 1
+
+```{r}
+fm1 <- lm(weightgain ~ source * type, data = WG_ub)
+anova(fm1)
+```
+
+## ANOVA Model 2
+
+```{r}
+fm2 <- lm(weightgain ~ type * source, data = WG_ub)
+anova(fm2)
+```
+
+## Type III sums of squares
+
+```{r}
+library(car)
+Anova(fm1, type = "III")
+```
+
+## Type III sums of squares
+
+```{r}
+library(car)
+Anova(fm2, type = "III")
+```
+
+## Key points
+
+1. Check your sample sizes within groups
+1. Pay attention when you have interaction terms
+1. Think about your sums of squares
+1. Type II or Type III is likely what you want
+
+## Higher order interaction terms
+
+It is difficult enough to interpret an interaction in a 2 X 2 ANOVA model.
+
+- Higher order terms multiply and become impossible to comprehend
+
+$$Y = \beta_0 + \beta_1 Sex \times \beta_2 Wheel \times \beta_3 Linetype$$
+
+- What does a significant Sex X Wheel X Linetype interaction mean?
+
+Split your data and do two analyses unless you really must.
+
+## I really want to know more about these Type III sums of squares
+
+- https://www.stats.ox.ac.uk/pub/MASS3/Exegeses.pdf
+- http://stats.stackexchange.com/q/60362/597
+- http://www.matthewckeller.com/TypeIorTypeIIISS.pdf
+
+## These disagreements are all specific to sums of squares and variance component estimation.
+
+Alternatives:
+
+- Model Comparisons & Likelihood
+
+- Bayesian Analyses
+
+
+## Quiz 08-2
+
+Watch Lecture 08-3
+
+## References {.references}
+

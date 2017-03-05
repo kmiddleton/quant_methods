@@ -1,0 +1,214 @@
+---
+title: "General(ized) Linear Models: Partitioning Variance"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+library(GGally)
+library(ggrepel)
+#library(rgl)
+
+```
+
+## GLMs and Variance 
+
+> How much of the variation in the outcome variable is explained by the predictor variables?
+
+<center>
+<img src="images/GeneralizedLinearModels.png" width="80%" />
+</center>
+
+## Multiple Regression Makes a Composite Variable
+
+- Linear combination of predictor variables that is maximally correlated with outcome variable
+- How well can you predict the outcome by the set of predictor variables?
+    - correlation of y with $\hat{y}$ 
+    - $R^{2}$ = squared correlation coefficient of y with $\hat{y}$ 
+    
+## Milk Energy
+
+```{r}
+milk <- read_excel("../data/Milk.xlsx", na = "NA")
+M <- milk %>% select(species, kcal.per.g, mass, neocortex.perc) %>%
+  drop_na()
+names(M) <- c("Species", "Milk_Energy", "Mass", "Neocortex")
+M <- M %>% mutate(log_Mass = log(Mass))
+```
+
+## Visualizing data
+
+```{r webgl=TRUE, echo=FALSE}
+#plot3d(M$Fat, M$Lactose, M$Milk_Energy,
+ #      type = "s", col = "red", size = 1,
+  #     xlab = "Fat Percent",
+   #    ylab = "Lactose Percent",
+    #   zlab = "Milk Energy")
+```
+
+## Multivariate model {.smaller}
+
+```{r}
+fm_Multi <- lm(Milk_Energy ~ Neocortex + log_Mass, data = M)
+summary(fm_Multi)
+```
+
+
+
+
+## $R^{2}$: Multiple Regression Makes a Composite Variable
+
+```{r echo=FALSE}
+y_hat<-fm_Multi$fitted.values
+
+ggplot(M, aes(x=y_hat, y=M$Milk_Energy)) +
+  geom_point() +
+  geom_smooth(method='lm', se=FALSE) +
+  ylab('Milk Energy') +
+  xlab('Predicted Milk Energy') 
+```
+
+## $R^{2}$: Multiple Regression Makes a Composite Variable
+
+```{r}
+y_hat<-fm_Multi$fitted.values
+
+cor(y_hat,M$Milk_Energy)^2
+
+summary(fm_Multi)$r.squared
+
+```
+
+
+## "Analysis of Variance"
+
+Some total variability in *Y*:
+
+1. Part explained by group membership
+1. Part remains unexplained ("error" or "residual")
+
+$F$-statistic is the ratio of the two.
+
+## Visualizing ANOVA
+
+<center>
+<img src="images/JetLag_Means.png" width="100%" />
+</center>
+
+$$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
+
+## Parts of an ANOVA table
+
+```{r message=FALSE, echo=FALSE}
+JL <- read_csv("../data/JetLag.csv") %>% 
+  mutate(Treatment = factor(Treatment))
+fm_lm <- lm(Shift ~ Treatment, data = JL)
+```
+
+```{r echo=FALSE}
+anova(fm_lm)
+```
+
+- `Sum Sq`: Variability accounted for by that part of the ANOVA
+- `Mean Sq`: `Sum Sq` / `Df`
+- `F value`: `Mean Sq` Treatment / `Mean Sq` Residual
+- `Pr(>F)`: *P*-value for the *F*-test of that variable
+
+## Role of variation
+
+Large values of $F$ are more likely to be significant.
+
+$F$ is a ratio:
+
+$$F = \frac{\mbox{MS}_{group}}{\mbox{MS}_{error}}$$
+
+What role does within vs. between group variation have in determining $F$?
+
+
+## Intraclass Correlation Coefficient
+
+For continuously varying measurements:
+
+$$\mbox{ICC} =\frac{\sigma_{A}^{2}}{\sigma_{A}^{2}+MS_{error}}$$
+
+$$\sigma_{A}^{2}=\frac{MS_{group}-MS_{error}}{n}$$
+
+- $n$ = Number of measurements per specimen (*not the sample size*).
+
+Uses the results of the one-way ANOVA:
+
+$$\mbox{Measurement} \sim \mbox{Specimen ID}$$
+
+## Repeatability of caliper measurements
+
+<center>
+<img src="images/Mouse_Bones.png" width="40%" />
+</center>
+
+## Calculation of ICC {.smaller}
+
+What is the ICC of repeated measurements of mouse bones?
+
+```{r}
+M <- read_excel("../data/G44_Morphometrics.xlsx")
+glimpse(M)
+```
+
+## Pairs of measurements
+
+```{r echo=FALSE}
+ggplot(M, aes(Len1, Len2)) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point() +
+  xlab("Femur Length #1 (mm)") +
+  ylab("Femur Length #2 (mm)")
+```
+
+## Data processing
+
+Want two columns: (1) measurement and (2) ID as a factor.
+
+```{r}
+Lengths <- data.frame(Fem_Len = c(M$Len1, M$Len2),
+                      MouseID = factor(c(M$MouseID, M$MouseID)))
+Lengths <- Lengths %>% drop_na()
+glimpse(Lengths)
+```
+
+## ICC via ANOVA {.smaller}
+
+```{r}
+fm <- anova(lm(Fem_Len ~ MouseID, data = Lengths))
+print(fm, digits = 5)
+```
+
+```{r}
+var_a <- (0.63579 - 0.00018) / 2
+var_a / (var_a + 0.00018)
+```
+
+ICC is 0.999 for these measurements.
+
+## Examples of Applications of Variance Component Estimation
+
+- Quantitative genetics
+    - especially heritabilities, genetic correlations etc. 
+    
+- Repeability
+
+## Quiz 08-1
+
+Watch Lecture 08-2
+
+## References {.references}
+

@@ -272,6 +272,8 @@ Goals:
   - Variance components
   - Repeatability
 
+  Transformations??
+
 1. Variance components & R^2
 
   - Repeatability
