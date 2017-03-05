@@ -17,19 +17,16 @@ library(cowplot)
 library(readxl)
 library(cowplot)
 library(car)
-library(multcomp)
-library(lsmeans)
-
 ```
 
 ## Factorial designs and interactions
 
 **Factorial designs** all combinations of treatments are included:
 
-|            | $X_1$ Tx A       | $X_1$ Tx B       |
+|            | $X_1$ Group A       | $X_1$ Group B       |
 |-----------:|:----------------:|:----------------:|
-|$X_2$ Tx A  | $X_1$ A, $X_2$ A | $X_1$ B, $X_1$ A |
-|$X_2$ Tx B  | $X_1$ A, $X_2$ B | $X_1$ B, $X_1$ B |
+|$X_2$ Group A  | $X_1$ A, $X_2$ A | $X_1$ B, $X_1$ A |
+|$X_2$ Group B  | $X_1$ A, $X_2$ B | $X_1$ B, $X_1$ B |
 
 - Allow you to explore *interactions* (multiplicative effects)
 
@@ -65,7 +62,7 @@ Balanced data is the best to work with.
 
 ## Visualizing factorial data
 
-```{r}
+```{r echo=FALSE}
 ggplot(WG, aes(x = source, y = weightgain, color = type)) +
   geom_point(position = position_jitter(width = 0.1))
 ```
@@ -138,7 +135,7 @@ anova(fm2)
 ```{r ref.label="int_plot1", echo=FALSE, eval=TRUE}
 ```
 
-## Power to detect interactions is low [@wahlsten_insensitivity_1990]
+## Power to detect interactions is low [@Wahlsten1990-hc]
 
 For a 2 X 2 design
 
@@ -300,5 +297,4 @@ Alternatives:
 
 Watch Lecture 08-3
 
-## References {.references}
-
+## References

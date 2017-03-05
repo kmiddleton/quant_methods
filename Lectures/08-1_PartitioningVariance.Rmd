@@ -17,8 +17,10 @@ library(cowplot)
 library(readxl)
 library(GGally)
 library(ggrepel)
-#library(rgl)
-
+library(rgl)
+library(knitr)
+knit_hooks$set(webgl = hook_webgl)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ## GLMs and Variance 
@@ -40,7 +42,8 @@ library(ggrepel)
 
 ```{r}
 milk <- read_excel("../data/Milk.xlsx", na = "NA")
-M <- milk %>% select(species, kcal.per.g, mass, neocortex.perc) %>%
+M <- milk %>%
+  select(species, kcal.per.g, mass, neocortex.perc) %>%
   drop_na()
 names(M) <- c("Species", "Milk_Energy", "Mass", "Neocortex")
 M <- M %>% mutate(log_Mass = log(Mass))
@@ -49,11 +52,11 @@ M <- M %>% mutate(log_Mass = log(Mass))
 ## Visualizing data
 
 ```{r webgl=TRUE, echo=FALSE}
-#plot3d(M$Fat, M$Lactose, M$Milk_Energy,
- #      type = "s", col = "red", size = 1,
-  #     xlab = "Fat Percent",
-   #    ylab = "Lactose Percent",
-    #   zlab = "Milk Energy")
+plot3d(M$Mass, M$Neocortex, M$Milk_Energy,
+       type = "s", col = "red", size = 1,
+       xlab = "Body Mass",
+       ylab = "Percent Neocortex",
+       zlab = "Milk Energy")
 ```
 
 ## Multivariate model {.smaller}
@@ -63,17 +66,14 @@ fm_Multi <- lm(Milk_Energy ~ Neocortex + log_Mass, data = M)
 summary(fm_Multi)
 ```
 
-
-
-
 ## $R^{2}$: Multiple Regression Makes a Composite Variable
 
 ```{r echo=FALSE}
-y_hat<-fm_Multi$fitted.values
+y_hat <- fm_Multi$fitted.values
 
-ggplot(M, aes(x=y_hat, y=M$Milk_Energy)) +
+ggplot(M, aes(x = y_hat, y = Milk_Energy)) +
   geom_point() +
-  geom_smooth(method='lm', se=FALSE) +
+  geom_smooth(method = 'lm', se = FALSE) +
   ylab('Milk Energy') +
   xlab('Predicted Milk Energy') 
 ```
@@ -81,12 +81,8 @@ ggplot(M, aes(x=y_hat, y=M$Milk_Energy)) +
 ## $R^{2}$: Multiple Regression Makes a Composite Variable
 
 ```{r}
-y_hat<-fm_Multi$fitted.values
-
-cor(y_hat,M$Milk_Energy)^2
-
+cor(y_hat, M$Milk_Energy)^2
 summary(fm_Multi)$r.squared
-
 ```
 
 
@@ -209,6 +205,3 @@ ICC is 0.999 for these measurements.
 ## Quiz 08-1
 
 Watch Lecture 08-2
-
-## References {.references}
-
