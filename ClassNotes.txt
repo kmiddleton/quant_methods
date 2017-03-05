@@ -317,6 +317,8 @@ Week 10: Model comparison, model based inference
 
 "In comparing nested models, the larger model typically has the advantage of making more sense and ﬁtting the data better but the disadvantage of being more diﬃcult to understand and compute. The key questions of model comparison are typically: (1) is the improvement in ﬁt large enough to justify the additional diﬃculty in ﬁtting, and (2) is the prior distribution on the additional parameters reasonable?" Gelman ARM Book
 
+material in multilevel models
+
 Goals:
 
 ---
@@ -342,6 +344,7 @@ Goals:
 Notes:
 
   - Multiple regression tries to figure out which variable is the important one. e.g., shape doesn't make sense
+  - Logisitc regression and DFA
 
 ---
 

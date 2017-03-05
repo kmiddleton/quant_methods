@@ -17,7 +17,7 @@ library(cowplot)
 library(readxl)
 library(GGally)
 library(ggrepel)
-#library(rgl)
+library(car)
 
 ```
 
@@ -60,13 +60,13 @@ $\beta_n$ are the parameter estimates for the $X$.
 
 ## Logistic regression
 
-What are the predictors of:
+Outcome variable is categorical:
 
 - Heart disease
 - Diabetes
 - Cancer
 
-Mix categorical and continuous variables:
+Predictors can be a mix of categorical and continuous variables:
 
 - sex, smoking status, family history of ...
 - body mass, BMI, blood glucose level
@@ -149,6 +149,8 @@ Fitting in R:
 
 ## Self-interacting additive predictors in GLM
 
+????????
+
 $$\log \frac{P}{1 - P} = \beta_0 + \beta_1 x$$
 
 $$P = \frac{\exp(\beta_0 + \beta_1 x)}{1 + \exp(\beta_0 + \beta_1 x)}$$
@@ -226,14 +228,14 @@ ggplot(LogReg, aes(x = Rainfall,
 Presence/absence of sole in the Tagus estuary of Portugal.
 
 ```{r}
-M <- read_excel("./data/Sole.xlsx")
+M <- read_excel("../data/Sole.xlsx")
 str(M)
 ```
 
 ## Presence of sole
 
 ```{r}
-M <- M %>% select(salinity, Solea_solea)
+M <- M[,c("salinity", "Solea_solea")]
 M$Solea_solea <- factor(M$Solea_solea)
 ```
 
@@ -273,7 +275,7 @@ ggplot(M, aes(x = salinity,
 ## Drug testing
 
 ```{r}
-M <- read_excel("./data/Drug_test.xlsx")
+M <- read_excel("../data/Drug_test.xlsx")
 M$Treatment <- factor(M$Treatment)
 str(M)
 ```
@@ -364,7 +366,7 @@ Curve shifts left to right based on the values of `BP` and `Pain`
 ## Tibetan skulls
 
 ```{r}
-M <- read_excel("./data/Tibetan_Skulls.xlsx")
+M <- read_excel("../data/Tibetan_Skulls.xlsx")
 str(M)
 M <- M %>% mutate(Origin = factor(Origin))
 ```
@@ -404,86 +406,16 @@ logistic.display(fm)
 Anova(fm, type = "III")
 ```
 
-## Logistic regression to discriminant function analysis
+## Logistic regression as a classifier
 
 Logistic regression:
 
 - Which variable(s) are good predictors of group membership
 
-Discriminant function analysis:
-
-- Predict which categories sets of variables are good at predicting
-- Groups are known *a priori*
-- Uses linear combinations of variables
-- Like the reverse of MANOVA
-- **Predict new observations**
-
-## Iris data
-
-```{r}
-glimpse(iris)
-```
-
-## Iris data
-
-```{r echo=FALSE}
-ggscatmat(iris, 1:4, color = "Species") +
-  theme(text = element_text(size = 9),
-        axis.text = element_text(size = 6),
-        axis.text.x = element_text(angle = -90, vjust = 0.5))
-```
-
-## DFA in R
-
-Linear discriminant analysis:
-
-- `lda()` with `Group ~ Predictors`
-
-```{r}
-iris.lda <- lda(Species ~ . ,  data = iris)
-```
-
-## Posterior prediction
-
-```{r}
-iris.predict <- predict(iris.lda, iris[, 1:4])
-iris.predict$posterior
-```
-
-## Classification
-
-```{r}
-(iris.classify <- iris.predict$class)
-```
-
-## Percent correct
-
-Mean value of the correct classifications
-
-```{r}
-mean(iris.classify == iris$Species)
-```
-
-## Confusion matrix
-
-```{r}
-table(Original = iris$Species, Predicted = iris.classify)
-```
-
-## Predicting a new observation
-
-```{r}
-new_iris <- data.frame(Sepal.Length = c(6.11),
-                       Sepal.Width = c(3.55),
-                       Petal.Length = c(1.44),
-                       Petal.Width = c(2.5))
-predict(iris.lda, new_iris)
-```
-
 ## Tibetan skulls
 
 ```{r}
-M <- read_excel("./data/Tibetan_Skulls.xlsx")
+M <- read_excel("../data/Tibetan_Skulls.xlsx")
 M <- M %>% mutate(Origin = factor(Origin)) %>% as.data.frame()
 skulls_lda <- lda(Origin ~ ., data = M)
 ```
@@ -515,7 +447,7 @@ Skull measurements of oreodonts
 ## Oreodonts
 
 ```{r}
-M <- read_excel("./data/Oreodont.xlsx")
+M <- read_excel("../data/Oreodont.xlsx")
 str(M)
 M$Sex <- factor(M$Sex)
 
