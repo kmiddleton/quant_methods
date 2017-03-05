@@ -20,36 +20,31 @@ library(cowplot)
 library(dplyr)
 library(tidyr)
 library(wesanderson)
-
 ```
 
 ## Notes
 
-## Readings
 
-Bolker et al. [-@bolker_generalized_2009]: Generalized linear mixed models: a practical guide for ecology and evolution
-
-LESSELS AND BOAG
-
-## Additional resources {.smaller}
+## Resources {.smaller}
 
 *Approachable*:
 
-- Zuur et al. [-@zuur_mixed_2009a]: *Mixed Effects Models and Extensions in Ecology with R*. But takes a very old fashioned view of model selection.
+- Bolker et al. [-@Bolker2009-ry]: Generalized linear mixed models: a practical guide for ecology and evolution
+- Zuur et al. [-@Zuur2009-be]: *Mixed Effects Models and Extensions in Ecology with R*. But takes a very old fashioned view of model selection.
 
 *Bayesian*:
 
-- McElreath [-@mcelreath_statistical_2015]: *Statistical Rethinking: A Bayesian Course with Examples in R and Stan*
+- McElreath [-@McElreath2015-no]: *Statistical Rethinking: A Bayesian Course with Examples in R and Stan*
 
 *MCMC*:
 
-- Hadfield [-@hadfield_mcmc_2010]: MCMC Methods for Multi-response Generalized Linear Mixed Models: The MCMCglmm R Package
+- Hadfield [-@Hadfield2010-pp]: MCMC Methods for Multi-response Generalized Linear Mixed Models: The MCMCglmm R Package
 
 *Technical*:
 
-- Pinheiro and Bates [-@pinheiro_mixed-effects_2000]: *Mixed-effects models in S and S-PLUS*
+- Pinheiro and Bates [-@Pinheiro2000-sg]: *Mixed-effects models in S and S-PLUS*
 
-## Goals for today
+## Goals for multilevel models
 
 *Very Important*:
 
@@ -93,8 +88,8 @@ We need a method to model that correlation structure.
 
 - Non-equal sample sizes, missing data
 - Non-equal within-group variance
-- Phylogenetic structure [@paradis_analysis_2012; @paradis_analysis_2002]
-- Population structure and genetic relatedness [@wilson_ecologist_2010]
+- Phylogenetic structure 
+- Population structure and genetic relatedness 
 
 ## Some terminology
 
@@ -164,11 +159,6 @@ Where $\mbox{Random}$ can be:
 <img src="images/WCB/WCB_img.010.png" width="80%" />
 </center>
 
-## Turning flight in hummingbirds
-
-<center>
-<img src="images/WCB/WCB_img.011.png" width="100%" />
-</center>
 
 ## Turning flight in hummingbirds
 
@@ -217,7 +207,6 @@ Each bird gets its own mean value for a maneuver (across 5 trials). Maneuver is 
 **Computational complexity**
 
 - Many methods fit by likelihood
-    - Singularities abound, differentiation doesn't always work
 - MCMC can be slow, difficult to tune
 - Bayesian requires defining priors
 
@@ -228,67 +217,6 @@ Among the options for R packages:
 - `nlme`: Oldest, restricted to a subset of models (linear and non-linear Gaussian), *for us the place to start*
 - `lme4`: Newer (but same authors as `nlme`), can handle more complex models with crossed random effects, pedigrees, non-Gaussian response, etc., more flexible distributions of response variables, but harder to test hypotheses
 - `MCMCglmm`, `rstan`, `rjags`: Fit Bayesian multilevel models via a variety of MCMC samplers
-
-## You have already fit several multilevel models
-
-Intraclass correlation coefficient:
-
-- Repeated measurements for a single specimen
-- What is the relative among measurement vs. between specimen variation
-
-## Intraclass correlation coefficient
-
-```{r echo=FALSE}
-M <- read_excel("../data/G44_Morphometrics.xlsx")
-ggplot(M, aes(Len1, Len2)) +
-  geom_abline(slope = 1, intercept = 0) +
-  geom_point() +
-  xlab("Femur Length #1 (mm)") +
-  ylab("Femur Length #2 (mm)")
-```
-
-## Intraclass correlation coefficient {.smaller}
-
-```{r }
-Lengths <- data.frame(Fem_Len = c(M$Len1, M$Len2),
-                      MouseID = factor(c(M$MouseID, M$MouseID)))
-Lengths <- Lengths %>% drop_na()
-fm <- anova(lm(Fem_Len ~ MouseID, data = Lengths))
-print(fm, digits = 5)
-```
-
-```{r}
-var_a <- (fm$'Mean Sq'[1] - fm$'Mean Sq'[2]) / 2
-var_a / (var_a + fm$'Mean Sq'[2])
-```
-
-## ICC with `lme()`
-
-```{r ICC_lme1, message=FALSE}
-library(nlme)
-fm_lme <- lme(Fem_Len ~ 1,
-              random = ~ 1 | MouseID,
-              data = Lengths,
-              method = "ML")
-head(coef(fm_lme))
-```
-
-## ICC with `lme()`
-
-```{r}
-Lengths %>% group_by(MouseID) %>% summarize(mean(Fem_Len)) %>% head()
-```
-
-## ICC with `lme()`
-
-```{r ICC_lme2}
-(varcomps <- VarCorr(fm_lme))
-var.among <- as.numeric(varcomps[1, 1])
-var.within <- as.numeric(varcomps[2, 1])
-var.among / (var.among + var.within)
-```
-
-Note: very close but not numerically equivalent to the `anova()` version. *Models are slightly different*.
 
 ## *Loligo forbesii*
 
@@ -524,8 +452,6 @@ Allow a different mean richness per beach:
 fm2 <- lme(Richness ~ NAP, random = ~ 1 | Beach, data = RIKZ)
 ```
 
-- Similar to the model we used for intraclass correlation coefficient.
-
 ## Diagnostics
 
 ```{r}
@@ -706,7 +632,7 @@ Anova(fm2, type = "III")
 
 ## Reasons to use multilevel models {.smaller}
 
-Adapted from McElreath [-@mcelreath_statistical_2015]
+Adapted from McElreath [-@McElreath2015-no]
 
 1. *To adjust estimates for repeat sampling*. When more than one observation arises from the same individual, location, or time, then traditional, single-level models may mislead us.
 2. *To adjust estimates for imbalance in sampling*. When some individuals, locations, or times are sampled more than others, we may also be misled by single-level models.
@@ -717,11 +643,10 @@ Adapted from McElreath [-@mcelreath_statistical_2015]
 
 No.
 
+## No quiz
 
-
-## Quiz 08-3
+Watch this lecture again for review.
 
 Watch Lecture 08-4
 
 ## References {.references}
-

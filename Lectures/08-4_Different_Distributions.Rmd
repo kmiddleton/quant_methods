@@ -18,16 +18,7 @@ library(readxl)
 library(GGally)
 library(ggrepel)
 library(car)
-
 ```
-
-## Notes
-
-## Readings
-
-
-- Tabachnick and Fidell [-@tabachnick_using_2013]: *Using Multivariate Statistics*
-- Zuur et al. [-@zuur_analysing_2007]: *Analyzing Ecological Data*
 
 ## Hierarchy of GLMs
 
@@ -147,20 +138,6 @@ Fitting in R:
     - "binomial" $\rightarrow$ logit
     - "Poisson" $\rightarrow$ log
 
-## Self-interacting additive predictors in GLM
-
-????????
-
-$$\log \frac{P}{1 - P} = \beta_0 + \beta_1 x$$
-
-$$P = \frac{\exp(\beta_0 + \beta_1 x)}{1 + \exp(\beta_0 + \beta_1 x)}$$
-
-$$\frac{dP}{dx} = \frac{\beta_1}{2(1 + \cosh(\beta_0 + \beta_1 x))}$$
-
-The impact of a change in $x$ on $P$ depends on the value of $x$.
-
-Differentiate with Wolfram alpha: http://bit.ly/1R4Hlxj
-
 ## Logistic regression
 
 ```{r}
@@ -192,7 +169,7 @@ summary(fm)
 
 ## Summarizing with `logistic.display()`
 
-```{r}
+```{r message=FALSE}
 library(epiDisplay)
 logistic.display(fm)
 ```
@@ -272,97 +249,6 @@ ggplot(M, aes(x = salinity,
   scale_y_continuous(breaks = seq(0, 1, by = 0.1))
 ```
 
-## Drug testing
-
-```{r}
-M <- read_excel("../data/Drug_test.xlsx")
-M$Treatment <- factor(M$Treatment)
-str(M)
-```
-
-## Drug testing
-
-```{r warning=FALSE}
-ggscatmat(as.data.frame(M), 1:3, color = "Treatment")
-```
-
-## Drug testing
-
-```{r}
-fm <- glm(Treatment ~ Fever + BP + Pain, data = M,
-          family = "binomial")
-```
-
-## Drug testing {.smaller}
-
-```{r echo=FALSE}
-summary(fm)
-```
-
-## Drug testing {.smaller}
-
-```{r}
-logistic.display(fm)
-```
-
-## Drug testing
-
-```{r}
-Anova(fm, type = "III")
-```
-
-## Drug testing
-
-Predict new data for `Fever`, with 0 for `BP` and `Pain`:
-
-```{r}
-n <- 30
-M_new <- data.frame(Fever = seq(36, 42, length.out = n),
-                    BP = rep(0, n),
-                    Pain = rep(0, n))
-predicted <- predict(fm, M_new)
-M_new$Treatment <- 1 / (1 + exp(-predicted))
-```
-
-$$\mbox{Inverse logit} = \frac{1}{1 + \exp (\mbox{-Predicted})}$$
-
-## Drug testing
-
-```{r echo=FALSE}
-ggplot(M, aes(x = Fever,
-              y = as.numeric(Treatment) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_line(data = M_new, aes(Fever, Treatment), size = 2, color = "blue") +
-  geom_point(size = 3) +
-  ylab("Probability of Placebo") +
-  xlab("Fever") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) + 
-  ggtitle("BP = 0; Pain = 0")
-```
-
-## Drug testing
-
-```{r echo=FALSE}
-n <- 30
-M_new <- data.frame(Fever = seq(36, 42, length.out = n),
-                    BP = rep(mean(M$BP), n),
-                    Pain = rep(mean(M$Pain), n))
-predicted <- predict(fm, M_new)
-M_new$Treatment <- 1 / (1 + exp(-predicted))
-
-ggplot(M, aes(x = Fever,
-              y = as.numeric(Treatment) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_line(data = M_new, aes(Fever, Treatment), size = 2, color = "blue") +
-  geom_point(size = 3) +
-  ylab("Probability of Placebo") +
-  xlab("Fever") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) + 
-  ggtitle("BP = mean(BP); Pain = mean(Pain)")
-```
-
-Curve shifts left to right based on the values of `BP` and `Pain` 
-
 ## Tibetan skulls
 
 ```{r}
@@ -406,91 +292,6 @@ logistic.display(fm)
 Anova(fm, type = "III")
 ```
 
-## Logistic regression as a classifier
-
-Logistic regression:
-
-- Which variable(s) are good predictors of group membership
-
-## Tibetan skulls
-
-```{r}
-M <- read_excel("../data/Tibetan_Skulls.xlsx")
-M <- M %>% mutate(Origin = factor(Origin)) %>% as.data.frame()
-skulls_lda <- lda(Origin ~ ., data = M)
-```
-
-- Convert `M` to a `data.frame()` to avoid problems later (`Incompatible methods ("Ops.factor", "Ops.data.frame") for "=="`).
-
-## Tibetan skulls
-
-```{r}
-skulls_predict <- predict(skulls_lda, M[, 1:5])
-(skulls_classify <- skulls_predict$class)
-```
-
-## Tibetan skulls
-
-```{r}
-mean(skulls_classify == M$Origin)
-table(Original = M$Origin, Predicted = skulls_classify)
-```
-
-## Oreodonts
-
-Skull measurements of oreodonts
-
-<center>
-<img src="images/oreodont.jpg" width="80%" />
-</center>
-
-## Oreodonts
-
-```{r}
-M <- read_excel("../data/Oreodont.xlsx")
-str(M)
-M$Sex <- factor(M$Sex)
-
-# Convert to data.frame
-M <- as.data.frame(M)
-```
-
-## Oreodonts
-
-```{r}
-M %>% group_by(Sex) %>% summarise_each("mean")
-```
-
-## Oreodonts
-
-```{r echo=FALSE}
-ggplot(M, aes(Length, Width, color = Sex)) +
-  geom_point(size = 3)
-```
-
-## Oreodonts
-
-```{r}
-oreo_lda <- lda(Sex ~ ., data = M)
-oreo_predict <- predict(oreo_lda, M[, 1:2])
-(oreo_classify <- oreo_predict$class)
-```
-
-## Oreodonts
-
-```{r}
-mean(oreo_classify == M$Sex)
-table(Original = M$Sex, Predicted = oreo_classify)
-```
-
-## Predict sex of new oreodonts
-
-```{r}
-new_oreo <- data.frame(Length = c(30, 25, 25),
-                       Width = c(15, 20, 15))
-predict(oreo_lda, new_oreo)
-```
-
 ## Generalized linear multilevel models
 
 Generalization of Gaussian multilevel models to all the kinds of predictors that generalized linear models can be used for
@@ -499,11 +300,6 @@ Large can of worms:
 
 - http://glmm.wikidot.com/faq
 
-
-
 ## Quiz 08-4
 
 No more Lectures
-
-## References {.references}
-

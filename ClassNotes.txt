@@ -289,6 +289,12 @@ Goals:
 
 4. Binomial and others
 
+
+problem set
+lme repeatability??
+drug testing example
+
+
 ---
 
 Week 9: Randomization, multiple testing
