@@ -65,6 +65,7 @@ Now let's try our simulation. We will simulate two groups that have different me
 5) There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Return to your function and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value.
 
 ```{r}
+# FIXME
 set.seed(2351222)
 
 getF <- function(mu1, mu2, sd_both, nobs) {
@@ -90,13 +91,33 @@ sims <- data.frame(
 Fs <- apply(sims, 1, function(x) {getF(x[2], x[3], x[1], x[4])})
 sims$Fs <- Fs
 
-ggplot(sims, aes(sd_both, Fs)) +
-  geom_point()
+fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
 
+ggplot(sims, aes(x = sds, y = Fs)) +
+  geom_point() +
+  geom_hline(yintercept = fcrit, color = 'coral')
+
+getF2 <- function(mu1, mu2, sd_both, nobs) {
+  niter <- 100
+  Fs <- numeric(length = niter)
+  for (ii in 1:niter) {
+    x <- factor(rep(c(1, 2), each = nobs))
+    y1 <- rnorm(nobs, mu1, sd_both)
+    y2 <- rnorm(nobs, mu2, sd_both)
+    y <- c(y1, y2)
+    M <- data.frame(x, y)
+    fm <- anova(lm(y ~ x, data = M))
+    Fs[ii] <- fm$"F value"[1]
+  }
+  return(mean(Fs))
+}
+
+Fs <- apply(sims, 1, function(x) {getF2(x[2], x[3], x[1], x[4])})
+sims$Fs <- Fs
 
 fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
 
-ggplot(sims, aes(x = sds, y = Fval)) +
+ggplot(sims, aes(x = sds, y = Fs)) +
   geom_point() +
   geom_hline(yintercept = fcrit, color = 'coral')
 ```
