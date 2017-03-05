@@ -141,7 +141,6 @@ coef(fm)
 <br />
 <br />
 <br />
-<br />
 <img src="images/semi1.png" width="75%" />
 <br />
 <br />
@@ -177,6 +176,7 @@ What regression does:
 <img src="images/semi2.png" width="50%" />
 </center>
 
+<br />
 <br />
 <br />
 <br />

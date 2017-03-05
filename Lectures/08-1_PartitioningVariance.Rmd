@@ -52,9 +52,9 @@ M <- M %>% mutate(log_Mass = log(Mass))
 ## Visualizing data
 
 ```{r webgl=TRUE, echo=FALSE}
-plot3d(M$Mass, M$Neocortex, M$Milk_Energy,
+plot3d(M$log_Mass, M$Neocortex, M$Milk_Energy,
        type = "s", col = "red", size = 1,
-       xlab = "Body Mass",
+       xlab = "log Body Mass",
        ylab = "Percent Neocortex",
        zlab = "Milk Energy")
 ```
@@ -200,7 +200,11 @@ ICC is 0.999 for these measurements.
 - Quantitative genetics
     - especially heritabilities, genetic correlations etc. 
     
-- Repeability
+- Repeatability
+
+<center>
+<img src="images/Learning_ind.png" width="60%" />
+</center>
 
 ## Quiz 08-1
 
