@@ -266,7 +266,7 @@ Among the options for R packages:
 ## Intraclass correlation coefficient
 
 ```{r echo=FALSE}
-M <- read_excel("data/G44_Morphometrics.xlsx")
+M <- read_excel("../data/G44_Morphometrics.xlsx")
 ggplot(M, aes(Len1, Len2)) +
   geom_abline(slope = 1, intercept = 0) +
   geom_point() +
@@ -328,7 +328,7 @@ Seasonal patterns in testis mass in the squid *Loligo*. Testis mass predicted by
 ## `Squid` data
 
 ```{r}
-S <- read_excel("./data/Squid.xlsx")
+S <- read_excel("../data/Squid.xlsx")
 S <- S %>% mutate(Month = factor(Month))
 str(S)
 
@@ -494,7 +494,7 @@ Collected by National Institute for Coastal and Marine Management (RIKZ)
 ## Intertidal data
 
 ```{r}
-RIKZ <- read_excel("./data/RIKZ.xlsx")
+RIKZ <- read_excel("../data/RIKZ.xlsx")
 glimpse(RIKZ)
 ```
 
@@ -677,7 +677,7 @@ Distance from the sella turcica to the pterygomaxillary fissure in growing child
 ## Orthodonics data
 
 ```{r}
-O <- read_excel("data/Ortho.xlsx")
+O <- read_excel("../data/Ortho.xlsx")
 O <- O %>% mutate(Subject = factor(Subject),
                   Sex = factor(Sex))
 glimpse(O)
