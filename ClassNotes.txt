@@ -290,10 +290,13 @@ Goals:
 4. Binomial and others
 
 
-problem set
-lme repeatability??
-drug testing example
+Problem set:
 
+  - Factorial anova, make plots (grid), relevel factors
+  - Simple block design
+  - EGK lme repeatability (head height, head depth)
+  - EGK Drug testing example (lect 18, logistic), scatterplot matrix
+  - Chisq (make table of counts)
 
 ---
 
@@ -315,6 +318,7 @@ Problem set:
   - Simple permutation test
 
 ---
+
 Week 10: Model comparison, model based inference
 
 "Despite our best eﬀorts to include information, all models are approximate" Gelman et al. ABD
