@@ -270,6 +270,7 @@ Using `lm()`, fit a linear model in which transformed survival is modeled by the
 # FIXME
 fm <- lm(log_Survival ~ Mismatch_Degree, data = M)
 anova(fm)
+summary(fm)
 ```
 
 What do the results of this linear model show?
@@ -280,6 +281,7 @@ Fit another linear model just like the one above, but remove the intercept term 
 
 ```{r}
 fm2 <- lm(log_Survival ~ Mismatch_Degree - 1, data = M)
+anova(fm2)
 summary(fm2)
 
 M %>% group_by(Mismatch_Degree) %>%
