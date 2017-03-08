@@ -1,0 +1,282 @@
+---
+title: 'Problem Set 08'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+# FIXME
+library(tidyverse)
+library(readxl)
+library(cowplot)
+library(forcats)
+library(car)
+library(nlme)
+library(GGally)
+library(epiDisplay)
+
+library(knitr)
+```
+
+## Calcium concentration in bird plasma
+
+The file `Bird_Plasma.xlsx` contains factorial data on blood plasma calcium concentration (`Calcium`, mg / 100 mL) in male and female birds (`Sex`) each of which was treated or not with a hormone (`Treatment`).
+
+### Activity
+
+Load the Excel file, and convert hormone and sex to factors. The levels of `Treatment` are "Hormone" and "None". Because "Hormone" is first alphabetically, it becomes the base level of the factor. Use `fct_relevel` from the `forcats` package to make "None" the base level.
+
+```{r, message = FALSE}
+# FIXME
+M <- read_excel("../data/Bird_Plasma.xlsx") %>% 
+  mutate(Treatment = factor(Treatment),
+         Sex = factor(Sex),
+         Treatment = fct_relevel(Treatment, "None"))
+```
+
+Use `group_by()` and `tally()` to determine the sample size in each of the groups.
+
+```{r}
+# FIXME
+M %>% group_by(Treatment, Sex) %>% tally()
+```
+
+Create interaction plots of the calcium concentration data. Use the code from lecture as a template. Make two plots, one with `Treatment` on the x axis and one with `Sex` on the x axis. Use `plot_grid()` to place them side by side
+
+```{r}
+# FIXME
+p1  <- ggplot(M, aes(x = Sex,
+              y = Calcium,
+              color = Treatment,
+              group = Treatment)) +
+  geom_point(position = position_jitter(width = 0.1)) +
+  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
+  stat_summary(fun.y = mean, geom = "line")
+
+p2 <- ggplot(M, aes(x = Treatment,
+              y = Calcium,
+              color = Sex,
+              group = Sex)) +
+  geom_point(position = position_jitter(width = 0.1)) +
+  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
+  stat_summary(fun.y = mean, geom = "line")
+plot_grid(p1, p2, ncol = 2)
+```
+
+What do you learn from these plots?
+
+> Hormone almost certainly has a strong positive effect -- the lines are very far apart in the first plot. Sexes appear not to differ that much, because the elevations of the lines in the second plot are very similar. Both sexes appear to response in the same direction with the same magnitude.
+
+Fit a factorial linear model (both main effects and the interaction term) and save the result to an R object.
+
+```{r}
+# FIXME
+fm <- lm(Calcium ~ Sex * Treatment, data = M)
+```
+
+Using the `Anova()` function in the `car` package, calculate an ANOVA table with type III sums of squares. You might have to install `car` first.
+
+```{r}
+# FIXME
+Anova(fm, type = "III")
+```
+
+Describe the results of the analysis.
+
+> To determine the relative roles of sex and hormone treatment on blood plasma calcium concentration, we used a 2 X 2 factorial design (*n* = 5 in each group). Factorial ANOVA with the interaction between sex and hormone treatment was analyzed using type III sums of squares. We found a significant effect of hormone treatmen (*F*~1,16~ = 41; *P* < 0.001). Sexes did not differ after controlling for other effects (*P* = 0.33), including the interaction (*P* = 0.62).
+
+## Effect of predation on zooplankton
+
+The file `Zooplankton.csv` contains data on the concentration of zooplankton in three predator treatment groups (control, low, and high). Each of the three treatments were measured in five replicate blocks.
+
+### Activity
+
+Read in the data and convert both Treatment and Block into factors. It is especially important to make sure that Block is a factor, because Blocks are coded 1-5. We need to make sure that R converts them to a model matrix (0's and 1's).
+
+```{r, message = FALSE}
+# FIXME
+M <- read_csv("../data/Zooplankton.csv") %>% 
+  mutate(Treatment = factor(Treatment),
+         Block = factor(Block))
+```
+
+Make two plots, one in which Treatment is on the x axis and Block is encoded by color, and the second in which Block is on the x axis and Treatment is encoded by color. Notice how you learn different things about the data from each of these plots.
+
+```{r}
+# FIXME
+M %>% 
+  ggplot(aes(x = Treatment, y = Zooplankton, color = Block)) +
+  geom_point()
+M %>% 
+  ggplot(aes(x = Block, y = Zooplankton, color = Treatment)) +
+  geom_point()
+```
+
+We want to test for significant differences in Treatment while accounting for the replicated blocks. We can fit this model in two different ways:
+
+1. `lm()` and `anova()` with an additive model including Treatment and Block
+2. `lme()` from the `nlme` package with Block as a random effect
+
+Fit both of these models 
+
+```{r}
+fm_lm <- lm(Zooplankton ~ Treatment + Block, M)
+anova(fm_lm)
+
+fm_lme <- lme(Zooplankton ~ Treatment,
+              random = ~ 1 | Block, M)
+anova(fm_lme)
+```
+
+Compare the output of the two models.
+
+> The models are identical. There is a significant effect of Treatment (at least one mean is different), but there doesn't appear to be much difference between blocks.
+
+## Intraclass correlation coefficient
+
+The model you use to calculate the intraclass correlation coefficient *is* a multilevel model. You have repeated measurements for a single specimen. Those measurements are obviously not independent from one another. The major question you want to ask is: What is the relative between *measurement* vs. between *specimen* variation?
+
+We will fit this model in two ways: using `anova(lm())` and using `lme()`. There are minor differences in the mathematics underlying how fixed and random effects are handled, which means that the differences in ICC will be small (not numerically identical).
+
+### Activity
+
+Load the data in `G44_Morphometrics.xlsx` and plot the two measurements for head height (`HeadHt`) against one another. 
+
+```{r echo=FALSE}
+M <- read_excel("../data/G44_Morphometrics.xlsx")
+ggplot(M, aes(HeadHt1, HeadHt2)) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point() +
+  xlab("Head Height #1 (mm)") +
+  ylab("Head Height #2 (mm)")
+```
+
+Based on your plot, do you expect repeatability to be high or low? Give an estimate?
+
+> The points are very close to the line, so repeatability should be large (> 0.9).
+ 
+Follow the example from lecture to calculate repeatability of the head height (`HeadHt`) measurement using `anova(lm())`.
+
+```{r}
+Heads <- data.frame(HeadHt = c(M$HeadHt1, M$HeadHt2),
+                    MouseID = factor(c(M$MouseID, M$MouseID)))
+Heads <- Heads %>% drop_na()
+fm <- anova(lm(HeadHt ~ MouseID, data = Heads))
+fm
+
+var_a <- (fm$'Mean Sq'[1] - fm$'Mean Sq'[2]) / 2
+var_a / (var_a + fm$'Mean Sq'[2])
+```
+
+Calculate repeatability of the head height (HeadHt) measurement using `lme()` with MouseID treated as a random effect. 
+
+1) Fit a linear model using `lme()` with MouseID treated as a random effect.
+
+```{r}
+library(nlme)
+fm_lme <- lme(HeadHt ~ 1,
+              random = ~ 1 | MouseID,
+              data = Heads,
+              method = "ML")
+```
+
+2) Extract the coefficients of your model. Compare these with the means for each MouseID. Hint: `group_by()` and `summarize()` will help here. What is the relationship between the intercept estimates and the means calculated for each MouseID??
+ 
+> The numbers are very similar.
+
+```{r}
+head(coef(fm_lme))
+
+MouseMeans <- Heads %>% group_by(MouseID) %>% summarize(mean(HeadHt)) 
+head(MouseMeans)
+```
+
+3) Use `VarCorr()` to calculate the variace components for your model object. The first column of the output hold the two estimated variance components. No need to do further calculations. These are true variances, not mean squares. Use these to calculate repeatability. Also, use `var()` to get the variance of the means per MouseID you calculated in #2. What is the relationship between the variance of the means per MouseID and the variances from `VarCorr()`?
+
+> The numbers are very similar.
+
+```{r}
+(varcomps <- VarCorr(fm_lme))
+var.among <- as.numeric(varcomps[1, 1])
+var.within <- as.numeric(varcomps[2, 1])
+var.among / (var.among + var.within)
+
+print(var(MouseMeans[, 2]),digits = 4)
+print(var.among, digits = 4)
+
+MouseVars <- Heads %>% group_by(MouseID) %>% summarize(var(HeadHt)) 
+MouseVars <- as.data.frame(MouseVars)
+
+print(mean(as.numeric(MouseVars[, 2])), digits = 4)
+print(var.within, digits = 4)
+```
+
+## Testing a new drug
+
+
+## Aspirin and cancer
+
+The file `Aspirin.csv` contains data on the frequency of cancer in 39,876 women taking or not taking low-dose aspirin.^[Cook, N.R., I. Lee, J.M. Gaziano, D. Gordon, P.M. Ridker, J.E. Manson, C.H. Hennekens, and J.E. Buring. 2005. Low-dose aspirin in the primary prevention of cancer. _Journal of the American Medical Association_ 294: 47-55.]
+
+The authors were interested in determining whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin.
+
+### Activity
+
+Read in the data, and convert all the variables to factors. Look at the help for `mutate_each()` for a shortcut.
+
+```{r message = FALSE}
+M <- read_csv("../data/Aspirin.csv") %>% 
+  mutate_each("factor")
+str(M)
+```
+
+Tally up the number of obvervations in each group.
+
+```{r}
+M %>% group_by(Treatment, Cancer) %>% tally()
+```
+
+Another way to look at the same information is using a cross tabulation, also called a contingency table. The R function `xtabs()` takes a one sided formula and returns the count in each group. Your code will look something like `xtabs(~ Treatment + Cancer, M)`.
+
+```{r}
+#FIXME
+xtabs(~ Treatment + Cancer, M)
+```
+
+The usual way to analyze data consisting of counts is to use a $\chi^2$ test. In R, `chisq.test()` is the function that carries out this test. One of the nice things about `chisq.test()` is that you can pass it the object returned by `xtabs()`.
+
+Run a $\chi^2$ test on the cross tabulation of the aspirin data. Use the `correct = FALSE` argument to *not* use Yates's correction.
+
+```{r}
+chisq.test(xtabs(~ Treatment + Cancer, M),
+           correct = FALSE)
+```
+
+What is your interpretation of the $\chi^2$ test?
+
+> P = 0.82, so there is no association between treatment and cancer.
+
+Because the outcome variable, `Cancer`, is binomially distributed, we could also use a logistic regression to analyze these data.
+
+Fit a logistic regression where presence of cancer is predicted by treatment. Save the result to an object.
+
+```{r}
+fm <- glm(Cancer ~ Treatment, M, family = "binomial")
+```
+
+Analyze the model you fit using ANOVA with type III sums of squares and using `logistic.display()`.
+
+```{r}
+Anova(fm, type = "III")
+logistic.display(fm)
+```
+
+From these results, what can you conclude about a $\chi^2$ test and logistic regressin in this case?
+
+> They are equivalent in this situation.
