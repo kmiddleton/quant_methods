@@ -1,0 +1,305 @@
+---
+title: "General(ized) Linear Models: Other Distributions"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+library(GGally)
+library(ggrepel)
+library(car)
+```
+
+## Hierarchy of GLMs
+
+<center>
+<img src="images/GeneralizedLinearModels.png" width="100%" />
+</center>
+
+## *Generalized* linear models
+
+$$\mbox{Response variable(s)} \sim \mbox{Predictor variable(s)} + \mbox{Error}$$
+
+Distribution of the response variable(s) can be:
+
+1. Normal (Gaussian)
+1. Binomial (two states)
+1. Poisson (counts)
+1. Lots and lots of others
+
+## General equation form of GLMs
+
+$$Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
+
+$Y$ follows some distribution (e.g., $Y \sim \mathcal{N}$ or $Y \sim \mbox{Binom}$)
+
+- Most often normal.
+
+$X_n$  are some combination of continuous and categorical predictors.
+
+$\beta_n$ are the parameter estimates for the $X$.
+
+## Logistic regression
+
+Outcome variable is categorical:
+
+- Heart disease
+- Diabetes
+- Cancer
+
+Predictors can be a mix of categorical and continuous variables:
+
+- sex, smoking status, family history of ...
+- body mass, BMI, blood glucose level
+
+## Logistic regression
+
+What are the predictors of presence or absence?
+
+- Morphology
+- Character state
+- Species
+- Rain
+
+## Challenge
+
+How much variance is there in 0's and 1's?
+
+## Odds
+
+$$\mbox{Odds} = \frac{P_{event}}{1 - P_{event}}$$
+
+Odds is the ratio of the probability of an event to the probability of no event.
+
+$$\log O_i = \log \left(\frac{P_i}{1 - P_i} \right) = \mbox{logit}(P_i)$$
+
+Logit function converts probabilities to a continuous value not bounded by 0 and 1.
+
+## Probabilities, odds, and log odds
+
+P  | 0.001 | 0.5 | 0.999
+--:|--:|--:|--:|
+1 - P    | 0.999 | 0.5 | 0.001
+Odds     | 0.001 | 1   | 999
+log(Odds) | -6.9  | 0   | 6.9
+
+## Probabilities to log odds
+
+```{r}
+P <- seq(0.0001, 0.9999, length.out = 1000)
+Odds <- P / (1 - P)
+log_Odds <- log(Odds)
+M <- data.frame(P, Odds, log_Odds)
+```
+
+## Probabilities to log odds
+
+```{r echo=FALSE}
+ggplot(M, aes(P, Odds)) + geom_line() +
+  labs(x = "Probability", y = "Odds")
+```
+
+## Probabilities to log odds
+
+```{r echo=FALSE}
+ggplot(M, aes(P, log_Odds)) + geom_line() +
+  labs(x = "Probability", y = "log Odds")
+```
+
+log-Odds ranges from never (-$\infty$) to always ($\infty$).
+
+## Link functions
+
+1. Gaussian: Identity
+1. Binomial: Logit
+1. Poisson: Log
+
+## Logistic regression
+
+$$\mbox{logit}(Y) = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
+
+The logit "transformation" allows $\beta$s to be estimated iteratively.
+
+Fitting in R:
+
+- `glm()` uses the formula interface
+- `family = ` determines the link function
+    - "Gaussian" $\rightarrow$ identity
+    - "binomial" $\rightarrow$ logit
+    - "Poisson" $\rightarrow$ log
+
+## Logistic regression
+
+```{r}
+set.seed(4)
+rainfall <- c(runif(20, 100, 160),
+              runif(20, 160, 210)) 
+presence <- c(rbinom(20, 1, 0.15),
+              rbinom(20, 1, 0.95))
+LogReg <- data.frame(Rainfall = rainfall,
+                     Presence = as.factor(presence))
+head(LogReg)
+```
+
+## Fitting a logistic model
+
+```{r}
+fm <- glm(Presence ~ Rainfall,
+          data = LogReg,
+          family = "binomial")
+```
+
+*Note*: `Presence` is a factor with two levels
+
+## Summarizing {.smaller}
+
+```{r}
+summary(fm)
+```
+
+## Summarizing with `logistic.display()`
+
+```{r message=FALSE}
+library(epiDisplay)
+logistic.display(fm)
+```
+
+## Visualizing
+
+```{r log_plot, eval=FALSE}
+ggplot(LogReg, aes(x = Rainfall,
+                   y = as.numeric(Presence) - 1)) + 
+  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_smooth(method = "glm",
+              method.args = list(family = "binomial"),
+              se = FALSE, size = 2) + 
+  geom_point(size = 3) +
+  ylab("Probability of Presence") +
+  xlab("Rainfall (cm/y)") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+```
+
+## Visualizing
+
+```{r echo=FALSE, ref.label="log_plot"}
+```
+
+## Presence of sole
+
+<center>
+<img src="images/solea.jpg" width="100%" />
+</center>
+
+## Presence of sole
+
+Presence/absence of sole in the Tagus estuary of Portugal.
+
+```{r}
+M <- read_excel("../data/Sole.xlsx")
+str(M)
+```
+
+## Presence of sole
+
+```{r}
+M <- M[,c("salinity", "Solea_solea")]
+M$Solea_solea <- factor(M$Solea_solea)
+```
+
+## Presence of sole
+
+```{r}
+fm <- glm(Solea_solea ~ salinity, data = M, family = "binomial")
+```
+
+## Presence of sole {.smaller}
+
+```{r echo=FALSE}
+summary(fm)
+```
+
+## Presence of sole
+
+```{r}
+logistic.display(fm)
+```
+
+## Presence of sole
+
+```{r echo=FALSE}
+ggplot(M, aes(x = salinity,
+              y = as.numeric(Solea_solea) - 1)) + 
+  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_smooth(method = "glm",
+              method.args = list(family = "binomial"),
+              se = FALSE, size = 2) + 
+  geom_point(size = 3) +
+  ylab("Probability of Presence") +
+  xlab("Salinity") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+```
+
+## Tibetan skulls
+
+```{r}
+M <- read_excel("../data/Tibetan_Skulls.xlsx")
+str(M)
+M <- M %>% mutate(Origin = factor(Origin))
+```
+
+## Tibetan skulls
+
+```{r echo=FALSE}
+ggscatmat(as.data.frame(M), 1:5, color = "Origin") +
+  theme(text = element_text(size = 9),
+        axis.text = element_text(size = 6),
+        axis.text.x = element_text(angle = -90, vjust = 0.5))
+```
+
+## Tibetan skulls
+
+```{r}
+fm <- glm(Origin ~ ., data = M, family = "binomial")
+```
+
+- Use `~ .` to include all other variables
+
+## Tibetan skulls {.smaller}
+
+```{r echo=FALSE}
+summary(fm)
+```
+
+## Tibetan skulls {.smaller}
+
+```{r}
+logistic.display(fm)
+```
+
+## Tibetan skulls
+
+```{r}
+Anova(fm, type = "III")
+```
+
+## Generalized linear multilevel models
+
+Generalization of Gaussian multilevel models to all the kinds of predictors that generalized linear models can be used for
+
+Large can of worms:
+
+- http://glmm.wikidot.com/faq
+
+## Quiz 08-4
+
+No more Lectures
