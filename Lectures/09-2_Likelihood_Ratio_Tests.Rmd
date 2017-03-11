@@ -20,7 +20,7 @@ library(wesanderson)
 
 ## Likelihoods and model comparison
 
-We have maxmimized likelihoods for single models
+We have maximized likelihoods for single models
 
 Now maximize likelihoods for competing models
 
@@ -31,14 +31,13 @@ Now maximize likelihoods for competing models
 - Nested models
     - Mean only
     - Mean for each group
-- Assmptotic assumptions
+- Asymptotic assumptions
 - $\chi^2$ distribution
 
 ```{r echo=FALSE, fig.height = 2.5, fig.width = 4}
 source("Shade_Distributions.R")
 shade_chisq(0.05, 1)
 ```
-
 
 ## Energy expenditure in naked mole rats
 

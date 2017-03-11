@@ -101,7 +101,7 @@
 
 <slide class=''><hgroup><h2>Likelihoods and model comparison</h2></hgroup><article  id="likelihoods-and-model-comparison">
 
-<p>We have maxmimized likelihoods for single models</p>
+<p>We have maximized likelihoods for single models</p>
 
 <p>Now maximize likelihoods for competing models</p>
 
@@ -189,11 +189,13 @@
 ## -0.72004 -0.17990  0.05631  0.19551  0.43128 
 ## 
 ## Coefficients:
-##                  Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)        1.2939     1.6691   0.775   0.4441
-## Mass               0.6069     0.3428   1.771   0.0865
-## CasteWorker       -1.5713     1.9518  -0.805   0.4269
-## Mass:CasteWorker   0.4186     0.4147   1.009   0.3206
+##                  Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)        1.2939     1.6691   0.775   0.4441  
+## Mass               0.6069     0.3428   1.771   0.0865 .
+## CasteWorker       -1.5713     1.9518  -0.805   0.4269  
+## Mass:CasteWorker   0.4186     0.4147   1.009   0.3206  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.2965 on 31 degrees of freedom
 ## Multiple R-squared:  0.4278, Adjusted R-squared:  0.3725 
@@ -384,13 +386,15 @@ lrtest(fm1, fm2)</pre>
 ## Model 4: Energy ~ Mass + Caste
 ## Model 5: Energy ~ Mass * Caste
 ## Model 6: Energy ~ Mass * Caste + Noise
-##   #Df   LogLik Df   Chisq Pr(&gt;Chisq)
-## 1   2 -14.7581                      
-## 2   3 -14.5118  1  0.4926   0.482771
-## 3   3  -9.1258  0 10.7720  &lt; 2.2e-16
-## 4   4  -5.5530  1  7.1456   0.007515
-## 5   5  -4.9871  1  1.1318   0.287392
-## 6   6  -4.7276  1  0.5190   0.471270</pre>
+##   #Df   LogLik Df   Chisq Pr(&gt;Chisq)    
+## 1   2 -14.7581                          
+## 2   3 -14.5118  1  0.4926   0.482771    
+## 3   3  -9.1258  0 10.7720  &lt; 2.2e-16 ***
+## 4   4  -5.5530  1  7.1456   0.007515 ** 
+## 5   5  -4.9871  1  1.1318   0.287392    
+## 6   6  -4.7276  1  0.5190   0.471270    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
 
 <p><code>Energy ~ Mass + Caste</code> is not improved by adding an interaction term.</p>
 
@@ -407,10 +411,12 @@ lrtest(fm1, fm2)</pre>
 ## -0.73388 -0.19371  0.01317  0.17578  0.47673 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept) -0.09687    0.94230  -0.103   0.9188
-## Mass         0.89282    0.19303   4.625 5.89e-05
-## CasteWorker  0.39334    0.14611   2.692   0.0112
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.09687    0.94230  -0.103   0.9188    
+## Mass         0.89282    0.19303   4.625 5.89e-05 ***
+## CasteWorker  0.39334    0.14611   2.692   0.0112 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.2966 on 32 degrees of freedom
 ## Multiple R-squared:  0.409,  Adjusted R-squared:  0.3721 

@@ -23,7 +23,7 @@ library(wesanderson)
 ## The Problem
 
 - Models maximize the amount of variation explained in the outcome variable by the predictor variables
-- Can produce results specific to the dataset (i.e. overfitting)
+- Can produce results specific to the data set (i.e., overfitting)
 - More complex models = more specific, less general
 
 ## Simulation
@@ -239,9 +239,9 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
 1. Split data into 10 ~equal sets
 1. Use each set as the test set with the remaining data as the training set
 1. Quantify error 
-    - **mean squared error**
-    - correlation between predicted & observed values
-    - categorical outcome: % misclassified
+    - **Mean squared error**
+    - Correlation between predicted & observed values
+    - Categorical outcome: % misclassified
 
 ## 10-fold cross validation
     

@@ -73,7 +73,7 @@ df = 2 because the mean and standard deviation are estimated.
 - AIC is a measure of the *lack* of model fit
     - Smaller AIC is better
 - No notion of "significance".
-    - Comparison in the key
+    - Comparison is the key
 - Negative twice the log-likelihood + 2 X *number of estimated parameters*
     - Penalization of models with large number of estimated parameters, because they will always fit the observed data better
     - Parsimony as a side-effect
