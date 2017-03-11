@@ -1,0 +1,44 @@
+---
+title: 'Problem Set 09'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+# FIXME
+library(tidyverse)
+library(readxl)
+library(cowplot)
+library(forcats)
+library(ggsci)
+library(xkcd)
+```
+
+Some pretty color palettes: https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html
+
+## Neandertal Brains
+
+```{r}
+M <- read_csv("../data/NeandertalBrainSize.csv") %>% 
+  mutate(Species = fct_relevel(Species, "Recent"))
+
+xrange <- range(M$ln_Mass)
+yrange <- range(M$ln_Brain)
+
+M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+  geom_point(size = 2) +
+  scale_color_d3() +
+  theme(legend.position = c(0.9, 0.12),
+        legend.background = element_rect(size = 0.5,
+                                         color = "black",
+                                         linetype = "solid")) +
+  labs(x = "ln Body Mass", y = "ln Brain Size") +
+  xkcdaxis(xrange, yrange)
+```
+
