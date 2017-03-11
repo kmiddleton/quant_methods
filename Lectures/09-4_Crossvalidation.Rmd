@@ -1,5 +1,5 @@
 ---
-title: "General(ized) Linear Models: Other Distributions"
+title: "Model Comparison: Cross Validation"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -14,292 +14,324 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
-library(readxl)
-library(GGally)
-library(ggrepel)
-library(car)
+library(ggplot2)
+library(latex2exp)
+library(wesanderson)
+
 ```
 
-## Hierarchy of GLMs
+## The Problem
+
+- Models maximize the amount of variation explained in the outcome variable by the predictor variables
+- Can produce results specific to the dataset (i.e. overfitting)
+- More complex models = more specific, less general
+
+## Simulation
+
+- Set up a data set where we know which variables are true predictors and which are not
+- Pull outcome variable from a normal distribution
+    - Two groups, differ in mean value
+- Predictor 1 is the grouping variable 
+- All other predictors are randomly generated and unrelated to the outcome variable
+
+## Simulation
+
+```{r}
+set.seed(29545)
+
+nobs<-10
+yy<-c(rnorm(nobs/2,0,1),rnorm(nobs/2,3,1))
+xx1<-rep(c(0,1),each=nobs/2)
+xx2<-rnorm(nobs)
+xx3<-rnorm(nobs)
+xx4<-rnorm(nobs)
+xx5<-rnorm(nobs)
+xx6<-rnorm(nobs)
+xx7<-rnorm(nobs)
+xx8<-rnorm(nobs)
+xx9<-rnorm(nobs)
+xx10<-rnorm(nobs)
+```
+
+## Simulation
+
+Fit 3 models:
+
+```{r}
+
+mod1<-lm(yy~xx1)
+mod2<-lm(yy~xx1+xx2+xx3+xx4+xx5)
+mod3<-lm(yy~xx1+xx2+xx3+xx4+xx5+xx6+xx7+xx8++xx9+xx10)
+
+```
+
+- Compare fitted values to assess how well the model fits the data  
+- Remember $R^2$ = the squared correlation between the fitted and observed y values
+
+## Model 1
+
+```{r, echo=FALSE}
+yy_hat1<-mod1$fitted.values
+data.frame('Yhat'=yy_hat1,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
+  geom_point(size=3,alpha=1/3)+
+  labs(x = TeX("$\\hat{Y}$"),
+       title = TeX(paste0("R^2 = ",
+                          round(summary(mod1)$r.squared, 2),
+                   "; Correlation = ",
+                   round(sqrt(summary(mod1)$r.squared), 2))))
+```
+
+## Model 2
+
+```{r, echo=FALSE}
+yy_hat2<-mod2$fitted.values
+data.frame('Yhat'=yy_hat2,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
+  geom_point(size=3,alpha=1/3)+
+  labs(x = TeX("$\\hat{Y}$"),
+       title = TeX(paste0("R^2 = ",
+                          round(summary(mod2)$r.squared, 2),
+                   "; Correlation = ",
+                   round(sqrt(summary(mod2)$r.squared), 2))))
+```
+
+## Model 3
+
+```{r, echo=FALSE}
+yy_hat3<-mod3$fitted.values
+data.frame('Yhat'=yy_hat3,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
+  geom_point(size=3,alpha=1/3)+
+  labs(x = TeX("$\\hat{Y}$"),
+       title = TeX(paste0("R^2 = ",
+                          round(summary(mod3)$r.squared, 2),
+                   "; Correlation = ",
+                   round(sqrt(summary(mod3)$r.squared), 2))))
+```
+
+## Simulation
+
+- How will our models perform with new data?
+
+```{r}
+newN<-10
+newy<-c(rnorm(newN/2,0,1),rnorm(newN/2,3,1))
+newx<-data.frame('xx1'=rep(c(0,1),each=newN/2),
+                 'xx2'=rnorm(newN),
+                 'xx3'=rnorm(newN),
+                 'xx4'=rnorm(newN),
+                 'xx5'=rnorm(newN),
+                 'xx6'=rnorm(newN),
+                 'xx7'=rnorm(newN),
+                 'xx8'=rnorm(newN),
+                 'xx9'=rnorm(newN),
+                 'xx10'=rnorm(newN))
+
+y_hat_new1<-predict.lm(object=mod1,newdata=newx)
+y_hat_new2<-predict.lm(object=mod2,newdata=newx)
+y_hat_new3<-predict.lm(object=mod3,newdata=newx)
+```
+
+## Model 1
+
+```{r, echo=FALSE}
+miny<-min(c(newy,yy))
+maxy<-max(c(newy,yy))
+
+minx<-min(c(y_hat_new1,y_hat_new2,y_hat_new3, yy_hat1, yy_hat2,yy_hat3))
+maxx<-max(c(y_hat_new1,y_hat_new2,y_hat_new3,yy_hat1, yy_hat2,yy_hat3))
+
+new1<-data.frame('Yhat'=y_hat_new1,'Yobs'=newy)
+new2<-data.frame('Yhat'=y_hat_new2,'Yobs'=newy)
+new3<-data.frame('Yhat'=y_hat_new3,'Yobs'=newy)
+
+data.frame('Yhat'=yy_hat1,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
+  geom_point(size=3,alpha=1/3)+
+  geom_point(data=new1,aes(x=Yhat, y=Yobs), size=3, alpha=1/3,color='red')+
+  ylim(miny,maxy)+
+  xlim(minx,maxx) +
+  labs(x = TeX("$\\hat{Y}$"),
+       title = TeX(paste0("Correlation (new data vs. predicted values) = ",
+                   round(cor(y_hat_new1,newy), 2))))
+```
+
+## Model 2
+
+```{r, echo=FALSE}
+data.frame('Yhat'=yy_hat2,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
+  geom_point(size=3,alpha=1/3)+
+  geom_point(data=new2,aes(x=Yhat, y=Yobs), size=3, alpha=1/3,color='red')+
+  ylim(miny,maxy)+
+  xlim(minx,maxx) +
+  labs(x = TeX("$\\hat{Y}$"),
+       title = TeX(paste0("Correlation (new data vs. predicted values) = ",
+                   round(cor(y_hat_new2,newy), 2))))
+
+```
+
+## Model 3
+
+```{r, echo=FALSE}
+data.frame('Yhat'=yy_hat3,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
+  geom_point(size=3,alpha=1/3)+
+  geom_point(data=new3,aes(x=Yhat, y=Yobs), size=3, alpha=1/3,color='red')+
+  ylim(miny,maxy)+
+  xlim(minx,maxx) +
+  labs(x = TeX("$\\hat{Y}$"),
+       title = TeX(paste0("Correlation (new data vs. predicted values) = ",
+                   round(cor(y_hat_new3,newy), 2))))
+```
+
+## Cross Validation
+
+> When we don't know the true model (all cases but simulation), how do we know if a model is too specific to a given data set?
+
+- Cross validation is one technique to address this question
+
+## Approach
+
+- Split data into training and test sets
+- Use training set to build model
+- Use test set to evaluate model
+- Repeat to get average error
+- **Which Predictors?**
+- **What Parameter Values?**
+
+## Approaches
+
+- Random sub samples as test set
+    - Issue: reuse of data
+- K-fold cross validation
+    - Issue: need large data set
+- Leave one out
+    - Issue: small test set
+
+## Energy expenditure in naked mole rats
 
 <center>
-<img src="images/GeneralizedLinearModels.png" width="100%" />
+<img src="images/NMR.jpg" width="80%" />
 </center>
 
-## *Generalized* linear models
-
-$$\mbox{Response variable(s)} \sim \mbox{Predictor variable(s)} + \mbox{Error}$$
-
-Distribution of the response variable(s) can be:
-
-1. Normal (Gaussian)
-1. Binomial (two states)
-1. Poisson (counts)
-1. Lots and lots of others
-
-## General equation form of GLMs
-
-$$Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
-
-$Y$ follows some distribution (e.g., $Y \sim \mathcal{N}$ or $Y \sim \mbox{Binom}$)
-
-- Most often normal.
-
-$X_n$  are some combination of continuous and categorical predictors.
-
-$\beta_n$ are the parameter estimates for the $X$.
-
-## Logistic regression
-
-Outcome variable is categorical:
-
-- Heart disease
-- Diabetes
-- Cancer
-
-Predictors can be a mix of categorical and continuous variables:
-
-- sex, smoking status, family history of ...
-- body mass, BMI, blood glucose level
-
-## Logistic regression
-
-What are the predictors of presence or absence?
-
-- Morphology
-- Character state
-- Species
-- Rain
-
-## Challenge
-
-How much variance is there in 0's and 1's?
-
-## Odds
-
-$$\mbox{Odds} = \frac{P_{event}}{1 - P_{event}}$$
-
-Odds is the ratio of the probability of an event to the probability of no event.
-
-$$\log O_i = \log \left(\frac{P_i}{1 - P_i} \right) = \mbox{logit}(P_i)$$
-
-Logit function converts probabilities to a continuous value not bounded by 0 and 1.
-
-## Probabilities, odds, and log odds
-
-P  | 0.001 | 0.5 | 0.999
---:|--:|--:|--:|
-1 - P    | 0.999 | 0.5 | 0.001
-Odds     | 0.001 | 1   | 999
-log(Odds) | -6.9  | 0   | 6.9
-
-## Probabilities to log odds
-
-```{r}
-P <- seq(0.0001, 0.9999, length.out = 1000)
-Odds <- P / (1 - P)
-log_Odds <- log(Odds)
-M <- data.frame(P, Odds, log_Odds)
-```
-
-## Probabilities to log odds
+## Energy expenditure in naked mole rats
 
 ```{r echo=FALSE}
-ggplot(M, aes(P, Odds)) + geom_line() +
-  labs(x = "Probability", y = "Odds")
+data(MoleRats, package = "abd")
+M <- MoleRats
+M$caste <- factor(as.numeric(M$caste),
+                  labels = c("Non-worker", "Worker"))
+names(M) <- c("Caste", "Mass", "Energy")
+
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## Probabilities to log odds
+## Fit different models to these data
+
+1. ANOVA (group mean, no body mass)
+1. ANCOVA, intercepts varying
+1. ANCOVA, slopes varying & intercepts varying
+
+## Assess models with 10-fold cross validation
+
+1. Split data into 10 ~equal sets
+1. Use each set as the test set with the remaining data as the training set
+1. Quantify error 
+    - **mean squared error**
+    - correlation between predicted & observed values
+    - categorical outcome: % misclassified
+
+## 10-fold cross validation
+    
+```{r}
+set.seed(666)
+folds <- 10
+M$id.group <- sample(c(rep(seq(1, folds), each = 3),
+                       sample(seq(1, folds), 5)))
+gg <- 1:folds
+err.out <- data.frame('mod1' = numeric(length = folds),
+                      'mod2' = numeric(length = folds),
+                      'mod3' = numeric(length = folds))
+```
+
+## 10-fold cross validation
+    
+```{r}
+for(ii in gg) {
+  M_train <- M[M$id.group != ii, ]
+  mod1 <- lm(Energy ~ Caste, data = M_train)
+  mod2 <- lm(Energy ~ Mass + Caste, data = M_train)
+  mod3 <- lm(Energy ~ Mass * Caste, data = M_train)
+  M_test <- M[M$id.group == ii, ]
+  pp1 <- predict(mod1, M_test)
+  pp2 <- predict(mod2, M_test)
+  pp3 <- predict(mod3, M_test)
+  err.out[ii, 'mod1'] <- mean((M_test$Energy - pp1) ^ 2)
+  err.out[ii, 'mod2'] <- mean((M_test$Energy - pp2) ^ 2)
+  err.out[ii, 'mod3'] <- mean((M_test$Energy - pp3) ^ 2)
+}
+```
+
+## Visualizing MSE of one "fold"
 
 ```{r echo=FALSE}
-ggplot(M, aes(P, log_Odds)) + geom_line() +
-  labs(x = "Probability", y = "log Odds")
+preds <- M_test %>% 
+  select(-id.group) %>% 
+  mutate(`Overall Mean` = pp1,
+         `Mass + Caste` = pp2,
+         `Mass * Caste` = pp3) %>% 
+  gather(Model, value, -Caste, -Mass, -Energy)
+
+ggplot() +
+  geom_vline(xintercept = M_test$Mass, color = "gray60", linetype = "dotted") +
+  geom_point(data = M_train, aes(x = Mass, y = Energy, color = Caste),
+             size = 1, alpha = 0.5) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)") +
+  geom_point(data = M_test, aes(x = Mass, y = Energy, color = Caste), size = 4, pch = 16) +
+  geom_point(data = preds, aes(x = Mass, y = value, color = Caste,
+                               shape = Model), size = 4) +
+  scale_shape_manual(values = c(0, 1, 2))
 ```
 
-log-Odds ranges from never (-$\infty$) to always ($\infty$).
-
-## Link functions
-
-1. Gaussian: Identity
-1. Binomial: Logit
-1. Poisson: Log
-
-## Logistic regression
-
-$$\mbox{logit}(Y) = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
-
-The logit "transformation" allows $\beta$s to be estimated iteratively.
-
-Fitting in R:
-
-- `glm()` uses the formula interface
-- `family = ` determines the link function
-    - "Gaussian" $\rightarrow$ identity
-    - "binomial" $\rightarrow$ logit
-    - "Poisson" $\rightarrow$ log
-
-## Logistic regression
-
+## 10-fold cross validation {.smaller}
+    
 ```{r}
-set.seed(4)
-rainfall <- c(runif(20, 100, 160),
-              runif(20, 160, 210)) 
-presence <- c(rbinom(20, 1, 0.15),
-              rbinom(20, 1, 0.95))
-LogReg <- data.frame(Rainfall = rainfall,
-                     Presence = as.factor(presence))
-head(LogReg)
+err.out
+
+colMeans(err.out)
 ```
 
-## Fitting a logistic model
-
-```{r}
-fm <- glm(Presence ~ Rainfall,
-          data = LogReg,
-          family = "binomial")
-```
-
-*Note*: `Presence` is a factor with two levels
-
-## Summarizing {.smaller}
-
-```{r}
-summary(fm)
-```
-
-## Summarizing with `logistic.display()`
-
-```{r message=FALSE}
-library(epiDisplay)
-logistic.display(fm)
-```
-
-## Visualizing
-
-```{r log_plot, eval=FALSE}
-ggplot(LogReg, aes(x = Rainfall,
-                   y = as.numeric(Presence) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_smooth(method = "glm",
-              method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
-  geom_point(size = 3) +
-  ylab("Probability of Presence") +
-  xlab("Rainfall (cm/y)") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
-```
-
-## Visualizing
-
-```{r echo=FALSE, ref.label="log_plot"}
-```
-
-## Presence of sole
-
-<center>
-<img src="images/solea.jpg" width="100%" />
-</center>
-
-## Presence of sole
-
-Presence/absence of sole in the Tagus estuary of Portugal.
-
-```{r}
-M <- read_excel("../data/Sole.xlsx")
-str(M)
-```
-
-## Presence of sole
-
-```{r}
-M <- M[,c("salinity", "Solea_solea")]
-M$Solea_solea <- factor(M$Solea_solea)
-```
-
-## Presence of sole
-
-```{r}
-fm <- glm(Solea_solea ~ salinity, data = M, family = "binomial")
-```
-
-## Presence of sole {.smaller}
+## 10-fold cross validation
 
 ```{r echo=FALSE}
-summary(fm)
+err.out %>%
+  mutate(Fold = factor(1:folds)) %>% 
+  gather(Model, MSE, -Fold) %>% 
+  mutate(Model = factor(
+    Model,
+    labels = c("Overall Mean", "Mass + Caste", "Mass * Caste"))) %>% 
+  ggplot(aes(Model, MSE, color = Fold)) +
+  geom_point() +
+  stat_summary(fun.y = "mean", geom = "point", color = "black", size = 3)
+
 ```
 
-## Presence of sole
+## Notes & Resources
 
-```{r}
-logistic.display(fm)
-```
+- Training and Test sets must come from the same population
+- There is uncertainty in cross validation estimates
+- We've written our own code here but there are several R packages:
 
-## Presence of sole
+    - `cvTools` package
+    - `boot` package
 
-```{r echo=FALSE}
-ggplot(M, aes(x = salinity,
-              y = as.numeric(Solea_solea) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_smooth(method = "glm",
-              method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
-  geom_point(size = 3) +
-  ylab("Probability of Presence") +
-  xlab("Salinity") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
-```
 
-## Tibetan skulls
-
-```{r}
-M <- read_excel("../data/Tibetan_Skulls.xlsx")
-str(M)
-M <- M %>% mutate(Origin = factor(Origin))
-```
-
-## Tibetan skulls
-
-```{r echo=FALSE}
-ggscatmat(as.data.frame(M), 1:5, color = "Origin") +
-  theme(text = element_text(size = 9),
-        axis.text = element_text(size = 6),
-        axis.text.x = element_text(angle = -90, vjust = 0.5))
-```
-
-## Tibetan skulls
-
-```{r}
-fm <- glm(Origin ~ ., data = M, family = "binomial")
-```
-
-- Use `~ .` to include all other variables
-
-## Tibetan skulls {.smaller}
-
-```{r echo=FALSE}
-summary(fm)
-```
-
-## Tibetan skulls {.smaller}
-
-```{r}
-logistic.display(fm)
-```
-
-## Tibetan skulls
-
-```{r}
-Anova(fm, type = "III")
-```
-
-## Generalized linear multilevel models
-
-Generalization of Gaussian multilevel models to all the kinds of predictors that generalized linear models can be used for
-
-Large can of worms:
-
-- http://glmm.wikidot.com/faq
-
-## Quiz 08-4
+## No Quiz
 
 No more Lectures
