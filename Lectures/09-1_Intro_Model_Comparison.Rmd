@@ -1,5 +1,5 @@
 ---
-title: "General(ized) Linear Models: Other Distributions"
+title: "Introduction to Model Comparison"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -14,292 +14,243 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
-library(readxl)
-library(GGally)
 library(ggrepel)
-library(car)
 ```
 
-## Hierarchy of GLMs
+## Readings
+
+- Burnham and Anderson [-@Burnham2001-wq] Kullback-Leibler information as a basis for strong inference in ecological studies. *Wildl Res* 28:111-119.
+
+## Additional resources
+
+- Anderson and Burnham [-@Anderson2002-cf]. Avoiding Pitfalls When Using Information-Theoretic Methods. *J Wildl Manage* 66:912–918.
+- Burnham & Anderson [-@Burnham2004-zr]. Multimodel Inference: Understanding AIC and BIC in Model Selection. *Sociol Methods Res* 33:261–304.
+- Burnham and Anderson [-@Burnham2002-xt]. *Model Selection and Multi-model Inference: a Practical Information Theoretic Approach*. Springer
+- Judge et al. [-@Judge1985-gl]: *The Classical Inference Approach for the General Linear Model*. John Wiley & Sons
+
+## Underfitting and overfitting {.columns-2}
+
+**Occam's Razor**: Models with fewer assumptions are preferred
+
+- How should we designate "preferred"?
+- How should we compare among them?
+- How good is good enough?
+
 
 <center>
-<img src="images/GeneralizedLinearModels.png" width="100%" />
+<img src="images/ockham.jpg" width="80%" />
 </center>
 
-## *Generalized* linear models
+## Tradeoff in model specification
 
-$$\mbox{Response variable(s)} \sim \mbox{Predictor variable(s)} + \mbox{Error}$$
+**Underfitting**: Model is too simple. Doesn't describe the sample *well enough*.
 
-Distribution of the response variable(s) can be:
+- Leads to poor prediction
 
-1. Normal (Gaussian)
-1. Binomial (two states)
-1. Poisson (counts)
-1. Lots and lots of others
+**Overfitting**: Model is too accurate. Describes the sample *too well*.
 
-## General equation form of GLMs
+- Leads to poor prediction
 
-$$Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
+We need to find a balance between *regular* and *irregular* features.
 
-$Y$ follows some distribution (e.g., $Y \sim \mathcal{N}$ or $Y \sim \mbox{Binom}$)
+## Why do we make models?
 
-- Most often normal.
+- Estimates of the magnitudes of parameters and/or differences between parameter estimates, *and* their relative precision
+- Are the estimates large enough to be used for prediction?
 
-$X_n$  are some combination of continuous and categorical predictors.
+No model represents the true biological process
 
-$\beta_n$ are the parameter estimates for the $X$.
+- This is actually a good thing.
+- Which model comes *closest* to the true biological process from a *(small) set of working hypotheses*?
 
-## Logistic regression
-
-Outcome variable is categorical:
-
-- Heart disease
-- Diabetes
-- Cancer
-
-Predictors can be a mix of categorical and continuous variables:
-
-- sex, smoking status, family history of ...
-- body mass, BMI, blood glucose level
-
-## Logistic regression
-
-What are the predictors of presence or absence?
-
-- Morphology
-- Character state
-- Species
-- Rain
-
-## Challenge
-
-How much variance is there in 0's and 1's?
-
-## Odds
-
-$$\mbox{Odds} = \frac{P_{event}}{1 - P_{event}}$$
-
-Odds is the ratio of the probability of an event to the probability of no event.
-
-$$\log O_i = \log \left(\frac{P_i}{1 - P_i} \right) = \mbox{logit}(P_i)$$
-
-Logit function converts probabilities to a continuous value not bounded by 0 and 1.
-
-## Probabilities, odds, and log odds
-
-P  | 0.001 | 0.5 | 0.999
---:|--:|--:|--:|
-1 - P    | 0.999 | 0.5 | 0.001
-Odds     | 0.001 | 1   | 999
-log(Odds) | -6.9  | 0   | 6.9
-
-## Probabilities to log odds
-
-```{r}
-P <- seq(0.0001, 0.9999, length.out = 1000)
-Odds <- P / (1 - P)
-log_Odds <- log(Odds)
-M <- data.frame(P, Odds, log_Odds)
-```
-
-## Probabilities to log odds
+## Brain volume and (estimated) body mass in hominins
 
 ```{r echo=FALSE}
-ggplot(M, aes(P, Odds)) + geom_line() +
-  labs(x = "Probability", y = "Odds")
+Species <- c("afarensis", "africanus", "habilis", "boisei",
+             "rudolfensis", "ergaster", "sapiens")
+Brain_Vol <- c(438, 452, 612, 521, 752, 871, 1350)
+Mass <- c(37, 35.5, 34.5, 41.5, 55.5, 61, 53.3)
+M <- data.frame(Species, Brain_Vol, Mass)
 ```
-
-## Probabilities to log odds
 
 ```{r echo=FALSE}
-ggplot(M, aes(P, log_Odds)) + geom_line() +
-  labs(x = "Probability", y = "log Odds")
+M
 ```
 
-log-Odds ranges from never (-$\infty$) to always ($\infty$).
+## Brain volume and body mass in hominins
 
-## Link functions
+```{r echo=FALSE}
+set.seed(29)
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
+  geom_point(size = 2) +
+  geom_text_repel(size = 4, force = 15,
+                  fontface = "italic",
+                  box.padding = unit(0.5, "lines"),
+                  point.padding = unit(0.5, "lines"),
+                  arrow = arrow(length = unit(0.01, 'npc'))) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
 
-1. Gaussian: Identity
-1. Binomial: Logit
-1. Poisson: Log
+## 6 increasingly complex polynomial models {.smaller}
 
-## Logistic regression
+- $\mbox{Brain Vol} = \beta_0 + \beta1 \mbox{M}$
+- $\mbox{Brain Vol} = \beta_0 + \beta1 \mbox{M} + \beta2 \mbox{M}^2$
+- $\mbox{Brain Vol} = \beta_0 + \beta1 \mbox{M} + \beta2 \mbox{M}^2 + \beta3 \mbox{M}^3$
+- $\mbox{Brain Vol} = \beta_0 + \beta1 \mbox{M} + \beta2 \mbox{M}^2 + \beta3 \mbox{M}^3 + \beta4 \mbox{M}^4$
+- $\mbox{Brain Vol} = \beta_0 + \beta1 \mbox{M} + \beta2 \mbox{M}^2 + \beta3 \mbox{M}^3 + \beta4 \mbox{M}^4 + \beta5 \mbox{M}^5$
+- $\mbox{Brain Vol} = \beta_0 + \beta1 \mbox{M} + \beta2 \mbox{M}^2 + \beta3 \mbox{M}^3 + \beta4 \mbox{M}^4 + \beta5 \mbox{M}^5 + \beta6 \mbox{M}^6$
 
-$$\mbox{logit}(Y) = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
+Compare *R*^2^ among them.
 
-The logit "transformation" allows $\beta$s to be estimated iteratively.
-
-Fitting in R:
-
-- `glm()` uses the formula interface
-- `family = ` determines the link function
-    - "Gaussian" $\rightarrow$ identity
-    - "binomial" $\rightarrow$ logit
-    - "Poisson" $\rightarrow$ log
-
-## Logistic regression
+## 1: $\mbox{Brain Vol} = \beta_0 + \beta_1 \mbox{M}$
 
 ```{r}
-set.seed(4)
-rainfall <- c(runif(20, 100, 160),
-              runif(20, 160, 210)) 
-presence <- c(rbinom(20, 1, 0.15),
-              rbinom(20, 1, 0.95))
-LogReg <- data.frame(Rainfall = rainfall,
-                     Presence = as.factor(presence))
-head(LogReg)
+fm1 <- lm(Brain_Vol ~ Mass, data = M)
+coef(fm1)
+summary(fm1)$r.squared
 ```
 
-## Fitting a logistic model
+## 1: $\mbox{Brain Vol} = \beta_0 + \beta_1 \mbox{M}$
 
-```{r}
-fm <- glm(Presence ~ Rainfall,
-          data = LogReg,
-          family = "binomial")
-```
-
-*Note*: `Presence` is a factor with two levels
-
-## Summarizing {.smaller}
-
-```{r}
-summary(fm)
-```
-
-## Summarizing with `logistic.display()`
-
-```{r message=FALSE}
-library(epiDisplay)
-logistic.display(fm)
-```
-
-## Visualizing
-
-```{r log_plot, eval=FALSE}
-ggplot(LogReg, aes(x = Rainfall,
-                   y = as.numeric(Presence) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_smooth(method = "glm",
-              method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
+```{r echo=FALSE}
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   geom_point(size = 3) +
-  ylab("Probability of Presence") +
-  xlab("Rainfall (cm/y)") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+  geom_smooth(method = "lm", color = "red", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
-## Visualizing
-
-```{r echo=FALSE, ref.label="log_plot"}
-```
-
-## Presence of sole
-
-<center>
-<img src="images/solea.jpg" width="100%" />
-</center>
-
-## Presence of sole
-
-Presence/absence of sole in the Tagus estuary of Portugal.
+## 2. $\mbox{Brain Vol} = \beta_0 + \beta_1 \mbox{M} + \beta_2 \mbox{M}^2$
 
 ```{r}
-M <- read_excel("../data/Sole.xlsx")
-str(M)
+fm2 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2), data = M)
+coef(fm2)
+summary(fm2)$r.squared
 ```
 
-## Presence of sole
-
-```{r}
-M <- M[,c("salinity", "Solea_solea")]
-M$Solea_solea <- factor(M$Solea_solea)
-```
-
-## Presence of sole
-
-```{r}
-fm <- glm(Solea_solea ~ salinity, data = M, family = "binomial")
-```
-
-## Presence of sole {.smaller}
+## 2. $\mbox{Brain Vol} = \beta_0 + \beta_1 \mbox{M} + \beta_2 \mbox{M}^2$
 
 ```{r echo=FALSE}
-summary(fm)
-```
-
-## Presence of sole
-
-```{r}
-logistic.display(fm)
-```
-
-## Presence of sole
-
-```{r echo=FALSE}
-ggplot(M, aes(x = salinity,
-              y = as.numeric(Solea_solea) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_smooth(method = "glm",
-              method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   geom_point(size = 3) +
-  ylab("Probability of Presence") +
-  xlab("Salinity") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 2)',
+              color = "red", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
-## Tibetan skulls
+## 3. $\mbox{Brain Vol} = \beta_0 + ... + \beta_3 \mbox{M}^3$
 
 ```{r}
-M <- read_excel("../data/Tibetan_Skulls.xlsx")
-str(M)
-M <- M %>% mutate(Origin = factor(Origin))
+fm3 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3), data = M)
+coef(fm3)
+summary(fm3)$r.squared
 ```
 
-## Tibetan skulls
+## 3. $\mbox{Brain Vol} = \beta_0 + ... + \beta_3 \mbox{M}^3$
 
 ```{r echo=FALSE}
-ggscatmat(as.data.frame(M), 1:5, color = "Origin") +
-  theme(text = element_text(size = 9),
-        axis.text = element_text(size = 6),
-        axis.text.x = element_text(angle = -90, vjust = 0.5))
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 3)',
+              color = "red", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
-## Tibetan skulls
+## 4. $\mbox{Brain Vol} = \beta_0 + ... + \beta_4 \mbox{M}^4$
 
 ```{r}
-fm <- glm(Origin ~ ., data = M, family = "binomial")
+fm4 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
+            I(Mass ^ 4), data = M)
+coef(fm4)
+summary(fm4)$r.squared
 ```
 
-- Use `~ .` to include all other variables
-
-## Tibetan skulls {.smaller}
+## 4. $\mbox{Brain Vol} = \beta_0 + ... + \beta_4 \mbox{M}^4$
 
 ```{r echo=FALSE}
-summary(fm)
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 4)',
+              color = "red", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
-## Tibetan skulls {.smaller}
+## 5. $\mbox{Brain Vol} = \beta_0 + ... + \beta_5 \mbox{M}^5$
 
 ```{r}
-logistic.display(fm)
+fm5 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
+            I(Mass ^ 4) + I(Mass ^ 5), data = M)
+coef(fm5)
+summary(fm5)$r.squared
 ```
 
-## Tibetan skulls
+## 5. $\mbox{Brain Vol} = \beta_0 + ... + \beta_5 \mbox{M}^5$
+
+```{r echo=FALSE}
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 5)',
+              color = "red", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+## 6. $\mbox{Brain Vol} = \beta_0 + ... + \beta_6 \mbox{M}^6$
 
 ```{r}
-Anova(fm, type = "III")
+fm6 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
+            I(Mass ^ 4) + I(Mass ^ 5) + I(Mass ^ 6), data = M)
+coef(fm6)
+summary(fm6)$r.squared
 ```
 
-## Generalized linear multilevel models
+## 6. $\mbox{Brain Vol} = \beta_0 + ... + \beta_6 \mbox{M}^6$
 
-Generalization of Gaussian multilevel models to all the kinds of predictors that generalized linear models can be used for
+```{r echo=FALSE, warning=FALSE}
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 6)',
+              color = "red", lwd = 1.5,
+              se = FALSE) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
 
-Large can of worms:
+## Summary R^2^
 
-- http://glmm.wikidot.com/faq
+Model  | R^2^  |
+------:|------:|
+1      | `r round(summary(fm1)$r.squared, 2)`
+2      | `r round(summary(fm2)$r.squared, 2)`
+3      | `r round(summary(fm3)$r.squared, 2)`
+4      | `r round(summary(fm4)$r.squared, 2)`
+5      | `r round(summary(fm5)$r.squared, 2)`
+6      | `r round(summary(fm6)$r.squared, 2)`
 
-## Quiz 08-4
+## Which model(s) balance under- vs. overfitting?
 
-No more Lectures
+Model 0: Mean only
+
+- Poor *in-sample* prediction
+- Poor *out-of-sample* prediction
+
+Model 1: Maybe enough information?
+
+Model 6: Clearly overfit
+
+- Perfect *in-sample* prediction
+- Poor *out-of-sample* prediction
+
+## Tradeoff in model specification
+
+> "Overfitting: fitting is easy; prediction is hard. Future data will not be exactly like past data, and so any model that is unaware of this fact tends to make worse predictions than it could. So if we wish to make good predictions, we cannot judge our models simply on how well they fit our data. **Information criteria** provide estimates of predictive accuracy, rather than merely fit. So they compare models where it matters." [@McElreath2015-no]
+
+## Methods for model comparison
+
+1. Likelihood ratio tests
+2. Information criteria
+3. Cross validation
+
+## Quiz 09-1
+
+Lecture 09-2
+
+## References
+

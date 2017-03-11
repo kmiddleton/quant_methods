@@ -1,5 +1,5 @@
 ---
-title: "General(ized) Linear Models: Other Distributions"
+title: "Likelihood Ratio Tests"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -15,291 +15,273 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 library(readxl)
-library(GGally)
-library(ggrepel)
-library(car)
+library(wesanderson)
 ```
 
-## Hierarchy of GLMs
+## Likelihoods and model comparison
+
+We have maxmimized likelihoods for single models
+
+Now maximize likelihoods for competing models
+
+- How to explicitly compare likelihoods?
+
+## Likelihood ratio tests
+
+- Nested models
+    - Mean only
+    - Mean for each group
+- Assmptotic assumptions
+- $\chi^2$ distribution
+
+```{r echo=FALSE, fig.height = 2.5, fig.width = 4}
+source("Shade_Distributions.R")
+shade_chisq(0.05, 1)
+```
+
+
+## Energy expenditure in naked mole rats
 
 <center>
-<img src="images/GeneralizedLinearModels.png" width="100%" />
+<img src="images/NMR.jpg" width="80%" />
 </center>
 
-## *Generalized* linear models
-
-$$\mbox{Response variable(s)} \sim \mbox{Predictor variable(s)} + \mbox{Error}$$
-
-Distribution of the response variable(s) can be:
-
-1. Normal (Gaussian)
-1. Binomial (two states)
-1. Poisson (counts)
-1. Lots and lots of others
-
-## General equation form of GLMs
-
-$$Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
-
-$Y$ follows some distribution (e.g., $Y \sim \mathcal{N}$ or $Y \sim \mbox{Binom}$)
-
-- Most often normal.
-
-$X_n$  are some combination of continuous and categorical predictors.
-
-$\beta_n$ are the parameter estimates for the $X$.
-
-## Logistic regression
-
-Outcome variable is categorical:
-
-- Heart disease
-- Diabetes
-- Cancer
-
-Predictors can be a mix of categorical and continuous variables:
-
-- sex, smoking status, family history of ...
-- body mass, BMI, blood glucose level
-
-## Logistic regression
-
-What are the predictors of presence or absence?
-
-- Morphology
-- Character state
-- Species
-- Rain
-
-## Challenge
-
-How much variance is there in 0's and 1's?
-
-## Odds
-
-$$\mbox{Odds} = \frac{P_{event}}{1 - P_{event}}$$
-
-Odds is the ratio of the probability of an event to the probability of no event.
-
-$$\log O_i = \log \left(\frac{P_i}{1 - P_i} \right) = \mbox{logit}(P_i)$$
-
-Logit function converts probabilities to a continuous value not bounded by 0 and 1.
-
-## Probabilities, odds, and log odds
-
-P  | 0.001 | 0.5 | 0.999
---:|--:|--:|--:|
-1 - P    | 0.999 | 0.5 | 0.001
-Odds     | 0.001 | 1   | 999
-log(Odds) | -6.9  | 0   | 6.9
-
-## Probabilities to log odds
-
-```{r}
-P <- seq(0.0001, 0.9999, length.out = 1000)
-Odds <- P / (1 - P)
-log_Odds <- log(Odds)
-M <- data.frame(P, Odds, log_Odds)
-```
-
-## Probabilities to log odds
+## Energy expenditure in naked mole rats
 
 ```{r echo=FALSE}
-ggplot(M, aes(P, Odds)) + geom_line() +
-  labs(x = "Probability", y = "Odds")
+data(MoleRats, package = "abd")
+M <- MoleRats
+M$caste <- factor(as.numeric(M$caste),
+                  labels = c("Non-worker", "Worker"))
+names(M) <- c("Caste", "Mass", "Energy")
+
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## Probabilities to log odds
+## Fit different models to these data
+
+1. Mean (overall mean, no body mass)
+1. ANOVA (group mean, no body mass)
+1. OLS regression (body mass only, no grouping)
+1. ANCOVA, intercepts varying
+1. ANCOVA, slopes varying & intercepts varying
+
+## 1: Mean
+
+```{r}
+fm1 <- lm(Energy ~ 1, data = M)
+```
 
 ```{r echo=FALSE}
-ggplot(M, aes(P, log_Odds)) + geom_line() +
-  labs(x = "Probability", y = "log Odds")
+M <- M %>% mutate(pred1 = predict(fm1))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred1), lwd = 2,
+            color = wes_palette("Cavalcanti")[5]) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-log-Odds ranges from never (-$\infty$) to always ($\infty$).
-
-## Link functions
-
-1. Gaussian: Identity
-1. Binomial: Logit
-1. Poisson: Log
-
-## Logistic regression
-
-$$\mbox{logit}(Y) = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
-
-The logit "transformation" allows $\beta$s to be estimated iteratively.
-
-Fitting in R:
-
-- `glm()` uses the formula interface
-- `family = ` determines the link function
-    - "Gaussian" $\rightarrow$ identity
-    - "binomial" $\rightarrow$ logit
-    - "Poisson" $\rightarrow$ log
-
-## Logistic regression
+## 2: ANOVA
 
 ```{r}
-set.seed(4)
-rainfall <- c(runif(20, 100, 160),
-              runif(20, 160, 210)) 
-presence <- c(rbinom(20, 1, 0.15),
-              rbinom(20, 1, 0.95))
-LogReg <- data.frame(Rainfall = rainfall,
-                     Presence = as.factor(presence))
-head(LogReg)
+fm2 <- lm(Energy ~ Caste, data = M)
 ```
-
-## Fitting a logistic model
-
-```{r}
-fm <- glm(Presence ~ Rainfall,
-          data = LogReg,
-          family = "binomial")
-```
-
-*Note*: `Presence` is a factor with two levels
-
-## Summarizing {.smaller}
-
-```{r}
-summary(fm)
-```
-
-## Summarizing with `logistic.display()`
-
-```{r message=FALSE}
-library(epiDisplay)
-logistic.display(fm)
-```
-
-## Visualizing
-
-```{r log_plot, eval=FALSE}
-ggplot(LogReg, aes(x = Rainfall,
-                   y = as.numeric(Presence) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_smooth(method = "glm",
-              method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
-  geom_point(size = 3) +
-  ylab("Probability of Presence") +
-  xlab("Rainfall (cm/y)") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
-```
-
-## Visualizing
-
-```{r echo=FALSE, ref.label="log_plot"}
-```
-
-## Presence of sole
-
-<center>
-<img src="images/solea.jpg" width="100%" />
-</center>
-
-## Presence of sole
-
-Presence/absence of sole in the Tagus estuary of Portugal.
-
-```{r}
-M <- read_excel("../data/Sole.xlsx")
-str(M)
-```
-
-## Presence of sole
-
-```{r}
-M <- M[,c("salinity", "Solea_solea")]
-M$Solea_solea <- factor(M$Solea_solea)
-```
-
-## Presence of sole
-
-```{r}
-fm <- glm(Solea_solea ~ salinity, data = M, family = "binomial")
-```
-
-## Presence of sole {.smaller}
 
 ```{r echo=FALSE}
-summary(fm)
+M <- M %>% mutate(pred2 = predict(fm2))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred2, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## Presence of sole
+## 3: OLS regression
 
 ```{r}
-logistic.display(fm)
+fm3 <- lm(Energy ~ Mass, data = M)
 ```
-
-## Presence of sole
 
 ```{r echo=FALSE}
-ggplot(M, aes(x = salinity,
-              y = as.numeric(Solea_solea) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_smooth(method = "glm",
-              method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
-  geom_point(size = 3) +
-  ylab("Probability of Presence") +
-  xlab("Salinity") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+M <- M %>% mutate(pred3 = predict(fm3))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred3, group = 1), lwd = 2,
+            color = wes_palette("Cavalcanti")[5]) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## Tibetan skulls
+## 4: ANCOVA, intercepts varying
 
 ```{r}
-M <- read_excel("../data/Tibetan_Skulls.xlsx")
-str(M)
-M <- M %>% mutate(Origin = factor(Origin))
+fm4 <- lm(Energy ~ Mass + Caste, data = M)
 ```
-
-## Tibetan skulls
 
 ```{r echo=FALSE}
-ggscatmat(as.data.frame(M), 1:5, color = "Origin") +
-  theme(text = element_text(size = 9),
-        axis.text = element_text(size = 6),
-        axis.text.x = element_text(angle = -90, vjust = 0.5))
+M <- M %>% mutate(pred4 = predict(fm4))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred4, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## Tibetan skulls
+## 5: ANCOVA, intercepts and slopes vary
 
 ```{r}
-fm <- glm(Origin ~ ., data = M, family = "binomial")
+fm5 <- lm(Energy ~ Mass * Caste, data = M)
 ```
-
-- Use `~ .` to include all other variables
-
-## Tibetan skulls {.smaller}
 
 ```{r echo=FALSE}
-summary(fm)
+M <- M %>% mutate(pred5 = predict(fm5))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred5, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## Tibetan skulls {.smaller}
+## 5: ANCOVA, intercepts and slopes varying {.smaller}
 
 ```{r}
-logistic.display(fm)
+summary(fm5)
 ```
 
-## Tibetan skulls
+## Comparing likelihoods
+
+Model  | *n* Estimated Parameters | log-Likelihood
+-------|------:|------:
+1 - Mean only                  | 1 | `r round(logLik(fm1), 3)`
+2 - ANOVA                      | 2 | `r round(logLik(fm2), 3)`
+3 - OLS regression             | 2 | `r round(logLik(fm3), 3)`
+4 - ANCOVA, intercept only     | 3 | `r round(logLik(fm4), 3)`
+5 - ANCOVA, slope & intercept  | 4 | `r round(logLik(fm5), 3)`
+
+## Adding predictors *can't decrease* model likelihood
+
+At worst, likelihood will be equal. It will probably go up.
+
+Add a column of [0, 1] random numbers:
 
 ```{r}
-Anova(fm, type = "III")
+set.seed(341)
+M <- M %>% mutate(Noise = runif(nrow(M), 0, 1))
 ```
 
-## Generalized linear multilevel models
+```{r echo=FALSE}
+dplyr::select(M, Mass, Caste, Energy, Noise) %>% head()
+```
 
-Generalization of Gaussian multilevel models to all the kinds of predictors that generalized linear models can be used for
+## 6: ANCOVA 5 + Noise {.smaller}
 
-Large can of worms:
+```{r}
+fm6 <- lm(Energy ~ Mass * Caste + Noise, data = M)
+summary(fm6)
+```
 
-- http://glmm.wikidot.com/faq
+## Comparing likelihoods
 
-## Quiz 08-4
+Model  | *n* Parameters | log-Likelihood
+-------|------:|------:
+1 - Mean only                 | 1 | `r round(logLik(fm1), 3)`
+2 - ANOVA                     | 2 | `r round(logLik(fm2), 3)`
+3 - OLS regression            | 2 | `r round(logLik(fm3), 3)`
+4 - ANCOVA, intercept         | 3 | `r round(logLik(fm4), 3)`
+5 - ANCOVA, intercept, slope  | 4 | `r round(logLik(fm5), 3)`
+6 - ANCOVA, intercept, slope, Noise  | 5 | `r round(logLik(fm6), 3)`
 
-No more Lectures
+## Comparing models
+
+Six nested models:
+
+1. Mean
+1. ANOVA
+1. OLS regression
+1. ANCOVA, intercepts varying
+1. ANCOVA, intercepts and slopes varying
+1. ANCOVA, intercepts and slopes varying, Noise
+
+What one(s) has/have the best support?
+
+## Likelihood ratio tests
+
+- Compare *nested* models
+    - Add or remove predictors
+    - Add or remove interactions
+    - **Outcome variable does not change**
+- 2 * $\Delta$log-Likelihood of the two models
+- Distributed as $\chi^2$ with *df* equal to difference in number of estimated parameters
+    - 1 more predictor, 1 less *df*
+
+## ANOVA vs. Mean only {.smaller}
+
+```{r message = FALSE}
+(chisq <- as.numeric(2 * (logLik(fm2) - logLik(fm1))))
+pchisq(chisq, df = 1, lower.tail = FALSE)
+
+library(lmtest)
+lrtest(fm1, fm2)
+```
+
+## Likelihood ratio tests {.smaller}
+
+Compare sets of *nested* models. Each compared to the one above with a $\chi^2$ test. 
+
+```{r}
+lrtest(fm1, fm2, fm3, fm4, fm5, fm6)
+```
+
+`Energy ~ Mass + Caste` is not improved by adding an interaction term.
+
+## "Preferred" model {.smaller}
+
+The "preferred" model is the one that is not improved by increased complexity. Interpretations based on this model:
+
+```{r echo=FALSE}
+summary(fm4)
+```
+
+```{r echo=FALSE}
+# Save models
+save(fm1, fm2, fm3, fm4, fm5, fm6, file = "lrtmodels.Rda")
+```
+
+## "Preferred" model {.smaller}
+
+```{r echo=FALSE}
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred4, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  theme(legend.justification = c(0, 1),
+        legend.position = c(0, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
+```
+
+## Quiz 09-2
+
+Lecture 09-3

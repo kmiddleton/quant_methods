@@ -1,5 +1,5 @@
 ---
-title: "General(ized) Linear Models: Other Distributions"
+title: "Akaike Information Criteria"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -15,291 +15,377 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 library(readxl)
-library(GGally)
-library(ggrepel)
-library(car)
+library(lmtest)
+library(nlme)
+library(forcats)
+
+load("lrtmodels.Rda")
 ```
 
-## Hierarchy of GLMs
+## Tradeoff in model specification
+
+> "Overfitting: fitting is easy; prediction is hard. Future data will not be exactly like past data, and so any model that is unaware of this fact tends to make worse predictions than it could. So if we wish to make good predictions, we cannot judge our models simply on how well they fit our data. **Information criteria** provide estimates of predictive accuracy, rather than merely fit. So they compare models where it matters." [@McElreath2015-no]
+
+## Kullback-Leibler information
+
+**No model represents the true process that generated the outcomes.**
+
+**Information** is the distance between a proposed model and reality
+
+  - Information lost when trying to approximate the true model
+  - Amount of "surprise" when a model predicts new data
+
+K-L information doesn't aid directly in model evaluation (what is the true model?)
+
+## Estimation of K-L information
+
+Hirotugu Akaike ("Ah-ka-ee-kay") [-@Akaike1974-iw]
+
+- Maximized log-likelihood could be used to estimate the *expected* K-L divergence between the candidate model and the true model.
 
 <center>
-<img src="images/GeneralizedLinearModels.png" width="100%" />
+<img src="images/AIC.jpg" width="40%" />
 </center>
 
-## *Generalized* linear models
+## Akaike's Information Criterion
 
-$$\mbox{Response variable(s)} \sim \mbox{Predictor variable(s)} + \mbox{Error}$$
+"An Information Criterion": AIC is proportional to the *relative* K-L information of a model:
 
-Distribution of the response variable(s) can be:
+$$\mbox{AIC} = -2 \log\left(\mathcal{L}(\theta | \mbox{data})\right) + 2 k$$
 
-1. Normal (Gaussian)
-1. Binomial (two states)
-1. Poisson (counts)
-1. Lots and lots of others
+where $\log\left(\mathcal{L}(\theta | \mbox{data})\right)$ is the maximized log-likelihood for the parameters $\theta$ given data.
 
-## General equation form of GLMs
+- $-2$ comes in "for historical reasons" having to do with the $\chi^2$ distribution.
 
-$$Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
+## Calculating AIC
 
-$Y$ follows some distribution (e.g., $Y \sim \mathcal{N}$ or $Y \sim \mbox{Binom}$)
-
-- Most often normal.
-
-$X_n$  are some combination of continuous and categorical predictors.
-
-$\beta_n$ are the parameter estimates for the $X$.
-
-## Logistic regression
-
-Outcome variable is categorical:
-
-- Heart disease
-- Diabetes
-- Cancer
-
-Predictors can be a mix of categorical and continuous variables:
-
-- sex, smoking status, family history of ...
-- body mass, BMI, blood glucose level
-
-## Logistic regression
-
-What are the predictors of presence or absence?
-
-- Morphology
-- Character state
-- Species
-- Rain
-
-## Challenge
-
-How much variance is there in 0's and 1's?
-
-## Odds
-
-$$\mbox{Odds} = \frac{P_{event}}{1 - P_{event}}$$
-
-Odds is the ratio of the probability of an event to the probability of no event.
-
-$$\log O_i = \log \left(\frac{P_i}{1 - P_i} \right) = \mbox{logit}(P_i)$$
-
-Logit function converts probabilities to a continuous value not bounded by 0 and 1.
-
-## Probabilities, odds, and log odds
-
-P  | 0.001 | 0.5 | 0.999
---:|--:|--:|--:|
-1 - P    | 0.999 | 0.5 | 0.001
-Odds     | 0.001 | 1   | 999
-log(Odds) | -6.9  | 0   | 6.9
-
-## Probabilities to log odds
+log-likelihood for the intercept only (overall mean) model for the naked mole rats data:
 
 ```{r}
-P <- seq(0.0001, 0.9999, length.out = 1000)
-Odds <- P / (1 - P)
-log_Odds <- log(Odds)
-M <- data.frame(P, Odds, log_Odds)
+logLik(fm1)
+-2 * as.numeric(logLik(fm1)) + 2 * 2
 ```
 
-## Probabilities to log odds
+df = 2 because the mean and standard deviation are estimated.
 
-```{r echo=FALSE}
-ggplot(M, aes(P, Odds)) + geom_line() +
-  labs(x = "Probability", y = "Odds")
+## AIC
+
+- AIC is a measure of the *lack* of model fit
+    - Smaller AIC is better
+- No notion of "significance".
+    - Comparison in the key
+- Negative twice the log-likelihood + 2 X *number of estimated parameters*
+    - Penalization of models with large number of estimated parameters, because they will always fit the observed data better
+    - Parsimony as a side-effect
+
+## AIC in practice
+
+- AIC was defined for large sample sizes
+
+AICc adapts AIC for small samples
+
+- AICc is asymptotic with AIC for large samples but less biased for small *n*
+
+$$\mbox{AICc} = -2 \log\left(\mathcal{L}(\theta | \mbox{data})\right) + 2 k + \frac{2k(k+1)}{n - k - 1}$$
+
+- Added "parameter" $\rightarrow$ 0 as $n \rightarrow \infty$
+- Use AICc except when n/k > ~40 (see Burnham and Anderson)
+
+## Comparing models with AIC (AICc)
+
+1. Fit a set of candidate models (hypotheses)
+1. Rank models according to AIC
+1. Find the model with the lowest AIC
+1. $\Delta$AIC is the value of AIC~lowest~ - AIC~model~
+
+## Comparing models with AIC (AICc)
+
+Rules of thumb:
+
+- $\Delta$AIC $\leq$ 2: Substantial support
+- $\leq$ 4 $\Delta$AIC $\leq$ 7: Considerably less support
+- $\Delta$AIC $\geq$ 10: very little support
+
+In practice:
+
+- $\Delta$AIC < 4: Equally well supported
+
+**This does not mean that the model you have ranked highest is a good model for the data in an absolute sense.**
+
+## Akaike weights: evidence ratios
+
+Back-transforming the logged likelihoods allows us to standardize AICs:
+
+$$w_i = \frac{e^{-\Delta_i / 2}}{\sum_{r = 1}^R e^{-\Delta_r / 2}}$$
+
+$w$ is a rescaled AIC on a scale of 0 $\rightarrow$ 1, giving the probability of a model actually being the best K-L model among *R* models.
+
+- Still conditional on the data and the models
+    - Maybe a better model is not in the sample of models
+
+## Working with AIC
+
+AIC is built-in to R:
+
+```{r}
+AIC(fm1)
 ```
 
-## Probabilities to log odds
+AICc is not:
 
-```{r echo=FALSE}
-ggplot(M, aes(P, log_Odds)) + geom_line() +
-  labs(x = "Probability", y = "log Odds")
+```{r}
+library(AICcmodavg)
+AICc(fm1)
 ```
 
-log-Odds ranges from never (-$\infty$) to always ($\infty$).
+Get in the habit of using AICc.
 
-## Link functions
+## AIC Tables
 
-1. Gaussian: Identity
-1. Binomial: Logit
-1. Poisson: Log
+`AICcmodavg` function `aictab` for model comparison:
 
-## Logistic regression
+```{r}
+aictab(cand.set = list(fm1, fm2, fm3, fm4, fm5, fm6))
+```
 
-$$\mbox{logit}(Y) = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_nX_n$$
+## Return to some previous models
 
-The logit "transformation" allows $\beta$s to be estimated iteratively.
+Use AICc to compare:
 
-Fitting in R:
+1. Maximum likelihood example
+1. Rat weight gain
+1. Limb lengths
+1. Squid size
+1. Species richness
+1. Orthodontic growth
 
-- `glm()` uses the formula interface
-- `family = ` determines the link function
-    - "Gaussian" $\rightarrow$ identity
-    - "binomial" $\rightarrow$ logit
-    - "Poisson" $\rightarrow$ log
-
-## Logistic regression
+## Maximum likelihood example
 
 ```{r}
 set.seed(4)
-rainfall <- c(runif(20, 100, 160),
-              runif(20, 160, 210)) 
-presence <- c(rbinom(20, 1, 0.15),
-              rbinom(20, 1, 0.95))
-LogReg <- data.frame(Rainfall = rainfall,
-                     Presence = as.factor(presence))
-head(LogReg)
+n <- 30
+X <- rnorm(n, mean = 10, sd = 1)
+Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
+fm_0 <- lm(Y ~ 1)       # Intercept (mean) only
+(ll_0 <- logLik(fm_0))
+fm_1 <- lm(Y ~ X)       # Intercept and slope
+(ll_1 <- logLik(fm_1))
 ```
 
-## Fitting a logistic model
+## Maximum likelihood example
 
-```{r}
-fm <- glm(Presence ~ Rainfall,
-          data = LogReg,
-          family = "binomial")
-```
-
-*Note*: `Presence` is a factor with two levels
-
-## Summarizing {.smaller}
-
-```{r}
-summary(fm)
-```
-
-## Summarizing with `logistic.display()`
+Likelihood ratio test:
 
 ```{r message=FALSE}
-library(epiDisplay)
-logistic.display(fm)
+library(lmtest)
+lrtest(fm_0, fm_1)
 ```
 
-## Visualizing
-
-```{r log_plot, eval=FALSE}
-ggplot(LogReg, aes(x = Rainfall,
-                   y = as.numeric(Presence) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_smooth(method = "glm",
-              method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
-  geom_point(size = 3) +
-  ylab("Probability of Presence") +
-  xlab("Rainfall (cm/y)") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
-```
-
-## Visualizing
-
-```{r echo=FALSE, ref.label="log_plot"}
-```
-
-## Presence of sole
-
-<center>
-<img src="images/solea.jpg" width="100%" />
-</center>
-
-## Presence of sole
-
-Presence/absence of sole in the Tagus estuary of Portugal.
+## Maximum likelihood example {.smaller}
 
 ```{r}
-M <- read_excel("../data/Sole.xlsx")
-str(M)
+AICc(fm_0) # Intercept only
+AICc(fm_1) # Intercept and slope
+aictab(cand.set = list(fm_0, fm_1),
+       modnames = c("Intercept Only", "OLS"))
 ```
 
-## Presence of sole
+## Rat weight gain
 
 ```{r}
-M <- M[,c("salinity", "Solea_solea")]
-M$Solea_solea <- factor(M$Solea_solea)
+data("weightgain", package = "HSAUR3")
+
+# Source only
+fm_source <- lm(weightgain ~ source, data = weightgain)
+
+# Type only
+fm_type <- lm(weightgain ~ type, data = weightgain)
+
+# Additive
+fm_add <- lm(weightgain ~ source + type, data = weightgain)
+
+# Factorial
+fm_factorial <- lm(weightgain ~ source * type, data = weightgain)
 ```
 
-## Presence of sole
+## Rat weight gain
 
 ```{r}
-fm <- glm(Solea_solea ~ salinity, data = M, family = "binomial")
+aictab(list(fm_source, fm_type, fm_add, fm_factorial),
+       modnames = c("Source", "Type", "Source + Type",
+                    "Source * Type"))
 ```
 
-## Presence of sole {.smaller}
+## Limb lengths
+
+```{r message = FALSE}
+M <- read_csv("../data/Limb_Lengths.csv")
+```
 
 ```{r echo=FALSE}
-summary(fm)
+# FIXME
+p1 <- ggplot(M, aes(left_limb, height)) + geom_point() +
+  labs(x = "Limb Length (cm)", y = "Height (cm)") +
+  ggtitle("Left Limb")
+p2 <- ggplot(M, aes(right_limb, height)) + geom_point() +
+  labs(x = "Limb Length (cm)", y = "Height (cm)") +
+  ggtitle("Right Limb")
+plot_grid(p1, p2, ncol = 2)
 ```
 
-## Presence of sole
+## Limb lengths
 
 ```{r}
-logistic.display(fm)
+# Left and right limb length
+fm_LR <- lm(height ~ left_limb + right_limb, data = M)
+
+# Left limb length only
+fm_L <- lm(height ~ left_limb, data = M)
 ```
 
-## Presence of sole
-
-```{r echo=FALSE}
-ggplot(M, aes(x = salinity,
-              y = as.numeric(Solea_solea) - 1)) + 
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
-  geom_smooth(method = "glm",
-              method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
-  geom_point(size = 3) +
-  ylab("Probability of Presence") +
-  xlab("Salinity") +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
-```
-
-## Tibetan skulls
+## Limb lengths
 
 ```{r}
-M <- read_excel("../data/Tibetan_Skulls.xlsx")
-str(M)
-M <- M %>% mutate(Origin = factor(Origin))
+aictab(list(fm_L, fm_LR), modnames = c("Left", "Left & Right"))
 ```
 
-## Tibetan skulls
+Models are both well supported, but *one is worthless*.
 
-```{r echo=FALSE}
-ggscatmat(as.data.frame(M), 1:5, color = "Origin") +
-  theme(text = element_text(size = 9),
-        axis.text = element_text(size = 6),
-        axis.text.x = element_text(angle = -90, vjust = 0.5))
-```
+**AICc will not tell you if your model is good.**
 
-## Tibetan skulls
+## Squid size
 
 ```{r}
-fm <- glm(Origin ~ ., data = M, family = "binomial")
+library(nlme)
+S <- read_excel("../data/Squid.xlsx")
+S <- S %>% mutate(Month = factor(Month))
+
+# Linear model with interaction term
+fm1 <- gls(Testis_Mass ~ DML * Month, data = S,
+           method = "ML")
+
+# Weighted regression
+fm2 <- gls(Testis_Mass ~ DML * Month, data = S,
+           weights = varPower(form = ~ DML | Month),
+           method = "ML")
 ```
 
-- Use `~ .` to include all other variables
+Note: using maximum likelihood here (`ML`), rather than restricted maximum likelihood (`REML`).
 
-## Tibetan skulls {.smaller}
-
-```{r echo=FALSE}
-summary(fm)
-```
-
-## Tibetan skulls {.smaller}
+## Squid size
 
 ```{r}
-logistic.display(fm)
+aictab(list(fm1, fm2), modnames = c("Linear model", "Weighted"))
 ```
 
-## Tibetan skulls
+## Intertidal species richness
 
 ```{r}
-Anova(fm, type = "III")
+RIKZ <- read_excel("../data/RIKZ.xlsx")
+RIKZ <- RIKZ %>% mutate(Beach = factor(Beach))
+
+fm_mixed_1 <- lme(Richness ~ NAP, random = ~ 1 | Beach, data = RIKZ,
+                  method = "ML")
+fm_mixed_2 <- lme(Richness ~ NAP, random = ~ NAP | Beach, data = RIKZ,
+                  method = "ML",
+                  control = list(opt = 'optim'))
 ```
 
-## Generalized linear multilevel models
+- Switching `fm_mixed_2` to use a different optimizer, so the model will converge.
 
-Generalization of Gaussian multilevel models to all the kinds of predictors that generalized linear models can be used for
+## Intertidal species richness
 
-Large can of worms:
+```{r}
+AICc(fm_mixed_1) # random = ~ 1 | Beach
+AICc(fm_mixed_2) # random = ~ NAP | Beach
+```
+
+## Intertidal species richness
+
+```{r}
+aictab(list(fm_mixed_1, fm_mixed_2),
+       modnames = c("Random intercept", "Random int. & slope"))
+```
+
+## Orthodontic growth
+
+```{r}
+O <- read_excel("../data/Ortho.xlsx")
+O <- O %>% mutate(Subject = factor(Subject),
+                  Sex = factor(Sex))
+
+# Intercepts per Subject
+fm1 <- lme(Distance ~ Sex + Age, random = ~ 1 | Subject, 
+           method = "ML",
+           data = O)
+
+# Intercepts and slopes per Subject
+fm2 <- lme(Distance ~ Sex + Age, random = ~ Age | Subject,
+           method = "ML",
+           data = O)
+```
+
+## Orthodontic growth
+
+```{r}
+aictab(list(fm1, fm2),
+       modnames = c("1 | Subject", "Age | Subject"))
+```
+
+## PS 08 Zooplankton
+
+```{r message = FALSE, fig.height=3}
+M <- read_csv("../data/Zooplankton.csv") %>% 
+  mutate(Treatment = factor(Treatment),
+         Treatment = fct_relevel(Treatment,
+                                 "control", "low", "high"),
+         Block = factor(Block))
+M %>% 
+  ggplot(aes(x = Treatment, y = Zooplankton, color = Block)) +
+  geom_point()
+```
+
+## PS 08 Zooplankton
+
+Model without `Block`, assumes all block means are equal:
+
+```{r}
+fm <- lm(Zooplankton ~ Treatment, M)
+```
+
+Model with `Block`, allows each block to have its own mean:
+
+```{r}
+fm_hier <- lm(Zooplankton ~ Treatment + Block, M)
+```
+
+## PS 08 Zooplankton
+
+```{r}
+aictab(list(fm, fm_hier), modnames = c("Non-hierarchical", "Block"))
+```
+
+## Note about model comparison with hierarchical models
+
+This is a nuanced business:
 
 - http://glmm.wikidot.com/faq
 
-## Quiz 08-4
 
-No more Lectures
+## General approach
+
+1. Define hypotheses (models)
+1. Fit using maximum likelihood methods (`lm()`, `gls()`, `lme()`, etc.). Note: not `REML` for hierarchical models.
+1. Calculate AICc for each.
+1. Sort by AICc.
+1. Calculate $\Delta$AICc.
+1. Models with $\Delta$AICc within ~4 of the best are all roughly equivalent
+1. Decide what to do.
+    - Describe multiple models
+    - Compare Akaike weights
+
+## Quiz 09-3
+
+Lecture 09-4
+
+## References
