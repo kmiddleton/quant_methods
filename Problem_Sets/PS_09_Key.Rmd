@@ -17,19 +17,24 @@ library(readxl)
 library(cowplot)
 library(forcats)
 library(ggsci)
-library(xkcd)
+
+library(lmtest)
+library(AICcmodavg)
+
+library(nlme)
+library(lme4)
+library(car)
+library(epiDisplay)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
-Some pretty color palettes: https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html
+Some useful color palettes for ggplot: https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html
 
 ## Neandertal Brains
 
 ```{r}
 M <- read_csv("../data/NeandertalBrainSize.csv") %>% 
   mutate(Species = fct_relevel(Species, "Recent"))
-
-xrange <- range(M$ln_Mass)
-yrange <- range(M$ln_Brain)
 
 M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
   geom_point(size = 2) +
@@ -38,7 +43,235 @@ M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
         legend.background = element_rect(size = 0.5,
                                          color = "black",
                                          linetype = "solid")) +
-  labs(x = "ln Body Mass", y = "ln Brain Size") +
-  xkcdaxis(xrange, yrange)
+  labs(x = "ln Body Mass", y = "ln Brain Size")
+
+fm1 <- lm(ln_Brain ~ ln_Mass, M)
+fm2 <- lm(ln_Brain ~ ln_Mass + Species, M)
+fm3 <- lm(ln_Brain ~ ln_Mass * Species, M)
+
+lmtest::lrtest(fm1, fm2, fm3)
+aictab(list(fm1, fm2, fm3))
 ```
 
+## Streams
+
+Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the original file from Dryad.
+
+Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8
+
+### Activity
+
+Load the `TemperatureData` sheet from the `Streams.xlsx` file. Look at the structure of the file. You should have 5 columns: `Site`, `Date`, `AirTemp_observed`, `AirTempPredicted`, and `WaterTemp`. If you don't, then you probably did not load the correct sheet. Check the `read_excel()` help to see how to do this.
+
+```{r}
+# FIXME
+Temp_Data <- read_excel("../data/Streams.xlsx", "TemperatureData")
+Site_Data <- read_excel("../data/Streams.xlsx", "SiteData")
+M <- left_join(Temp_Data, Site_Data)
+
+M %>% group_by(Site, Stream_Name) %>% tally()
+```
+
+Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). Utimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
+
+We then need to do one more thing: make a new variable that converts `Date` into a day number. We can do this with the function `as.numeric()`. Make a new variable `Day`, which is the numeric representation of `Date`. It will look something like: `mutate(Day = as.numeric(Date))`.
+
+```{r}
+# FIXME
+M <- M %>%
+  mutate(Site = factor(Site),
+         Date = factor(Date),
+         Stream_Name = factor(Stream_Name),
+         Day = as.numeric(Date))
+```
+
+Because not all observations have observed air temperature, first we should check for correlation between observed and predicted air temperatures. Calculate the correlation between the two. We could filter out missing data, but instead just provide the argument `use = "pairwise.complete.obs"` to `cor()`, which will tell the function to use only complete pairs for the calculation. If you find that the correlation is `NA`, that means R is using incomplete cases. Correlation with `NA`s is `NA`.
+
+```{r}
+# FIXME
+cor(M$AirTemp_observed, M$AirTempPredicted, use = "pairwise.complete.obs")
+```
+
+The correlation should be pretty high. So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete). Let's plot: make a plot with day on the x axis and predicted air temp on the y axis. Color by site. Add `theme(legend.position = "none")` to your plot to prevent the legend from plotting (otherwise you will get all 78 levels of site).
+
+Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable.)
+
+```{r fig.height = 15}
+# FIXME
+ggplot(M, aes(Day, AirTempPredicted, group = Site)) +
+  geom_line() +
+  theme(legend.position = "none") +
+  facet_grid(Stream_Name ~ .) +
+  labs(title = "Air Temperature")
+
+ggplot(M, aes(Day, WaterTemp, group = Site)) +
+  geom_line() +
+  theme(legend.position = "none") +
+  facet_grid(Stream_Name ~ .) +
+  labs(title = "Water Temperature")
+```
+
+What general patterns do you see, comparing the two plots?
+
+> Air temperature appears to vary more day to day than water temperature does. Air temperatures at a given stream are highly conserved, but water temperature varies much more within a stream.
+
+We want to fit two models to these data. In both models we want to model water temperature by predicted air temperature. The difference between the models will be in the random effects.
+
+1. Fit a model where the intercept for site is random
+2. Fit a model where the intercept for site is random and day is also included.
+
+There are similar models from the lectures. Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood. If you have trouble formulating the model, let me know.
+
+```{r}
+# FIXME
+fm1 <- lme(WaterTemp ~ AirTempPredicted,
+           random = ~ 1 | Site,
+           data = M, method = "ML")
+summary(fm1)
+
+fm2 <- lme(WaterTemp ~ AirTempPredicted,
+           random = ~ Day | Site,
+           data = M, method = "ML")
+summary(fm2)
+
+# With Day as additional main effect
+fm3 <- lme(WaterTemp ~ AirTempPredicted + Day,
+           random = ~ Day | Site,
+           data = M, method = "ML")
+summary(fm3)
+
+fm4 <- lme(WaterTemp ~ AirTempPredicted * Day,
+           random = ~ Day | Site,
+           data = M, method = "ML")
+summary(fm4)
+aictab(list(fm1, fm2, fm3, fm4))
+
+# lmer
+
+fm1 <- lmer(WaterTemp ~ AirTempPredicted + (1 | Stream_Name:Site),
+           data = M, REML = FALSE)
+summary(fm1)
+
+fm2 <- lmer(WaterTemp ~ AirTempPredicted + (Day | Stream_Name:Site),
+           data = M, REML = FALSE)
+summary(fm2)
+
+fm3 <- lmer(WaterTemp ~ AirTempPredicted + Day + (1 | Stream_Name:Site),
+           data = M, REML = FALSE)
+summary(fm3)
+
+fm4 <- lmer(WaterTemp ~ AirTempPredicted + Day + (Day | Stream_Name:Site),
+           data = M, REML = FALSE)
+summary(fm4)
+
+aictab(list(fm1, fm2, fm3, fm4))
+```
+
+Explain in non-mathematical words what the addition of day in the random effects part of the formula accomplishes.
+
+> Addition of day in the random effects part of the model allows the linear relationship (slope) of the water temperature relationship to change on a daily basis. Each day can essentially have its own trajectory.
+
+Load the `AICcmodavg` package and use the `aictab()` function to compare the two models you fit above. Follow the examples in lecture 14.
+
+```{r}
+# FIXME
+library(AICcmodavg)
+aictab(list(fm1, fm2), modnames = c("1 | Site", "Day | Site"))
+```
+
+Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the model comparison make sense in light of your understanding of the difference between the two models?
+
+> I fit four models, including Day as an additional main effect. In this case, the model with day X air temperature is preferred over all the other models.
+
+Write a brief summary of the analysis here.
+
+> To study the relative influence of air temperature on stream water temperature, we used a multilevel linear model across 78 difference site on 48 consecutive days. First, because observed air temperature was not available for all locations, we assessed the bivariate correlation between observed air temperature and predicted air temperature. This correlation was 0.94, suggesting that predicted air temperature was a suitable proxy for observed air temperature. We then predicted water temperature by predicted air tempaerature. We fit a multilevel model where observed water temperature was modeled by predicted air temperature with several different covariate and mixed effects structures. Four models were compared: (1) site as a random intercept, (2) site as a random intercept with day as a continuous random covariate, (3) model 2 with the addition of day as an additive main effect, and (4) model 3 with the addition of an interaction term between air temperature and day. Comparison of AICc across the four models showed that the most complex model was preferred over all others ($\Delta$AIC = 128) and that model had 100% of the Akaike weight.
+
+## Sole
+
+In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by the salinity of the water. That data set has a great deal of additional information. In this question, we will explore the predictors of sole being found in the estuary.
+
+### Activity
+
+a. Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
+
+```{r}
+# FIXME
+M <- read_excel("../data/Sole.xlsx")
+M <- M %>% mutate(season = factor(season),
+                  month = factor(month),
+                  area = factor(area),
+                  Solea_solea = factor(Solea_solea))
+M <- M %>% as.data.frame()
+str(M)
+```
+
+b. Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
+
+```{r}
+# FIXME
+M %>% group_by(season, area) %>% tally()
+```
+
+c. If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary. Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
+
+```{r}
+# FIXME
+fm <- glm(Solea_solea ~ season + area, data = M,
+          family = "binomial")
+```
+
+d. Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
+
+```{r}
+# FIXME
+Anova(fm, type = "III")
+```
+
+e. Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
+
+> Only area is a good predictor (P = 0.0001).
+
+f. Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
+
+```{r}
+# FIXME
+logistic.display(fm)
+```
+
+g. See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
+
+> Adjusted odds ratio for season isn't significant (i.e., after setting area to 0), with a CI that crosses 1. Each area is compared to area 1, and all are significantly different from one another. It seems reasonable to conclude that there is considerable variation in the presence/absence of sole among the four areas. This is actullay bad, because area to area variation is higher than seasonal variation. There appears to be substantial geographic heterogeneity in sole presence.
+
+h. The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent their proportional concentrations in the substrate (they sum to 100). Calculate a composite score for "substrate". Use principal components analysis on these columns.
+
+```{r}
+# FIXME
+z <- prcomp(~ gravel + large_sand + med_fine_sand + mud,
+              data = M,
+              scale. = TRUE,
+              center = TRUE)
+```
+
+i. Use the `summary()` and `print()` methods to determine the percent of variance accounted for by each PC and the relative loadings of each variable.
+
+```{r}
+summary(z)
+z
+```
+
+j. Fit another logistic regression where presence of sole is predicted by the first PC from the PCA in part h. Refer to the lecture 16 slides if you need to.
+
+```{r}
+# FIXME
+fm2 <- glm(Solea_solea ~ z$x[, 1], data = M, family = "binomial")
+```
+
+k. Try to interpret the output of the summary of the fitted model from part j. Why kind of substrate do sole appear to prefer?
+
+```{r}
+# FIXME
+summary(fm2)
+```
+
+> PC is basically as axis of sand (large, medium, fine) with values in negative PC1 scores to mud in positive PC1 scores. Gravel doesn't load appreciably on PC1. Logistic regression shows that as PC1 score increases, sole are less likely to be present (negative coefficient estimate). So sole are less likely to be present as the substrate gets more muddy. They are mor likely to be present as the substrate gets more sandy.
