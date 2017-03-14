@@ -39,18 +39,18 @@ library(wesanderson)
 ```{r}
 set.seed(29545)
 
-nobs<-10
-yy<-c(rnorm(nobs/2,0,1),rnorm(nobs/2,3,1))
-xx1<-rep(c(0,1),each=nobs/2)
-xx2<-rnorm(nobs)
-xx3<-rnorm(nobs)
-xx4<-rnorm(nobs)
-xx5<-rnorm(nobs)
-xx6<-rnorm(nobs)
-xx7<-rnorm(nobs)
-xx8<-rnorm(nobs)
-xx9<-rnorm(nobs)
-xx10<-rnorm(nobs)
+nobs <- 10
+yy <- c(rnorm(nobs / 2, 0, 1), rnorm(nobs / 2, 3, 1))
+xx1 <- rep(c(0, 1), each = nobs / 2)
+xx2 <- rnorm(nobs)
+xx3 <- rnorm(nobs)
+xx4 <- rnorm(nobs)
+xx5 <- rnorm(nobs)
+xx6 <- rnorm(nobs)
+xx7 <- rnorm(nobs)
+xx8 <- rnorm(nobs)
+xx9 <- rnorm(nobs)
+xx10 <- rnorm(nobs)
 ```
 
 ## Simulation
@@ -58,11 +58,10 @@ xx10<-rnorm(nobs)
 Fit 3 models:
 
 ```{r}
-
-mod1<-lm(yy~xx1)
-mod2<-lm(yy~xx1+xx2+xx3+xx4+xx5)
-mod3<-lm(yy~xx1+xx2+xx3+xx4+xx5+xx6+xx7+xx8++xx9+xx10)
-
+mod1 <- lm(yy ~ xx1)
+mod2 <- lm(yy ~ xx1 + xx2 + xx3 + xx4 + xx5)
+mod3 <- lm(yy ~ xx1 + xx2 + xx3 + xx4 + xx5 +
+             xx6 + xx7 + xx8 + xx9 + xx10)
 ```
 
 - Compare fitted values to assess how well the model fits the data  
@@ -71,40 +70,43 @@ mod3<-lm(yy~xx1+xx2+xx3+xx4+xx5+xx6+xx7+xx8++xx9+xx10)
 ## Model 1
 
 ```{r, echo=FALSE}
-yy_hat1<-mod1$fitted.values
-data.frame('Yhat'=yy_hat1,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
-  geom_point(size=3,alpha=1/3)+
+yy_hat1 <- mod1$fitted.values
+data.frame('Yhat' = yy_hat1, 'Yobs' = yy) %>%
+  ggplot(aes(x = Yhat, y = Yobs)) +
+  geom_point(size = 3, alpha = 1 / 3) +
   labs(x = TeX("$\\hat{Y}$"),
        title = TeX(paste0("R^2 = ",
                           round(summary(mod1)$r.squared, 2),
-                   "; Correlation = ",
-                   round(sqrt(summary(mod1)$r.squared), 2))))
+                          "; Correlation = ",
+                          round(sqrt(summary(mod1)$r.squared), 2))))
 ```
 
 ## Model 2
 
 ```{r, echo=FALSE}
-yy_hat2<-mod2$fitted.values
-data.frame('Yhat'=yy_hat2,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
-  geom_point(size=3,alpha=1/3)+
+yy_hat2 <- mod2$fitted.values
+data.frame('Yhat' = yy_hat2, 'Yobs' = yy) %>%
+  ggplot(aes(x = Yhat, y = Yobs)) +
+  geom_point(size = 3, alpha = 1 / 3) +
   labs(x = TeX("$\\hat{Y}$"),
        title = TeX(paste0("R^2 = ",
                           round(summary(mod2)$r.squared, 2),
-                   "; Correlation = ",
-                   round(sqrt(summary(mod2)$r.squared), 2))))
+                          "; Correlation = ",
+                          round(sqrt(summary(mod2)$r.squared), 2))))
 ```
 
 ## Model 3
 
 ```{r, echo=FALSE}
-yy_hat3<-mod3$fitted.values
-data.frame('Yhat'=yy_hat3,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
-  geom_point(size=3,alpha=1/3)+
+yy_hat3 <- mod3$fitted.values
+data.frame('Yhat' = yy_hat3, 'Yobs' = yy) %>%
+  ggplot(aes(x = Yhat, y = Yobs)) +
+  geom_point(size = 3, alpha = 1 / 3) +
   labs(x = TeX("$\\hat{Y}$"),
        title = TeX(paste0("R^2 = ",
                           round(summary(mod3)$r.squared, 2),
-                   "; Correlation = ",
-                   round(sqrt(summary(mod3)$r.squared), 2))))
+                          "; Correlation = ",
+                          round(sqrt(summary(mod3)$r.squared), 2))))
 ```
 
 ## Simulation
@@ -112,72 +114,79 @@ data.frame('Yhat'=yy_hat3,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
 - How will our models perform with new data?
 
 ```{r}
-newN<-10
-newy<-c(rnorm(newN/2,0,1),rnorm(newN/2,3,1))
-newx<-data.frame('xx1'=rep(c(0,1),each=newN/2),
-                 'xx2'=rnorm(newN),
-                 'xx3'=rnorm(newN),
-                 'xx4'=rnorm(newN),
-                 'xx5'=rnorm(newN),
-                 'xx6'=rnorm(newN),
-                 'xx7'=rnorm(newN),
-                 'xx8'=rnorm(newN),
-                 'xx9'=rnorm(newN),
-                 'xx10'=rnorm(newN))
+newN <- 10
+newy <- c(rnorm(newN / 2, 0, 1), rnorm(newN / 2, 3, 1))
+newx <- data.frame('xx1' = rep(c(0, 1), each = newN / 2),
+                   'xx2' = rnorm(newN),
+                   'xx3' = rnorm(newN),
+                   'xx4' = rnorm(newN),
+                   'xx5' = rnorm(newN),
+                   'xx6' = rnorm(newN),
+                   'xx7' = rnorm(newN),
+                   'xx8' = rnorm(newN),
+                   'xx9' = rnorm(newN),
+                   'xx10' = rnorm(newN))
 
-y_hat_new1<-predict.lm(object=mod1,newdata=newx)
-y_hat_new2<-predict.lm(object=mod2,newdata=newx)
-y_hat_new3<-predict.lm(object=mod3,newdata=newx)
+y_hat_new1 <- predict.lm(object = mod1, newdata = newx)
+y_hat_new2 <- predict.lm(object = mod2, newdata = newx)
+y_hat_new3 <- predict.lm(object = mod3, newdata = newx)
 ```
 
 ## Model 1
 
 ```{r, echo=FALSE}
-miny<-min(c(newy,yy))
-maxy<-max(c(newy,yy))
+miny <- min(c(newy, yy))
+maxy <- max(c(newy, yy))
 
-minx<-min(c(y_hat_new1,y_hat_new2,y_hat_new3, yy_hat1, yy_hat2,yy_hat3))
-maxx<-max(c(y_hat_new1,y_hat_new2,y_hat_new3,yy_hat1, yy_hat2,yy_hat3))
+minx <- min(c(y_hat_new1, y_hat_new2, y_hat_new3,
+              yy_hat1, yy_hat2, yy_hat3))
+maxx <- max(c(y_hat_new1, y_hat_new2, y_hat_new3,
+              yy_hat1, yy_hat2, yy_hat3))
 
-new1<-data.frame('Yhat'=y_hat_new1,'Yobs'=newy)
-new2<-data.frame('Yhat'=y_hat_new2,'Yobs'=newy)
-new3<-data.frame('Yhat'=y_hat_new3,'Yobs'=newy)
+new1 <- data.frame('Yhat' = y_hat_new1, 'Yobs' = newy)
+new2 <- data.frame('Yhat' = y_hat_new2, 'Yobs' = newy)
+new3 <- data.frame('Yhat' = y_hat_new3, 'Yobs' = newy)
 
-data.frame('Yhat'=yy_hat1,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
-  geom_point(size=3,alpha=1/3)+
-  geom_point(data=new1,aes(x=Yhat, y=Yobs), size=3, alpha=1/3,color='red')+
-  ylim(miny,maxy)+
-  xlim(minx,maxx) +
+data.frame('Yhat' = yy_hat1, 'Yobs' = yy) %>%
+  ggplot(aes(x = Yhat, y = Yobs)) +
+  geom_point(size = 3, alpha = 1 / 3) +
+  geom_point(data = new1, aes(x = Yhat, y = Yobs),
+             size = 3, alpha = 1 / 3, color = 'red') +
+  ylim(miny, maxy) +
+  xlim(minx, maxx) +
   labs(x = TeX("$\\hat{Y}$"),
        title = TeX(paste0("Correlation (new data vs. predicted values) = ",
-                   round(cor(y_hat_new1,newy), 2))))
+                          round(cor(y_hat_new1,newy), 2))))
 ```
 
 ## Model 2
 
 ```{r, echo=FALSE}
-data.frame('Yhat'=yy_hat2,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
-  geom_point(size=3,alpha=1/3)+
-  geom_point(data=new2,aes(x=Yhat, y=Yobs), size=3, alpha=1/3,color='red')+
-  ylim(miny,maxy)+
-  xlim(minx,maxx) +
+data.frame('Yhat' = yy_hat2, 'Yobs' = yy) %>%
+  ggplot(aes(x = Yhat, y = Yobs)) +
+  geom_point(size = 3, alpha = 1 / 3) +
+  geom_point(data = new2, aes(x = Yhat, y = Yobs),
+             size = 3, alpha = 1 / 3, color = 'red') +
+  ylim(miny, maxy) +
+  xlim(minx, maxx) +
   labs(x = TeX("$\\hat{Y}$"),
        title = TeX(paste0("Correlation (new data vs. predicted values) = ",
-                   round(cor(y_hat_new2,newy), 2))))
-
+                          round(cor(y_hat_new2,newy), 2))))
 ```
 
 ## Model 3
 
 ```{r, echo=FALSE}
-data.frame('Yhat'=yy_hat3,'Yobs'=yy) %>% ggplot(aes(x=Yhat,y=Yobs)) +
-  geom_point(size=3,alpha=1/3)+
-  geom_point(data=new3,aes(x=Yhat, y=Yobs), size=3, alpha=1/3,color='red')+
-  ylim(miny,maxy)+
-  xlim(minx,maxx) +
+data.frame('Yhat' = yy_hat3, 'Yobs' = yy) %>%
+  ggplot(aes(x = Yhat , y = Yobs)) +
+  geom_point(size = 3, alpha = 1 / 3) +
+  geom_point(data = new3, aes(x = Yhat, y = Yobs),
+             size = 3, alpha = 1 / 3, color = 'red') +
+  ylim(miny, maxy) +
+  xlim(minx, maxx) +
   labs(x = TeX("$\\hat{Y}$"),
        title = TeX(paste0("Correlation (new data vs. predicted values) = ",
-                   round(cor(y_hat_new3,newy), 2))))
+                          round(cor(y_hat_new3,newy), 2))))
 ```
 
 ## Cross Validation
@@ -285,7 +294,8 @@ preds <- M_test %>%
   gather(Model, value, -Caste, -Mass, -Energy)
 
 ggplot() +
-  geom_vline(xintercept = M_test$Mass, color = "gray60", linetype = "dotted") +
+  geom_vline(xintercept = M_test$Mass, color = "gray60",
+             linetype = "dotted") +
   geom_point(data = M_train, aes(x = Mass, y = Energy, color = Caste),
              size = 1, alpha = 0.5) +
   scale_color_manual(values = wes_palette("Cavalcanti")) +
@@ -293,7 +303,8 @@ ggplot() +
         legend.position = c(0, 1)) +
   labs(x = "ln Body Mass (g)",
        y = "ln Daily Energy Expenditure (kJ)") +
-  geom_point(data = M_test, aes(x = Mass, y = Energy, color = Caste), size = 4, pch = 16) +
+  geom_point(data = M_test, aes(x = Mass, y = Energy, color = Caste),
+             size = 4, pch = 16) +
   geom_point(data = preds, aes(x = Mass, y = value, color = Caste,
                                shape = Model), size = 4) +
   scale_shape_manual(values = c(0, 1, 2))
@@ -318,7 +329,8 @@ err.out %>%
     labels = c("Overall Mean", "Mass + Caste", "Mass * Caste"))) %>% 
   ggplot(aes(Model, MSE, color = Fold)) +
   geom_point() +
-  stat_summary(fun.y = "mean", geom = "point", color = "black", size = 3)
+  stat_summary(fun.y = "mean", geom = "point", color = "black",
+               size = 3)
 
 ```
 
@@ -330,7 +342,6 @@ err.out %>%
 
     - `cvTools` package
     - `boot` package
-
 
 ## No Quiz
 

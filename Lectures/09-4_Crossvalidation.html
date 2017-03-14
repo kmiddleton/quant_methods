@@ -95,7 +95,7 @@
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
       <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
       <p data-config-presenter><!-- populated from slide_config.json --></p>
-            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-03-11</p>
+            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-03-12</p>
           </hgroup>
   </slide>
 
@@ -124,26 +124,27 @@
 
 <pre class = 'prettyprint lang-r'>set.seed(29545)
 
-nobs&lt;-10
-yy&lt;-c(rnorm(nobs/2,0,1),rnorm(nobs/2,3,1))
-xx1&lt;-rep(c(0,1),each=nobs/2)
-xx2&lt;-rnorm(nobs)
-xx3&lt;-rnorm(nobs)
-xx4&lt;-rnorm(nobs)
-xx5&lt;-rnorm(nobs)
-xx6&lt;-rnorm(nobs)
-xx7&lt;-rnorm(nobs)
-xx8&lt;-rnorm(nobs)
-xx9&lt;-rnorm(nobs)
-xx10&lt;-rnorm(nobs)</pre>
+nobs &lt;- 10
+yy &lt;- c(rnorm(nobs / 2, 0, 1), rnorm(nobs / 2, 3, 1))
+xx1 &lt;- rep(c(0, 1), each = nobs / 2)
+xx2 &lt;- rnorm(nobs)
+xx3 &lt;- rnorm(nobs)
+xx4 &lt;- rnorm(nobs)
+xx5 &lt;- rnorm(nobs)
+xx6 &lt;- rnorm(nobs)
+xx7 &lt;- rnorm(nobs)
+xx8 &lt;- rnorm(nobs)
+xx9 &lt;- rnorm(nobs)
+xx10 &lt;- rnorm(nobs)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Simulation</h2></hgroup><article  id="simulation-2">
 
 <p>Fit 3 models:</p>
 
-<pre class = 'prettyprint lang-r'>mod1&lt;-lm(yy~xx1)
-mod2&lt;-lm(yy~xx1+xx2+xx3+xx4+xx5)
-mod3&lt;-lm(yy~xx1+xx2+xx3+xx4+xx5+xx6+xx7+xx8++xx9+xx10)</pre>
+<pre class = 'prettyprint lang-r'>mod1 &lt;- lm(yy ~ xx1)
+mod2 &lt;- lm(yy ~ xx1 + xx2 + xx3 + xx4 + xx5)
+mod3 &lt;- lm(yy ~ xx1 + xx2 + xx3 + xx4 + xx5 +
+             xx6 + xx7 + xx8 + xx9 + xx10)</pre>
 
 <ul>
 <li>Compare fitted values to assess how well the model fits the data<br/></li>
@@ -168,22 +169,22 @@ mod3&lt;-lm(yy~xx1+xx2+xx3+xx4+xx5+xx6+xx7+xx8++xx9+xx10)</pre>
 <li>How will our models perform with new data?</li>
 </ul>
 
-<pre class = 'prettyprint lang-r'>newN&lt;-10
-newy&lt;-c(rnorm(newN/2,0,1),rnorm(newN/2,3,1))
-newx&lt;-data.frame(&#39;xx1&#39;=rep(c(0,1),each=newN/2),
-                 &#39;xx2&#39;=rnorm(newN),
-                 &#39;xx3&#39;=rnorm(newN),
-                 &#39;xx4&#39;=rnorm(newN),
-                 &#39;xx5&#39;=rnorm(newN),
-                 &#39;xx6&#39;=rnorm(newN),
-                 &#39;xx7&#39;=rnorm(newN),
-                 &#39;xx8&#39;=rnorm(newN),
-                 &#39;xx9&#39;=rnorm(newN),
-                 &#39;xx10&#39;=rnorm(newN))
+<pre class = 'prettyprint lang-r'>newN &lt;- 10
+newy &lt;- c(rnorm(newN / 2, 0, 1), rnorm(newN / 2, 3, 1))
+newx &lt;- data.frame(&#39;xx1&#39; = rep(c(0, 1), each = newN / 2),
+                   &#39;xx2&#39; = rnorm(newN),
+                   &#39;xx3&#39; = rnorm(newN),
+                   &#39;xx4&#39; = rnorm(newN),
+                   &#39;xx5&#39; = rnorm(newN),
+                   &#39;xx6&#39; = rnorm(newN),
+                   &#39;xx7&#39; = rnorm(newN),
+                   &#39;xx8&#39; = rnorm(newN),
+                   &#39;xx9&#39; = rnorm(newN),
+                   &#39;xx10&#39; = rnorm(newN))
 
-y_hat_new1&lt;-predict.lm(object=mod1,newdata=newx)
-y_hat_new2&lt;-predict.lm(object=mod2,newdata=newx)
-y_hat_new3&lt;-predict.lm(object=mod3,newdata=newx)</pre>
+y_hat_new1 &lt;- predict.lm(object = mod1, newdata = newx)
+y_hat_new2 &lt;- predict.lm(object = mod2, newdata = newx)
+y_hat_new3 &lt;- predict.lm(object = mod3, newdata = newx)</pre>
 
 <pre >## Warning in predict.lm(object = mod3, newdata = newx): prediction from a
 ## rank-deficient fit may be misleading</pre>
