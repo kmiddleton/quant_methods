@@ -375,3 +375,8 @@ Goals:
 - Power analysis (formal)
 - Power analysis (via simulation)
 
+
+Next Year:
+
+Type III & interaction terms- model comparision
+
