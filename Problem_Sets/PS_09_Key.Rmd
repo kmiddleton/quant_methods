@@ -22,38 +22,18 @@ library(lmtest)
 library(AICcmodavg)
 
 library(nlme)
-library(lme4)
 library(car)
 library(epiDisplay)
+library(cvTools)
+library(broom)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
 Some useful color palettes for ggplot: https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html
 
-## Neandertal Brains
+Try adding `scale_color_d3()`, `scale_color_aaas()`, and others to your ggplots.
 
-```{r}
-M <- read_csv("../data/NeandertalBrainSize.csv") %>% 
-  mutate(Species = fct_relevel(Species, "Recent"))
-
-M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
-  geom_point(size = 2) +
-  scale_color_d3() +
-  theme(legend.position = c(0.9, 0.12),
-        legend.background = element_rect(size = 0.5,
-                                         color = "black",
-                                         linetype = "solid")) +
-  labs(x = "ln Body Mass", y = "ln Brain Size")
-
-fm1 <- lm(ln_Brain ~ ln_Mass, M)
-fm2 <- lm(ln_Brain ~ ln_Mass + Species, M)
-fm3 <- lm(ln_Brain ~ ln_Mass * Species, M)
-
-lmtest::lrtest(fm1, fm2, fm3)
-aictab(list(fm1, fm2, fm3))
-```
-
-## Streams
+## Nested Sites in Streams
 
 Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the original file from Dryad.
 
@@ -66,13 +46,26 @@ Load the `TemperatureData` sheet from the `Streams.xlsx` file. Look at the struc
 ```{r}
 # FIXME
 Temp_Data <- read_excel("../data/Streams.xlsx", "TemperatureData")
+```
+
+Now load the `SiteData` sheet from the Excel file. It has four columns, including the mapping from `Stream_Name` to `Site`. We need to merge the two data.frames^[tibbles] together. Because they share a column `Site`, we can match rows, yielding a single data.frame.
+
+Base R has a `merge()` function, but it can be somewhat finicky. `tidyverse` has a complex set of functions for joining data.frames. The most useful are:
+
+1. `inner_join()`: "return all rows from x where there are matching values in y, and all columns from x and y. If there are multiple matches between x and y, all combination of the matches are returned."
+2. `left_join()`: "return all rows from x, and all columns from x and y. Rows in x with no match in y will have NA values in the new columns. If there are multiple matches between x and y, all combinations of the matches are returned."
+3. `full_join()`: "return all rows and all columns from both x and y. Where there are not matching values, returns NA for the one missing."
+
+`left_join()` the temperature data and the site data and assign to a new object. This will add the columns of one to the other, matching on `Site`. You should end up with a 3,744 x 8 tibble.
+
+```{r}
 Site_Data <- read_excel("../data/Streams.xlsx", "SiteData")
 M <- left_join(Temp_Data, Site_Data)
 
 M %>% group_by(Site, Stream_Name) %>% tally()
 ```
 
-Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). Utimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
+Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). Ultimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
 
 We then need to do one more thing: make a new variable that converts `Date` into a day number. We can do this with the function `as.numeric()`. Make a new variable `Day`, which is the numeric representation of `Date`. It will look something like: `mutate(Day = as.numeric(Date))`.
 
@@ -92,11 +85,13 @@ Because not all observations have observed air temperature, first we should chec
 cor(M$AirTemp_observed, M$AirTempPredicted, use = "pairwise.complete.obs")
 ```
 
-The correlation should be pretty high. So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete). Let's plot: make a plot with day on the x axis and predicted air temp on the y axis. Color by site. Add `theme(legend.position = "none")` to your plot to prevent the legend from plotting (otherwise you will get all 78 levels of site).
+The correlation should be pretty high. So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete). Let's plot: make a line plot with day on the x axis and predicted air temp on the y axis. Then facet by `Stream_Name`.
+
+One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly.
 
 Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable.)
 
-```{r fig.height = 15}
+```{r fig.height = 10}
 # FIXME
 ggplot(M, aes(Day, AirTempPredicted, group = Site)) +
   geom_line() +
@@ -117,75 +112,51 @@ What general patterns do you see, comparing the two plots?
 
 We want to fit two models to these data. In both models we want to model water temperature by predicted air temperature. The difference between the models will be in the random effects.
 
-1. Fit a model where the intercept for site is random
-2. Fit a model where the intercept for site is random and day is also included.
+We have an added wrinkle with these data that we have not yet encountered: nesting. Each site is only associated with one stream, so we need to tell R to only expect sites in some stream names. In an R formula, you can designate nesting using /. If B is nested in A, this would be coded as `A/B`.^[http://conjugateprior.org/2013/01/formulae-in-r-anova/ has a good overview of R's model formula.]
 
-There are similar models from the lectures. Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood. If you have trouble formulating the model, let me know.
+1. Fit a model where the intercept for site nested in stream is random
+2. Fit a model where the intercept for site nested in stream is random and day is also included (as a continuous random predictor).
+
+Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood.
 
 ```{r}
 # FIXME
 fm1 <- lme(WaterTemp ~ AirTempPredicted,
-           random = ~ 1 | Site,
+           random = ~ 1 | Stream_Name/Site,
            data = M, method = "ML")
 summary(fm1)
 
 fm2 <- lme(WaterTemp ~ AirTempPredicted,
-           random = ~ Day | Site,
+           random = ~ Day | Stream_Name/Site,
            data = M, method = "ML")
 summary(fm2)
-
-# With Day as additional main effect
-fm3 <- lme(WaterTemp ~ AirTempPredicted + Day,
-           random = ~ Day | Site,
-           data = M, method = "ML")
-summary(fm3)
-
-fm4 <- lme(WaterTemp ~ AirTempPredicted * Day,
-           random = ~ Day | Site,
-           data = M, method = "ML")
-summary(fm4)
-aictab(list(fm1, fm2, fm3, fm4))
-
-# lmer
-
-fm1 <- lmer(WaterTemp ~ AirTempPredicted + (1 | Stream_Name:Site),
-           data = M, REML = FALSE)
-summary(fm1)
-
-fm2 <- lmer(WaterTemp ~ AirTempPredicted + (Day | Stream_Name:Site),
-           data = M, REML = FALSE)
-summary(fm2)
-
-fm3 <- lmer(WaterTemp ~ AirTempPredicted + Day + (1 | Stream_Name:Site),
-           data = M, REML = FALSE)
-summary(fm3)
-
-fm4 <- lmer(WaterTemp ~ AirTempPredicted + Day + (Day | Stream_Name:Site),
-           data = M, REML = FALSE)
-summary(fm4)
-
-aictab(list(fm1, fm2, fm3, fm4))
 ```
+
+Looking at the `summary()` of each, you should see sections in the random effects for `Stream_Name` and `Site %in% Stream_Name`.
 
 Explain in non-mathematical words what the addition of day in the random effects part of the formula accomplishes.
 
 > Addition of day in the random effects part of the model allows the linear relationship (slope) of the water temperature relationship to change on a daily basis. Each day can essentially have its own trajectory.
 
-Load the `AICcmodavg` package and use the `aictab()` function to compare the two models you fit above. Follow the examples in lecture 14.
+Load the `AICcmodavg` package and use the `aictab()` function to compare the two models you fit above.
 
 ```{r}
 # FIXME
 library(AICcmodavg)
-aictab(list(fm1, fm2), modnames = c("1 | Site", "Day | Site"))
+aictab(list(fm1, fm2))
 ```
 
 Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the model comparison make sense in light of your understanding of the difference between the two models?
 
-> I fit four models, including Day as an additional main effect. In this case, the model with day X air temperature is preferred over all the other models.
+> The second model is massively preferred (deltaAIC = 2560). This makes sense because there is a lot of day to day variation in temperature. We could probably do even better by adding a main effect of day to model the overall trend of increasing temperature.
 
-Write a brief summary of the analysis here.
-
-> To study the relative influence of air temperature on stream water temperature, we used a multilevel linear model across 78 difference site on 48 consecutive days. First, because observed air temperature was not available for all locations, we assessed the bivariate correlation between observed air temperature and predicted air temperature. This correlation was 0.94, suggesting that predicted air temperature was a suitable proxy for observed air temperature. We then predicted water temperature by predicted air tempaerature. We fit a multilevel model where observed water temperature was modeled by predicted air temperature with several different covariate and mixed effects structures. Four models were compared: (1) site as a random intercept, (2) site as a random intercept with day as a continuous random covariate, (3) model 2 with the addition of day as an additive main effect, and (4) model 3 with the addition of an interaction term between air temperature and day. Comparison of AICc across the four models showed that the most complex model was preferred over all others ($\Delta$AIC = 128) and that model had 100% of the Akaike weight.
+```{r}
+# FIXME
+fm3 <- lme(WaterTemp ~ AirTempPredicted + Day,
+           random = ~ Day | Stream_Name/Site,
+           data = M, method = "ML")
+aictab(list(fm1, fm2, fm3))
+```
 
 ## Sole
 
@@ -193,7 +164,7 @@ In lecture, we looked at presence/absence data for the common sole ([*Solea sole
 
 ### Activity
 
-a. Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
+Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
 
 ```{r}
 # FIXME
@@ -206,14 +177,16 @@ M <- M %>% as.data.frame()
 str(M)
 ```
 
-b. Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
+Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
 
 ```{r}
 # FIXME
 M %>% group_by(season, area) %>% tally()
 ```
 
-c. If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary. Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
+If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary.
+
+Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
 
 ```{r}
 # FIXME
@@ -221,57 +194,109 @@ fm <- glm(Solea_solea ~ season + area, data = M,
           family = "binomial")
 ```
 
-d. Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
+Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
 
 ```{r}
 # FIXME
 Anova(fm, type = "III")
 ```
 
-e. Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
+Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
 
 > Only area is a good predictor (P = 0.0001).
 
-f. Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
+Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
 
 ```{r}
 # FIXME
 logistic.display(fm)
 ```
 
-g. See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
+See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
 
 > Adjusted odds ratio for season isn't significant (i.e., after setting area to 0), with a CI that crosses 1. Each area is compared to area 1, and all are significantly different from one another. It seems reasonable to conclude that there is considerable variation in the presence/absence of sole among the four areas. This is actullay bad, because area to area variation is higher than seasonal variation. There appears to be substantial geographic heterogeneity in sole presence.
 
-h. The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent their proportional concentrations in the substrate (they sum to 100). Calculate a composite score for "substrate". Use principal components analysis on these columns.
+## Neandertal Brains
+
+There are well-known differences in both body size between modern humans and Neanderthals. But are there differences in brain size as well, adjusted for body size. Ruff and colleagues (1997) tried to answer just that question.^[Ruff, C.B., E. Trinkaus, and T.W. Holliday. 1997. Body mass and encephalization in Pleistocene _Homo_. _Nature_ 387: 173-176.]
+
+### Activity
+
+The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log brain size, and `Species`. Load the file, and convert `Species` to a factor.
 
 ```{r}
 # FIXME
-z <- prcomp(~ gravel + large_sand + med_fine_sand + mud,
-              data = M,
-              scale. = TRUE,
-              center = TRUE)
+M <- read_csv("../data/NeandertalBrainSize.csv") %>% 
+  mutate(Species = fct_relevel(Species, "Recent"))
 ```
 
-i. Use the `summary()` and `print()` methods to determine the percent of variance accounted for by each PC and the relative loadings of each variable.
-
-```{r}
-summary(z)
-z
-```
-
-j. Fit another logistic regression where presence of sole is predicted by the first PC from the PCA in part h. Refer to the lecture 16 slides if you need to.
+Make a scatterplot of brain size vs. body mass, with points colored by species. See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner.
 
 ```{r}
 # FIXME
-fm2 <- glm(Solea_solea ~ z$x[, 1], data = M, family = "binomial")
+M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+  geom_point(size = 2) +
+  scale_color_d3() +
+  theme(legend.position = c(0.9, 0.12),
+        legend.background = element_rect(size = 0.5,
+                                         color = "black",
+                                         linetype = "solid")) +
+  labs(x = "ln Body Mass", y = "ln Brain Size")
 ```
 
-k. Try to interpret the output of the summary of the fitted model from part j. Why kind of substrate do sole appear to prefer?
+Fit and save three linear models:
+
+1. Brain size modeled by body mass
+2. Brain size modeled by body mass and species (additive)
+3. Brain size modeled by body mass and species with the mass X species interaction
 
 ```{r}
 # FIXME
-summary(fm2)
+fm1 <- lm(ln_Brain ~ ln_Mass, M)
+fm2 <- lm(ln_Brain ~ ln_Mass + Species, M)
+fm3 <- lm(ln_Brain ~ ln_Mass * Species, M)
 ```
 
-> PC is basically as axis of sand (large, medium, fine) with values in negative PC1 scores to mud in positive PC1 scores. Gravel doesn't load appreciably on PC1. Logistic regression shows that as PC1 score increases, sole are less likely to be present (negative coefficient estimate). So sole are less likely to be present as the substrate gets more muddy. They are mor likely to be present as the substrate gets more sandy.
+Use the `lrtest()` function from the `lmtest` package to perform a likelihood ratio test on the three models.
+
+```{r}
+# FIXME
+lmtest::lrtest(fm1, fm2, fm3)
+```
+
+What is your interpretation of the likelihood ratio test?
+
+> The additive model is significantly better than then mass only model. The interaction is not significantly better.
+
+Use the `aictab()` function from the `AICcmodavg` package to compare AICc for the three models.
+
+```{r}
+# FIXME
+library(AICcmodavg)
+aictab(list(fm1, fm2, fm3))
+```
+
+What is your interpretation of the results?
+
+> The additive and interaction models are both well supported. 61% of the Akaike weight is on the additive model, and 30% on the interaction model. They both deserve discussion
+
+In lecture, we wrote out own code to do cross-validation. In practice, you would use code from others to automate this process, which is more general than any specific code you would write. A good package for cross-validation is `cvTools`. Install this package.
+
+The function `cvFit()` performs cross-validation on a variety of R objects, including `lm()`. Look at the help for `cvFit()`. Running cross-validation is simple.
+
+`cvFit(fm1, data = M, y = M$ln_Brain, K = 10, R = 100)`
+
+The basic parts are a fitted model (`fm1`), a source for the data, the ID of the `y` variable. Optionally, you can supply the number of `K` folds (default is 5 fold) and the number of replicates `R`. Increasing the number of replicates is important to get a more accurate estimate for the error.
+
+Run 10-fold cross-validation on the three models with 100 replicates of each.
+
+```{r}
+# FIXME
+cvFit(fm1, data = M, y = M$ln_Brain, K = 10, R = 100)
+cvFit(fm2, data = M, y = M$ln_Brain, K = 10, R = 100)
+cvFit(fm3, data = M, y = M$ln_Brain, K = 10, R = 100)
+```
+
+What do the results indicate? Which model has the lowest error?
+
+> The additive model has the lowest error (0.071) relative to the other models (0.073).
