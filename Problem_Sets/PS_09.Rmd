@@ -11,20 +11,6 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-# FIXME
-library(tidyverse)
-library(readxl)
-library(cowplot)
-library(forcats)
-library(ggsci)
-
-library(lmtest)
-library(AICcmodavg)
-
-library(nlme)
-library(car)
-library(epiDisplay)
-library(cvTools)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -43,8 +29,7 @@ Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish th
 Load the `TemperatureData` sheet from the `Streams.xlsx` file. Look at the structure of the file. You should have 5 columns: `Site`, `Date`, `AirTemp_observed`, `AirTempPredicted`, and `WaterTemp`. If you don't, then you probably did not load the correct sheet. Check the `read_excel()` help to see how to do this.
 
 ```{r}
-# FIXME
-Temp_Data <- read_excel("../data/Streams.xlsx", "TemperatureData")
+
 ```
 
 Now load the `SiteData` sheet from the Excel file. It has four columns, including the mapping from `Stream_Name` to `Site`. We need to merge the two data.frames^[tibbles] together. Because they share a column `Site`, we can match rows, yielding a single data.frame.
@@ -58,10 +43,7 @@ Base R has a `merge()` function, but it can be somewhat finicky. `tidyverse` has
 `left_join()` the temperature data and the site data and assign to a new object. This will add the columns of one to the other, matching on `Site`. You should end up with a 3,744 x 8 tibble.
 
 ```{r}
-Site_Data <- read_excel("../data/Streams.xlsx", "SiteData")
-M <- left_join(Temp_Data, Site_Data)
 
-M %>% group_by(Site, Stream_Name) %>% tally()
 ```
 
 Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). Ultimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
@@ -69,19 +51,13 @@ Data were collected for 78 different sites across 48 days. The 78 sites are nest
 We then need to do one more thing: make a new variable that converts `Date` into a day number. We can do this with the function `as.numeric()`. Make a new variable `Day`, which is the numeric representation of `Date`. It will look something like: `mutate(Day = as.numeric(Date))`.
 
 ```{r}
-# FIXME
-M <- M %>%
-  mutate(Site = factor(Site),
-         Date = factor(Date),
-         Stream_Name = factor(Stream_Name),
-         Day = as.numeric(Date))
+
 ```
 
 Because not all observations have observed air temperature, first we should check for correlation between observed and predicted air temperatures. Calculate the correlation between the two. We could filter out missing data, but instead just provide the argument `use = "pairwise.complete.obs"` to `cor()`, which will tell the function to use only complete pairs for the calculation. If you find that the correlation is `NA`, that means R is using incomplete cases. Correlation with `NA`s is `NA`.
 
 ```{r}
-# FIXME
-cor(M$AirTemp_observed, M$AirTempPredicted, use = "pairwise.complete.obs")
+
 ```
 
 The correlation should be pretty high. So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete). Let's plot: make a line plot with day on the x axis and predicted air temp on the y axis. Then facet by `Stream_Name`.
@@ -91,23 +67,12 @@ One more thing we need to add to `aes()` is `group = Site`. This code will tell 
 Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable.)
 
 ```{r fig.height = 10}
-# FIXME
-ggplot(M, aes(Day, AirTempPredicted, group = Site)) +
-  geom_line() +
-  theme(legend.position = "none") +
-  facet_grid(Stream_Name ~ .) +
-  labs(title = "Air Temperature")
 
-ggplot(M, aes(Day, WaterTemp, group = Site)) +
-  geom_line() +
-  theme(legend.position = "none") +
-  facet_grid(Stream_Name ~ .) +
-  labs(title = "Water Temperature")
 ```
 
 What general patterns do you see, comparing the two plots?
 
-> Air temperature appears to vary more day to day than water temperature does. Air temperatures at a given stream are highly conserved, but water temperature varies much more within a stream.
+> 
 
 We want to fit two models to these data. In both models we want to model water temperature by predicted air temperature. The difference between the models will be in the random effects.
 
@@ -119,42 +84,27 @@ We have an added wrinkle with these data that we have not yet encountered: nesti
 Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood.
 
 ```{r}
-# FIXME
-fm1 <- lme(WaterTemp ~ AirTempPredicted,
-           random = ~ 1 | Stream_Name/Site,
-           data = M, method = "ML")
-summary(fm1)
 
-fm2 <- lme(WaterTemp ~ AirTempPredicted,
-           random = ~ Day | Stream_Name/Site,
-           data = M, method = "ML")
-summary(fm2)
 ```
 
 Looking at the `summary()` of each, you should see sections in the random effects for `Stream_Name` and `Site %in% Stream_Name`.
 
 Explain in non-mathematical words what the addition of day in the random effects part of the formula accomplishes.
 
-> Addition of day in the random effects part of the model allows the linear relationship (slope) of the water temperature relationship to change on a daily basis. Each day can essentially have its own trajectory.
+> 
 
 Load the `AICcmodavg` package and use the `aictab()` function to compare the two models you fit above.
 
 ```{r}
-# FIXME
-library(AICcmodavg)
-aictab(list(fm1, fm2))
+
 ```
 
 Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the model comparison make sense in light of your understanding of the difference between the two models?
 
-> The second model is massively preferred (deltaAIC = 2560). This makes sense because there is a lot of day to day variation in temperature. We could probably do even better by adding a main effect of day to model the overall trend of increasing temperature.
+> 
 
 ```{r}
-# FIXME
-fm3 <- lme(WaterTemp ~ AirTempPredicted + Day,
-           random = ~ Day | Stream_Name/Site,
-           data = M, method = "ML")
-aictab(list(fm1, fm2, fm3))
+
 ```
 
 ## Sole
@@ -166,21 +116,13 @@ In lecture, we looked at presence/absence data for the common sole ([*Solea sole
 Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
 
 ```{r}
-# FIXME
-M <- read_excel("../data/Sole.xlsx")
-M <- M %>% mutate(season = factor(season),
-                  month = factor(month),
-                  area = factor(area),
-                  Solea_solea = factor(Solea_solea))
-M <- M %>% as.data.frame()
-str(M)
+
 ```
 
 Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
 
 ```{r}
-# FIXME
-M %>% group_by(season, area) %>% tally()
+
 ```
 
 If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary.
@@ -188,32 +130,28 @@ If all goes well, you should find 6-12 observations for each season/area combina
 Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
 
 ```{r}
-# FIXME
-fm <- glm(Solea_solea ~ season + area, data = M,
-          family = "binomial")
+
 ```
 
 Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
 
 ```{r}
-# FIXME
-Anova(fm, type = "III")
+
 ```
 
 Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
 
-> Only area is a good predictor (P = 0.0001).
+> 
 
 Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
 
 ```{r}
-# FIXME
-logistic.display(fm)
+
 ```
 
 See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
 
-> Adjusted odds ratio for season isn't significant (i.e., after setting area to 0), with a CI that crosses 1. Each area is compared to area 1, and all are significantly different from one another. It seems reasonable to conclude that there is considerable variation in the presence/absence of sole among the four areas. This is actullay bad, because area to area variation is higher than seasonal variation. There appears to be substantial geographic heterogeneity in sole presence.
+> 
 
 ## Neandertal Brains
 
@@ -224,23 +162,13 @@ There are well-known differences in both body size between modern humans and Nea
 The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log brain size, and `Species`. Load the file, and convert `Species` to a factor.
 
 ```{r}
-# FIXME
-M <- read_csv("../data/NeandertalBrainSize.csv") %>% 
-  mutate(Species = fct_relevel(Species, "Recent"))
+
 ```
 
 Make a scatterplot of brain size vs. body mass, with points colored by species. See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner.
 
 ```{r}
-# FIXME
-M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
-  geom_point(size = 2) +
-  scale_color_d3() +
-  theme(legend.position = c(0.9, 0.12),
-        legend.background = element_rect(size = 0.5,
-                                         color = "black",
-                                         linetype = "solid")) +
-  labs(x = "ln Body Mass", y = "ln Brain Size")
+
 ```
 
 Fit and save three linear models:
@@ -250,34 +178,28 @@ Fit and save three linear models:
 3. Brain size modeled by body mass and species with the mass X species interaction
 
 ```{r}
-# FIXME
-fm1 <- lm(ln_Brain ~ ln_Mass, M)
-fm2 <- lm(ln_Brain ~ ln_Mass + Species, M)
-fm3 <- lm(ln_Brain ~ ln_Mass * Species, M)
+
 ```
 
 Use the `lrtest()` function from the `lmtest` package to perform a likelihood ratio test on the three models.
 
 ```{r}
-# FIXME
-lmtest::lrtest(fm1, fm2, fm3)
+
 ```
 
 What is your interpretation of the likelihood ratio test?
 
-> The additive model is significantly better than then mass only model. The interaction is not significantly better.
+> 
 
 Use the `aictab()` function from the `AICcmodavg` package to compare AICc for the three models.
 
 ```{r}
-# FIXME
-library(AICcmodavg)
-aictab(list(fm1, fm2, fm3))
+
 ```
 
 What is your interpretation of the results?
 
-> The additive and interaction models are both well supported. 61% of the Akaike weight is on the additive model, and 30% on the interaction model. They both deserve discussion
+> 
 
 In lecture, we wrote out own code to do cross-validation. In practice, you would use code from others to automate this process, which is more general than any specific code you would write. A good package for cross-validation is `cvTools`. Install this package.
 
@@ -290,12 +212,9 @@ The basic parts are a fitted model (`fm1`), a source for the data, the ID of the
 Run 10-fold cross-validation on the three models with 100 replicates of each.
 
 ```{r}
-# FIXME
-cvFit(fm1, data = M, y = M$ln_Brain, K = 10, R = 100)
-cvFit(fm2, data = M, y = M$ln_Brain, K = 10, R = 100)
-cvFit(fm3, data = M, y = M$ln_Brain, K = 10, R = 100)
+
 ```
 
 What do the results indicate? Which model has the lowest error?
 
-> The additive model has the lowest error (0.071) relative to the other models (0.073).
+> 
