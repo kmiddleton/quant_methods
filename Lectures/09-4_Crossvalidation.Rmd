@@ -17,7 +17,6 @@ library(cowplot)
 library(ggplot2)
 library(latex2exp)
 library(wesanderson)
-
 ```
 
 ## The Problem
