@@ -1,0 +1,39 @@
+---
+title: "Model Comparison: In Class"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(knitr)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## Review Project 
+
+- Approval Due 04.07
+    - Note: Approval, not proposal
+- Project Due 05.12
+
+## Review Project
+
+  - Perform a "peer review" of a published article (pre-prints are ok)
+  - Article must:
+      - use substantial statistical/quantitative methods
+      - be in your broad area of expertise
+
+## Guidelines for Reviews
+
+  - Follow the [Proc B Guidelines for Reviewers](http://rspb.royalsocietypublishing.org/for-reviewers)
+  - You may consider the scope of the journal in which the article is published instead of Proc B
+  - Example reviews will be posted on Canvas
+  
