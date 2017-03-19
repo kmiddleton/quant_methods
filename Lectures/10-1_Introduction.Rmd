@@ -44,14 +44,14 @@ Distribution free methods do not assume the data are drawn from any specific pro
   
   - Real data often does not follow standard distributions
   - Very flexible
-  - Uses only infomation from your dataset
+  - Uses only information from your data set
       - Good & Bad
   - Standard errors can not always be calculated for all parameters
   
 ## Resampling
 
   - Primarily a method for parameter estimation and interval estimation
-  - Sample from the data to estimate the variablility in the parameter estimate
+  - Sample from the data to estimate the variability in the parameter estimate
   - **Assumption:** Observed distribution is representative of the true distribution
   - Need to empirically show the method works for each type of application using simulation
 
