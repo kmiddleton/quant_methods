@@ -31,19 +31,22 @@ Churchill, G. A., and R. W. Doerge. 1994. Empirical threshold values for quantit
 ```{r echo=FALSE}
 load("../data/set_all.rda")
 top <- 8
-ggplot(set[set$Treatment=='Life DR',], aes(x=Position, y=P))+
-  geom_rect(xmin=66.3,ymin=-10,xmax=120.3,ymax=top+10,fill='aliceblue',color='aliceblue')+
-  geom_rect(xmin=174,ymin=-10,xmax=221,ymax=top+10,fill='aliceblue',color='aliceblue')+
-  geom_line()+
-  scale_x_continuous(breaks=c(0,66.3,120,174,221,277,33.15,98.3,145,205,249), 
-                     labels=c(0,"66  0",54,"108  0",47,103,'\nX','\n2L','\n2R','\n3L','\n3R'))+
-  
-  theme(axis.ticks.x=element_blank())+
-  ylab(expression("-log"[10]*"(P-value)"))+
+ggplot(set[set$Treatment == 'Life DR',], aes(x = Position, y = P)) +
+  geom_rect(xmin = 66.3, ymin = -10, xmax = 120.3,
+            ymax = top + 10, fill = 'aliceblue',
+            color = 'aliceblue') +
+  geom_rect(xmin = 174, ymin = -10, xmax = 221,
+            ymax = top + 10, fill = 'aliceblue',
+            color = 'aliceblue') +
+  geom_line() +
+  scale_x_continuous(
+    breaks = c(0,66.3,120,174,221,277,33.15,98.3,145,205,249), 
+                     labels = c(0, "66  0", 54, "108  0", 47, 103,
+                                '\nX', '\n2L', '\n2R', '\n3L', '\n3R')) +
+  theme(axis.ticks.x = element_blank()) +
+  ylab(expression("-log"[10]*"(P-value)")) +
   xlab("Position (cM)") +
   geom_hline(yintercept = -log10(0.05), color = "coral")
-
-
 ```
 
 ## Genetic Mapping
@@ -55,49 +58,57 @@ What is the threshold where we expect to find at least one significant hit by ch
     - Choose maximum -log~10~P each time
     
 ```{r pl1, echo=FALSE, fig.height=2.5}
-sub.d<-subset(set, Treatment=='Life C')
-dd <- data.frame('xx' = sub.d[which.max(sub.d$P),'Position'], 
-                 'yy'=sub.d[which.max(sub.d$P),'P'])
+sub.d <- subset(set, Treatment == 'Life C')
+dd <- data.frame('xx' = sub.d[which.max(sub.d$P), 'Position'], 
+                 'yy' = sub.d[which.max(sub.d$P), 'P'])
 top <- 8
-ggplot(set[set$Treatment=='Life C',], aes(x=Position, y=P))+
-  geom_rect(xmin=66.3,ymin=-10,xmax=120.3,ymax=top+10,fill='aliceblue',color='aliceblue')+
-  geom_rect(xmin=174,ymin=-10,xmax=221,ymax=top+10,fill='aliceblue',color='aliceblue')+
-  geom_line()+
-  geom_point(data=dd, aes(xx, yy, color='coral'),size=3) +
-  scale_x_continuous(breaks=c(0,66.3,120,174,221,277,33.15,98.3,145,205,249), 
-                     labels=c(0,"66  0",54,"108  0",47,103,'\nX','\n2L','\n2R','\n3L','\n3R'))+
-  
-  theme(axis.ticks.x=element_blank())+
-  ylab(expression("-log"[10]*"(P-value)"))+
+ggplot(set[set$Treatment == 'Life C',], aes(x = Position, y = P)) +
+  geom_rect(xmin = 66.3, ymin = -10, xmax = 120.3,
+            ymax = top + 10, fill = 'aliceblue',
+            color = 'aliceblue') +
+  geom_rect(xmin = 174, ymin = -10, xmax = 221,
+            ymax = top + 10, fill = 'aliceblue',
+            color = 'aliceblue') +
+  geom_line() +
+  geom_point(data = dd, aes(xx, yy, color = 'coral'), size = 3) +
+  scale_x_continuous(
+    breaks = c(0, 66.3, 120, 174, 221, 277, 33.15, 98.3, 145, 205, 249), 
+    labels = c(0, "66  0", 54, "108  0", 47, 103,
+               '\nX', '\n2L', '\n2R', '\n3L', '\n3R')) +
+  theme(axis.ticks.x = element_blank()) +
+  ylab(expression("-log"[10]*"(P-value)")) +
   xlab("Position (cM)") +
-  theme(legend.position="none")
-  
+  theme(legend.position = "none")
 ```
 
 ## Distribution of Maxima
 
 ```{r pl2, echo=FALSE}
 load("../data/exPPP.rda")
-ppp<-data.frame('MaxValue'=ppp)
-ggplot(ppp, aes(x=MaxValue)) +
-  geom_histogram(bins=30) +
-  geom_vline(xintercept=quantile(ppp$MaxValue,0.95),color='coral')
-
+ppp <- data.frame('MaxValue' = ppp)
+ggplot(ppp, aes(x = MaxValue)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = quantile(ppp$MaxValue, 0.95), color = 'coral')
 ```
 
 ## Genetic Mapping
 
 ```{r pl3, echo=FALSE}
-ggplot(set[set$Treatment=='Life DR',], aes(x=Position, y=P))+
-  geom_rect(xmin=66.3,ymin=-10,xmax=120.3,ymax=top+10,fill='aliceblue',color='aliceblue')+
-  geom_rect(xmin=174,ymin=-10,xmax=221,ymax=top+10,fill='aliceblue',color='aliceblue')+
-  geom_line()+
-  geom_hline(yintercept = quantile(ppp$MaxValue,0.95),color='coral') +
-  scale_x_continuous(breaks=c(0,66.3,120,174,221,277,33.15,98.3,145,205,249), 
-                     labels=c(0,"66  0",54,"108  0",47,103,'\nX','\n2L','\n2R','\n3L','\n3R'))+
-  
-  theme(axis.ticks.x=element_blank())+
-  ylab(expression("-log"[10]*"(P-value)"))+
+ggplot(set[set$Treatment == 'Life DR', ], aes(x = Position, y = P)) +
+  geom_rect(xmin = 66.3, ymin = -10, xmax = 120.3,
+            ymax = top + 10, fill = 'aliceblue',
+            color = 'aliceblue') +
+  geom_rect(xmin = 174, ymin = -10, xmax = 221,
+            ymax = top + 10, fill = 'aliceblue',
+            color = 'aliceblue') +
+  geom_line() +
+  geom_hline(yintercept = quantile(ppp$MaxValue, 0.95), color = 'coral') +
+  scale_x_continuous(
+    breaks = c(0, 66.3, 120, 174, 221, 277, 33.15, 98.3, 145, 205, 249), 
+    labels = c(0, "66  0", 54, "108  0", 47, 103,
+               '\nX', '\n2L', '\n2R', '\n3L', '\n3R')) +
+  theme(axis.ticks.x = element_blank()) +
+  ylab(expression("-log"[10]*"(P-value)")) +
   xlab("Position (cM)")
 ```
 
@@ -114,7 +125,7 @@ Sources of Sampling Error
   - Choosing 100 females for each pool
   - Prepping library & sequencing
 
-## Approach 1: Use known population to estimate what we expect from randomly choosing 100 females for each pool {.smaller}
+## Approach 1: Use known population to estimate expectations from randomly choosing 100 females for each pool {.smaller}
 
 <center>
 <img src="./images/cent1.png" width="90%" />
@@ -126,6 +137,29 @@ Sources of Sampling Error
 <img src="./images/cent2.png" width="90%" />
 </center>
 
+## Turning flight in hummingbirds
+
+<center>
+<img src="images/WCB/WCB_img.004.png" width="100%" />
+</center>
+
+## Turning flight in hummingbirds
+
+<center>
+<img src="images/WCB/WCB_img.005.png" width="80%" />
+</center>
+
+## Turning flight in hummingbirds
+
+<center>
+<img src="images/Bird_6.png" width="80%" />
+</center>
+
+## Turning flight in hummingbirds
+
+<center>
+<img src="images/Bird_7.png" width="80%" />
+</center>
 
 ## No Quiz
 
