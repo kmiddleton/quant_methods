@@ -1,0 +1,33 @@
+---
+title: "Distribution Free Methods: Introduction"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+library(wesanderson)
+```
+
+## Readings
+
+- North et al: A Note on the Calculation of Empirical P Values from Monte Carlo Procedures
+
+## Why Randomization
+
+  - Real data often does not follow standard distributions
+  - Can be applied to any dataset
+  
+
+## Quiz 10-1
+
+Lecture 10-2

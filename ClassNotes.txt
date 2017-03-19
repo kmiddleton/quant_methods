@@ -300,26 +300,7 @@ Problem set:
 
 ---
 
-Week 9: Randomization, multiple testing
-
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC379178/
-
-Look at Stevens material
-
-Goals:
-
-  - Example of when it didn't work: randomizing reads
-  - Churchill paper
-  - Storey
-  - glht, tukey HSD
-
-Problem set:
-
-  - Simple permutation test
-
----
-
-Week 10: Model comparison, model based inference
+Week 9: Model comparison, model based inference
 
 "Despite our best eﬀorts to include information, all models are approximate" Gelman et al. ABD
 
@@ -333,6 +314,31 @@ Goals:
 
 ---
 
+Week 10:Distribution free methods
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC379178/
+
+Look at Stevens material
+
+Goals:
+
+  - What is randomization (1: EGK)
+  - What is resampling? (1: EGK)
+  - When should you use it? (1: EGK)
+  - Applications(KMM)
+  - Permutation tests (EGK)
+
+  - Example of when it didn't work: randomizing reads
+
+
+Problem set:
+
+  - Simple permutation test
+
+
+
+---
+
 Week 11: Kinship, phylogenetic methods, mixed models
 
 Goals:
@@ -343,7 +349,15 @@ Week 12: Multiple comparisons procedures
 
 Goals:
 
+
 Nutrition data, 27000 correlation p values
+
+- Churchill paper
+
+  - Storey
+
+  - glht, tukey HSD
+
 
 ---
 
