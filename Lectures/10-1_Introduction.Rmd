@@ -135,7 +135,10 @@ cat("....")
   1. Bootstrapping in phylogenetics: Sample character vectors, construct best tree, repeat. Felsenstein 1985 Felsenstein and Kishino (1993)
 
   1. Jackknifing in quantitative genetics
-    Roff papers
+    Roff papers:
+    Roff & Preziosi 1994: The estimation of the genetic correlation: the use of the jackknife
+    Roff 2002: Comparing G matrices: A MANOVA approach
+    Roff 2008: Comparing sire and dam estimates of heritability: jackknife and likelihood approaches
 
 ## Randomization
 
