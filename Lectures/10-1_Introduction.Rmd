@@ -20,7 +20,13 @@ library(wesanderson)
 
 ## Readings
 
-- North et al: A Note on the Calculation of Empirical P Values from Monte Carlo Procedures
+North BV, Curtis D, Sham PC. [-@North2002-nu]. A note on the calculation of empirical P values from Monte Carlo procedures. *Am J Hum Genet* 71:439-441.
+
+## Additional Resources
+
+- Ludbrook J, Dudley H. [-@Ludbrook1998-zg]. Why Permutation Tests Are Superior to t and F Tests in Biomedical Research. Am Stat 52:127–132.
+- Manly BFJ. [-@Manly2006-ky]. *Randomization, Bootstrap and Monte Carlo Methods in Biology*. 3rd edition. Boca Raton, FL: Chapman and Hall/CRC.
+- Roff DA. [-@Roff2006-lz]. *Introduction to Computer-intensive Methods of Data Analysis in Biology*. Cambridge University Press.
 
 ## Distribution Free Methods
 
@@ -58,22 +64,19 @@ set.seed(519)
 
 BeakLength <- data.frame("BeakLength" = rnorm(100, 12, 0.5))
 
-ggplot(BeakLength, aes(x=BeakLength)) +
-  geom_histogram(bins=20) +
-  geom_vline(xintercept = mean(BeakLength$BeakLength), color='coral',lwd=3)
-
+ggplot(BeakLength, aes(x = BeakLength)) +
+  geom_histogram(bins = 20) +
+  geom_vline(xintercept = mean(BeakLength$BeakLength),
+             color = 'coral', lwd = 3)
 ```
-
 
 ## Resampling procedure: bootstrap
 
 - Sample with replacement, n = number of observations
 
 ```{r echo=FALSE, fig.width=7, fig.height=4}
-
-bs1 <- sample(BeakLength$BeakLength, replace=T)
+bs1 <- sample(BeakLength$BeakLength, replace = TRUE)
 cat(bs1[1:6], "...")
-
 ```
 
 - Get mean of sample (& repeat):
@@ -81,16 +84,14 @@ cat(bs1[1:6], "...")
 ```{r echo=FALSE, fig.width=5, fig.height=3, fig.align='center'}
 mean(bs1)
 
-BS <- data.frame('BS'=numeric(length=100))
+BS <- data.frame('BS' = numeric(length = 100))
 
-for(jj in 1:100)
-{
-  BS[jj,'BS']<- mean(sample(BeakLength$BeakLength, replace=T))
+for (jj in 1:100) {
+  BS[jj,'BS'] <- mean(sample(BeakLength$BeakLength, replace = TRUE))
 }
 
-ggplot(BS, aes(x=BS)) +
-  geom_histogram(bins=20)
-
+ggplot(BS, aes(x = BS)) +
+  geom_histogram(bins = 20)
 ```
  
 ## Resampling procedure: bootstrap 
@@ -99,46 +100,38 @@ ggplot(BS, aes(x=BS)) +
 - Estimate of SE = standard deviation of the bootstrap estimates
 
 ```{r echo = FALSE, fig.width=7, fig.height=4}
-ggplot(BS, aes(x=BS)) +
-  geom_histogram(bins=20) +
-  geom_vline(xintercept = mean(BS$BS), color='coral',lwd=3) +
-  geom_vline(xintercept = (mean(BS$BS)-sd(BS$BS)), color='slateblue') +
-    geom_vline(xintercept = (mean(BS$BS)+sd(BS$BS)), color='slateblue')
-
+ggplot(BS, aes(x = BS)) +
+  geom_histogram(bins = 20) +
+  geom_vline(xintercept = mean(BS$BS), color = 'coral', lwd = 3) +
+  geom_vline(xintercept = (mean(BS$BS) - sd(BS$BS)), color = 'slateblue') +
+  geom_vline(xintercept = (mean(BS$BS) + sd(BS$BS)), color = 'slateblue')
 ```
 
 ## Resampling procedure: jackknife
 
-  > Jackknife: Remove 1 observation, estimate parameter, repeat for each observation in the data set, removing each exactly once.
+> Jackknife: Remove 1 observation, estimate parameter, repeat for each observation in the data set, removing each exactly once.
 
 ```{r echo=FALSE, fig.width=7, fig.height=4}
-
-ggplot(BeakLength, aes(x=BeakLength)) +
-  geom_histogram(bins=20) +
-  geom_vline(xintercept = mean(BeakLength$BeakLength), color='coral',lwd=3)
-
+ggplot(BeakLength, aes(x = BeakLength)) +
+  geom_histogram(bins = 20) +
+  geom_vline(xintercept = mean(BeakLength$BeakLength),
+             color = 'coral', lwd = 3)
 ```
 
 ## Resampling procedure: jackknife
 
 ```{r echo=FALSE}
-
 cat("Obs:",BeakLength$BeakLength[1:6], "...")
 cat(" \t\tX\t",BeakLength$BeakLength[2:6], "...")
-cat("  \t",BeakLength$BeakLength[1],"\tX\t ",BeakLength$BeakLength[3:6], "...")
+cat("  \t",BeakLength$BeakLength[1],"\tX\t ", BeakLength$BeakLength[3:6], "...")
 cat("....")
-
 ```
 
 ## Applications & Resources: Resampling
 
-  1. Bootstrapping in phylogenetics: Sample character vectors, construct best tree, repeat. Felsenstein 1985 Felsenstein and Kishino (1993)
+1. Bootstrapping in phylogenetics: Sample character vectors, construct best tree, repeat. [@Felsenstein1985-my; @Felsenstein1993-on]
 
-  1. Jackknifing in quantitative genetics
-    Roff papers:
-    Roff & Preziosi 1994: The estimation of the genetic correlation: the use of the jackknife
-    Roff 2002: Comparing G matrices: A MANOVA approach
-    Roff 2008: Comparing sire and dam estimates of heritability: jackknife and likelihood approaches
+1. Jackknifing in quantitative genetics [@Roff1994-gz; @Roff2002-rf; @Roff2008-on]
 
 ## Randomization
 
@@ -171,12 +164,17 @@ When test assumptions are met, the results will match asymptotic procedures. Whe
 
 ```{r echo=FALSE, fig.height=4}
 set.seed(903)
-dat<-data.frame('BeakLength' = c(rnorm(20,12,0.5),rnorm(20,13.5,0.5)), "Original" = rep(c('A','B'),each=20), "Type" = rep(c('A','B'),each=20))
+dat <- data.frame('BeakLength' = c(rnorm(20, 12, 0.5),
+                                   rnorm(20, 13.5, 0.5)),
+                  "Original" = rep(c('A', 'B'), each = 20),
+                  "Type" = rep(c('A', 'B'), each = 20))
 
-cat("Mean A:",mean(dat$BeakLength[dat$Type=='A']),"\n","Mean B:",mean(dat$BeakLength[dat$Type=='B']))
+cat("Mean A:", mean(dat$BeakLength[dat$Type == 'A']),
+    "\nMean B:", mean(dat$BeakLength[dat$Type == 'B']))
 
-ggplot(dat, aes(x=Type, y=BeakLength, color=Original)) +
-  geom_point(position = position_jitter(width = 0.05), alpha=1/2, size=2)
+ggplot(dat, aes(x = Type, y = BeakLength, color = Original)) +
+  geom_point(position = position_jitter(width = 0.05),
+             alpha = 1 / 2, size = 2)
 ```
 
 ## Randomization procedure
@@ -184,12 +182,16 @@ ggplot(dat, aes(x=Type, y=BeakLength, color=Original)) +
 Shuffle Type
 
 ```{r echo=FALSE, fig.height=4}
-dat.s<-data.frame('BeakLength' = dat$BeakLength, "Original" = dat$Original, "Type" = sample(dat$Type))
+dat.s <- data.frame('BeakLength' = dat$BeakLength,
+                    "Original" = dat$Original,
+                    "Type" = sample(dat$Type))
 
-cat("Mean A:",mean(dat.s$BeakLength[dat.s$Type=='A']),"\n","Mean B:",mean(dat.s$BeakLength[dat.s$Type=='B']))
+cat("Mean A:", mean(dat.s$BeakLength[dat.s$Type == 'A']),
+    "\nMean B:", mean(dat.s$BeakLength[dat.s$Type == 'B']))
 
-ggplot(dat.s, aes(x=Type, y=BeakLength, color=Original)) +
-  geom_point(position = position_jitter(width = 0.05), alpha=1/2, size=2)
+ggplot(dat.s, aes(x = Type, y = BeakLength, color = Original)) +
+  geom_point(position = position_jitter(width = 0.05),
+             alpha = 1 / 2, size = 2)
 ```
 
 ## Randomization procedure
@@ -197,15 +199,20 @@ ggplot(dat.s, aes(x=Type, y=BeakLength, color=Original)) +
 Repeat N times
 
 ```{r echo=FALSE, fig.height=4}
-dat.s<-data.frame('BeakLength' = dat$BeakLength, "Original" = dat$Original, "Type" = sample(dat$Type))
+dat.s <- data.frame('BeakLength' = dat$BeakLength,
+                    "Original" = dat$Original,
+                    "Type" = sample(dat$Type))
 
-cat("Mean A:",mean(dat.s$BeakLength[dat.s$Type=='A']),"\n","Mean B:",mean(dat.s$BeakLength[dat.s$Type=='B']))
+cat("Mean A:", mean(dat.s$BeakLength[dat.s$Type == 'A']),
+    "\nMean B:", mean(dat.s$BeakLength[dat.s$Type == 'B']))
 
-ggplot(dat.s, aes(x=Type, y=BeakLength, color=Original)) +
-  geom_point(position = position_jitter(width = 0.05), alpha=1/2, size=2)
+ggplot(dat.s, aes(x = Type, y = BeakLength, color = Original)) +
+  geom_point(position = position_jitter(width = 0.05),
+             alpha = 1 / 2, size = 2)
 ```
-
 
 ## Quiz 10-1
 
 Lecture 10-2
+
+## References
