@@ -21,19 +21,22 @@ knitr::opts_chunk$set(cache = TRUE)
 ## Review Project 
 
 - Approval Due 04.07
-    - Note: Approval, not proposal
+    - Note: *Approval*, not proposal (don't wait until the last minute)
 - Project Due 05.12
 
 ## Review Project
 
-  - Perform a "peer review" of a published article (pre-prints are ok)
-  - Article must:
-      - use substantial statistical/quantitative methods
-      - be in your broad area of expertise
+- Perform a "peer review" of a published article
+    - Pre-prints are ok
+- Article must:
+    - Use substantial statistical/quantitative methods
+    - Be in your broad area of expertise
+- Focus on the statistical / analytical aspects
 
 ## Guidelines for Reviews
 
-  - Follow the [Proc B Guidelines for Reviewers](http://rspb.royalsocietypublishing.org/for-reviewers)
-  - You may consider the scope of the journal in which the article is published instead of Proc B
-  - Example reviews will be posted on Canvas
+- Follow the [Proc B Guidelines for Reviewers](http://rspb.royalsocietypublishing.org/for-reviewers)
+    - Focus on the statistical guidelines.  
+- You may consider the scope of the journal in which the article is published instead of Proc B
+- Example reviews will be posted on Canvas
   
