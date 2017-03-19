@@ -22,11 +22,186 @@ library(wesanderson)
 
 - North et al: A Note on the Calculation of Empirical P Values from Monte Carlo Procedures
 
-## Why Randomization
+## Distribution Free Methods
 
-  - Real data often does not follow standard distributions
-  - Can be applied to any dataset
+Distribution free methods do not assume the data are drawn from any specific probability distribution. *Important: distribution-free, not assumption-free (e.g. IID).*
+
+  - Randomization 
+      - Shuffle data set in some way
+    
+  - Resampling
+      - Sample from data set in some way
+        - Jackknife
+        - Bootstrap
+
+## Why distribution free methods?      
   
+  - Real data often does not follow standard distributions
+  - Very flexible
+  - Uses only infomation from your dataset
+      - Good & Bad
+  - Standard errors can not always be calculated for all parameters
+  
+## Resampling
+
+  - Primarily a method for parameter estimation and interval estimation
+  - Sample from the data to estimate the variablility in the parameter estimate
+  - **Assumption:** Observed distribution is representative of the true distribution
+  - Need to empirically show the method works for each type of application using simulation
+
+## Resampling procedure: bootstrap
+
+  > Bootstrap: Sample N observations with replacement, estimate parameter, repeat k times
+
+```{r echo=FALSE, fig.width=7, fig.height=4}
+set.seed(519)
+
+BeakLength <- data.frame("BeakLength" = rnorm(100, 12, 0.5))
+
+ggplot(BeakLength, aes(x=BeakLength)) +
+  geom_histogram(bins=20) +
+  geom_vline(xintercept = mean(BeakLength$BeakLength), color='coral',lwd=3)
+
+```
+
+
+## Resampling procedure: bootstrap
+
+- Sample with replacement, n = number of observations
+
+```{r echo=FALSE, fig.width=7, fig.height=4}
+
+bs1 <- sample(BeakLength$BeakLength, replace=T)
+cat(bs1[1:6], "...")
+
+```
+
+- Get mean of sample (& repeat):
+
+```{r echo=FALSE, fig.width=5, fig.height=3, fig.align='center'}
+mean(bs1)
+
+BS <- data.frame('BS'=numeric(length=100))
+
+for(jj in 1:100)
+{
+  BS[jj,'BS']<- mean(sample(BeakLength$BeakLength, replace=T))
+}
+
+ggplot(BS, aes(x=BS)) +
+  geom_histogram(bins=20)
+
+```
+ 
+## Resampling procedure: bootstrap 
+
+- Estimate of mean = mean of the bootstrap estimates
+- Estimate of SE = standard deviation of the bootstrap estimates
+
+```{r echo = FALSE, fig.width=7, fig.height=4}
+ggplot(BS, aes(x=BS)) +
+  geom_histogram(bins=20) +
+  geom_vline(xintercept = mean(BS$BS), color='coral',lwd=3) +
+  geom_vline(xintercept = (mean(BS$BS)-sd(BS$BS)), color='slateblue') +
+    geom_vline(xintercept = (mean(BS$BS)+sd(BS$BS)), color='slateblue')
+
+```
+
+## Resampling procedure: jackknife
+
+  > Jackknife: Remove 1 observation, estimate parameter, repeat for each observation in the data set, removing each exactly once.
+
+```{r echo=FALSE, fig.width=7, fig.height=4}
+
+ggplot(BeakLength, aes(x=BeakLength)) +
+  geom_histogram(bins=20) +
+  geom_vline(xintercept = mean(BeakLength$BeakLength), color='coral',lwd=3)
+
+```
+
+## Resampling procedure: jackknife
+
+```{r echo=FALSE}
+
+cat("Obs:",BeakLength$BeakLength[1:6], "...")
+cat(" \t\tX\t",BeakLength$BeakLength[2:6], "...")
+cat("  \t",BeakLength$BeakLength[1],"\tX\t ",BeakLength$BeakLength[3:6], "...")
+cat("....")
+
+```
+
+## Applications & Resources: Resampling
+
+  1. Bootstrapping in phylogenetics: Sample character vectors, construct best tree, repeat. Felsenstein 1985 Felsenstein and Kishino (1993)
+
+  1. Jackknifing in quantitative genetics
+    Roff papers
+
+## Randomization
+
+  - Primarily a method for hypothesis testing
+  - More directly asks: What is the probability of observing a result as extreme or more than my observed result? 
+  
+  **Assumption:** Under the null hypothesis, observations are random draws from a common population
+
+## Randomization procedure
+
+1. Decide on a test statistic
+1. Calculate the test statistic for the *observed* data
+1. Randomly shuffle the observations
+1. Calculate the test statistic for that group
+1. Repeat thousands of times
+1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+
+When test assumptions are met, the results will match asymptotic procedures. When the assumptions are not met, the results will be valid.
+
+## Decide on a test statistic
+
+1. Mean difference
+2. *t*: *t*-test, linear model parameter estimate (slope, intercept)
+3. *F*: ANOVA-like
+4. $\chi^2$
+5. Any metric of your choice (P-value, Fst, heterozygosity, LOD score, etc.)
+
+
+## Randomization procedure
+
+```{r echo=FALSE, fig.height=4}
+set.seed(903)
+dat<-data.frame('BeakLength' = c(rnorm(20,12,0.5),rnorm(20,13.5,0.5)), "Original" = rep(c('A','B'),each=20), "Type" = rep(c('A','B'),each=20))
+
+cat("Mean A:",mean(dat$BeakLength[dat$Type=='A']),"\n","Mean B:",mean(dat$BeakLength[dat$Type=='B']))
+
+ggplot(dat, aes(x=Type, y=BeakLength, color=Original)) +
+  geom_point(position = position_jitter(width = 0.05), alpha=1/2, size=2)
+```
+
+## Randomization procedure
+
+Shuffle Type
+
+```{r echo=FALSE, fig.height=4}
+dat.s<-data.frame('BeakLength' = dat$BeakLength, "Original" = dat$Original, "Type" = sample(dat$Type))
+
+cat("Mean A:",mean(dat.s$BeakLength[dat.s$Type=='A']),"\n","Mean B:",mean(dat.s$BeakLength[dat.s$Type=='B']))
+
+ggplot(dat.s, aes(x=Type, y=BeakLength, color=Original)) +
+  geom_point(position = position_jitter(width = 0.05), alpha=1/2, size=2)
+```
+
+## Randomization procedure
+
+Repeat N times
+
+```{r echo=FALSE, fig.height=4}
+dat.s<-data.frame('BeakLength' = dat$BeakLength, "Original" = dat$Original, "Type" = sample(dat$Type))
+
+cat("Mean A:",mean(dat.s$BeakLength[dat.s$Type=='A']),"\n","Mean B:",mean(dat.s$BeakLength[dat.s$Type=='B']))
+
+ggplot(dat.s, aes(x=Type, y=BeakLength, color=Original)) +
+  geom_point(position = position_jitter(width = 0.05), alpha=1/2, size=2)
+```
+
 
 ## Quiz 10-1
 

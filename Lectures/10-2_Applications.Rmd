@@ -238,10 +238,13 @@ toc - tic
 
 With larger sample sizes, permutation is not feasible.
 
-## Example models
+## Example: Age predicted by coloration in lion noses
 
-1. Age predicted by coloration in lion noses
-1. Horned lizard predation
+<center>
+<img src="http://photorator.com/photos/images/african-lion-nose--9087.jpg" width="40%" />
+<img src="https://s-media-cache-ak0.pinimg.com/236x/36/0e/0e/360e0e6f2172303e53a6661ce47920ad.jpg" width="42%" />
+</center>
+
 
 ## Age predicted by coloration in lion noses
 
@@ -450,7 +453,7 @@ Non-parametric tests often used when data do not meet the assumptions of a tradi
 
 Small sample size, non-normality, unequal variances
 
-**Dramatically lower power than a parametric test**
+**Dramatically lower power compared to a parametric test**
 
 ## Randomization as an alternative
 
