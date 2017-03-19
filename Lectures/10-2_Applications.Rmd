@@ -17,8 +17,15 @@ library(cowplot)
 library(readxl)
 library(wesanderson)
 library(knitr)
+library(scales)
 knitr::opts_chunk$set(cache = TRUE)
 ```
+
+## Hypothesis testing by randomization
+
+<center>
+<img src="https://s-media-cache-ak0.pinimg.com/originals/e2/6f/cf/e26fcf6e3c0b082534cb6009f76567d9.jpg" width="55%" />
+</center>
 
 ## Hypothesis testing by randomization
 
@@ -66,6 +73,7 @@ When test assumptions are met, the results will match asymptotic procedures. Whe
 2. *t*: *t*-test, linear model parameter estimate (slope, intercept)
 3. *F*: ANOVA-like
 4. $\chi^2$
+5. Any metric of your choice (P-value, Fst, heterozygosity, LOD score, etc.)
 
 ## Calculate the test statistic for the observed data
 
@@ -85,63 +93,25 @@ set.seed(10)
 nreps <- 1e4
 diffs <- numeric(length = nreps)
 diffs[1] <- obs
-for (i in 2:nreps) {
-  Rand_Sex <- sample(M$Sex)
-  diffs[i] <- mean(M$Mandible[Rand_Sex == "F"]) -
-    mean(M$Mandible[Rand_Sex == "M"])
-}
-```
-
-## Dissection
-
-Set the seed for the random number generator, so that results are repeatable:
-
-```{r eval=FALSE}
-set.seed(10)
-```
-
-Set the number of iterations (~10000 is usually enough):
-
-```{r eval=FALSE}
-nreps <- 1e4
-```
-
-Create an empty vector to hold the test statistics:
-
-```{r eval=FALSE}
-diffs <- numeric(length = nreps)
-```
-
-## Dissection
-
-Assign the observed test statistic to the 1st position in the vector:
-
-```{r eval=FALSE}
-diffs[1] <- obs
-```
-
-`sample()` `M$Sex` to create new "female" and "male" groups, then calculate the difference in means and assign to `diffs`:
-
-```{r eval=FALSE}
 for (ii in 2:nreps) {
   Rand_Sex <- sample(M$Sex)
   diffs[ii] <- mean(M$Mandible[Rand_Sex == "F"]) -
     mean(M$Mandible[Rand_Sex == "M"])
+}
 ```
 
-- `sample()` resamples *without* replacement. This shuffles the values.
-
-## Look at the results
+## Visualize the results
 
 ```{r ex_1, eval=FALSE, message=FALSE}
 ggplot(data.frame(diffs), aes(diffs)) +
   geom_histogram(bins = 25) +
-  geom_vline(xintercept = diffs[1], color = "red")
+  geom_vline(xintercept = diffs[1], color = "red") +
+  labs(x = "Difference", y = "Count")
 ```
 
 Histogram of the randomized differences, vertical red line to mark the observed value.
 
-## Look at the results
+## Visualize the results
 
 ```{r echo=FALSE, ref.label="ex_1", message=FALSE}
 ```
@@ -156,7 +126,9 @@ Mean of `diffs` where the value is *less than or equal to* the observed mean dif
 
 Empirically determined *P*-value is `r round(mean(diffs <= diffs[1]), 4)`.
 
-Should we use a two-tailed test?
+```{r}
+mean(c(TRUE, TRUE, FALSE))
+```
 
 ## Randomization using R functions
 
@@ -181,35 +153,36 @@ str(obs)
 ## Randomization using a *t*-test
 
 ```{r t_rand}
-set.seed(8)
+set.seed(8987324)
 nreps <- 1e4
 t_stats <- numeric(nreps)
 t_stats[1] <- t.test(Mandible ~ Sex, data = M)$statistic
 
-for (i in 2:nreps) {
-  t_stats[i] <- t.test(sample(Mandible) ~ Sex, data = M)$statistic
+for (ii in 2:nreps) {
+  t_stats[ii] <- t.test(sample(Mandible) ~ Sex, data = M)$statistic
 }
 ```
 
 `t.test(Mandible ~ Sex, data = M)$statistic` returns only the *t*-statistic.
 
-## Look at the results
+## Visualize the results
 
 ```{r echo=FALSE, message=FALSE}
 ggplot(data.frame(t_stats), aes(t_stats)) +
   geom_histogram() +
-  geom_vline(xintercept = t_stats[1], color = "red")
+  geom_vline(xintercept = t_stats[1], color = "red") +
+  labs(x = "t statistics", y = "Count")
 ```
 
 ## Proportion of randomized *t* more extreme than the observed
 
-```{r}
+```{r prop_t}
 2 * mean(t_stats <= t_stats[1])
 ```
 
 Empirical *P* value is `r round(2 * mean(t_stats <= t_stats[1]), 4)` (*two-tailed test*).
 
-## Use an *F*-test
+## Use an *F*-test {.smaller}
 
 ```{r rand_F, cache=TRUE}
 tic <- Sys.time()
@@ -220,15 +193,11 @@ F_stats <- numeric(nreps)
 obs_lm <- lm(Mandible ~ Sex, data = M)
 obs_F <- anova(obs_lm)$"F value"[1]
 F_stats[1] <- obs_F
-```
 
-## Use an *F*-test
-
-```{r}
-for (i in 2:nreps) {
+for (ii in 2:nreps) {
   rand_lm <- lm(sample(Mandible) ~ Sex, data = M)
   rand_F <- anova(rand_lm)$"F value"[1]
-  F_stats[i] <- rand_F
+  F_stats[ii] <- rand_F
 }
 
 toc <- Sys.time()
@@ -240,7 +209,7 @@ toc <- Sys.time()
 str(anova(obs_lm))
 ```
 
-## Look at the results
+## Visualize the results
 
 ```{r echo=FALSE, message=FALSE}
 ggplot(data.frame(F_stats), aes(F_stats)) +
@@ -307,7 +276,7 @@ summary(fm)$coefficients[2, 3]
 ## Age predicted by nose coloration
 
 ```{r mc_ols}
-set.seed(9)
+set.seed(481769)
 nreps <- 1e4
 t_stats <- numeric(nreps)
 t_stats[1] <- summary(fm)$coefficients[2, 3]
@@ -334,13 +303,13 @@ ggplot(data.frame(t_stats), aes(t_stats)) +
 2 * mean(t_stats >= t_stats[1])
 ```
 
-Note change in sign: how often does the randomized age data give a *larger* *t* statistic than the observed?
+Note sign of the inequality: how often does the randomized age data give a *larger* *t* statistic than the observed?
 
 Why 2 x 10^-4^?
 
 ## Horned lizard predation
 
-```{r echo=FALSE, warning=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 HornedLizards <- read_csv("../data/HornedLizards.csv")
 HornedLizards <- HornedLizards %>%
   drop_na() %>%
@@ -392,21 +361,34 @@ ggplot(data.frame(t_stats), aes(t_stats)) +
 ## Iterations vs. *P*
 
 ```{r iter_sim, echo=FALSE, eval=FALSE}
+# Repeatedly generate empirical p values for increasing
+# numbers of repetitions. Show that as reps increases,
+# the empirical p will be the lower limit for as long 
+# as the actual p is less than 1/reps (or 2 * 1/reps).
+
+HornedLizards <- read_csv("../data/HornedLizards.csv")
+HornedLizards <- HornedLizards %>%
+  drop_na() %>%
+  as.data.frame()
+
 set.seed(4345)
 
 library(parallel)
 library(foreach)
 library(doParallel)
 
-no_cores <- detectCores() - 1
-cl <- makeCluster(no_cores)
-registerDoParallel(cl, cores = no_cores)
+n_cores <- 10
+cl <- makeCluster(n_cores)
+registerDoParallel(cl, cores = n_cores)
 
 logspace <- function(d1, d2, n) exp(log(10) * seq(d1, d2,
                                                   length.out = n))
-reps_list <- floor(logspace(1, 6, n = 20))
+steps <- 20
+reps_list <- floor(logspace(1, 6.1, n = steps))
 reps_ex <- data.frame(nreps = reps_list,
-                      P = numeric(length(nreps)))
+                      P = numeric(length = steps))
+
+t_obs <- t.test(horn_length ~ group, data = HornedLizards)
 
 for (j in 1:nrow(reps_ex)) {
   tic <- Sys.time()
@@ -414,15 +396,15 @@ for (j in 1:nrow(reps_ex)) {
   message("nreps = ", nreps)
   t_stats <- numeric(nreps)
   t_stats[1] <- t_obs$statistic
-
+  
   do_rand <- function() {
     Rand_group <- sample(HornedLizards$group)
     as.numeric(t.test(horn_length ~ Rand_group,
-           data = HornedLizards)$statistic)
+                      data = HornedLizards)$statistic)
   }
   
   t_stats[2:nreps] <- foreach(i = 2:nreps,
-          .combine = c) %dopar% do_rand()
+                              .combine = c) %dopar% do_rand()
   
   reps_ex$P[j] <- 2 * mean(t_stats >= t_stats[1])
   message(Sys.time() - tic)
@@ -430,10 +412,7 @@ for (j in 1:nrow(reps_ex)) {
 save(reps_ex, file = "../data/MC_reps_ex.Rda")
 reps_ex
 stopImplicitCluster()
-```
 
-```{r echo=FALSE}
-load("../data/MC_reps_ex.Rda")
 ggplot(reps_ex, aes(nreps, P)) +
   geom_point() +
   scale_x_log10() +
@@ -441,14 +420,45 @@ ggplot(reps_ex, aes(nreps, P)) +
   labs(x = "n Iterations", y = "Empirical P-value")
 ```
 
-What is the minimal detectable *P*?
+```{r echo=FALSE}
+load("../data/MC_reps_ex.Rda")
+ggplot(reps_ex, aes(nreps, P)) +
+  geom_point() +
+  scale_y_log10() +
+  scale_x_log10("x",
+                breaks = trans_breaks("log10", function(x) 10^x),
+                labels = trans_format("log10", math_format(10^.x)))+
+  labs(x = "n Iterations", y = "Empirical P-value")
+```
 
-## Iterations vs. *P* {.smaller}
+What is the minimal detectable *P* for *n* iterations?
+
+## Empirical *P* vs. Iterations {.smaller}
 
 ```{r echo=FALSE}
 reps_ex$min_P <- 2 * (1 / reps_ex$nreps)
-kable(reps_ex[seq(2, nrow(reps_ex), by = 2), ])
+kable(reps_ex[seq(2, nrow(reps_ex), by = 2),])
 ```
+
+## Non-parametric tests
+
+Non-parametric tests often used when data do not meet the assumptions of a traditional (parametric) test:
+
+- One-sample *t*-test $\rightarrow$ Sign test, Wilcoxon test
+- Two-sample *t*-test $\rightarrow$ Mann-Whitney test
+- ANOVA $\rightarrow$ Kruskal-Wallis
+
+Small sample size, non-normality, unequal variances
+
+**Dramatically lower power than a parametric test**
+
+## Randomization as an alternative
+
+For all practical cases, randomization is a better alternative
+
+- Increased power
+- No reliance on asymptotic properties of tests
+- More relaxed assumptions
 
 ## Quiz 10-2
 
