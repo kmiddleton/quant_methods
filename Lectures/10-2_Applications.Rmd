@@ -16,8 +16,431 @@ library(tidyverse)
 library(cowplot)
 library(readxl)
 library(wesanderson)
+library(knitr)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
+## Hypothesis testing by randomization
+
+Mandible lengths of female and male jackals from the Natural History Museum (London).
+
+```{r}
+M <- read_excel("../data/Jackals.xlsx")
+glimpse(M)
+M <- M %>% mutate(Sex = factor(Sex)) %>% as.data.frame()
+```
+
+## Randomization tests
+
+```{r echo=FALSE, message=FALSE}
+ggplot(M, aes(Mandible)) +
+  geom_histogram(bins = 30) +
+  facet_grid(Sex ~ .) +
+  labs(x = "Mandible Length (mm)", y = "Count")
+```
+
+## Randomization tests
+
+We'd like to do a *t*-test to compare group means.
+
+But:
+
+1. Assumes random sampling
+2. Assumes equal group variances
+3. Assumes normal distribution within groups
+
+## Basic randomization procedure
+
+1. Decide on a test statistic
+1. Calculate the test statistic for the *observed* data
+1. Randomly shuffle the observations
+1. Calculate the test statistic for that group
+1. Repeat thousands of times
+1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+
+When test assumptions are met, the results will match asymptotic procedures. When the assumptions are not met, the results will be valid.
+
+## Decide on a test statistic
+
+1. Mean difference
+2. *t*: *t*-test, linear model parameter estimate (slope, intercept)
+3. *F*: ANOVA-like
+4. $\chi^2$
+
+## Calculate the test statistic for the observed data
+
+Observed difference in mean value for females vs. males:
+
+```{r}
+(obs <- mean(M$Mandible[M$Sex == "F"]) -
+   mean(M$Mandible[M$Sex == "M"]))
+```
+
+## Randomly reassign, recalculate, repeat
+
+```{r mc_mean}
+# Set random number seed
+set.seed(10)
+
+nreps <- 1e4
+diffs <- numeric(length = nreps)
+diffs[1] <- obs
+for (i in 2:nreps) {
+  Rand_Sex <- sample(M$Sex)
+  diffs[i] <- mean(M$Mandible[Rand_Sex == "F"]) -
+    mean(M$Mandible[Rand_Sex == "M"])
+}
+```
+
+## Dissection
+
+Set the seed for the random number generator, so that results are repeatable:
+
+```{r eval=FALSE}
+set.seed(10)
+```
+
+Set the number of iterations (~10000 is usually enough):
+
+```{r eval=FALSE}
+nreps <- 1e4
+```
+
+Create an empty vector to hold the test statistics:
+
+```{r eval=FALSE}
+diffs <- numeric(length = nreps)
+```
+
+## Dissection
+
+Assign the observed test statistic to the 1st position in the vector:
+
+```{r eval=FALSE}
+diffs[1] <- obs
+```
+
+`sample()` `M$Sex` to create new "female" and "male" groups, then calculate the difference in means and assign to `diffs`:
+
+```{r eval=FALSE}
+for (ii in 2:nreps) {
+  Rand_Sex <- sample(M$Sex)
+  diffs[ii] <- mean(M$Mandible[Rand_Sex == "F"]) -
+    mean(M$Mandible[Rand_Sex == "M"])
+```
+
+- `sample()` resamples *without* replacement. This shuffles the values.
+
+## Look at the results
+
+```{r ex_1, eval=FALSE, message=FALSE}
+ggplot(data.frame(diffs), aes(diffs)) +
+  geom_histogram(bins = 25) +
+  geom_vline(xintercept = diffs[1], color = "red")
+```
+
+Histogram of the randomized differences, vertical red line to mark the observed value.
+
+## Look at the results
+
+```{r echo=FALSE, ref.label="ex_1", message=FALSE}
+```
+
+## Proportion of randomized differences more extreme than the observed
+
+```{r}
+mean(diffs <= diffs[1])
+```
+
+Mean of `diffs` where the value is *less than or equal to* the observed mean difference.
+
+Empirically determined *P*-value is `r round(mean(diffs <= diffs[1]), 4)`.
+
+Should we use a two-tailed test?
+
+## Randomization using R functions
+
+- Run the test as usual, save the result to an object
+- Extract the value of the test statistic
+    - `str()`
+    - `summary()`
+
+## Finding the test statistic
+
+```{r}
+obs <- t.test(Mandible ~ Sex, data = M)
+obs
+```
+
+## Finding the test statistic
+
+```{r}
+str(obs)
+```
+
+## Randomization using a *t*-test
+
+```{r t_rand}
+set.seed(8)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- t.test(Mandible ~ Sex, data = M)$statistic
+
+for (i in 2:nreps) {
+  t_stats[i] <- t.test(sample(Mandible) ~ Sex, data = M)$statistic
+}
+```
+
+`t.test(Mandible ~ Sex, data = M)$statistic` returns only the *t*-statistic.
+
+## Look at the results
+
+```{r echo=FALSE, message=FALSE}
+ggplot(data.frame(t_stats), aes(t_stats)) +
+  geom_histogram() +
+  geom_vline(xintercept = t_stats[1], color = "red")
+```
+
+## Proportion of randomized *t* more extreme than the observed
+
+```{r}
+2 * mean(t_stats <= t_stats[1])
+```
+
+Empirical *P* value is `r round(2 * mean(t_stats <= t_stats[1]), 4)` (*two-tailed test*).
+
+## Use an *F*-test
+
+```{r rand_F, cache=TRUE}
+tic <- Sys.time()
+
+set.seed(432431)
+nreps <- 1e4
+F_stats <- numeric(nreps)
+obs_lm <- lm(Mandible ~ Sex, data = M)
+obs_F <- anova(obs_lm)$"F value"[1]
+F_stats[1] <- obs_F
+```
+
+## Use an *F*-test
+
+```{r}
+for (i in 2:nreps) {
+  rand_lm <- lm(sample(Mandible) ~ Sex, data = M)
+  rand_F <- anova(rand_lm)$"F value"[1]
+  F_stats[i] <- rand_F
+}
+
+toc <- Sys.time()
+```
+
+## Finding *F*
+
+```{r}
+str(anova(obs_lm))
+```
+
+## Look at the results
+
+```{r echo=FALSE, message=FALSE}
+ggplot(data.frame(F_stats), aes(F_stats)) +
+  geom_histogram() +
+  geom_vline(xintercept = F_stats[1], color = "red")
+```
+
+## Proportion of randomized *F* more extreme than the observed
+
+```{r}
+mean(F_stats >= F_stats[1])
+```
+
+Empirical *P* value is `r round(mean(F_stats >= F_stats[1]), 4)`. No need to double here, because of the shape of the *F* distribution
+
+## Randomization or permutation?
+
+We have randomly sampled 10,000 possible combinations (some of which may have repeated).
+
+We could permute all 184,756 combinations of 20 items taken 10 at a time (`choose(20, 10)`) with a little time. 10,000 combinations took:
+
+```{r}
+toc - tic
+```
+
+With larger sample sizes, permutation is not feasible.
+
+## Example models
+
+1. Age predicted by coloration in lion noses
+1. Horned lizard predation
+
+## Age predicted by coloration in lion noses
+
+```{r echo=FALSE}
+data("LionNoses", package = "abd")
+ggplot(LionNoses, aes(proportion.black, age)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Proportion Black", y = "Age (yr)")
+```
+
+## Age predicted by nose coloration {.smaller}
+
+```{r}
+fm <- lm(age ~ proportion.black, data = LionNoses)
+summary(fm)
+```
+
+## Age predicted by nose coloration {.smaller}
+
+```{r}
+str(summary(fm))
+```
+
+## Age predicted by nose coloration
+
+```{r}
+summary(fm)$coefficients
+summary(fm)$coefficients[2, 3]
+```
+
+## Age predicted by nose coloration
+
+```{r mc_ols}
+set.seed(9)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- summary(fm)$coefficients[2, 3]
+
+for (ii in 2:nreps) {
+  Rand_Age <- sample(LionNoses$age)
+  fm_rand <- lm(Rand_Age ~ proportion.black, data = LionNoses)
+  t_stats[ii] <- summary(fm_rand)$coefficients[2, 3]
+}
+```
+
+## Age predicted by nose coloration
+
+```{r echo=FALSE, message=FALSE}
+ggplot(data.frame(t_stats), aes(t_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1], color = "red")
+```
+
+## Age predicted by nose coloration
+
+```{r}
+2 * mean(t_stats >= t_stats[1])
+```
+
+Note change in sign: how often does the randomized age data give a *larger* *t* statistic than the observed?
+
+Why 2 x 10^-4^?
+
+## Horned lizard predation
+
+```{r}
+data("HornedLizards", package = "abd")
+HornedLizards <- HornedLizards %>%
+  drop_na() %>%
+  as.data.frame()
+```
+
+## Horned lizard predation
+
+```{r}
+t_obs <- t.test(horn.length ~ group, data = HornedLizards)
+t_obs
+```
+
+## Horned lizard predation
+
+```{r mc_lizard, cache=TRUE}
+set.seed(100)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- t_obs$statistic
+
+for (i in 2:nreps) {
+  Rand_group <- sample(HornedLizards$group)
+  t_stats[i] <- t.test(horn.length ~ Rand_group,
+                       data = HornedLizards)$statistic
+}
+```
+
+## Horned lizard predation
+
+```{r echo=FALSE, message=FALSE}
+ggplot(data.frame(t_stats), aes(t_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1], color = "red")
+```
+
+## Horned lizard predation
+
+```{r}
+2 * mean(t_stats <= t_stats[1])
+```
+
+## Iterations vs. *P*
+
+```{r iter_sim, echo=FALSE, eval=FALSE}
+set.seed(4)
+
+library(parallel)
+library(foreach)
+library(doParallel)
+
+no_cores <- detectCores() - 1
+cl <- makeCluster(no_cores)
+registerDoParallel(cl, cores = no_cores)
+
+logspace <- function(d1, d2, n) exp(log(10) * seq(d1, d2,
+                                                  length.out = n))
+reps_list <- floor(logspace(1, 5, n = 20))
+reps_ex <- data.frame(nreps = reps_list,
+                      P = numeric(length(nreps)))
+
+for (j in 1:nrow(reps_ex)) {
+  tic <- Sys.time()
+  nreps <- reps_ex$nreps[j]
+  message("nreps = ", nreps)
+  t_stats <- numeric(nreps)
+  t_stats[1] <- t_obs$statistic
+
+  do_rand <- function() {
+    Rand_group <- sample(HornedLizards$group)
+    as.numeric(t.test(horn.length ~ Rand_group,
+           data = HornedLizards)$statistic)
+  }
+  
+  t_stats[2:nreps] <- foreach(i = 2:nreps,
+          .combine = c) %dopar% do_rand()
+  
+  reps_ex$P[j] <- 2 * mean(t_stats <= t_stats[1])
+  message(Sys.time() - tic)
+}
+save(reps_ex, file = "./data/MC_reps_ex.Rda")
+reps_ex
+stopImplicitCluster()
+```
+
+```{r echo=FALSE}
+load("../data/MC_reps_ex.Rda")
+ggplot(reps_ex, aes(nreps, P)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "n Iterations", y = "Empirical P-value")
+```
+
+What is the minimal detectable *P*?
+
+## Iterations vs. *P* {.smaller}
+
+```{r echo=FALSE}
+reps_ex$min_P <- 2 * (1 / reps_ex$nreps)
+kable(reps_ex[seq(2, nrow(reps_ex), by = 2), ])
+```
 
 ## Quiz 10-2
 
