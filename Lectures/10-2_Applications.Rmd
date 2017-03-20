@@ -352,7 +352,7 @@ for (i in 2:nreps) {
 ggplot(data.frame(t_stats), aes(t_stats)) +
   geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1], color = "red") +
-  labs(x = "F statistics", y = "Count")
+  labs(x = "t statistics", y = "Count")
 ```
 
 ## Horned lizard predation
