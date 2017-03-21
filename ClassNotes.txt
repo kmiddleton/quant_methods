@@ -334,7 +334,7 @@ Goals:
 Problem set:
 
   - Simple permutation test
-
+  - Interaction (permute together)
 
 
 ---

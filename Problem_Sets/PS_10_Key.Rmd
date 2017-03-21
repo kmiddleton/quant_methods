@@ -1,0 +1,55 @@
+---
+title: 'Problem Set 10'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+# FIXME
+library(tidyverse)
+library(readxl)
+library(cowplot)
+
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## General Framework for This Week's Problem Set
+
+This week we will approach hypothesis testing for several of the models we have fit previously with generalized linear models in a randomization framework. For each, you will:
+
+1. Decide on a test statistic
+1. Perform the randomization:
+    1. Calculate the test statistic for the *observed* data
+    1. Randomly shuffle the observations
+    1. Calculate the test statistic for that group
+    1. Repeat thousands of times
+1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
+1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+
+Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides as a guide. 
+
+## Case 1:
+
+Which test statistic will you use?
+
+> 
+
+### Activity
+
+1. Perform the randomization.
+1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
+1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+
+
+
+
+
+
+
+
