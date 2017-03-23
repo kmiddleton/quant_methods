@@ -11,6 +11,9 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
 
 # This option turn on cacheing of chunks. This will dramatically
 # speed up knitting, because only chunks that have changed will
@@ -39,6 +42,89 @@ Remember to start with a small number of iterations (10 or 100) until you get th
 ## Stalk-eyed flies (PS 05)
 
 Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
+
+```{r message=FALSE}
+# Read data
+stalk <- read_csv("../data/Stalkies.csv")
+
+# Some thoughtful plotting
+ggplot(stalk, aes(x = food_source, y = eye_span)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Food Source", y = "Eye Span")
+
+set.seed(8987324)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- t.test(eye_span ~ food_source, data = stalk)$statistic
+
+for (ii in 2:nreps) {
+  t_stats[ii] <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
+}
+
+data_frame(t_stats) %>% 
+  ggplot(aes(t_stats)) +
+  geom_histogram() +
+  geom_vline(xintercept = t_stats[1], color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats >= t_stats[1])
+
+t.test(eye_span ~ food_source, data = stalk)
+```
+
+10^5^ iterations took 124.7 seconds on a single processor. We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical P is 6e-10, so we expect the empirical P to be close to that scale.
+
+We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
+
+The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the combination of `foreach()` and `dopar()`, which handle the parallelization and collection of the results.
+
+```{r}
+library(parallel)
+library(foreach)
+library(doParallel)
+
+t_obs <- t.test(eye_span ~ food_source, data = stalk)
+
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- t_obs$statistic
+
+# Set up parallel processor
+n_cores <- 2
+cl <- makeCluster(n_cores)
+registerDoParallel(cl, cores = n_cores)
+
+# Function to do the randomized t-test and return the t-value only.
+t_rand <- function() {
+  rnd_t <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
+  return(as.numeric(rnd_t))
+}
+
+# Parallel randomization execute t_rand(), and combine the output into t_stats.
+t_stats[2:nreps] <- foreach(i = 2:nreps, .combine = c) %dopar% t_rand()
+
+2 * mean(t_stats >= t_stats[1])
+
+# Close cluster
+stopImplicitCluster()
+```
+
+The same number of iterations but using 2 processors takes 93 seconds.
+
+```{r}
+# Iterations per second, 1 processor
+(p1 <- 124.7 / nreps)
+
+# Iterations per second, 6 processors
+(p6 <- 93 / nreps)
+
+p1 / p6
+```
+
+We get a speed-up of about 1.34 times. There is some overhead in the parallelization, and there were other things going on on the computer, so we don't get double the speed.
 
 ## Earwigs (PS 05)
 
