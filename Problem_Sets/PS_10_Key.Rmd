@@ -130,6 +130,38 @@ We get a speed-up of about 1.34 times. There is some overhead in the paralleliza
 
 In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
 
+```{r}
+EW <- read_csv("../data/Earwigs.csv")
+
+EW %>%
+  ggplot(aes(Density, Proportion_Forceps)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+fm <- lm(Proportion_Forceps ~ Density, data = EW)
+summary(fm)
+
+set.seed(28476)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- summary(fm)$coefficients[2, 3]
+
+for (ii in 2:nreps) {
+  fm_rnd <- lm(sample(Proportion_Forceps) ~ Density, data = EW)
+  t_stats[ii] <- summary(fm_rnd)$coefficients[2, 3]
+}
+
+data_frame(t_stats) %>% 
+  ggplot(aes(t_stats)) +
+  geom_histogram() +
+  geom_vline(xintercept = t_stats[1], color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats >= t_stats[1])
+
+factorial(7)
+```
+
 ## Heart Transplant Survivorship (PS 07)
 
 For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
