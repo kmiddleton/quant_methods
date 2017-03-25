@@ -184,6 +184,57 @@ You should do the randomization and collect the output test statistics using jus
 
 In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use.
 
+```{r}
+M <- read_csv("../data/Aspirin.csv") %>% 
+  mutate_each("factor")
+fm <- glm(Cancer ~ Treatment, M, family = "binomial")
+
+set.seed(8736)
+nreps <- 1e3
+devs <- numeric(nreps)
+devs[1] <- fm$deviance
+
+system.time({
+  for (ii in 2:nreps) {
+    devs[ii] <- glm(sample(Cancer) ~ Treatment, M,
+                    family = "binomial")$deviance
+  }
+})
+
+data_frame(devs) %>% 
+  ggplot(aes(devs)) +
+  geom_histogram() +
+  geom_vline(xintercept = devs[1], color = "red") +
+  labs(x = "Deviance", y = "Count")
+
+mean(devs <= devs[1])
+```
+
+```{r}
+obs <- chisq.test(xtabs(~ Treatment + Cancer, M),
+                  correct = FALSE)
+
+set.seed(8736)
+nreps <- 1e3
+chisqs <- numeric(nreps)
+chisqs[1] <- obs$statistic
+
+system.time({
+  for (ii in 2:nreps) {
+    chisqs[ii] <- chisq.test(xtabs(~ sample(Treatment) + Cancer, M),
+                             correct = FALSE)$statistic
+  }
+})
+
+data_frame(chisqs) %>% 
+  ggplot(aes(chisqs)) +
+  geom_histogram() +
+  geom_vline(xintercept = chisqs[1], color = "red") +
+  labs(x = "Chi-squared Statistic", y = "Count")
+
+mean(chisqs >= chisqs[1])
+```
+
 ## Correlation
 
 Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
