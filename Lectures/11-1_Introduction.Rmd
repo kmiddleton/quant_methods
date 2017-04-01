@@ -15,12 +15,23 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 library(readxl)
-library(wesanderson)
 ```
 
 ## Readings
 
+- Garland T Jr, Adolph SC [-@Garland1994-vk] Why not to do two-species comparative studies: limitations on inferring adaptation. *Physiol Zool* 67:797-828.
 
+## Resources
+
+- Nunn CL. [-@Nunn2011-zi] *The Comparative Approach in Evolutionary Anthropology and Biology*. Chicago: University of Chicago Press.
+- Nunn CL, Barton RA [-@Nunn2001-oq] Comparative methods for studying primate adaptation and allometry. *Evol Anthropol* 10:81–98.
+- Yang J, Zaitlen NA, Goddard ME, Visscher PM, Price AL [-@Yang2014-cz] Advantages and pitfalls in the application of mixed-model association methods. *Nat Genet* 46:100-106.
+
+## Even more resources
+
+- http://www.anthrotree.info/: Website accompanying *The Comparative Approach in Evolutionary Anthropology and Biology*
+- http://treethinkers.org/: UC Davis Bodega Bay Marine Lab Workshop in Applied Phylogenetics
+- http://www.phylometh.org/: Brian O'Meara's (UT Knoxville) course on phylogenetic comparative methods
 
 ## IID is often violated
 
@@ -35,25 +46,25 @@ Recall IID = Independent and Identically Distributed
 
 ## When is independence assumption violated?
   
-  - When there is a hierarchical structure to the data
-      - e.g. several samples at each site 
-  - Shared ancestry
-      - phylogenetic relatedness (between populations/species)
-      - genetic relatedness (between individuals within populations/species)
-  - Sampling over time
-  - ...
+- When there is a hierarchical structure to the data
+    - e.g., several samples at each site 
+- Shared ancestry
+    - Phylogenetic relatedness (between populations/species)
+    - Genetic relatedness (between individuals within populations/species)
+- Spatial relationships    
+- Sampling over time
+- ...
   
 ## Why is non-independence a problem?
 
 Does higher altitude drive the evolution of higher levels of hemoglobin?
 
 ```{r echo=FALSE, fig.width=7, fig.height=4}
-ex.dat <- data.frame('Altitude'=c(0,1400,2500,3500,4500,6000),
-                     'Hemoglobin'=c(9,15,11,21,16,20),
-                     'Clade' = rep(c('A','B'),each=3)) 
-ggplot(ex.dat, aes(x=Altitude, y=Hemoglobin)) +
-  geom_point(size=6)
-
+ex.dat <- data.frame(Altitude = c(0, 1400, 2500, 3500, 4500, 6000),
+                     Hemoglobin = c(9, 15, 11, 21, 16, 20),
+                     Clade = rep(c('Low', 'High'),each = 3)) 
+ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin)) +
+  geom_point(size = 6)
 ```
 
 ## Why is non-independence a problem?
@@ -61,14 +72,15 @@ ggplot(ex.dat, aes(x=Altitude, y=Hemoglobin)) +
 Does higher altitude drive the evolution of higher levels of hemoglobin?
 
 ```{r echo=FALSE, fig.width=7, fig.height=4}
-ggplot(ex.dat, aes(x=Altitude, y=Hemoglobin, color=Clade)) +
-  geom_point(size=6)
-
+ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin, color = Clade)) +
+  geom_point(size = 6) +
+  scale_color_manual(values = c("blue", "red")) +
+  theme(legend.position = c(0.92, 0.17))
 ```
 
 ## Why is non-independence a problem?
 
-  - Pseudoreplication: artificially inflated sample size lead to unfounded confidence
+**Pseudoreplication**: artificially inflated sample size lead to unfounded confidence
 
 <center>
 <img src="images/PCM_2.png" width="90%" />

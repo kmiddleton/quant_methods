@@ -1,0 +1,87 @@
+---
+title: 'Problem Set 11'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+
+# This option turn on cacheing of chunks. This will dramatically
+# speed up knitting, because only chunks that have changed will
+# be recompiled.
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## Working with trees
+
+Read in from a Mesquite file:
+
+```{r}
+library(ape)
+tree1 <- read.nexus("../data/MyTree.nex")
+```
+
+Generate for testing purposes:
+
+```{r}
+library(phytools)
+set.seed(4)
+tree2 <- pbtree(n = 8)
+```
+
+## Working with trees
+
+```{r}
+tree1
+```
+
+## Working with trees
+
+```{r}
+str(tree1)
+```
+
+## Working with trees
+
+```{r}
+plot(tree1)
+```
+
+## `ggtree`
+
+```{r eval=FALSE}
+source("https://bioconductor.org/biocLite.R")
+biocLite("ggtree")
+```
+
+[Tutorial](https://www.bioconductor.org/packages/3.3/bioc/vignettes/ggtree/inst/doc/ggtree.html)
+
+If you get errors try:
+
+```
+library(devtools)
+install_github("GuangchuangYu/ggtree")
+install_github("GuangchuangYu/treeio")
+```
+
+## Working with trees
+
+```{r plt_tree, eval=FALSE}
+ggtree(tree2, ladderize = FALSE) +
+  geom_nodepoint(color = "darkblue", alpha = 1/4, size = 10) +
+  geom_tiplab(size = 5, color = "darkred")
+```
+
+## Working with trees
+
+```{r ref.label="plt_tree", echo=FALSE}
+```
