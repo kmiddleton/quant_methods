@@ -13,6 +13,7 @@ bibliography: Multivariate.bib
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
+library(knitr)
 library(tidyverse)
 library(cowplot)
 library(readxl)
@@ -28,6 +29,8 @@ library(foreach)
 library(reshape2)
 library(geiger)
 library(latex2exp)
+library(nlme)
+library(AICcmodavg)
 ```
 
 ## Readings
@@ -44,6 +47,38 @@ library(latex2exp)
 - http://www.anthrotree.info/: Website accompanying *The Comparative Approach in Evolutionary Anthropology and Biology*
 - http://treethinkers.org/: UC Davis Bodega Bay Marine Lab Workshop in Applied Phylogenetics
 - http://www.phylometh.org/: Brian O'Meara's (UT Knoxville) course on phylogenetic comparative methods
+
+## Yet more resources
+
+Longer lectures on phylogenetic comparative methods (much overlap with this lecture, but much more detail):
+
+- [Introduction](https://www.youtube.com/edit?o=U&video_id=Y4LQdEQIta8)
+- [Phylogenetically independent contrasts](https://www.youtube.com/edit?o=U&video_id=aaLcwYz9R8I)
+- [Phylogenetic general least squares](https://www.youtube.com/edit?o=U&video_id=9Ldm3r-M4RQ)
+- [Character state evolution](https://www.youtube.com/edit?o=U&video_id=yh2gxM-YCto)
+- [Character state coevolution](https://www.youtube.com/edit?o=U&video_id=ks1bsJZKvZQ)
+
+## Non-R resources
+
+Mesquite (http://mesquiteproject.org/)
+
+- Enter, store, and manipulate trees
+- Branch length alternations
+- Models of character evolution (discrete, continuous)
+- PDAP module (http://mesquiteproject.org/pdap_mesquite/)
+    - Lots of functions for working with comparative data
+
+## R Resources
+
+[CRAN Phylogenetics Task View]( https://cran.r-project.org/web/views/Phylogenetics.html)
+
+Common packages:
+
+- ape
+- geiger
+- phytools
+- picante
+- caper
 
 ## Trees and tree thinking
 
@@ -66,25 +101,6 @@ You have a tree and data
 <center>
 *Trees are hypotheses of relationships. You have hypotheses resting on hypotheses.*
 </center>
-
-## Polytomies
-
-**Hard**:
-
-- Rapid speciation
-
-**Soft**:
-
-- Uncertainty of relationships
-- Adjust the degrees of freedom for tests [@Diaz-Uriarte1996-fe; @Diaz-Uriarte1998-kk]
-- Convert polytomies into very short branches for procedures that can't handle soft polytomies
-
-## Polytomies
-
-```{r echo=FALSE}
-poly_tree <- read.tree(text = "(((A,B,C),(D,E)),F);")
-ggtree(poly_tree) + geom_tiplab(size = 3)
-```
 
 ## Is body size associated with home range area in mammals?
 
@@ -192,7 +208,7 @@ ggtree(tree_sqrt, ladderize = FALSE) +
 - Brownian motion
 - Ornstein-Uhlenbeck (OU)
 - Variable rates (ACDC)
-- Pagel's lambda
+- Pagel's $\lambda$
 
 **These models are all accomplished via branch length transformations.**
 
@@ -209,9 +225,9 @@ Simulate 100 Brownian motion random walks with a length of 100 steps.
 
 ```{r}
 set.seed(3)
-nsim <- 100
-t <- 0:100  # time
-s2 <- 0.01
+nsim <- 100  # Number of simulations
+t <- 0:100   # Time
+s2 <- 0.01   # Variance
 
 X <- foreach(i = 1:nsim, .combine = rbind) %do%
   c(0, cumsum(rnorm(n = length(t) - 1, sd = sqrt(s2))))
@@ -247,11 +263,11 @@ ggplot() +
 ```{r long_BM_sim, echo=FALSE, cache=TRUE}
 set.seed(3)
 nsim <- 500
-t <- 0:1000  # time
-sig2 <- 0.01
+t <- 0:1000
+s2 <- 0.01
 
 X <- foreach(i = 1:nsim, .combine = rbind) %do%
-  c(0, cumsum(rnorm(n = length(t) - 1, sd = sqrt(sig2))))
+  c(0, cumsum(rnorm(n = length(t) - 1, sd = sqrt(s2))))
 
 lims <- range(X)
 M_one <- data.frame(t = 1:ncol(X),
@@ -300,9 +316,9 @@ $$dX(t) = \alpha[\theta - X(t)]dt + \sigma dB(t)$$
 
 Key readings:
 
-- Hansen and Martins [-@Hansen1996-ad]
-- Blomberg et al. [-@Blomberg2003-jk]
-- Butler and King [-@Butler2004-ey]
+- Martins E, Hansen TF [-@Hansen1996-ad] Phylogenies and the comparative method: A general approach to incorporating phylogenetic information into the analysis of interspecific data. *Am Nat* 149:646-667.
+- Blomberg SP, Garland T Jr, Ives AR [-@Blomberg2003-jk] Testing for phylogenetic signal in comparative data: Behavioral traits are more labile. *Evolution* 57:717-745.
+- Butler M, King A [-@Butler2004-ey] Phylogenetic comparative analysis: a modeling approach for adaptive evolution. *Am Nat* 164:683-695.
 
 ## OU evolution along a tree
 
@@ -328,15 +344,15 @@ x <- fastBM(tree,
             a = 0,           # Ancestral state at the root node
             theta = 3,       # Optimum
             alpha = 0.2,     # Strength of selection
-            sig2 = 0.1,      # Variance of the BM process
+            s2 = 0.1,      # Variance of the BM process
             internal = TRUE) # Return states for internal nodes
 ```
 
 ## OU evolution along a tree
 
-```{r}
+```{r echo=FALSE}
 phenogram(tree, x, spread.labels = TRUE, spread.cost = c(1, 0.01),
-          main = "scale = 10, alpha = 0.2, sig2 = 0.1")
+          main = "scale = 10, alpha = 0.2, s2 = 0.1")
 ```
 
 ## OU evolution along a tree
@@ -348,10 +364,10 @@ x <- fastBM(tree,
             a = 0,           # Ancestral state at the root node
             theta = 3,       # Character state optimum
             alpha = 0.2,     # Strength of selection
-            sig2 = 0.1,      # Variance of the BM process
+            s2 = 0.1,      # Variance of the BM process
             internal = TRUE) # Return states for internal nodes
 phenogram(tree, x, spread.labels = TRUE, spread.cost = c(1, 0.01),
-          main = "scale = 100, alpha = 0.2, sig2 = 0.1")
+          main = "scale = 100, alpha = 0.2, s2 = 0.1")
 ```
 
 ## OU evolution along a tree
@@ -363,10 +379,10 @@ x <- fastBM(tree,
             a = 0,           # Ancestral state at the root node
             theta = 3,       # Character state optimum
             alpha = 0.5,     # Strength of selection
-            sig2 = 0.1,      # Variance of the BM process
+            s2 = 0.1,      # Variance of the BM process
             internal = TRUE) # Return states for internal nodes
 phenogram(tree, x, spread.labels = TRUE, spread.cost = c(1, 0.01),
-          main = "scale = 10, alpha = 0.5, sig2 = 0.1")
+          main = "scale = 10, alpha = 0.5, s2 = 0.1")
 ```
 
 ## OU evolution along a tree
@@ -378,10 +394,10 @@ x <- fastBM(tree,
             a = 0,           # Ancestral state at the root node
             theta = 3,       # Character state optimum
             alpha = 0.2,     # Strength of selection
-            sig2 = 0.5,      # Variance of the BM process
+            s2 = 0.5,      # Variance of the BM process
             internal = TRUE) # Return states for internal nodes
 phenogram(tree, x, spread.labels = TRUE, spread.cost = c(1, 0.01),
-          main = "scale = 10, alpha = 0.2, sig2 = 0.5")
+          main = "scale = 10, alpha = 0.2, s2 = 0.5")
 ```
 
 ## Estimating an OU model
@@ -476,30 +492,187 @@ ggtree(rescale(tree, "lambda", 0.001), ladderize = FALSE) +
   ggtitle(TeX("$\\lambda = 0.001$"))
 ```
 
-## Non-R resources
+## Home range vs. body mass
 
-Mesquite (http://mesquiteproject.org/)
+```{r echo=FALSE}
+tree <- read.nexus("../data/49LBR70.PDI.nex")
+lbr <- read_excel("../data/49LBR.xlsx") %>% 
+  as.data.frame()
+lbr$Clade <- relevel(as.factor(lbr$Clade), ref = "Ungulates")
+row.names(lbr) <- lbr$Species
 
-- Enter, store, and manipulate trees
-- Branch length alternations
-- Models of character evolution (discrete, continuous)
-- PDAP module (http://mesquiteproject.org/pdap_mesquite/)
-    - Lots of functions for working with comparative data
+# Clean up tree
+tree$tip.label <- gsub("\\.", "", tree$tip.label)
+tree$tip.label <- gsub("\\:", "", tree$tip.label)
+```
 
-## R Resources
+```{r echo=FALSE}
+tree2 <- groupClade(tree, node = 51)
+ggtree(tree2, aes(color = group), ladderize = FALSE) +
+  geom_tiplab(size = 3) +
+  geom_treescale() +
+  scale_color_manual(values = wes_palette("Moonrise2"))
+```
 
-CRAN Task View:  https://cran.r-project.org/web/views/Phylogenetics.html
+## Home range vs. body mass
 
-Common packages:
+```{r echo=FALSE}
+ggplot(lbr, aes(log_Mass, log_Home_Range, color = Clade)) +
+  geom_point(size = 3) +
+  labs(x = "log Body Mass", y = "log Home Range") +
+  theme(legend.position = c(0.85, 0.2)) +
+  scale_color_manual(values = wes_palette("Moonrise2"))
+```
 
-- ape
-- geiger
-- phytools
-- picante
-- caper
+## Working with `nlme::gls()`
+
+- We used `gls()` to fit the squid model, allowing correlated variance on a per-month basis
+- Phylogenetically based correlation variation is a similar issue
+- Choose a phylogenetic correlation structure
+
+## Phylogenetic correlation structures
+
+See ?`corClasses`
+
+- `corBrownian`: BM model of correlation
+- `corPagel`: Pagel's $\lambda$
+- `corMartins`: OU model originally proposed by Martins and Hansen [-@Martins1997-yv]
+- `corBlomberg`: ACDC model of Blomberg et al. [-@Blomberg2003-jk]
+
+## Model 1: Mass, BM
+
+```{r eval=FALSE}
+library(nlme)
+fm1 <- gls(log_Home_Range ~ log_Mass, data = lbr,
+           correlation = corBrownian(phy = tree))
+summary(fm1)
+```
+
+## Model 1: Mass, BM {.smaller}
+
+```{r echo=FALSE}
+fm1 <- gls(log_Home_Range ~ log_Mass, data = lbr,
+           correlation = corBrownian(phy = tree))
+summary(fm1)
+```
+
+## Model 2: Mass + Clade, BM {.smaller}
+
+```{r}
+fm2 <- gls(log_Home_Range ~ log_Mass + Clade , data = lbr,
+           correlation = corBrownian(phy = tree))
+summary(fm2)
+```
+
+## Model 3: Mass * Clade, BM {.smaller}
+
+```{r}
+fm3 <- gls(log_Home_Range ~ log_Mass * Clade , data = lbr,
+           correlation = corBrownian(phy = tree))
+summary(fm3)
+```
+
+## Model 4: Mass, OU {.smaller}
+
+Estimating OU parameter alpha often fails (`Error in corFactor.corStruct(object)`)
+
+- Brute-force optimization of OU alpha parameter
+- Maximize the log-likelihood for a range of models with different values of alpha.
+
+```{r}
+myOU <- function(alpha, dat, tree){
+  fm <- gls(log_Home_Range ~ log_Mass, data = dat, 
+            correlation = corMartins(alpha, tree, fixed = TRUE))
+  return(as.numeric(fm$logLik))
+}
+
+alpha <- optimize(f = myOU, interval = c(0, 2), 
+                  dat = lbr, tree = tree, maximum = TRUE)
+alpha
+```
+
+## Model 4: Mass, OU
+
+Fit a model with the alpha parameter fixed at the optimized value:
+
+```{r}
+ou_mod <- corMartins(value = alpha$maximum,
+                     phy = tree, fixed = TRUE)
+fm4 <- gls(log_Home_Range ~ log_Mass, data = lbr,
+           correlation = ou_mod)
+```
+
+## Model 4: Mass, OU {.smaller}
+
+```{r echo=FALSE}
+summary(fm4)
+```
+
+## Model comparison with AICc
+
+Models 5 and 6 ANCOVA with OU. Models 7-9, estimate Pagel's $\lambda$.
+
+```{r echo=FALSE}
+myOU <- function(alpha, dat, tree){
+  fm <- gls(log_Home_Range ~ log_Mass + Clade, data = dat, 
+            correlation = corMartins(alpha, tree, fixed = TRUE))
+  return(as.numeric(fm$logLik))
+}
+
+alpha <- optimize(f = myOU, interval = c(0, 2), 
+                  dat = lbr, tree = tree, maximum = TRUE)
+ou_mod <- corMartins(value = alpha$maximum,
+                     phy = tree, fixed = TRUE)
+fm5 <- gls(log_Home_Range ~ log_Mass + Clade, data = lbr,
+           correlation = ou_mod)
+
+myOU <- function(alpha, dat, tree){
+  fm <- gls(log_Home_Range ~ log_Mass * Clade, data = dat, 
+            correlation = corMartins(alpha, tree, fixed = TRUE))
+  return(as.numeric(fm$logLik))
+}
+
+alpha <- optimize(f = myOU, interval = c(0, 2), 
+                  dat = lbr, tree = tree, maximum = TRUE)
+ou_mod <- corMartins(value = alpha$maximum,
+                     phy = tree, fixed = TRUE)
+fm6 <- gls(log_Home_Range ~ log_Mass * Clade, data = lbr,
+           correlation = ou_mod)
+
+fm7 <- gls(log_Home_Range ~ log_Mass, data = lbr,
+           correlation = corPagel(1, phy = tree))
+fm8 <- gls(log_Home_Range ~ log_Mass + Clade, data = lbr,
+           correlation = corPagel(1, phy = tree))
+fm9 <- gls(log_Home_Range ~ log_Mass * Clade, data = lbr,
+           correlation = corPagel(1, phy = tree))
+
+mods <- matrix(NA, nrow = 3, ncol = 3)
+row.names(mods) <- c("Brownian Motion", "Stabilizing Selection (OU)", "Pagel's $\\lambda$")
+colnames(mods) <- c("Mass", "Mass + Clade", "Mass * Clade")
+mods[1, 1] <- AICc(fm1)
+mods[1, 2] <- AICc(fm2)
+mods[1, 3] <- AICc(fm3)
+mods[2, 1] <- AICc(fm4)
+mods[2, 2] <- AICc(fm5)
+mods[2, 3] <- AICc(fm6)
+mods[3, 1] <- AICc(fm7)
+mods[3, 2] <- AICc(fm8)
+mods[3, 3] <- AICc(fm9)
+kable(round(mods, 1))
+```
+
+## Best performing model {.smaller}
+
+OU model:
+
+$$Home~Range \sim Mass + Clade$$
+
+```{r echo=FALSE}
+summary(fm5)
+```
 
 ## Quiz 11-2
 
 Lecture 11-3
 
-## References
+## References {.references}

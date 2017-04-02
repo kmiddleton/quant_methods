@@ -88,31 +88,30 @@ ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin, color = Clade)) +
 
 Is a given genotype associated with a phenotype of interest?
 
-  - Consider two populations with ancestry differences
-  - Not accounting for ancestry differences can lead to spurious associations
-  - Population structure & relatedness are issues for all genetic association studies
+- Consider two populations with ancestry differences
+- Not accounting for ancestry differences can lead to spurious associations
+- Population structure & relatedness are issues for all genetic association studies
     
 ## Genotype-Phenotype Relationships
 
 Is a given genotype associated with a phenotype of interest?
 
-
 ```{r echo=FALSE, fig.width=6, fig.height=4}
 set.seed(23141)
 
-pop <- data.frame('population' = rep(c('A','B'),each=20), 
-                  'genotype' = c(c(rep(0,14),rep(1,6)), c(rep(0,3),rep(1,17))),
-                  'phenotype' = c(rnorm(20,5),rnorm(20,3)))
+pop <- data.frame('population' = rep(c('A', 'B'), each = 20), 
+                  'genotype' = c(c(rep(0, 14), rep(1, 6)),
+                                 c(rep(0, 3), rep(1, 17))),
+                  'phenotype' = c(rnorm(20, 5), rnorm(20, 3)))
 
-ggplot(pop, aes(x=as.factor(genotype),y=phenotype)) +
-  geom_point(position=position_jitter(0.05), alpha=0.8) +
-  xlab('genotype') +
+ggplot(pop, aes(x = as.factor(genotype), y = phenotype)) +
+  geom_point(position = position_jitter(0.05), alpha = 0.8) +
+  labs(x = 'Genotype', y = "Phenotype") +
   stat_summary(fun.y = mean, geom = "point", size = 5,
                color = "grey60") + 
   stat_summary(fun.data = mean_se, geom = "errorbar",
                width = 0.05,
                color = "grey60", size = 1)
-  
 ```
 
 ## Genotype-Phenotype Relationships
@@ -121,23 +120,18 @@ An effect of both 1) different allele frequency in two pops, and 2) different av
 
 ```{r echo=FALSE, fig.width=7, fig.height=4}
 
-ggplot(pop, aes(x=as.factor(genotype),y=phenotype,color=population)) +
-  geom_point(position=position_jitter(0.05),alpha=0.8) +
-  xlab('genotype') +
+ggplot(pop, aes(x = as.factor(genotype), y = phenotype,
+                color = population)) +
+  geom_point(position = position_jitter(0.05), alpha = 0.8) +
+  labs(x = 'Genotype', y = "Phenotype") +
   stat_summary(fun.y = mean, geom = "point", size = 5,
                color = "grey60") + 
   stat_summary(fun.data = mean_se, geom = "errorbar",
                width = 0.05,
-               color = "grey60", size = 1)
-
-  
-
+               color = "grey60", size = 1) +
+  scale_color_manual(values = c("orange", "purple"))
 ```
 
-
-    
 ## No Quiz
 
 Lecture 11-2
-
-## References
