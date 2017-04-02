@@ -376,6 +376,8 @@ Week 14: Composite variables
 
 Goals:
 
+possible application: population structure
+
 ---
 
 Week 15: Experimental design

@@ -17,26 +17,12 @@ library(cowplot)
 library(readxl)
 ```
 
-## Readings
-
-- Garland T Jr, Adolph SC [-@Garland1994-vk] Why not to do two-species comparative studies: limitations on inferring adaptation. *Physiol Zool* 67:797-828.
-
-## Resources
-
-- Nunn CL. [-@Nunn2011-zi] *The Comparative Approach in Evolutionary Anthropology and Biology*. Chicago: University of Chicago Press.
-- Nunn CL, Barton RA [-@Nunn2001-oq] Comparative methods for studying primate adaptation and allometry. *Evol Anthropol* 10:81–98.
-- Yang J, Zaitlen NA, Goddard ME, Visscher PM, Price AL [-@Yang2014-cz] Advantages and pitfalls in the application of mixed-model association methods. *Nat Genet* 46:100-106.
-
-## Even more resources
-
-- http://www.anthrotree.info/: Website accompanying *The Comparative Approach in Evolutionary Anthropology and Biology*
-- http://treethinkers.org/: UC Davis Bodega Bay Marine Lab Workshop in Applied Phylogenetics
-- http://www.phylometh.org/: Brian O'Meara's (UT Knoxville) course on phylogenetic comparative methods
 
 ## IID is often violated
 
 Recall IID = Independent and Identically Distributed
    
+- Events are independent if the occurence of one does not influence the occurence of the other
 - Assumption of most statistical tests
 - In biological situations, independence assumption is often violated
 
@@ -150,7 +136,7 @@ ggplot(pop, aes(x=as.factor(genotype),y=phenotype,color=population)) +
 
 
     
-## Quiz 11-1
+## No Quiz
 
 Lecture 11-2
 

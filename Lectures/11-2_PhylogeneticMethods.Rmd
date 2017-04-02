@@ -1,5 +1,5 @@
 ---
-title: "Phylogenetic Comparative Methods"
+title: "Non-independence: Phylogenetic Comparative Methods"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
 date: 'Last updated: `r Sys.Date()`'
@@ -29,6 +29,21 @@ library(reshape2)
 library(geiger)
 library(latex2exp)
 ```
+
+## Readings
+
+- Garland T Jr, Adolph SC [-@Garland1994-vk] Why not to do two-species comparative studies: limitations on inferring adaptation. *Physiol Zool* 67:797-828.
+
+## Resources
+
+- Nunn CL. [-@Nunn2011-zi] *The Comparative Approach in Evolutionary Anthropology and Biology*. Chicago: University of Chicago Press.
+- Nunn CL, Barton RA [-@Nunn2001-oq] Comparative methods for studying primate adaptation and allometry. *Evol Anthropol* 10:81–98.
+
+## Even more resources
+
+- http://www.anthrotree.info/: Website accompanying *The Comparative Approach in Evolutionary Anthropology and Biology*
+- http://treethinkers.org/: UC Davis Bodega Bay Marine Lab Workshop in Applied Phylogenetics
+- http://www.phylometh.org/: Brian O'Meara's (UT Knoxville) course on phylogenetic comparative methods
 
 ## Trees and tree thinking
 
