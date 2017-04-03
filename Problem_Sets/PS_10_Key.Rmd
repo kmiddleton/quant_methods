@@ -14,6 +14,7 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
+library(forcats)
 
 # This option turn on cacheing of chunks. This will dramatically
 # speed up knitting, because only chunks that have changed will
@@ -43,7 +44,7 @@ Remember to start with a small number of iterations (10 or 100) until you get th
 
 Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
 
-```{r message=FALSE}
+```{r flies1, message=FALSE}
 # Read data
 stalk <- read_csv("../data/Stalkies.csv")
 
@@ -81,7 +82,7 @@ We can use parallel processing to speed things up considerably, taking advantage
 
 The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the combination of `foreach()` and `dopar()`, which handle the parallelization and collection of the results.
 
-```{r}
+```{r flies2, eval=FALSE}
 library(parallel)
 library(foreach)
 library(doParallel)
@@ -130,7 +131,7 @@ We get a speed-up of about 1.34 times. There is some overhead in the paralleliza
 
 In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
 
-```{r}
+```{r earwigs}
 EW <- read_csv("../data/Earwigs.csv")
 
 EW %>%
@@ -166,6 +167,40 @@ factorial(7)
 
 For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
 
+```{r heart_transplants}
+M <- read_excel("../data/Heart_Transplants.xlsx") %>% 
+  mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
+
+ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Mismatch Degree", y = "Survival (days)")
+
+fm <- lm(Survival_Days ~ Mismatch_Degree, data = M)
+obs <- summary(fm)
+
+set.seed(823476)
+nreps <- 1e4
+F_stats <- numeric(nreps)
+F_stats[1] <- obs$fstatistic["value"]
+
+for (ii in 2:nreps) {
+  fm_rand <- lm(sample(Survival_Days) ~ Mismatch_Degree,
+                    data = M)
+  F_stats[ii] <- summary(fm_rand)$fstatistic["value"]
+}
+
+data_frame(F_stats) %>% 
+  ggplot(aes(F_stats)) +
+  geom_histogram() +
+  geom_vline(xintercept = F_stats[1], color = "red") +
+  labs(x = "F statistics", y = "Count")
+
+mean(F_stats >= F_stats[1])
+```
+
 ## Bird abundance (PS 07)
 
 We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors. 
@@ -180,11 +215,71 @@ There are four predictors, you will have 5 tests:
 
 You should do the randomization and collect the output test statistics using just one loop.
 
+```{r bird_abundance}
+M <- read_excel("../data/Birds.xlsx")
+fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
+         data = M)
+obs <- summary(fm)
+
+set.seed(2876)
+nreps <- 1e4
+
+t_stats <- matrix(NA, nrow = nreps, ncol = 4)
+colnames(t_stats) <- rownames(obs$coefficients)[2:5]
+t_stats[1, ] <- obs$coefficients[2:5, 3]
+
+for (ii in 2:nreps) {
+  fm_rand <- lm(sample(N_Species) ~ Dist_to_Island + Elevation +
+                  Area + Dist_to_Ecuador, data = M)
+  t_stats[ii, ] <- summary(fm_rand)$coefficients[2:5, 3]
+}
+
+# Dist_to_Island
+data_frame(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>% 
+  ggplot(aes(Dist_to_Island)) +
+  geom_histogram() +
+  geom_vline(xintercept = t_stats[1, "Dist_to_Island"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Dist_to_Island"] >= t_stats[1, "Dist_to_Island"])
+
+# Elevation
+data_frame(Elevation = t_stats[, "Elevation"]) %>% 
+  ggplot(aes(Elevation)) +
+  geom_histogram() +
+  geom_vline(xintercept = t_stats[1, "Elevation"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Elevation"] >= t_stats[1, "Elevation"])
+
+# Area
+data_frame(Area = t_stats[, "Area"]) %>% 
+  ggplot(aes(Area)) +
+  geom_histogram() +
+  geom_vline(xintercept = t_stats[1, "Area"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Area"] >= t_stats[1, "Area"])
+
+# Elevation
+data_frame(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>% 
+  ggplot(aes(Dist_to_Ecuador)) +
+  geom_histogram() +
+  geom_vline(xintercept = t_stats[1, "Dist_to_Ecuador"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Dist_to_Ecuador"] <= t_stats[1, "Dist_to_Ecuador"])
+```
+
 ## Aspirin and cancer (PS 08)
 
 In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use.
 
-```{r}
+```{r aspirin1}
 M <- read_csv("../data/Aspirin.csv") %>% 
   mutate_each("factor")
 fm <- glm(Cancer ~ Treatment, M, family = "binomial")
@@ -210,7 +305,7 @@ data_frame(devs) %>%
 mean(devs <= devs[1])
 ```
 
-```{r}
+```{r aspirin2}
 obs <- chisq.test(xtabs(~ Treatment + Cancer, M),
                   correct = FALSE)
 
@@ -238,3 +333,25 @@ mean(chisqs >= chisqs[1])
 ## Correlation
 
 Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
+
+```{r correlation}
+M <- read_excel("../data/Birds.xlsx")
+
+set.seed(2876)
+nreps <- 1e4
+
+corrs <- numeric(length = nreps)
+corrs[1] <- cor(M$Area, M$Elevation)
+
+for (ii in 2:nreps) {
+  corrs[ii] <- cor(sample(M$Area), M$Elevation)
+}
+
+data_frame(corrs) %>% 
+  ggplot(aes(corrs)) +
+  geom_histogram() +
+  geom_vline(xintercept = corrs[1], color = "red") +
+  labs(x = "Deviance", y = "Count")
+
+mean(corrs >= corrs[1])
+```
