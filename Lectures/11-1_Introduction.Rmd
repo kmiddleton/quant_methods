@@ -20,8 +20,6 @@ library(readxl)
 
 ## IID is often violated
 
-Recall IID = Independent and Identically Distributed
-   
 - Events are independent if the occurence of one does not influence the occurence of the other
 - Assumption of most statistical tests
 - In biological situations, independence assumption is often violated

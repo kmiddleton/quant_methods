@@ -22,8 +22,8 @@ library(ape)
 library(phytools)
 # source("https://bioconductor.org/biocLite.R")
 # biocLite("ggtree")
-# install_github("GuangchuangYu/ggtree")
 # install_github("GuangchuangYu/treeio")
+# install_github("GuangchuangYu/ggtree")
 library(ggtree)
 library(foreach)
 library(reshape2)
@@ -671,7 +671,7 @@ $$Home~Range \sim Mass + Clade$$
 summary(fm5)
 ```
 
-## Quiz 11-2
+## No quiz
 
 Lecture 11-3
 
