@@ -14,6 +14,8 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
+library(ape)
+library(nlme)
 
 # This option turn on cacheing of chunks. This will dramatically
 # speed up knitting, because only chunks that have changed will
@@ -21,67 +23,164 @@ library(cowplot)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
-## Working with trees
+Package that you will need for this problem set that you might not have installed yet:
 
-Read in from a Mesquite file:
+- `ape`
 
-```{r}
-library(ape)
-tree1 <- read.nexus("../data/MyTree.nex")
-```
+Go ahead and install it now. Also load the `nlme` package, which has the `gls()` function.
 
-Generate for testing purposes:
+## Primate life history
 
-```{r}
-library(phytools)
-set.seed(4)
-tree2 <- pbtree(n = 8)
-```
+We are going to work with two files, one containing a tree of (extant) primates (226 tips; `Primate_Masses_Tree.nex`) and another containing data of primate life history (`Primate_Masses.xlsx`). We will use these data to explore phylogenetic comparative methods.
 
-## Working with trees
+### Activity
 
-```{r}
-tree1
-```
+a. Load the `Primate_Masses.xlsx` file and explore the contents. You will find columns:
 
-## Working with trees
+- `Order`: Traditional Linnean order
+- `Family`: Traditional Linnean family
+- `Binomial`: Genus species binomial. *This column matches the tree tip labels.*
+- `AdultBodyMass_g`: Body mass in grams
+- `GestationLen_d`: Gestation length in days
+- `HomeRange_km2`: Home range area in square kilometers
+- `MaxLongevity_m`: Maximum longevity in months
+- `SocialGroupSize`: Mean social group size
 
-```{r}
-str(tree1)
-```
-
-## Working with trees
+As a final step, be sure to convert the object into a `data.frame` from the `tibble` that `read_excel()` produces by default.
 
 ```{r}
-plot(tree1)
+# FIXME
+M <- read_excel("../data/Primate_Masses.xlsx") %>% as.data.frame()
 ```
 
-## `ggtree`
+Load the tree from the file `Primate_Masses_Tree.nex` using the function `read.nexus()` which is in the `ape` package.
 
-```{r eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite("ggtree")
+Give it is useful name like `tree`. Plot the tree using the `plot()` method for `phylo` objects (which is what your tree will be). In the `plot()` call, include you can make the tip labels smaller with `cex = 0.8`. We expanded the figure size in the chunk header to keep the tips from overlapping. It will look like a mess in the RStudio window, but will look OK when knitted.
+
+```{r, fig.height=30, fig.width=10}
+# FIXME
+tree <- read.nexus("../data/Primate_Masses_Tree.nex")
+plot(tree, cex = 0.8)
 ```
 
-[Tutorial](https://www.bioconductor.org/packages/3.3/bioc/vignettes/ggtree/inst/doc/ggtree.html)
+Any time you have comparative data and a tree, you should do a lot of tests to make sure that the tree labels match the data column that codes for them. 
+Some functions will do these checks for you. However, it's important to do these checks yourself, just to be sure. They are absolutely necessary when you are using phylogenetically independent contrasts or another method that makes assumptions about a match between tips and data without an explicit check. Using `gls()` for PGLS will do this also, albeit with a warning message.
 
-If you get errors try:
+Start by looking at both the `Binomial` column of your data frame and the tip labels of the tree (e.g., `tree$tip.label`).
 
-```
-library(devtools)
-install_github("GuangchuangYu/ggtree")
-install_github("GuangchuangYu/treeio")
-```
-
-## Working with trees
-
-```{r plt_tree, eval=FALSE}
-ggtree(tree2, ladderize = FALSE) +
-  geom_nodepoint(color = "darkblue", alpha = 1/4, size = 10) +
-  geom_tiplab(size = 5, color = "darkred")
+```{r}
+# FIXME
+M$Binomial
+tree$tip.label
 ```
 
-## Working with trees
+Let's figure out what tree tips are not represented in the data file (a lot probably) and what data are not represented in the tree (hopefully only a few). Let's start by looking at the species that are present in both the data and the tree. We use the intersection of the `Binomial` column and the tip labels (the function `intersect()`). Change `eval` to true in the following chunk.
 
-```{r ref.label="plt_tree", echo=FALSE}
+```{r eval=TRUE}
+# FIXME
+intersect(tree$tip.label, M$Binomial)
 ```
+
+How many species are present in both? How many rows of data are there? How many tips or taxa need to be dropped in total (we don't know yet which are tips are which are taxa)?
+
+> 83 are present in both. There are 91 data observations, so 8 must not match up.
+
+The first step in the process is to keep only the tips of the tree where tips are present in the data. The `setdiff()` function returns a vector of the differences between two sets. If we use the same syntax as above but with `setdiff` rather than `intersect`, we'll get the list of tips that need to be dropped. Create that variable and call it something memorable like `tips_to_drop`. There should be 143 tips in the list.
+
+```{r}
+tips_to_drop <- setdiff(tree$tip.label, M$Binomial)
+length(tips_to_drop)
+```
+
+Now we can actually drop the tips from the tree. The `ape` package has a function `drop.tip()` which does just this. Create a new tree (e.g., `tree_pruned`) where all the orphan tips are dropped. Look at the help for `drop.tip()` for the syntax. Then plot your tree to make sure it still looks OK. We we use this tree for the rest of this exercise.
+
+```{r, fig.height=15, fig.width=10}
+# FIXME
+tree_pruned <- drop.tip(tree, tips_to_drop)
+plot(tree_pruned)
+```
+
+We should probably also remove any rows from the data that are not present in the tree. This isn't strictly necessary in most cases, but it's good practice. We can use `setdiff()` again, but this time reverse the order: `setdiff(M$Binomial, tree_pruned$tip.label)`. Do this, and save to a new variable `rows_to_drop`. You should find 8 rows that need to be dropped from the data frame.
+
+```{r}
+# FIXME
+rows_to_drop <- setdiff(M$Binomial, tree_pruned$tip.label)
+length(rows_to_drop)
+```
+
+ Drop the rows from the data that are not in the tree. The best (though least clear) way to do this is with a notation like `M[!(M$Binomial %in% rows_to_drop), ]`. The `!` negates the entire parenthetical that follows. Inside parentheses, the function `%in%` returns true for all the rows in `M$Binomial` that match any items in `rows_to_drop`. So by negating this set, we get all the rows that are *not* in `rows_to_drop`.
+
+Assign a new variable the data frame resulting from dropping all rows not in the tree file. Check the number of rows. You should find 83.
+
+```{r}
+# FIXME
+M_pruned <- M[!(M$Binomial %in% rows_to_drop), ]
+nrow(M_pruned)
+```
+
+The final thing to do is to assign `Binomial` to the row names (`row.names()`) of the data.frame.
+
+```{r}
+# FIXME
+row.names(M_pruned) <- M_pruned$Binomial
+```
+
+We have finally arrived at the point of being able to do something with these data. As you may have realized, working with comparative data is much more involved in terms of processing than working with regular data.
+
+For the rest of this question, we will be exploring the relationship between body mass and maximum longevity. Make a scatterplot of the raw data for maximum longevity vs. body mass.
+
+```{r}
+# FIXME
+ggplot(M_pruned, aes(x = AdultBodyMass_g, y = MaxLongevity_m)) +
+  geom_point()
+```
+
+Assess the bivariate relationship and transform either or both of the variables if they require it.
+
+```{r}
+# FIXME
+M_pruned$log_Mass <- log10(M_pruned$AdultBodyMass_g)
+M_pruned$log_Longevity <- log10(M_pruned$MaxLongevity_m)
+ggplot(M_pruned, aes(x = log_Mass, y = log_Longevity, color = Family)) +
+  geom_point()
+```
+
+> We can log10 transform both variables. It's probably adequate to only log mass, but it looks a little better with both transformed.
+
+We're ready to perform PGLS. Fit a PGLS using `gls()` regressing longevity on mass. Use a Brownian motion correlation structure. Follow the lecture slides as an example. Save this model to an R object. Print the summary of the `gls` object that you just made.
+
+```{r}
+# FIXME
+fm1 <- gls(log_Longevity ~ log_Mass, data = M_pruned,
+           correlation = corBrownian(phy = tree_pruned),
+           method = "ML")
+summary(fm1)
+```
+
+e. What is the linear equation for the phylogenetic regression of longevity on body mass?
+
+> log Longevity = 2.07 + 0.11 * log Mass. 
+
+Fit a second model where `Family` is used in addition to mass. Use an additive model and Brownian motion model of trait evolution. Use the `anova()` method to generate an ANOVA table for the model fit.
+
+```{r}
+fm2 <- gls(log_Longevity ~ log_Mass + Family, data = M_pruned,
+           correlation = corBrownian(phy = tree_pruned),
+           method = "ML")
+summary(fm2)
+anova(fm2)
+```
+
+Considering the ANOVA table, does the relationship between longevity and mass differ by family? Briefly explain.
+
+> No. The *P*-value for family is 0.999, so there is no difference in the relationship based on family. The intercepts are all equal to one another.
+
+Extract (`AIC()`) and compare the AICs for the two models you just fit. Interpret the difference in AIC values.
+
+```{r}
+AIC(fm1, fm2)
+```
+
+> The difference is 25 AIC units, with the simpler model *much* preferred.
+
+Feel free to explore other variables in this data set.
