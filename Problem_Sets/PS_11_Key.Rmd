@@ -16,6 +16,7 @@ library(readxl)
 library(cowplot)
 library(ape)
 library(nlme)
+library(MCMCglmm)
 
 # This option turn on cacheing of chunks. This will dramatically
 # speed up knitting, because only chunks that have changed will
@@ -23,11 +24,155 @@ library(nlme)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
-Package that you will need for this problem set that you might not have installed yet:
+Packages that you will need for this problem set that you might not have installed yet:
 
 - `ape`
+- `MCMCglmm`
 
-Go ahead and install it now. Also load the `nlme` package, which has the `gls()` function.
+Go ahead and install them now. Also load the `nlme` package, which has the `gls()` function.
+
+## Grass Species Richness
+
+At the Conard Environmental Research Area, there are 20 experimental plots with 10 burned each fall and 10 unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
+
+
+```{r }
+set.seed(112)
+mms<-c(rnorm(10, 5.5, 2),rnorm(10,6.5,2))
+all.rich<-numeric(0)
+for(ii in mms){
+all.rich<-c(all.rich,as.integer(rnorm(5,ii,1)))
+}
+
+rich.dat<-data.frame('plot'=as.factor(rep(seq(1,20),each=5)), 
+                     'treatment'= rep(c('burned','unburned'),each=50), 
+                     'richness'=all.rich)
+write.table(rich.dat, file="../data/richness.txt", sep="\t", row.names=FALSE)
+```
+
+### Activity
+
+Load in the richness data (richness.txt). Plot species richness vs. treatment. Include an appropriate amount of jitter and transparency and color points by plot. 
+
+```{r}
+rich.dat <- read.table("../data/richness.txt",sep="\t",header=TRUE, stringsAsFactors = FALSE)
+
+ggplot(rich.dat, aes(x=treatment, y=richness, color=as.factor(plot))) +
+  geom_point(position = position_jitter(0.1), alpha=1/2)
+
+
+```
+
+
+Do you think there is a relationship between species richness and burning?
+
+> Probably not. It doesn't look like a strong relationship.
+
+First, fit a model predicting species richness from treatment without considering plot membership. What can you conclude from the results of this model?
+
+> It is difficult to interpret without considering plot as there is pseudoreplication.
+
+```{r}
+
+anova(lm(richness~treatment, data=rich.dat))
+
+```
+
+Now, get the mean species richness value for each plot. Fit a model predicting mean species richness from treatment. What can you conclude from this model?
+
+```{r}
+
+mean.plot<-rich.dat %>% group_by(plot,treatment) %>% summarize(meanrich=mean(richness))
+anova(lm(meanrich~treatment, data=mean.plot))
+
+
+```
+
+> There is no effect of treatment on species richness.
+
+Use the `lme()` function to fit a model predicting richness from treatment with plot as a random effect. 
+
+```{r}
+
+summary(lme(richness ~ treatment, random=~1|plot, data=rich.dat))
+
+```
+
+Compare your results to the approach using the mean value. What can you conclude from this model? 
+
+> The results are consistent with the model using the mean values. 
+
+Why would you use `lme()` versus means per group?
+
+>
+
+These 20 plots exist in an alternating pattern going from south to north on either side of an access road. What other source of non-independence should you consider? How would you account for this factor?
+
+> The spatial relationship between plots needs to be accounted for. You could include a continuous variable coding for position along the south to north axis and/or side of the road.
+
+## Indian meal moth
+
+For this activity, we will use a dataset measuring the amount of phenoloxidase (PO) produced by indian meal moth caterpillars in full-sibling families. 
+
+### Activity
+
+First we will load the `MCMCglmm` library and get the moth data called PlodiaPO.
+
+```{r}
+
+library(MCMCglmm)
+data(PlodiaPO)
+
+```
+
+Examine the data. Look at the first few rows and use `unique()` to see the list of families in this dataset. Plot a histogram of the PO values and calculate the overall mean value.
+
+
+```{r}
+
+head(PlodiaPO)
+unique(PlodiaPO$FSfamily)
+
+ggplot(PlodiaPO, aes(x=PO)) +
+  geom_histogram()
+
+mean(PlodiaPO$PO)
+
+```
+
+Now we will fit the MCMCglmm model with family as a random effect.
+
+```{r}
+
+fm <- MCMCglmm(PO ~ 1, random = ~ FSfamily, data = PlodiaPO, verbose = TRUE)
+
+```
+
+Refer to the lecture slides for the next section. Plot the fixed effects and calculate the median for the estimate of the intercept. Compare this value to the mean value you calculated above. 
+
+```{r}
+plot(fm$Sol)
+
+mean(PlodiaPO$PO)
+median(fm$Sol)
+```
+
+Now plot the random effects and calculate heritability for all the MCMC samples. Because we have fit family here instead of using an animal model like in lecture, you should multiply your estimate by 2. This is because full-sib families share 50% of their genes on average. Plot the resulting distribution of heritability estimates. Estimate the median value and the standard error. 
+
+
+```{r}
+
+plot(fm$VCV)
+
+h2 <- 2 * fm$VCV[, "FSfamily"]/(fm$VCV[, "FSfamily"] +
++     fm$VCV[, "units"])
+
+plot(h2)
+
+median(h2)
+sd(h2)
+
+```
 
 ## Primate life history
 

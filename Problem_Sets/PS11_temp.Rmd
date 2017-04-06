@@ -1,0 +1,90 @@
+---
+title: "Untitled"
+author: "KingMiddleton"
+date: "4/5/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(nlme)
+library(cowplot)
+```
+
+## Spatial Non-independence
+
+At the Conard Environmental Research Area, there are 20 experimental plots with 10 burned each fall and 10 unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
+
+
+```{r }
+#set.seed(54221)
+set.seed(112)
+mms<-c(rnorm(10, 5.5, 2),rnorm(10,6.5,2))
+all.rich<-numeric(0)
+for(ii in mms){
+all.rich<-c(all.rich,as.integer(rnorm(5,ii,1)))
+}
+
+rich.dat<-data.frame('plot'=as.factor(rep(seq(1,20),each=5)), 
+                     'treatment'= rep(c('burned','unburned'),each=50), 
+                     'richness'=all.rich)
+```
+
+### Activity
+
+Load in the richness data (NAME). Plot species richness vs. treatment. Include an appropriate amount of jitter and transparancy and color points by plot. 
+
+```{r}
+
+ggplot(rich.dat, aes(x=treatment, y=richness, color=plot)) +
+  geom_point(position = position_jitter(0.1), alpha=1/2)
+
+
+```
+
+
+
+Do you think there is a relationship between species richness and burning?
+
+>
+
+First, fit a model predicting species richness from treatment without considering plot membership. What can you conclude from the results of this model?
+
+>
+
+```{r}
+
+anova(lm(richness~treatment, data=rich.dat))
+
+```
+
+Now, get the mean species richness value for each plot. Fit a model predicting mean species richness from treatment. What can you conclude from this model?
+
+```{r}
+
+mean.plot<-rich.dat %>% group_by(plot,treatment) %>% summarize(meanrich=mean(richness))
+anova(lm(meanrich~treatment, data=mean.plot))
+
+
+```
+
+>
+
+Use the `lme()` function to fit a model predicting richness from treatment with plot as a random effect. 
+
+```{r}
+
+summary(lme(richness ~ treatment, random=~1|plot, data=rich.dat))
+
+```
+
+Compare your results to the approach using the mean value. What can you conclude from this model?
+
+
+These 20 plots exist in an alternating pattern going from south to north on either side of an access road. What other source of non-independence should you consider? How would you account for this factor?
+
+> 
+
+
+
