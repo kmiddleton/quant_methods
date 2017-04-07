@@ -351,7 +351,7 @@ data_frame(corrs) %>%
   ggplot(aes(corrs)) +
   geom_histogram() +
   geom_vline(xintercept = corrs[1], color = "red") +
-  labs(x = "Deviance", y = "Count")
+  labs(x = "Correlation", y = "Count")
 
 mean(corrs >= corrs[1])
 ```
