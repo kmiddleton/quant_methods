@@ -349,6 +349,18 @@ Week 12: Multiple comparisons procedures
 
 Goals:
 
+Understand the problem
+	-false positive rate
+	-false discovery rate
+	-FWER
+
+understand why you expect p-values to be uniform
+understand how to use randomization to estimate false postitive rate empirically
+
+KMM
+never do a bonferonni 
+use something like FDR
+
 
 Nutrition data, 27000 correlation p values
 
