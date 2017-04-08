@@ -29,8 +29,9 @@ Ps <- read_excel("../data/P_values.xlsx")
 3. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
 4. Sequential Bonferroni procedure
     - Generally more permissive than Bonferroni. Provides control of FWER at $\alpha$.
-5. False Discovery Rate
-6. _Positive_ False Discovery Rate
+5. Permutation Test
+6. False Discovery Rate
+7. _Positive_ False Discovery Rate
 
 ## FWER vs. False discovery rate
 
@@ -50,9 +51,11 @@ Proposed by Benjamini and Hochberg [-@Benjamini1995-cw].
 
 Controls FDR (i.e., rate of Type I errors), rather than FWER
 
-$$\mbox{FDR} = \frac{\mbox{n False Positives}}{\mbox{n Rejected Hypotheses}}$$
+$$\mbox{FDR} = \frac{\mbox{n False Positives}}{\mbox{n All Positives}}$$
 
 e.g., I'm OK with 5% false positives *among the tests I judge as significant*.
+
+Note: False Positive Rate = $\frac{\mbox{n False Positives}}{\mbox{n All Tests}}$
 
 ## False discovery rate
 

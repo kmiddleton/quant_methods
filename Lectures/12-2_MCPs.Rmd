@@ -17,6 +17,88 @@ library(cowplot)
 library(readxl)
 ```
 
+## Distribution of *P* values 
+
+*P* values resulting from chance alone have a uniform distribtution
+
+```{r echo=FALSE,  message = FALSE}
+set.seed(3210)
+nn <- 10
+group1.mean <- 6
+group2.mean <- 6
+niter <- 1000
+ps<-data.frame('p1'=numeric(length=niter),
+               'p2'=numeric(length=niter))
+
+for(ii in 1:niter)
+{
+yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg <- c(rep('a',nn), rep('b',nn))
+ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
+ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
+
+}
+
+ggplot(ps, aes(x=p1)) +
+  geom_histogram() +
+  xlim(c(0,1))
+
+```
+
+## Distribution of *P* values 
+
+*P* values resulting from chance alone have a uniform distribtution
+
+```{r echo=FALSE, message = FALSE}
+Ps <- ps %>% arrange(-log10(p1))
+Pp <- data.frame("P"= -log10(Ps$p1), "X"=sort(-log10(runif(nrow(ps),0,1)))) 
+ggplot(Pp, aes(x=X, y=P)) + 
+  geom_point() +
+  geom_abline(intercept=0, slope=1) +
+  xlim(c(0,5)) +
+  ylab("Observed P values") +
+  xlab("Expected P values")
+```
+
+## Distribution of *P* values 
+
+*P* values resulting from chance alone have a uniform distribtution
+
+```{r echo=FALSE, message = FALSE}
+require(latex2exp, quietly = TRUE)
+
+df1 <- 3
+df2 <- 10
+q <- 0.05
+vline <- NULL
+
+
+p1 <- c(1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1)
+p2 <- p1 - 0.1
+
+F1 <- qf(p = p1, df1, df2, lower.tail = FALSE)
+F2 <- qf(p = p2, df1, df2, lower.tail = FALSE)
+
+#data_frame(p1, p2, F1, F2)
+x_max <- max(F1) * 2
+M <- data_frame(x = seq(0.001, x_max, length = 20000),
+               y = df(x, df1, df2))
+p <- ggplot(M, aes(x, y)) +
+ geom_line() +
+ ylim(c(0, 1.1 * max(M$y))) +
+ labs(x = TeX("$F_{3, 10$"), y = "Relative Likelihood")
+
+for (ii in 1:length(p1)) {
+ p <- p +
+   geom_ribbon(data = subset(M, x > F1[ii] & x < F2[ii]),
+               aes(ymax = y), ymin = 0,
+               fill = rainbow(10)[ii])
+}
+p
+```
+
+
 ## Example *P* values to work with | Turning kinematics in hummingbirds
 
 ```{r}
@@ -30,12 +112,13 @@ range(Ps$P)
 ## A menu of MCPs
 
 1. <s>Do nothing</s>
-    - Not an option anymore
+    - Not an option 
 2. Common sense
 3. Bonferroni correction
 4. Sequential Bonferroni procedure
-5. False Discovery Rate
-6. _Positive_ False Discovery Rate
+5. Permutation Test
+6. False Discovery Rate
+7. _Positive_ False Discovery Rate
 
 ## "Common sense"
 
@@ -67,10 +150,6 @@ Statisticians have known of the problem for a long time:
 
 - Can be traced back to Galton [-@Galton1902-qc] and Pearson [-@Pearson1902-vz], who were interested in rare occurrences
     - How to fairly divide a prizes in a competition
-- "Rejection of outliers" [@Irwin1925-fz; @Irwin1925-ip]
-- History reviewed by Harter [-@Harter1980-gb] and Miller [-@Miller1981-jp]
-
-## History
 
 Not a huge leap to go from single observations as outliers to families of tests
 
@@ -139,6 +218,20 @@ ggplot(Ps, aes(P)) + geom_histogram(bins = 20)
 ```
 
 We have disproportionately more nominally significant tests. Otherwise relatively uniform.
+
+## Distribution of *P* values
+
+```{r echo=FALSE, message = FALSE}
+Ps <- Ps %>% arrange(-log10(P))
+Pp <- data.frame("P"= -log10(Ps$P), "X"=sort(-log10(runif(nrow(Ps),0,1)))) 
+ggplot(Pp, aes(x=X, y=P)) + 
+  geom_point() +
+  geom_abline(intercept=0, slope=1) +
+  xlim(c(0,5)) +
+  ylab("Observed P values") +
+  xlab("Expected P values")
+```
+
 
 ## Sort *P* values
 
@@ -246,15 +339,27 @@ Ps %>% slice(30:37)
 
 Here, Bonferroni and sequential Bonferroni are equal.
 
+## Permutation Test: Randomization to the Rescue
+
+Procedure:
+
+  - Shuffle the data
+  - Perform your set of tests
+  - Get the lowest p-value across all tests
+  - Repeat many, many times
+  - Calculate the threshold for which there is a 5% chance of observing one false positive across all tests (FWER)
+
+
 ## A menu of MCPs
 
 1. <s>Do nothing</s>
+    - Not an option 
 2. <s>Common sense</s>
-3. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
+3. <s>Bonferroni correction</s>
 4. Sequential Bonferroni procedure
-    - Generally more permissive than Bonferroni. Provides control of FWER at $\alpha$.
-5. False Discovery Rate
-6. _Positive_ False Discovery Rate
+5. Permutation Test
+6. False Discovery Rate
+7. _Positive_ False Discovery Rate
 
 ## Quiz 12-2
 

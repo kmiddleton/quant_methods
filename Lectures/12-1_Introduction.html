@@ -116,7 +116,7 @@
 <li>Storey JD, Tibshirani R <span class="cite">(2003)</span> Statistical significance for genomewide studies. <em>Proc Natl Acad Sci USA</em> 100:9440–9445.</li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Significance Testing Mistakes</h2></hgroup><article  id="significance-testing-mistakes" class="smaller">
+</article></slide><slide class=''><hgroup><h2>Significance Testing Mistakes</h2></hgroup><article  id="significance-testing-mistakes">
 
 <p>Mistake #1: Concluding there IS an effect when there IS NOT actually an effect.</p>
 
@@ -132,7 +132,7 @@ summary(lm(yy ~ gg))$coefficients</pre>
 ## (Intercept) 5.5093432  0.2167578 25.417051 0.000000000000001483964
 ## ggb         0.8602484  0.3065418  2.806301 0.011677945900063151086</pre>
 
-<p>This is a Type 1 error = A false positive = A false discovery</p>
+<p>This is a Type I error = A false positive = A false discovery</p>
 
 </article></slide><slide class=''><hgroup><h2>Significance Testing Mistakes</h2></hgroup><article  id="significance-testing-mistakes-1">
 
@@ -144,26 +144,13 @@ group1.mean &lt;- 5
 group2.mean &lt;- 6
 yy &lt;- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
 gg &lt;- c(rep(&#39;a&#39;,nn), rep(&#39;b&#39;,nn))
-summary(lm(yy ~ gg))</pre>
+summary(lm(yy ~ gg))$coefficients</pre>
 
-<pre >## 
-## Call:
-## lm(formula = yy ~ gg)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1.7849 -0.7564  0.2801  0.3633  2.1304 
-## 
-## Coefficients:
-##             Estimate Std. Error t value         Pr(&gt;|t|)    
-## (Intercept)   5.5837     0.3359  16.622 0.00000000000228 ***
-## ggb           0.6398     0.4751   1.347            0.195    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 1.062 on 18 degrees of freedom
-## Multiple R-squared:  0.09156,    Adjusted R-squared:  0.04109 
-## F-statistic: 1.814 on 1 and 18 DF,  p-value: 0.1947</pre>
+<pre >##              Estimate Std. Error   t value             Pr(&gt;|t|)
+## (Intercept) 5.5837026  0.3359147 16.622383 0.000000000002284901
+## ggb         0.6398448  0.4750551  1.346885 0.194731320450884815</pre>
+
+<p>This is a Type II error = False Negative</p>
 
 </article></slide><slide class=''><hgroup><h2>Types of errors and statistical power</h2></hgroup><article  id="types-of-errors-and-statistical-power">
 
@@ -207,6 +194,71 @@ summary(lm(yy ~ gg))</pre>
 <li>You will be more likely than 5% to erroneously reject a <em>true</em> null hypothesis.</li>
 <li>You will claim a significant effect when one does not exist.</li>
 </ul>
+
+</article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-1">
+
+<pre class = 'prettyprint lang-r'>set.seed(3210)
+nn &lt;- 10
+group1.mean &lt;- 6
+group2.mean &lt;- 6
+niter &lt;- 1000
+ps&lt;-data.frame(&#39;p1&#39;=numeric(length=niter),
+               &#39;p2&#39;=numeric(length=niter))
+
+for(ii in 1:niter)
+{
+yy1 &lt;- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+yy2 &lt;- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg &lt;- c(rep(&#39;a&#39;,nn), rep(&#39;b&#39;,nn))
+ps[ii,1] &lt;- summary(lm(yy1 ~ gg))$coefficients[2,4]
+ps[ii,2] &lt;- summary(lm(yy2 ~ gg))$coefficients[2,4]
+
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-2">
+
+<p>What is the probability of a false positive for yy1?</p>
+
+<pre class = 'prettyprint lang-r'>cbind(ps[c(8,12),],c(&quot;FP&quot;,&quot;x&quot;))</pre>
+
+<pre >##            p1        p2 c(&quot;FP&quot;, &quot;x&quot;)
+## 8  0.03907693 0.7073702           FP
+## 12 0.07440324 0.0249441            x</pre>
+
+<pre class = 'prettyprint lang-r'>mean(ps[,&#39;p1&#39;]&lt;0.05)</pre>
+
+<pre >## [1] 0.044</pre>
+
+</article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-3">
+
+<p>What is the probability of a false positive for yy2?</p>
+
+<pre class = 'prettyprint lang-r'>cbind(ps[c(8,12),],c(&quot;x&quot;,&quot;FP&quot;))</pre>
+
+<pre >##            p1        p2 c(&quot;x&quot;, &quot;FP&quot;)
+## 8  0.03907693 0.7073702            x
+## 12 0.07440324 0.0249441           FP</pre>
+
+<pre class = 'prettyprint lang-r'>mean(ps[,&#39;p2&#39;]&lt;0.05)</pre>
+
+<pre >## [1] 0.053</pre>
+
+</article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-4">
+
+<p>What is the probability of a false positive for yy1 or yy2?</p>
+
+<pre class = 'prettyprint lang-r'>cbind(ps[c(8,12,13),],c(&quot;FP&quot;,&quot;FP&quot;,&quot;x&quot;))</pre>
+
+<pre >##            p1        p2 c(&quot;FP&quot;, &quot;FP&quot;, &quot;x&quot;)
+## 8  0.03907693 0.7073702                 FP
+## 12 0.07440324 0.0249441                 FP
+## 13 0.11460592 0.2811390                  x</pre>
+
+<pre class = 'prettyprint lang-r'>length(which(ps[,&#39;p1&#39;]&lt;0.05 | ps[,&#39;p2&#39;]&lt;0.05))/niter</pre>
+
+<pre >## [1] 0.095</pre>
+
+<p>The overall error rate = the family-wise error rate (FWER).</p>
 
 </article></slide><slide class=''><hgroup><h2>Week 7: Post hoc tests for ANOVA</h2></hgroup><article  id="week-7-post-hoc-tests-for-anova">
 
@@ -267,9 +319,9 @@ summary(tukey)</pre>
 ## 
 ## Linear Hypotheses:
 ##                     Estimate Std. Error t value Pr(&gt;|t|)   
-## eyes - control == 0 -1.24268    0.36433  -3.411  0.00794 **
-## knee - control == 0 -0.02696    0.36433  -0.074  0.99698   
-## knee - eyes == 0     1.21571    0.37628   3.231  0.01153 * 
+## eyes - control == 0 -1.24268    0.36433  -3.411   0.0079 **
+## knee - control == 0 -0.02696    0.36433  -0.074   0.9970   
+## knee - eyes == 0     1.21571    0.37628   3.231   0.0118 * 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</pre>
@@ -297,7 +349,7 @@ summary(post_hoc)</pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</pre>
 
-</article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-1">
+</article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-5">
 
 <p>Beyond multiple testing in a single &quot;test&quot;:</p>
 
@@ -306,7 +358,7 @@ summary(post_hoc)</pre>
 <li>What about multiple tests in one thesis?</li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-2">
+</article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-6">
 
 <p>Rules for when and how to account for multiple comparisons are not clear-cut, nor has any single method emerged as best under all conditions:</p>
 
