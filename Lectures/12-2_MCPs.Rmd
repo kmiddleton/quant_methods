@@ -1,0 +1,263 @@
+---
+title: "Multiple Comparisons Procedures"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+```
+
+## Example *P* values to work with | Turning kinematics in hummingbirds
+
+```{r}
+Ps <- read_excel("../data/P_values.xlsx")
+glimpse(Ps)
+range(Ps$P)
+```
+
+203 *P* values. Range: 10^-16^ to 0.992
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+    - Not an option anymore
+2. Common sense
+3. Bonferroni correction
+4. Sequential Bonferroni procedure
+5. False Discovery Rate
+6. _Positive_ False Discovery Rate
+
+## "Common sense"
+
+$203 \times 0.05 = 10.15$ expected significant results. 
+
+```{r}
+sum(Ps$P < 0.05)
+```
+
+We have 62. So maybe only consider the smallest 10?
+
+- Extremely conservative
+    
+This is also subjective (which *P* values to trust?). We can do better.
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+2. <s>Common sense</s>
+    - As of this slide you know better, if you did not already
+3. Bonferroni correction
+4. Sequential Bonferroni procedure
+5. False Discovery Rate
+6. _Positive_ False Discovery Rate
+
+## History
+
+Statisticians have known of the problem for a long time:
+
+- Can be traced back to Galton [-@Galton1902-qc] and Pearson [-@Pearson1902-vz], who were interested in rare occurrences
+    - How to fairly divide a prizes in a competition
+- "Rejection of outliers" [@Irwin1925-fz; @Irwin1925-ip]
+- History reviewed by Harter [-@Harter1980-gb] and Miller [-@Miller1981-jp]
+
+## History
+
+Not a huge leap to go from single observations as outliers to families of tests
+
+- Student [-@Student1927-nh] discusses sources of error, including variation in repeated analyses. Introduced the use of a range as a criterion
+- Working and Hotelling [-@Working1929-cw] developed confidence intervals for linear regression
+
+## History
+
+Examples in which investigators tried to deal with it can be found scattered throughout the literature.
+
+- Fisher [-@Fisher1935-hw]: sequential *t*-tests following a significant ANOVA (later developed into least significant difference test)
+- Newman [-@Newman1939-we]: studentized range test for ANOVA-like analyses
+
+## History
+
+Duncan, Scheffé, and Tukey were responsible for the true modernization of multiple comparison procedures.
+
+- Duncan [-@Duncan1951-wo; -@Duncan1955-ry; -@Duncan1947-xp; -@Duncan1957-dc]: a variety of "multiple range tests"
+- Tukey [-@Tukey1949-ge]: most responsible for getting MCPs into much more general use (honestly significantly differences)
+- Scheffé [-@Scheffe1953-bx]: connected multiple comparisons procedures to general linear hypothesis tests. Method for comparing all contrasts in an ANOVA.
+
+## Modern history
+
+The widespread emergence of RNA microarrays and "gene chips" (which can involve >10,000 simultaneous comparisons) as well as "genomic data" more broadly (sequential tests of 10^5^-10^7^ SNPs) focused biostatisticians on the problem.
+
+- Storey and Tibshirani [-@Storey2003-mz]
+- van der Laan et al. [-@Van_der_Laan2004-in]
+- Dudoit and van der Laan [-@Dudoit2008-tx]
+
+## Goals of multiple comparisons procedures
+
+1. Reduce the risk of rejecting true null hypotheses
+    - i.e., not commit too many Type I errors
+1. Still be able to detect real effects if they exist
+    - i.e., not commit too many Type II errors
+    - Keep power (1 - Type II error rate) as high as possible.  Detect all "real" effects.
+    - Reduce the risk of rejecting true null hypotheses
+
+Type I and Type II errors will trade-off.
+
+## General procedure
+
+1. Complete an entire "family" of tests
+    - A set of tests on related data
+    - A single publication
+    - A single thesis
+    - All of science?
+1. Collect the resulting *P* values into a single vector or `data.frame`.
+1. Perform a multiple comparisons procedure (directly adjust or calculate new $\alpha$ level)
+1. Assess significance of your tests *as a whole*
+
+## Bonferroni correction
+
+- Dates to Fisher [-@Fisher1935-hw]
+- Define an adjusted alpha level of $\alpha/k$ where $k$ is the number of tests. Use that adjusted $\alpha_{adj}$ to decide if a test is statistically significant.
+- Simplest and most conservative method
+    - Relies on the Bonferroni inequality and results in control of FWER at $\alpha$
+- Can result in excessive false negatives (i.e., too many Type II errors)
+
+$$\alpha_{adj} = \frac{\alpha}{k}$$
+
+## Distribution of *P* values
+
+```{r echo=FALSE, message = FALSE}
+ggplot(Ps, aes(P)) + geom_histogram(bins = 20)
+```
+
+We have disproportionately more nominally significant tests. Otherwise relatively uniform.
+
+## Sort *P* values
+
+It will be easier to follow the procedures if the rows are sorted smallest to largest:
+
+```{r}
+Ps <- Ps %>% arrange(P)
+head(Ps)
+```
+
+## Bonferroni correction
+
+Adjusted $\alpha$ level for significance is $\alpha / k$:
+
+```{r}
+(alpha_adj <- 0.05 / nrow(Ps))
+```
+
+Judging any *P* values < 0.00024 as significant will control the FWER at $\alpha = 0.05$.
+
+## Bonferroni correction
+
+```{r}
+Ps$Bonf <- Ps$P < alpha_adj
+sum(Ps$Bonf)
+```
+
+Only 33 of the original 62 significant test remain significant.
+
+## Bonferroni correction
+
+```{r}
+Ps %>% slice(30:37)
+```
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+2. <s>Common sense</s>
+3. <s>Bonferroni correction</s>
+    - Excessively conservative, and we can do better
+4. Sequential Bonferroni procedure
+5. False Discovery Rate
+6. _Positive_ False Discovery Rate
+
+## Sequential Bonferroni
+
+Controls FWER as well as Bonferroni but is more permissive
+
+- Introduced by Holm [-@Holm1979-ip] - "Holm procedure"
+- Also see Rice [-@Rice1989-wz] for discussion
+
+All the methods from here on rely on a sorted list of *P* values.
+
+## Sequential Bonferroni
+
+- Sort the *P* values from smallest ($p_1$) to largest ($p_k$)
+- Start with the smallest ($i = 1$), and evaluate the inequality:
+
+$$p_i \leq \frac{\alpha}{k - i + 1}$$
+
+- If the inequality is *true*, call that test significant
+- No difference from the the Bonferroni correction yet.
+    - Step 1 equals Bonferroni correction
+
+## Sequential Bonferroni
+
+- Repeat for $i = 2, 3, 4, \dots$, up to $i = k$.
+- At each step, the test value increases:
+
+```{r}
+0.05 / 203
+0.05 / 202
+```
+
+The last observed *P* value is compared to $\alpha$.
+
+## Sequential Bonferroni
+
+If the inequality is *ever* false:
+
+- Stop.
+- Fail to reject that test.
+- Fail to reject all remaining tests (because the list is sorted)
+
+This and standard Bonferroni are "step-up" methods (start at the smallest and work up).
+
+## R's `p.adjust()` function
+
+`p.adjust()` can do some multiple comparisons procedures, given a vector of *P*.
+
+```{r}
+Ps$Bonf <- p.adjust(Ps$P, "bonferroni") < 0.05 # Bonferroni
+Ps$Seq_Bonf <- p.adjust(Ps$P, "holm") < 0.05   # Sequential Bonferroni
+sum(Ps$Seq_Bonf)
+```
+
+Only 33 of the original 62 significant tests remain.
+
+## Sequential Bonferroni
+
+```{r}
+Ps %>% slice(30:37)
+```
+
+Here, Bonferroni and sequential Bonferroni are equal.
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+2. <s>Common sense</s>
+3. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
+4. Sequential Bonferroni procedure
+    - Generally more permissive than Bonferroni. Provides control of FWER at $\alpha$.
+5. False Discovery Rate
+6. _Positive_ False Discovery Rate
+
+## Quiz 12-2
+
+Lecture 12-3
+
+## References {.references}

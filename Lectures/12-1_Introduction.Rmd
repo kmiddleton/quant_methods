@@ -1,0 +1,221 @@
+---
+title: "Multiple Testing: Introduction"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(wesanderson)
+library(multcomp)
+library(readxl)
+library(knitr)
+library(pander)
+knitr::opts_chunk$set(cache = TRUE)
+options(scipen = 999)
+```
+
+## Readings
+
+- Curran-Everett D [-@Curran-Everett2000-qv] Multiple comparisons: philosophies and illustrations. *Am J Physiol Regul Integr Comp Physiol* 279:R1-8.
+
+## Resources
+
+- http://www.nicebread.de/whats-the-probability-that-a-significant-p-value-indicates-a-true-effect/
+- Bretz F, Hothorn T, Westfall P [-@Bretz2010-cy] *Multiple Comparisons Using R*. Boca Raton, FL: Taylor & Francis.
+- Curran-Everett D, Benos DJ [-@Curran-Everett2007-nk] Guidelines for reporting statistics in journals published by the American Physiological Society: the sequel. *Adv Physiol Educ* 31:295-298.
+- Hothorn T, Bretz F, Westfall P [-@Hothorn2008-bj] Simultaneous inference in general parametric models. *Biom J* 50:346–363.
+- Ioannidis JPA [-@Ioannidis2005-od] Why most published research findings are false. *PLoS Med* 2:e124.
+- Storey JD, Tibshirani R [-@Storey2003-mz] Statistical significance for genomewide studies. *Proc Natl Acad Sci USA* 100:9440–9445.
+
+## Types of errors and statistical power
+
+|               | Reject H~0~    | Fail to reject H~0~   |
+|--------------:|:--------------:|:---------------------:|
+|H~0~ is true   | Type I error   | *Correct*             |
+|H~0~ is false  | *Correct*      | Type II error         |
+
+Type I error occurs when:
+
+- *P* is small by *random chance*, given that $\alpha$ is chosen ahead of the test
+
+Type II error probability depends on:
+
+- The value of $\alpha$
+- How "wrong" H~0~ is
+
+## Problems of Multiplicity
+
+If you set a Type I error rate ($\alpha$) of 0.05 for any one test and then perform more than one such test on related data:
+
+- The overall Type I error rate for all your tests together (familywise) is greater than 0.05
+- You will be more likely than 5% to erroneously reject a _true_ null hypothesis.
+- You will claim a significant effect when one does not exist.
+
+## Week 7: Post hoc tests for ANOVA
+
+Significant ANOVA (*P* = 0.004) only says that at least one mean is different.
+
+Many options are available for post hoc (unplanned) comparisons:
+
+- Scheffé test
+- Duncan's multiple range test
+- Fisher's least significant difference test
+- Newman-Keuls test
+- Tukey-Kramer test (Tukey's Honestly Significant
+Difference)
+
+We'll use the Tukey-Kramer test (only one you need to know right now)
+
+## Tukey-Kramer test
+
+- Assumes that we have already performed an ANOVA and rejected the null hypothesis
+    - If the overall ANOVA is not significant, then a post hoc test makes no sense.
+- The familywise error rate (FWER) with a Tukey-Kramer test is no larger than $\alpha$.
+    - FWER is the overall probability of a Type I error
+- Tukey-Kramer test makes all the same assumptions as ANOVA.
+    - Defaults to all pairwise combinations of levels
+
+## Tukey-Kramer test: `multcomp` library {.smaller}
+
+- Alternative but less general: `TukeyHSD()` in R
+    - Only takes an object from `aov()`
+
+```{r echo=FALSE, message=FALSE}
+JL <- read_csv("../data/JetLag.csv") %>% 
+  mutate(Treatment = factor(Treatment))
+fm_lm <- lm(Shift ~ Treatment, data = JL)
+```
+
+```{r}
+tukey <- glht(fm_lm, linfct = mcp(Treatment = "Tukey"))
+summary(tukey)
+```
+
+## Selective Set of Comparisons {.smaller}
+
+```{r}
+post_hoc <- glht(fm_lm,
+                 mcp(Treatment = c("eyes - control = 0",
+                                   "knee - control = 0")))
+summary(post_hoc)
+```
+
+## Problems of Multiplicity
+
+Beyond multiple testing in a single "test":
+
+- What about multiple tests in one experiment? 
+- What about multiple tests in one thesis?
+
+## Problems of Multiplicity
+
+Rules for when and how to account for multiple comparisons are not clear-cut, nor has any single method emerged as best under all conditions:
+
+- Philosophical issues
+    - Bayesians don't need accounting: Gelman et al. [-@Gelman2012-xe]
+- Mathematical issues
+    - Simultaneous corrections for thousands of tests
+
+## Reproducibility
+
+Reasons why studies are not able to be replicated [@Bretz2010-cy]
+
+1. There is an effect, but it's in the opposite direction that you thought.
+2. There is an effect in the direction that you think, but the magnitude is smaller than reported
+3. There is no effect despite having previously found one
+
+Usually we think of the inability to reproduce an experiment as resulting from poor experimental design or errors in data collection.
+
+- Failing to account multiplicity of tests is also likely.
+
+## Familywise Error Rate (FWER)
+
+FWER is the probability that at least one test will reject a true null hypothesis, i.e., committing *at least one* type I error.
+
+FWER is also sometimes termed
+
+- Familywise Error (FEW)
+- Experiment-wide error rate
+- Experiment-wise error rate
+
+We will use $\alpha$ = 0.05 throughout, but the general principles apply to any $\alpha$ (0.1, 0.05, 0.01, 0.001, etc.).
+
+## Calculating FWER
+
+For a family of $k$ tests, where $\alpha$ is the error rate for a single test:
+
+$$\mbox{FWER} = 1-(1-\alpha)^k$$
+
+For example, if you perform $k = 20$ tests and judge them all at $\alpha = 0.05$, then there is a 64% chance committing a type I error.
+
+Note that:
+
+$$\lim_{k \to \infty} (1 - \alpha)^k = 0$$
+
+And thus
+
+$$\lim_{k \to \infty} \mbox{FWER} = 1$$
+
+## Calculating FWER
+
+```{r}
+alpha <- 0.05
+(1 - alpha) ^ 20
+(1 - alpha) ^ 200
+(1 - alpha) ^ 2000
+```
+
+## Probability of a Type I Error ($\alpha = 0.05$)
+
+```{r FWER_table, echo=FALSE}
+calcFWER <- function(k, alpha){
+  round(1 - (1 - alpha) ^ k, 3)
+}
+k <- c(1, 2, 3, 5, 10, 20, 50, 100)
+FWER <- calcFWER(k, 0.05)
+error_rates <- data.frame(k, FWER)
+```
+
+```{r FWER_table_print, echo=FALSE, results='asis'}
+panderOptions("digits", 2)
+pander(error_rates)
+```
+
+## Probability of a Type I Error | from among a set of $k$ total tests
+
+```{r FWER_figure, echo=FALSE, fig.width=8}
+k <- seq(1, 200, by = 1)
+alphas <- c(0.05, 0.01, 0.001)
+out <- matrix(NA, ncol = length(alphas))
+for (i in alphas) {
+  FWER <- calcFWER(k, i)
+  alpha <- rep(i, times = length(k))
+  tmp <- cbind(alpha, k, FWER)
+  out <- rbind(out, tmp)
+}
+FWERs <- as.data.frame(out)
+FWERs$alpha <- as.factor(FWERs$alpha)
+ggplot(FWERs, aes(x = k, y = FWER, color = alpha)) +
+  geom_hline(yintercept = 1, lty = "dotted") +
+  geom_path(lwd = 2) +
+  ylab("Familywise Error Rate") +
+  xlab("k Tests") +
+  scale_color_manual(values = wes_palette("Moonrise3"),
+                     name = "Alpha",
+                     breaks = c("0.05", "0.01", "0.001"))
+```
+
+## Quiz 12-1
+
+Lecture 12-2
+
+## References
