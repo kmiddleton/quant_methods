@@ -36,6 +36,36 @@ options(scipen = 999)
 - Ioannidis JPA [-@Ioannidis2005-od] Why most published research findings are false. *PLoS Med* 2:e124.
 - Storey JD, Tibshirani R [-@Storey2003-mz] Statistical significance for genomewide studies. *Proc Natl Acad Sci USA* 100:9440–9445.
 
+## Significance Testing Mistakes {.smaller}
+
+Mistake #1: Concluding there IS an effect when there IS NOT actually an effect. 
+```{r}
+set.seed(10)
+nn <- 10
+group1.mean <- 6
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg <- c(rep('a',nn), rep('b',nn))
+summary(lm(yy ~ gg))$coefficients
+```
+
+This is a Type 1 error = A false positive = A false discovery
+
+## Significance Testing Mistakes
+
+Mistake #2: Concluding there IS NOT an effect when there IS actually an effect. 
+
+```{r}
+set.seed(93)
+nn <- 10
+group1.mean <- 5
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg <- c(rep('a',nn), rep('b',nn))
+summary(lm(yy ~ gg))
+```
+
+
 ## Types of errors and statistical power
 
 |               | Reject H~0~    | Fail to reject H~0~   |

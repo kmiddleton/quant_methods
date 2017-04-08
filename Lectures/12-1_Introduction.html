@@ -95,7 +95,7 @@
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
       <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
       <p data-config-presenter><!-- populated from slide_config.json --></p>
-            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-04-07</p>
+            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-04-08</p>
           </hgroup>
   </slide>
 
@@ -115,6 +115,55 @@
 <li>Ioannidis JPA <span class="cite">(2005)</span> Why most published research findings are false. <em>PLoS Med</em> 2:e124.</li>
 <li>Storey JD, Tibshirani R <span class="cite">(2003)</span> Statistical significance for genomewide studies. <em>Proc Natl Acad Sci USA</em> 100:9440–9445.</li>
 </ul>
+
+</article></slide><slide class=''><hgroup><h2>Significance Testing Mistakes</h2></hgroup><article  id="significance-testing-mistakes" class="smaller">
+
+<p>Mistake #1: Concluding there IS an effect when there IS NOT actually an effect.</p>
+
+<pre class = 'prettyprint lang-r'>set.seed(10)
+nn &lt;- 10
+group1.mean &lt;- 6
+group2.mean &lt;- 6
+yy &lt;- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg &lt;- c(rep(&#39;a&#39;,nn), rep(&#39;b&#39;,nn))
+summary(lm(yy ~ gg))$coefficients</pre>
+
+<pre >##              Estimate Std. Error   t value                Pr(&gt;|t|)
+## (Intercept) 5.5093432  0.2167578 25.417051 0.000000000000001483964
+## ggb         0.8602484  0.3065418  2.806301 0.011677945900063151086</pre>
+
+<p>This is a Type 1 error = A false positive = A false discovery</p>
+
+</article></slide><slide class=''><hgroup><h2>Significance Testing Mistakes</h2></hgroup><article  id="significance-testing-mistakes-1">
+
+<p>Mistake #2: Concluding there IS NOT an effect when there IS actually an effect.</p>
+
+<pre class = 'prettyprint lang-r'>set.seed(93)
+nn &lt;- 10
+group1.mean &lt;- 5
+group2.mean &lt;- 6
+yy &lt;- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg &lt;- c(rep(&#39;a&#39;,nn), rep(&#39;b&#39;,nn))
+summary(lm(yy ~ gg))</pre>
+
+<pre >## 
+## Call:
+## lm(formula = yy ~ gg)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.7849 -0.7564  0.2801  0.3633  2.1304 
+## 
+## Coefficients:
+##             Estimate Std. Error t value         Pr(&gt;|t|)    
+## (Intercept)   5.5837     0.3359  16.622 0.00000000000228 ***
+## ggb           0.6398     0.4751   1.347            0.195    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.062 on 18 degrees of freedom
+## Multiple R-squared:  0.09156,    Adjusted R-squared:  0.04109 
+## F-statistic: 1.814 on 1 and 18 DF,  p-value: 0.1947</pre>
 
 </article></slide><slide class=''><hgroup><h2>Types of errors and statistical power</h2></hgroup><article  id="types-of-errors-and-statistical-power">
 
@@ -217,10 +266,12 @@ summary(tukey)</pre>
 ## Fit: lm(formula = Shift ~ Treatment, data = JL)
 ## 
 ## Linear Hypotheses:
-##                     Estimate Std. Error t value Pr(&gt;|t|)
-## eyes - control == 0 -1.24268    0.36433  -3.411  0.00774
-## knee - control == 0 -0.02696    0.36433  -0.074  0.99698
-## knee - eyes == 0     1.21571    0.37628   3.231  0.01146
+##                     Estimate Std. Error t value Pr(&gt;|t|)   
+## eyes - control == 0 -1.24268    0.36433  -3.411  0.00794 **
+## knee - control == 0 -0.02696    0.36433  -0.074  0.99698   
+## knee - eyes == 0     1.21571    0.37628   3.231  0.01153 * 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Selective Set of Comparisons</h2></hgroup><article  id="selective-set-of-comparisons" class="smaller">
@@ -239,9 +290,11 @@ summary(post_hoc)</pre>
 ## Fit: lm(formula = Shift ~ Treatment, data = JL)
 ## 
 ## Linear Hypotheses:
-##                     Estimate Std. Error t value Pr(&gt;|t|)
-## eyes - control == 0 -1.24268    0.36433  -3.411  0.00559
-## knee - control == 0 -0.02696    0.36433  -0.074  0.99607
+##                     Estimate Std. Error t value Pr(&gt;|t|)   
+## eyes - control == 0 -1.24268    0.36433  -3.411  0.00559 **
+## knee - control == 0 -0.02696    0.36433  -0.074  0.99607   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Problems of Multiplicity</h2></hgroup><article  id="problems-of-multiplicity-1">
