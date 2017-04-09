@@ -101,11 +101,12 @@ Ps %>% slice(32:47)
 
 1. <s>Do nothing</s>
 2. <s>Common sense</s>
-3. <s>Bonferroni correction</s>
+3. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
 4. Sequential Bonferroni procedure
-5. False Discovery Rate
-    - More permissive than Bonferroni or sequential Bonferroni, but controls a different quantity
-6. _Positive_ False Discovery Rate
+    - Generally more permissive than Bonferroni. Provides control of FWER at $\alpha$.
+5. Permutation Test
+6. False Discovery Rate
+7. _Positive_ False Discovery Rate
 
 ## Positive false discovery rate
 
@@ -135,10 +136,11 @@ Seek a balance between false positives and true positives
 Estimate $\pi_0$ (ratio of true null tests to total tests) *from the distribution of P values*
 
 - Other multiple comparison procedures assume that $\pi_0 = 1$.
-- FDR = pFDR when $\pi_0 = 1$
+
 
 $$\pi_0 = \frac{\mbox{n True Null Tests}}{\mbox{n Total Tests}}$$
 
+- FDR = pFDR when $\pi_0 = 1$
 - More powerful than Bonferroni, sequential Bonferroni or FDR approaches
     - But the underlying assumptions of FDR and pFDR differ from Bonferroni and sequential Bonferroni
 
@@ -211,12 +213,6 @@ qobj <- qvalue(Ps$P, fdr.level = 0.05, pi0.method = "smoother")
 ## pFDR in practice
 
 ```{r}
-plot(qobj)
-```
-
-## pFDR in practice
-
-```{r}
 summary(qobj)
 ```
 
@@ -246,8 +242,12 @@ Include unadjusted *P* values and adjust $\alpha$. Discuss results with respect 
 
 > After completing our statistical analyses, a positive false discovery rate (pFDR) analysis was used to control the false discovery rate at 0.05. Our pFDR analysis used the "smoother" option in the R package `qvalue`. We determined that an adjusted $\alpha$ level of 0.040 controlled experiment-wide false discovery at 5% for our 203 statistical tests, and subsequent inferences (Tables 1-3 in the electronic supplementary materials) use this adjusted $\alpha$ level. All tables present raw (unadjusted) *P* values.
 
+## Empirical estimate of FDR
+
+How could you estimate the expected number of false positives for a given dataset?
+
 ## Quiz 12-3
 
-Lecture 12-4
+No more lectures.
 
 ## References

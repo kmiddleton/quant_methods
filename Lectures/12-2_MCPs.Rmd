@@ -19,7 +19,7 @@ library(readxl)
 
 ## Distribution of *P* values 
 
-*P* values resulting from chance alone have a uniform distribtution
+*P* values resulting from chance alone have a uniform distribution
 
 ```{r echo=FALSE,  message = FALSE}
 set.seed(3210)
@@ -48,7 +48,7 @@ ggplot(ps, aes(x=p1)) +
 
 ## Distribution of *P* values 
 
-*P* values resulting from chance alone have a uniform distribtution
+*P* values resulting from chance alone have a uniform distribution
 
 ```{r echo=FALSE, message = FALSE}
 Ps <- ps %>% arrange(-log10(p1))
@@ -63,7 +63,7 @@ ggplot(Pp, aes(x=X, y=P)) +
 
 ## Distribution of *P* values 
 
-*P* values resulting from chance alone have a uniform distribtution
+*P* values resulting from chance alone have a uniform distribution
 
 ```{r echo=FALSE, message = FALSE}
 require(latex2exp, quietly = TRUE)
@@ -88,12 +88,12 @@ p <- ggplot(M, aes(x, y)) +
  geom_line() +
  ylim(c(0, 1.1 * max(M$y))) +
  labs(x = TeX("$F_{3, 10$"), y = "Relative Likelihood")
-
+ccs <- c("steelblue","coral","steelblue","coral","steelblue","coral","steelblue","coral","steelblue","coral")
 for (ii in 1:length(p1)) {
  p <- p +
    geom_ribbon(data = subset(M, x > F1[ii] & x < F2[ii]),
                aes(ymax = y), ymin = 0,
-               fill = rainbow(10)[ii])
+               fill = ccs[ii])#rainbow(10)[ii])
 }
 p
 ```
