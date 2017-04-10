@@ -168,7 +168,7 @@ We are going to work with two files, one containing a tree of (extant) primates 
 
 ### Activity
 
-a. Load the `Primate_Masses.xlsx` file and explore the contents. You will find columns:
+Load the `Primate_Masses.xlsx` file and explore the contents. You will find columns:
 
 - `Order`: Traditional Linnean order
 - `Family`: Traditional Linnean family
