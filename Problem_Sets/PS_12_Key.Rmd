@@ -1,0 +1,65 @@
+---
+title: 'Problem Set 12'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(stringr)
+library(readxl)
+library(cowplot)
+
+# This option turn on cacheing of chunks. This will dramatically
+# speed up knitting, because only chunks that have changed will
+# be recompiled.
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+```{r}
+# Data preparation
+
+sid <- read_csv("../data/Butteryfly_IDs.csv",
+                col_names = c("ID", "Treatment", "Sex", "Population"))
+sid <- sid %>% 
+  mutate(Treatment = str_replace(Treatment, "treatment: ", ""),
+         Sex = str_replace(Sex, "Sex: ", ""),
+         Population = str_replace(Population, "population: ", ""),
+         ID2 = str_split(ID, "_", simplify = TRUE)[, 2],
+         ID = str_split(ID, "_", simplify = TRUE)[, 1],
+         ID = str_replace_all(ID, "-", "_")) %>% 
+  filter(ID2 == 450) %>% 
+  dplyr::select(-ID2)
+
+gg <- read_delim("../data/Butterfly_NormalizedCountsGenes.txt",
+                 delim = "\t")
+samp.names <- colnames(gg)[-1]
+gene.names <- gg$gene
+gg <- t(gg[, -1])
+colnames(gg) <- gene.names
+gg <- bind_cols(
+  data_frame(ID = str_replace_all(row.names(gg), "-", "_")),
+  as.data.frame(gg))
+
+ngenes <- 50
+gg_samp <- gg[, c(1, sample(size = ngenes, x = 2:ncol(gg)))]
+
+M <- left_join(sid, gg_samp)
+write_csv(M, path = "../data/Butterfly_Gene_Expression.csv")
+```
+
+```{r}
+M <- read_csv("../data/Butterfly_Gene_Expression.csv")
+str(M)
+
+Ys <- as.matrix(M[, 5:ncol(M)])
+
+fm <- lm(Ys ~ Sex, data = M)
+```
+
