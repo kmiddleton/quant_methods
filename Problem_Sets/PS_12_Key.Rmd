@@ -25,6 +25,12 @@ knitr::opts_chunk$set(cache = TRUE)
 ```{r}
 # Data preparation
 
+quant.norm<-function(y)
+{
+  nn<-qqnorm(y,plot.it=FALSE)
+  return(nn$x)
+}
+
 sid <- read_csv("../data/Butteryfly_IDs.csv",
                 col_names = c("ID", "Treatment", "Sex", "Population"))
 sid <- sid %>% 
@@ -42,24 +48,212 @@ gg <- read_delim("../data/Butterfly_NormalizedCountsGenes.txt",
 samp.names <- colnames(gg)[-1]
 gene.names <- gg$gene
 gg <- t(gg[, -1])
+rr.temp<-row.names(gg)
+gg<-apply(gg, 2, function(x) quant.norm(x))
 colnames(gg) <- gene.names
+rownames(gg)<-rr.temp
 gg <- bind_cols(
   data_frame(ID = str_replace_all(row.names(gg), "-", "_")),
   as.data.frame(gg))
 
-ngenes <- 50
+ngenes <- 100
 gg_samp <- gg[, c(1, sample(size = ngenes, x = 2:ncol(gg)))]
 
 M <- left_join(sid, gg_samp)
+M <- M[,-c(2,4)]
+
 write_csv(M, path = "../data/Butterfly_Gene_Expression.csv")
 ```
 
 ```{r}
-M <- read_csv("../data/Butterfly_Gene_Expression.csv")
-str(M)
+getP <- function(fm)
+{
+  sum.set <- summary(fm)
+  p.set <- lapply(sum.set, function(x) x[['coefficients']][2,4])
+  return(unlist(p.set))
+}
 
-Ys <- as.matrix(M[, 5:ncol(M)])
-
-fm <- lm(Ys ~ Sex, data = M)
 ```
 
+## RNAseq (gene expression) on males and females of the Glanville Fritillary
+
+<div style="width:350px">
+![](http://i1.treknature.com/photos/1289/melitaea_cinxia.jpg)
+
+</div>
+
+Load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `data.frame` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures).  We will perform 100 regressions using `lm()`, predicting each gene expresson measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the example code below and follow the same procedure to fit all 100 models at once.
+
+```{r}
+ex.dat <- data.frame('treatment' = rep(c('a','b'),each=20),
+                     'yy1' = rnorm(40),'yy2'=rnorm(40))
+
+treat <- ex.dat$treatment
+YYs <- as.matrix(ex.dat[,2:3])
+
+mods <- lm(YYs ~ treat)
+summary(mods)
+
+
+#FIXME
+M <- read_csv("../data/Butterfly_Gene_Expression.csv")
+
+Ys <- as.matrix(M[, 3:ncol(M)])
+
+fm <- lm(Ys ~ Sex, data = M)
+
+```
+
+Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. Do this for your data and assign it to an object, `obsP`. Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1). Based on these visualizations, do you think there are true positives in this dataset?  
+
+```{r}
+ex.P <- getP(mods)
+
+#FIXME
+obsP<-data.frame('P'=getP(fm))
+
+ggplot(obsP, aes(P)) +
+  geom_histogram(bins=20)
+
+qqP <- data.frame('observed' = sort(-log10(obsP$P)),
+                  'expected' = sort(-log10(runif(100,0,1))))
+
+ggplot(qqP, aes(x=expected, y=observed)) +
+  geom_point() +
+  geom_abline(intercept=0,slope=1)
+
+```
+
+> 
+
+Holm
+
+FDR
+
+pFDR
+
+Perform a randomization to estimate the number of expected false positives for this experiment. 1) You will want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) Perform your set of 100 tests in the same way that you did above. 3) Collect the associated p values using the `getP` function. 4) Keep these in a 1000 x 100 matrix with each column as one iteration. This process will take a few minutes to run. You may want to test the steps with a small number of iterations first.  
+
+```{r}
+#FIXME
+set.seed(874628)
+niter <- 1000
+
+Ys <- as.matrix(M[, 3:ncol(M)])
+Sex <- M$Sex
+
+allP <- matrix(NA, ncol(Ys), niter)
+
+for(kk in 1:niter)
+{
+  fms <- lm(Ys ~ sample(Sex))
+  allP[,kk] <- getP(fms)
+}
+
+```
+
+Visualize the p-values from one or a few of your iterations as you did above with a histogram and a q-q plot.
+
+```{r}
+
+it1 <- data.frame('P'=allP[,5])
+ggplot(it1, aes(P)) +
+  geom_histogram(bins=20)
+
+qqP <- data.frame('observed' = sort(-log10(it1$P)),
+                  'expected' = sort(-log10(runif(100,0,1))))
+
+ggplot(qqP, aes(x=expected, y=observed)) +
+  geom_point() +
+  geom_abline(intercept=0,slope=1)
+
+```
+
+For each iteration, get a count of the number of positives at a threshold of 0.05. Visualize the number of positives with a histogram. Keep in mind, because you have randomized the data, all positives here are false postives.
+
+- Calculate the average number of false positives and the average false positive rate at a threshold of 0.05.
+- Now calculate the Family-Wise Error Rate (FWER) at a threshold of 0.05 by calculating the proportion of iterations that result in at least one significant result.
+- Use your average estimated number of false positives to calculate the false discovery rate at a threshold of 0.05. Note you will need to consider your observed number of positives for this calculation. 
+
+
+```{r}
+
+th <- 0.05
+
+pos.counts <- data.frame('counts' = apply(allP, 2, function(x) sum(x< th)))
+
+ggplot(pos.counts, aes(counts)) +
+  geom_histogram(bins=20)
+
+
+mean(pos.counts$counts)
+
+mean(pos.counts$counts)/100
+
+sum(pos.counts>=1)/1000
+
+mean(pos.counts$counts)/sum(obsP$P < th)
+
+```
+
+
+Now use this same procedue to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `data.frame`.
+
+```{r}
+thresholds <- seq(0.0005, 0.05 , length = 200)
+
+#FIXME
+
+output <- data.frame('threshold' = thresholds,
+                      'FP' = numeric(length(thresholds)), 
+                     'FWER' = numeric(length(thresholds)),
+                     'FDR' = numeric(length(thresholds))
+                     ) 
+
+for(tt in 1:length(thresholds))
+{
+  th <- thresholds[tt]
+
+pos.counts <- data.frame('counts' = apply(allP, 2, function(x) sum(x< th)))
+
+output[tt,'FP'] <- mean(pos.counts$counts)/100
+
+output[tt,'FWER'] <- sum(pos.counts>=1)/1000
+
+output[tt,'FDR'] <- mean(pos.counts$counts)/sum(obsP$P < th)
+  
+}
+
+output
+```
+
+Make plots of the FDR, FP, and FWER plotted against the threshold (feel free to make three separate plots). In each, draw a horizontal line at 5%.
+
+```{r}
+#FIXME
+output %>%
+  ggplot(aes(threshold, FDR)) +
+  geom_point() +
+  geom_hline(yintercept = 0.05)
+
+output %>%
+  ggplot(aes(threshold, FP)) +
+  geom_point() +
+  geom_hline(yintercept = 0.05)
+
+output %>%
+  ggplot(aes(threshold, FWER)) +
+  geom_point() +
+  geom_hline(yintercept = 0.05)
+```
+
+Inspecting the `data.frame` you made above, what p-value threshold should you use if you want a false discovery rate of 5%? 
+
+> 
+
+Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here. 
+
+```{r}
+minP <- apply(allP, 2, min)
+quantile(minP, 0.05)
+```
