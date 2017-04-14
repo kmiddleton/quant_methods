@@ -11,53 +11,7 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-library(tidyverse)
-library(stringr)
-library(readxl)
-library(cowplot)
-```
 
-```{r}
-# Data preparation
-set.seed(28462)
-
-quant.norm <- function(y) {
-  nn <- qqnorm(y, plot.it = FALSE)
-  return(nn$x)
-}
-
-sid <- read_csv("../data/Butteryfly_IDs.csv",
-                col_names = c("ID", "Treatment", "Sex", "Population"))
-sid <- sid %>% 
-  mutate(Treatment = str_replace(Treatment, "treatment: ", ""),
-         Sex = str_replace(Sex, "Sex: ", ""),
-         Population = str_replace(Population, "population: ", ""),
-         ID2 = str_split(ID, "_", simplify = TRUE)[, 2],
-         ID = str_split(ID, "_", simplify = TRUE)[, 1],
-         ID = str_replace_all(ID, "-", "_")) %>% 
-  filter(ID2 == 450) %>% 
-  dplyr::select(-ID2)
-
-gg <- read_delim("../data/Butterfly_NormalizedCountsGenes.txt",
-                 delim = "\t")
-samp.names <- colnames(gg)[-1]
-gene.names <- gg$gene
-gg <- t(gg[, -1])
-rr.temp <- row.names(gg)
-gg <- apply(gg, 2, function(x) quant.norm(x))
-colnames(gg) <- gene.names
-rownames(gg) <- rr.temp
-gg <- bind_cols(
-  data_frame(ID = str_replace_all(row.names(gg), "-", "_")),
-  as.data.frame(gg))
-
-ngenes <- 100
-gg_samp <- gg[, c(1, sample(size = ngenes, x = 2:ncol(gg)))]
-
-M <- left_join(sid, gg_samp)
-M <- M[,-c(2,4)]
-
-write_csv(M, path = "../data/Butterfly_Gene_Expression.csv")
 ```
 
 ```{r}
@@ -90,11 +44,10 @@ YYs <- as.matrix(ex.dat[, 2:3])
 
 mods <- lm(YYs ~ treat)
 summary(mods)
+```
 
-#FIXME
-M <- read_csv("../data/Butterfly_Gene_Expression.csv")
-Ys <- as.matrix(M[, 3:ncol(M)])
-fm <- lm(Ys ~ Sex, data = M)
+```{r}
+
 ```
 
 Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. Do this for your data and assign it to an object, `obsP`. Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
@@ -102,102 +55,54 @@ Note this method produces a list of `lm()` results. We have written a function (
 ```{r}
 ex.P <- getP(mods)
 
-#FIXME
-set.seed(273645)
-obsP <- data.frame('P' = getP(fm))
-
-ggplot(obsP, aes(P)) +
-  geom_histogram(bins = 20)
-
-qqP <- data.frame('observed' = sort(-log10(obsP$P)),
-                  'expected' = sort(-log10(runif(100, 0, 1))))
-
-ggplot(qqP, aes(x = expected, y = observed)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1)
 ```
 
 Based on these visualizations, do you think there are true positives in this data set?
 
-> Probably. The P-values deviate pretty strongly from the expected line. 
+> 
 
 Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction (Holmes procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a `data.frame` with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.
 
 ```{r}
-# FIXME
-seq_bonf <- p.adjust(obsP$P, method = "holm")
-data_frame(P = obsP$P,
-           seq_bonf) %>% 
-  arrange(P) %>% 
-  filter(seq_bonf <= 0.05)
-sum(seq_bonf < 0.05)
+
 ```
 
 Repeat the procedure above, but now use the false discovery rate procedure of Benjamini and Hochberg.
 
 ```{r}
-# FIXME
-fdr <- p.adjust(obsP$P, method = "fdr")
-data_frame(P = obsP$P,
-           fdr) %>% 
-  arrange(P) %>% 
-  filter(fdr <= 0.05)
-sum(fdr < 0.05)
+
 ```
 
 Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the `qvalue` package, which is available through Bio conductor (rather than CRAN).
 
 ```{r}
-library(qvalue)
-qobj <- qvalue(obsP$P, fdr.level = 0.05, pi0.method = "smoother")
-summary(qobj)
+
 ```
 
 What is the value of $\pi_0$? What does this value represent?
 
-> 0.39. This means that only 39% of the null hypotheses are true.
+> 
 
 How many P-values are associated with q-values less than 0.05?
 
-> 29 (of 32 nominally less than 0.05)
+> 
 
 What is an adjusted $\alpha$-level that will control pDFR at 0.05?
 
 ```{r}
-max(qobj$pvalues[qobj$qvalues <= 0.05])
+
 ```
 
 Perform a randomization to estimate the number of expected false positives for this experiment. 1) You will want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) Perform your set of 100 tests in the same way that you did above. 3) Collect the associated p values using the `getP` function. 4) Keep these in a 1000 x 100 matrix with each column as one iteration. This process will take a few minutes to run. You may want to test the steps with a small number of iterations first.  
 
 ```{r randomization, cache=TRUE}
-#FIXME
-set.seed(874628)
-niter <- 1000
 
-Ys <- as.matrix(M[, 3:ncol(M)])
-Sex <- M$Sex
-
-allP <- matrix(NA, ncol(Ys), niter)
-
-for (kk in 1:niter) {
-  fms <- lm(Ys ~ sample(Sex))
-  allP[, kk] <- getP(fms)
-}
 ```
 
 Visualize the P-values from one or a few of your iterations as you did above with a histogram and a q-q plot.
 
 ```{r}
-it1 <- data.frame('P' = allP[, 5])
-ggplot(it1, aes(P)) +
-  geom_histogram(bins = 20)
 
-qqP <- data.frame('observed' = sort(-log10(it1$P)),
-                  'expected' = sort(-log10(runif(100, 0, 1))))
-
-ggplot(qqP, aes(x = expected, y = observed)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1)
 ```
 
 For each iteration, get a count of the number of positives at a threshold of 0.05. Visualize the number of positives with a histogram. Keep in mind, because you have randomized the data, *all positives here are false postives*.
@@ -208,64 +113,19 @@ For each iteration, get a count of the number of positives at a threshold of 0.0
 
 
 ```{r}
-th <- 0.05
 
-pos.counts <- data.frame(
-  'counts' = apply(allP, 2, function(x) sum(x < th)))
-
-ggplot(pos.counts, aes(counts)) +
-  geom_histogram(bins = 20)
-
-mean(pos.counts$counts)
-
-mean(pos.counts$counts) / 100
-
-sum(pos.counts >= 1) / 1000
-
-mean(pos.counts$counts) / sum(obsP$P < th)
 ```
 
 Now use this same procedure to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `data.frame`.
 
 ```{r}
-thresholds <- seq(0.0005, 0.05 , length = 200)
 
-#FIXME
-output <- data.frame('threshold' = thresholds,
-                      'FP' = numeric(length(thresholds)), 
-                     'FWER' = numeric(length(thresholds)),
-                     'FDR' = numeric(length(thresholds))) 
-
-for (tt in 1:length(thresholds)) {
-  th <- thresholds[tt]
-  pos.counts <- data.frame(
-    'counts' = apply(allP, 2, function(x) sum(x < th)))
-  output[tt,'FP'] <- mean(pos.counts$counts) / 100
-  output[tt,'FWER'] <- sum(pos.counts >= 1) / 1000
-  output[tt,'FDR'] <- mean(pos.counts$counts) / sum(obsP$P < th)
-}
-output
-max(output$threshold[output$FDR <= 0.05])
 ```
 
 Make plots of the FDR, FP, and FWER plotted against the threshold (feel free to make three separate plots). In each, draw a horizontal line at 5%.
 
 ```{r}
-#FIXME
-output %>%
-  ggplot(aes(threshold, FDR)) +
-  geom_point() +
-  geom_hline(yintercept = 0.05)
 
-output %>%
-  ggplot(aes(threshold, FP)) +
-  geom_point() +
-  geom_hline(yintercept = 0.05)
-
-output %>%
-  ggplot(aes(threshold, FWER)) +
-  geom_point() +
-  geom_hline(yintercept = 0.05)
 ```
 
 Inspecting the `data.frame` you made above, what P-value threshold should you use if you want a false discovery rate of 5%? 
@@ -275,6 +135,5 @@ Inspecting the `data.frame` you made above, what P-value threshold should you us
 Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here. 
 
 ```{r}
-minP <- apply(allP, 2, min)
-quantile(minP, 0.05)
+
 ```
