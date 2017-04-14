@@ -110,7 +110,7 @@ ggplot(obsP, aes(P)) +
   geom_histogram(bins = 20)
 
 qqP <- data.frame('observed' = sort(-log10(obsP$P)),
-                  'expected' = sort(-log10(runif(100, 0, 1))))
+                  'expected' = sort(-log10(runif(length(obsP$P), 0, 1))))
 
 ggplot(qqP, aes(x = expected, y = observed)) +
   geom_point() +
