@@ -334,51 +334,6 @@ heplot(fm, type = "III")
 pairs(fm, type = "III")
 ```
 
-## Mammal milk
-
-```{r echo=FALSE}
-data("milk", package = "rethinking")
-
-M <- milk %>% select(clade, kcal.per.g, mass, neocortex.perc) %>% 
-  drop_na()
-
-# Transformations
-M <- M %>% mutate(neocortex.perc = neocortex.perc / 100,
-                  mass = log10(mass),
-                  clade = factor(clade)) %>% 
-  filter(clade != "Strepsirrhine")
-names(M) <- c("Clade", "Milk_Energy", "Mass", "Neocortex")
-```
-
-```{r echo=FALSE}
-ggscatmat(as.data.frame(M), 2:4, color = "Clade")
-```
-
-## Mammal milk
-
-```{r}
-fm <- lm(cbind(Milk_Energy, Mass, Neocortex) ~ Clade, data = M)
-Anova(fm, type = "III")
-```
-
-## Mammal milk
-
-```{r}
-heplot(fm, type = "III")
-```
-
-## Mammal milk
-
-```{r}
-pairs(fm, type = "III")
-```
-
-## Mammal milk
-
-```{r}
-fm
-```
-
 ## Tibetan skulls
 
 Morant [-@Morant1923-co] published data on 32 skulls from Tibet:
