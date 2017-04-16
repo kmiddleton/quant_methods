@@ -1,0 +1,488 @@
+---
+title: "Composite Variables: Introduction and PCA"
+author: 'Special Topics: Multivariate Statistics'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(cowplot)
+library(smatr)
+library(factoextra)
+library(readxl)
+# library(rgl)
+library(dplyr)
+library(tidyr)
+library(GGally)
+library(pls)
+library(knitr)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## Resources
+
+- Everitt and Hothorn [-@everitt_introduction_2011]: *An Introduction to Applied Multivariate Analysis with R*
+
+Tabachnick and Fidel
+
+## Motivation: the curse of dimensionality
+
+Multivariate data is not just a challenge for visualization.
+
+You have too many variables
+
+- Some are redundant in measuring essentially the same thing
+- Some are highly correlated with others (multicollinear)
+- Some are both
+
+Your number of variables approaches your number of observations.
+
+## What is a composite variable?
+
+> A linear combination of variables
+
+Multiple Regression Makes a Composite Variable
+
+- Linear combination of predictor variables that is maximally correlated with outcome variable
+- $y = {\beta_1}X_1 + {\beta_2}X_2 + {\beta_3}X_3$
+- $\hat{y}$  is a composite variable
+
+## Multiple regression makes a composite variable
+
+```{r echo=FALSE, warning = FALSE}
+milk <- read_excel("../data/Milk.xlsx", na = "NA")
+M <- milk %>% 
+  select(species, kcal.per.g, perc.fat, perc.lactose) %>%
+  drop_na()
+names(M) <- c("Species", "Milk_Energy", "Fat", "Lactose")
+```
+
+## Milk investment across mammalian species
+
+```{r echo=FALSE, warning = FALSE}
+ggscatmat(as.data.frame(M))
+```
+
+## Principal components analysis
+
+*Goals*:
+
+1. Create a set of composite variables that encompasses the shared variation among variables
+1. Reduce the dimensionality of a set of variables: from considering all variables separately to considering fewer composite variables, while
+1. Accounting for as much of the original variation as possible in the data set 
+
+No predictor or outcome variable. Think of it as a one sided equation.
+
+## Principal components
+
+*Principal components:*
+
+- Sequential linear combinations of the original variables 
+- The resulting composite variables *are uncorrelated with one another*
+- The first few usually account for *most* of the variation in the original data
+
+## Principal components
+
+For *q* variables, you get *q* PCs
+
+- First encompasses the maximum variance
+- Each in turn maximizes remaining variance while remaining uncorrelated
+
+## Milk investment 
+
+```{r echo=FALSE}
+ggplot(M, aes(Fat, Lactose)) + geom_point() + coord_fixed()
+```
+
+## Milk investment 
+
+Find the indices of the minimum and maximum of `x1`
+
+```{r}
+themin <- which.min(M$Fat)
+themax <- which.max(M$Fat)
+```
+
+Make a `data.frame` with the points for plotting
+
+```{r}
+minpt <- data.frame(x1 = M$Fat[themin], x2 = M$Lactose[themin])
+maxpt <- data.frame(x1 = M$Fat[themax], x2 = M$Lactose[themax])
+```
+
+## Milk investment 
+
+Green = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r echo=FALSE}
+ma <- line.cis(M$Lactose, M$Fat,  method = "MA")
+
+p <- ggplot(M, aes(Fat, Lactose)) + geom_point() +
+  geom_point(data = minpt, aes(x1, x2), col = "green", size = 3) +
+  geom_point(data = maxpt, aes(x1, x2), col = "blue", size = 3) +
+  coord_fixed()
+print(p)
+```
+
+## Major axis == PC1
+
+Green = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r echo=FALSE}
+MA_plot <- p +
+  geom_abline(slope = ma[2, 1], intercept = ma[1, 1],
+              color = "red",
+              size = 1.5)
+print(MA_plot)
+```
+
+## Minor axis == PC2
+
+Green = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r echo=FALSE}
+raw_plot <- MA_plot +
+  geom_abline(slope = -1/ma[2, 1],
+              intercept = mean(M$Lactose) - -1/ma[2, 1] * mean(M$Fat),
+              color = "red",
+              size = 1.5)
+print(raw_plot)
+```
+
+## Plotting PCs
+
+- Rotation of the axes of multivariate data 
+
+Green = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+
+```{r echo=FALSE}
+z <- prcomp(~ Fat + Lactose, data = M, center = TRUE, scale. = TRUE)
+PC <- data.frame(pc1 = z$x[, 1],
+                 pc2 = z$x[, 2])
+
+minpt <- data.frame(x1 = PC$pc1[themin], x2 = PC$pc2[themin])
+maxpt <- data.frame(x1 = PC$pc1[themax], x2 = PC$pc2[themax])
+
+pc_plot <- ggplot(PC, aes(pc1, pc2)) +
+  geom_vline(xintercept = 0, color = "red", size = 1.5) +
+  geom_hline(yintercept = 0, color = "red", size = 1.5) +
+  geom_point() +
+  geom_point(data = minpt, aes(x1, x2), col = "green", size = 3) +
+  geom_point(data = maxpt, aes(x1, x2), col = "blue", size = 3) +
+  coord_fixed()
+print(pc_plot)
+```
+
+## Comparing PCs
+
+Green = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r echo=FALSE}
+plot_grid(raw_plot, pc_plot, ncol = 2)
+```
+
+## Principal components
+
+`prcomp()` is the preferred function for PCA (*not* `princomp()`):
+
+```{r}
+z <- prcomp(~ Fat + Lactose, data = M, center = TRUE, scale. = TRUE)
+```
+
+- One sided formula: `~ Fat + Lactose`
+- Centered to a mean of 0
+- Scaled to standard deviation of 1
+
+## More PCA options
+
+Packages:
+
+- `ade4`: https://cran.r-project.org/web/packages/ade4/index.html
+- `FactoMineR`: https://cran.r-project.org/web/packages/FactoMineR/index.html
+
+We will use the built-in `prcomp()`.
+
+## `prcomp` objects {.smaller}
+
+```{r}
+str(z)
+```
+
+`x` is a matrix of the the principal components
+
+## Proportion of variance (eigenvalues)
+
+```{r}
+summary(z)
+```
+
+PC1 explains 97% of the variance in the data.
+
+## Loadings (eigenvectors)
+
+Correlations with with composite variable
+
+```{r}
+print(z)
+```
+
+- `Lactose` loads negatively on PC1 and PC2
+- `Fat` loads positively on PC1 and negatively on PC2
+- Magnitudes are more informative with more than 2 variables
+
+## Extracting PC scores
+
+```{r}
+PC <- data.frame(pc1 = z$x[, 1],
+                 pc2 = z$x[, 2])
+PC
+```
+
+## Extracting PC scores
+
+Green = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r echo=FALSE}
+PC <- data.frame(pc1 = z$x[, 1],
+                 pc2 = z$x[, 2])
+PC[1,]
+pc_plot <- ggplot(PC, aes(pc1, pc2)) +
+  geom_vline(xintercept = 0, color = "red", size = 1.5) +
+  geom_hline(yintercept = 0, color = "red", size = 1.5) +
+  geom_point() +
+  geom_point(data = minpt, aes(x1, x2), col = "green", size = 3) +
+  geom_point(data = maxpt, aes(x1, x2), col = "blue", size = 3) +
+  geom_point(aes(x= -1.785, y=-0.0636), col="cyan", size=3) +
+  geom_segment(x = -1.785, xend = -1.785, y = -1, yend = -0.0636, col='cyan',lty=3,lwd=1.2) +
+  geom_segment(x = -3, xend = -1.785, y = -0.0636, yend = -0.0636,col='cyan',lty=3,lwd=1.2) +
+  coord_fixed()
+print(pc_plot)
+
+```
+
+## Visualizing loadings with `biplot()`
+
+```{r}
+biplot(z)
+```
+
+## Use `factoextra` for more handy functions
+
+```{r eval=FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("kassambara/factoextra")
+library(factoextra)
+```
+
+http://www.sthda.com/english/wiki/factoextra-r-package-quick-multivariate-data-analysis-pca-ca-mca-and-visualization-r-software-and-data-mining
+
+## Extracting eigenvalues
+
+```{r}
+get_eig(z)
+```
+
+Eigenvalues are variances. Default R `print()` method returns standard deviations.
+
+## Screeplot
+
+```{r}
+fviz_eig(z, addlabels = TRUE)
+```
+
+## Biplot
+
+```{r}
+fviz_pca_var(z) + coord_fixed()
+```
+
+## Plot of PC scores
+
+```{r}
+fviz_pca_ind(z, geom = "text")
+```
+
+## Milk investment: PCA approach {.smaller}
+
+1. Do fat and lactose together predict milk energy?
+
+```{r}
+PC1 <- z$x[, 1]
+summary(lm(Milk_Energy ~ PC1, data = M))
+```
+
+
+## Milk investment: Multiple Regression {.smaller}
+
+1. Do fat and lactose together predict milk energy?
+
+```{r}
+fm_Multi <- lm(Milk_Energy ~ Fat + Lactose, data = M)
+summary(fm_Multi)
+```
+
+
+## Mammal life history
+
+```{r}
+M <- read_excel("../data/mammals.xlsx", na = "NA")
+M <- M %>% select(litter_size,
+                  adult_body_mass_g,
+                  neonate_body_mass_g,
+                  max_longevity_m,
+                  sexual_maturity_age_d)
+names(M) <- c("Litter_Size", "Adult_Mass",
+              "Neonate_Mass", "Longevity", "Maturity_Age")
+M <- M %>% drop_na()
+```
+
+## Mammal life history
+
+`~ .` means all columns
+
+```{r}
+z <- prcomp(~ .,
+            data = M,
+            center = TRUE,
+            scale. = TRUE)
+```
+
+## Mammal life history
+
+```{r}
+get_eig(z)
+```
+
+## Mammal life history
+
+```{r}
+print(z)
+```
+
+## Mammal life history
+
+```{r}
+fviz_eig(z, addlabels = TRUE)
+```
+
+## Mammal life history
+
+```{r}
+fviz_pca_var(z) + coord_fixed()
+```
+
+## Mammal life history
+
+```{r}
+fviz_pca_var(z, axes = c(2, 3)) + coord_fixed()
+```
+
+## Trilobites
+
+<center>
+<img src="images/Trilobite.gif" width="50%" />
+</center>
+
+## Trilobites
+
+```{r}
+M <- read_excel("../data/Trilobites.xlsx")
+M
+```
+
+```{r, echo=FALSE}
+M <- M %>% select(-Genus)
+```
+
+
+## Trilobites
+
+```{r echo=FALSE}
+p1 <- ggplot(M, aes(Body_Length, Glabella_Length)) +
+  geom_point()
+p2 <- ggplot(M, aes(Body_Length, Glabella_Width)) +
+  geom_point()
+p3 <- ggplot(M, aes(Glabella_Length, Glabella_Width)) +
+  geom_point()
+plot_grid(p1, p2, p3, ncol = 3)
+```
+
+## Trilobites
+
+```{r}
+z <- prcomp(~ .,
+            data = M,
+            scale. = TRUE,
+            center = TRUE)
+```
+
+## Trilobites
+
+```{r trilobite_z2}
+summary(z)
+```
+
+- PC1 accounts for about 93% of the variance
+
+## Trilobites
+
+```{r echo=FALSE}
+print(z)
+```
+
+- PC1 is overall size (all load positively)
+- PC2 is dominated by the negative correlation between body length and glabella width
+
+## Sample size and other concerns
+
+Suggested sample sizes vary:
+
+- *n* = over 50
+- *n*:*q* > 5:1 (often violated with genomic data)
+- *n* and *n*:*q* are both large
+
+All data:
+
+- Numeric (continuous)
+- No missing values
+
+## Best case
+
+- A small number of variables that can be used as surrogates for the larger set without too much loss of information
+- Lower dimensional summary of a larger set of variables
+
+PC1:
+
+- Variables that combined account for the most variance
+- For morphological data:
+    - Can often be a proxy for "size"
+    - Remaining PCs are "shape"
+
+## Drawbacks
+
+1. Lose the original variable identity
+    - Interpretation can be a challenge
+1. If centered and scaled (advised), you lose the original scale
+
+
+## References {.references}

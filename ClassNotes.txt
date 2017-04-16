@@ -358,7 +358,7 @@ understand why you expect p-values to be uniform
 understand how to use randomization to estimate false postitive rate empirically
 
 KMM
-never do a bonferonni 
+never do a bonferonni
 use something like FDR
 
 
@@ -388,7 +388,9 @@ Week 14: Composite variables
 
 Goals:
 
-possible application: population structure
+- difference between figuring out which is most important variable and a more holistic ?
+
+possible application:pop structure
 
 ---
 
