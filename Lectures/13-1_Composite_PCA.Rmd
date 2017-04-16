@@ -11,25 +11,23 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
-library(ggplot2)
+library(tidyverse)
 library(cowplot)
 library(smatr)
 library(factoextra)
 library(readxl)
-# library(rgl)
-library(dplyr)
-library(tidyr)
+library(rgl)
 library(GGally)
 library(pls)
 library(knitr)
+knit_hooks$set(webgl = hook_webgl)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ## Resources
 
-- Everitt and Hothorn [-@everitt_introduction_2011]: *An Introduction to Applied Multivariate Analysis with R*
-
-Tabachnick and Fidel
+- Everitt and Hothorn [-@Everitt2011-eu] *An Introduction to Applied Multivariate Analysis with R*. Springer.
+- Tabachnick and Fidell [-@Tabachnick2013-yo]: *Using Multivariate Statistics*. Pearson.
 
 ## Motivation: the curse of dimensionality
 
@@ -59,14 +57,20 @@ Multiple Regression Makes a Composite Variable
 milk <- read_excel("../data/Milk.xlsx", na = "NA")
 M <- milk %>% 
   select(species, kcal.per.g, perc.fat, perc.lactose) %>%
-  drop_na()
+  drop_na() %>%
+  as.data.frame()
 names(M) <- c("Species", "Milk_Energy", "Fat", "Lactose")
+
+ggscatmat(M)
 ```
 
 ## Milk investment across mammalian species
-
-```{r echo=FALSE, warning = FALSE}
-ggscatmat(as.data.frame(M))
+```{r webgl=TRUE, echo=FALSE}
+plot3d(M$Lactose, M$Fat, M$Milk_Energy,
+       type = "s", col = "red", size = 1,
+       xlab = "Lactose",
+       ylab = "Fat",
+       zlab = "Milk Energy")
 ```
 
 ## Principal components analysis
