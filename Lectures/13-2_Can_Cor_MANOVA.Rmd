@@ -261,6 +261,8 @@ Directional:
 3. MANCOVA: *p* Continuous ~ *q* Categorical + *r* Continuous
 4. (Multiple) correspondence analysis: *p* Categorical ~ *q* Categorical
 
+MANOVA creates a composite variable from the set of outcome variables and asks whether the groups differ. 
+
 ## General approach
 
 1. Think about the question you want to answer

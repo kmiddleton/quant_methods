@@ -99,7 +99,25 @@
           </hgroup>
   </slide>
 
-<slide class=''><hgroup><h2>Tibetan skulls</h2></hgroup><article  id="tibetan-skulls">
+<slide class=''><hgroup><h2>MANOVA vs DFA &amp; Logistic Regression</h2></hgroup><article  id="manova-vs-dfa-logistic-regression">
+
+<p>MANOVA and Hotelling&#39;s <em>T</em><sup>2</sup>: <em>p</em> Continuous ~ <em>q</em> Categorical</p>
+
+<p>MANOVA creates a composite variable from the set of outcome variables and asks whether the groups differ.</p>
+
+<ul>
+<li>Predict the composite from the group membership</li>
+</ul>
+
+<p>DFA &amp; Logistic Regression: <em>q</em> Categorical ~ <em>p</em> Categorical</p>
+
+<p>DFA and Logistic Regression create a composite variable from the set of predictor variables and asks which variables best predict group membership.</p>
+
+<ul>
+<li>Predict group membership from the composite scores</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Tibetan skulls</h2></hgroup><article  id="tibetan-skulls">
 
 <pre class = 'prettyprint lang-r'>M &lt;- read_excel(&quot;../data/Tibetan_Skulls.xlsx&quot;)
 str(M)</pre>
@@ -137,13 +155,15 @@ str(M)</pre>
 ## -1.61850  -0.36347   0.00947   0.44172   1.55552  
 ## 
 ## Coefficients:
-##              Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)  73.51908   44.81155   1.641   0.1009
-## Skull_Length -0.12895    0.09688  -1.331   0.1832
-## Skull_Width   0.32337    0.18138   1.783   0.0746
-## Skull_Height -0.10429    0.12311  -0.847   0.3969
-## Face_Height  -0.33545    0.23132  -1.450   0.1470
-## Face_Breadth -0.42403    0.27276  -1.555   0.1200
+##              Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)  73.51908   44.81155   1.641   0.1009  
+## Skull_Length -0.12895    0.09688  -1.331   0.1832  
+## Skull_Width   0.32337    0.18138   1.783   0.0746 .
+## Skull_Height -0.10429    0.12311  -0.847   0.3969  
+## Face_Height  -0.33545    0.23132  -1.450   0.1470  
+## Face_Breadth -0.42403    0.27276  -1.555   0.1200  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
@@ -160,12 +180,14 @@ str(M)</pre>
 <pre >## Analysis of Deviance Table (Type III tests)
 ## 
 ## Response: Origin
-##              LR Chisq Df Pr(&gt;Chisq)
-## Skull_Length   2.0626  1    0.15095
-## Skull_Width    5.9786  1    0.01448
-## Skull_Height   0.7866  1    0.37512
-## Face_Height    2.9075  1    0.08817
-## Face_Breadth   4.9508  1    0.02608</pre>
+##              LR Chisq Df Pr(&gt;Chisq)  
+## Skull_Length   2.0626  1    0.15095  
+## Skull_Width    5.9786  1    0.01448 *
+## Skull_Height   0.7866  1    0.37512  
+## Face_Height    2.9075  1    0.08817 .
+## Face_Breadth   4.9508  1    0.02608 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
 
 </article></slide><slide class=''><hgroup><h2>Tibetan skulls</h2></hgroup><article  id="tibetan-skulls-5" class="smaller">
 
@@ -200,22 +222,24 @@ str(M)</pre>
 ## No. of observations = 32
 ## AIC value = 32.162</pre>
 
-</article></slide><slide class=''><hgroup><h2>Logistic regression to discriminant function analysis</h2></hgroup><article  id="logistic-regression-to-discriminant-function-analysis">
+</article></slide><slide class=''><hgroup><h2>Logistic regression vs. DFA</h2></hgroup><article  id="logistic-regression-vs.-dfa">
 
-<p>Logistic regression:</p>
+<p>Both:</p>
 
 <ul>
 <li>Which variable(s) are good predictors of group membership</li>
-</ul>
-
-<p>Discriminant function analysis:</p>
-
-<ul>
-<li>Predict which categories sets of variables are good at predicting</li>
 <li>Groups are known <em>a priori</em></li>
 <li>Uses linear combinations of variables</li>
-<li>Like the reverse of MANOVA</li>
 <li><strong>Predict new observations</strong></li>
+</ul>
+
+<p>Differences:</p>
+
+<ul>
+<li>Some assumptions</li>
+<li>Predictive ability (depends on specifics)</li>
+<li>See: <a href='https://stats.stackexchange.com/questions/95247/logistic-regression-vs-lda-as-two-class-classifiers' title=''>this stackexchange</a></li>
+<li>Ease of interpretation for different questions</li>
 </ul>
 
 </article></slide><slide class=''><hgroup><h2>Iris data</h2></hgroup><article  id="iris-data">

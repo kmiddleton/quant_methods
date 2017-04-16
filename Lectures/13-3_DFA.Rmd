@@ -20,6 +20,21 @@ library(epiDisplay)
 library(car)
 ```
 
+## MANOVA vs DFA & Logistic Regression
+
+MANOVA and Hotelling's *T*^2^: *p* Continuous ~ *q* Categorical
+
+MANOVA creates a composite variable from the set of outcome variables and asks whether the groups differ.
+
+  - Predict the composite from the group membership
+
+DFA & Logistic Regression: *q* Categorical ~ *p* Categorical
+
+DFA and Logistic Regression create a composite variable from the set of predictor variables and asks which variables best predict group membership.
+
+  - Predict group membership from the composite scores
+
+
 ## Tibetan skulls
 
 ```{r}
@@ -63,19 +78,21 @@ Anova(fm, type = "III")
 logistic.display(fm)
 ```
 
-## Logistic regression to discriminant function analysis
+## Logistic regression vs. DFA
 
-Logistic regression:
+Both:
 
 - Which variable(s) are good predictors of group membership
-
-Discriminant function analysis:
-
-- Predict which categories sets of variables are good at predicting
 - Groups are known *a priori*
 - Uses linear combinations of variables
-- Like the reverse of MANOVA
 - **Predict new observations**
+
+Differences:
+
+- Some assumptions
+- Predictive ability (depends on specifics)
+- See: [this stackexchange](https://stats.stackexchange.com/questions/95247/logistic-regression-vs-lda-as-two-class-classifiers)
+- Ease of interpretation for different questions
 
 ## Iris data
 
