@@ -252,6 +252,25 @@ new_oreo <- data.frame(Length = c(30, 25, 25),
 predict(oreo_lda, new_oreo)
 ```
 
+## Prediction with `glm()`
+
+```{r}
+logit_to_prob <- function(logit) {
+  odds <- exp(logit)
+  prob <- odds / (1 + odds)
+  return(prob)
+}
+
+fm <- glm(Sex ~ ., data = M, family = "binomial")
+```
+
+## Prediction with `glm()`
+
+```{r}
+(pred <- predict(fm, newdata = new_oreo))
+logit_to_prob(pred)
+```
+
 ## Quiz 13-3
 
 No more lectures this week.

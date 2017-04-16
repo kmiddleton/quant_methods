@@ -95,7 +95,7 @@
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
       <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
       <p data-config-presenter><!-- populated from slide_config.json --></p>
-            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-04-15</p>
+            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-04-16</p>
           </hgroup>
   </slide>
 
@@ -615,6 +615,30 @@ predict(oreo_lda, new_oreo)</pre>
 ## 1  1.56706914
 ## 2  0.82963240
 ## 3 -0.07548666</pre>
+
+</article></slide><slide class=''><hgroup><h2>Prediction with <code>glm()</code></h2></hgroup><article  id="prediction-with-glm">
+
+<pre class = 'prettyprint lang-r'>logit_to_prob &lt;- function(logit) {
+  odds &lt;- exp(logit)
+  prob &lt;- odds / (1 + odds)
+  return(prob)
+}
+
+fm &lt;- glm(Sex ~ ., data = M, family = &quot;binomial&quot;)</pre>
+
+<pre >## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</pre>
+
+</article></slide><slide class=''><hgroup><h2>Prediction with <code>glm()</code></h2></hgroup><article  id="prediction-with-glm-1">
+
+<pre class = 'prettyprint lang-r'>(pred &lt;- predict(fm, newdata = new_oreo))</pre>
+
+<pre >##          1          2          3 
+##  9.2935302  7.6636205 -0.5391932</pre>
+
+<pre class = 'prettyprint lang-r'>logit_to_prob(pred)</pre>
+
+<pre >##         1         2         3 
+## 0.9999080 0.9995306 0.3683753</pre>
 
 </article></slide><slide class=''><hgroup><h2>Quiz 13-3</h2></hgroup><article  id="quiz-13-3">
 
