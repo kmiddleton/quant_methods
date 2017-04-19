@@ -9,13 +9,7 @@ output:
 ---
 
 ```{r setup, echo=TRUE, message=FALSE, warning=FALSE}
-# FIXME
-library(readxl)
 library(tidyverse)
-library(cowplot)
-library(car)
-library(epiDisplay)
-library(forcats)
 ```
 
 ## Exploring PCA 
@@ -51,19 +45,19 @@ Rerun the code above, changing different parameters as you go, to answer the fol
 
 Keeping `rho`, `sigma`, and `n` constant, how does changing `mu` influence the proportion of variance accounted for by `V1` and `V2`? Briefly explain.
 
-> No change, because the data are centered prior to PCA.
+> 
 
 Keeping `rho`, `mu`, and `sigma` constant, how does changing `n` influence the proportion of variance accounted for by `V1` and `V2`? Briefly explain.
 
-> No change, because the correlation does not depend on `n`.
+> 
 
 Keeping `rho`, `mu`, and `n` constant, how does changing `sigma` influence the proportion of variance accounted for by `V1` and `V2`? Briefly explain.
 
-> No change, because the data are scaled prior to PCA.
+> 
 
 Keeping `mu`, `sigma`, and `n` constant, how does changing `rho` influence the proportion of variance accounted for by `V1` and `V2`? Be sure to explore the full possible range of `rho`. Briefly explain.
 
-> As `rho` increases, the proportion of variable accounted for by the first PC increases.
+> 
 
 ## Return of the Sole
 
@@ -74,48 +68,34 @@ In Week 8, we looked at presence/absence data for the common sole ([*Solea solea
 Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
 
 ```{r}
-# FIXME
-M <- read_excel("../data/Sole.xlsx")
-M <- M %>% mutate(season = factor(season),
-                  month = factor(month),
-                  area = factor(area),
-                  Solea_solea = factor(Solea_solea))
-M <- M %>% as.data.frame()
-str(M)
+
 ```
 
 The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent their proportional concentrations in the substrate (they sum to 100). Calculate a composite score for "substrate". Use principal components analysis on these columns.
 
 ```{r}
-# FIXME
-z <- prcomp(~ gravel + large_sand + med_fine_sand + mud,
-              data = M,
-              scale. = TRUE,
-              center = TRUE)
+
 ```
 
 Use the `summary()` and `print()` methods to determine the percent of variance accounted for by each PC and the relative loadings of each variable.
 
 ```{r}
-summary(z)
-z
+
 ```
 
 Fit a logistic regression where presence of sole is predicted by the first PC from the PCA above. Refer to the lecture slides if you need to.
 
 ```{r}
-# FIXME
-fm2 <- glm(Solea_solea ~ z$x[, 1], data = M, family = "binomial")
+
 ```
 
 Try to interpret the output of the summary of the fitted model from part d. Why kind of substrate do sole appear to prefer?
 
 ```{r}
-# FIXME
-summary(fm2)
+
 ```
 
-> PC is basically as axis of sand (large, medium, fine) with values in negative PC1 scores to mud in positive PC1 scores. Gravel doesn't load appreciably on PC1. Logistic regression shows that as PC1 score increases, sole are less likely to be present (negative coefficient estimate). So sole are less likely to be present as the substrate gets more muddy. They are more likely to be present as the substrate gets more sandy.
+> 
 
 ## Egyptian skulls
 
@@ -132,79 +112,54 @@ Thompson, A. and Randall-Maciver, R. (1905) *Ancient races of the Thebaid: Being
 Load the file. Convert `Time_Period` to a factor. Group by `Time_Period` and use `tally()` to confirm that there are 30 skulls per time period. Also, relevel the time periods so they go in chronological order (if you convert to factor with `forcats::fct_inorder()`, this will happen automagically).
 
 ```{r}
-# FIXME
-M <- read_excel("../data/Egyptian_Skulls.xlsx")
-M <- M %>% mutate(Time_Period = fct_inorder(Time_Period))
-M %>% group_by(Time_Period) %>% tally()
 
-# With base R
-# M$Time_Period <- relevel(M$Time_Period, ref = "200_BC")
-# M$Time_Period <- relevel(M$Time_Period, ref = "1850_BC")
-# M$Time_Period <- relevel(M$Time_Period, ref = "3300_BC")
-# M$Time_Period <- relevel(M$Time_Period, ref = "4000_BC")
 ```
 
 Use MANOVA to predict `Maximum_Breadth`, `Basibregmatic_Height` `Basialveolar_Length`, and `Nasal_Height` from `Time_Period` using the `lm()` function (see the lecture notes). 
 
 ```{r}
-# FIXME
-fm <- lm(cbind(Maximum_Breadth, Basibregmatic_Height,
-               Basialveolar_Length, Nasal_Height) ~ Time_Period,
-         data = M)
+
 ```
 
 Generate the MANOVA table with `Anova()` using type III sums of squares.
 
 ```{r}
-# FIXME
-Anova(fm, type = "III")
+
 ```
 
 What is your interpretation of the results of the MANOVA?
 
-> Collectively the multivariate measurements vary by time periods.
+> 
 
 We can also flip the analysis around and try to classify skulls by time period by their measurements. Use discriminant function analysis (linear discriminant analysis) to classify skulls by time period. See the lecture notes.
 
 ```{r}
-# FIXME
-skulls_lda <- lda(Time_Period ~ ., data = M)
+
 ```
 
 Calculate the percent correct classification for the DFA using the full dataset.
 
 ```{r}
-# FIXME
-skulls_predict <- predict(skulls_lda, M[, 1:4])
-skulls_classify <- skulls_predict$class
-mean(skulls_classify == M$Time_Period)
+
 ```
 
 Generate the confusion matrix for the classification. Are there any patterns as to which time periods are best or worst predicted?
 
 ```{r}
-# FIXME
-table(Original = M$Time_Period, Predicted = skulls_classify)
+
 ```
 
-> They are all actually pretty mediocre. Only 34% are correctly classified.
+> 
 
 Now use the `CV=TRUE` option to perform leave-one-out cross validation (see the help for `lda()`). 
 
 ```{r}
-# FIXME
-skulls_lda <- lda(Time_Period ~ ., data = M, CV = TRUE)
 
-ct <- table(M$Time_Period, skulls_lda$class)
-#% correct for each time period
-diag(prop.table(ct, 1))
-# total percent correct
-sum(diag(prop.table(ct)))
 ```
 
 How does the percent correct compare to using the full data set to estimate this quantity? Explain why you observe a difference.
 
-> It's 29% for the CV and 34% in the full dataset. The 29% is probably more accurate, because the percent seems sensitive to individual observations.
+> 
 
 ## Pottery
 
@@ -217,77 +172,61 @@ A. Tubb and N. J. Parker and G. Nickless (1980), The analysis of Romano-British 
 Load the file `pottery.xslx` and check the structure, and create a new object having dropped the column `kiln`. This will leave you with 9 columns of data in your new object. We will return to the `data.frame` with `kiln` later.
 
 ```{r}
-# FIXME
-M.all <- read_excel("../data/pottery.xlsx")
-M <- M.all %>% dplyr::select(-kiln)
+
 ```
 
 Calculate the principal components using centered and scaled data.
 
 ```{r}
-# FIXME
-z <- prcomp(~., M, center = TRUE, scale. = TRUE)
+
 ```
 
 Using the `summary()` output: (1) what percentage of the variance does PC1 account for? (2) What percentage of the variation do the first 5 PCs cumulatively account for?
 
 ```{r}
-summary(z)
+
 ```
 
-> PC1 accounts for 47% of the variance. PCs 1-5 account for 94% of the variance.
+> 
 
 Using the `print()` method for a `prcomp` object, (1) what variables load positively on PC1? (2) What variables load negatively on PC1? (3) What variables have minimal loading on PC1?
 
 ```{r}
-z
+
 ```
 
-> Fe2O3, MgO, Na2O, K2O, and MnO load positively on PC1. CaO and BaO also do, but they have very low scores. CaO and Fe2O3 load negatively on PC3.
+> 
 
 Make a biplot of PC2 vs. PC1. What variables have similar loadings on these two axes?
 
 ```{r}
-biplot(z)
+
 ```
 
-> Al2O3 and TiO2 load together. BaO, CaO, Na2O, and Fe2O3 cluster together. MnO, K2O, and MgO also load similarly.
+> 
 
 Return to the full dataset including the `kiln` column. Convert `kiln` to a factor.
 
 ```{r}
-# FIXME
-M.all$kiln <- factor(M.all$kiln)
+
 ```
 
 Perform discriminant function analysis on the kiln column predicted by the first 9 variables. Calculate the percent correct classification for the full set (as above).
 
 ```{r}
-# FIXME
-pottery_lda <- lda(kiln ~ ., data = M.all)
-pottery_predict <- predict(pottery_lda, M.all[, 1:9])
-pottery_classify <- pottery_predict$class
-mean(pottery_classify == M.all$kiln)
+
 ```
 
 Calculate the confusion table for the classification.
 
 ```{r}
-# FIXME
-table(Original = M.all$kiln, Predicted = pottery_classify)
+
 ```
 
 Use the `CV = TRUE` option to perform cross validation and calculate the % correct and confusion table as in question 2, part h. 
 
 ```{r}
-# FIXME
-pottery_lda <- lda(kiln ~ ., data = M.all, CV = TRUE)
 
-ct <- table(M.all$kiln, pottery_lda$class)
-#% correct for each time period
-diag(prop.table(ct, 1))
-# total percent correct
-sum(diag(prop.table(ct)))
 ```
 
 A piece of pottery is found, but it's source is unknown. Chemical analysis reveals the following composition. Predict the source kiln it came from. Which kiln has the highest posterior probability? Use the `lda()` performed without `CV=TRUE` as that changes the structure of the output and won't work with `predict()`. 
@@ -303,20 +242,7 @@ A piece of pottery is found, but it's source is unknown. Chemical analysis revea
 - BaO: 0.016
 
 ```{r}
-# FIXME
-pottery_lda <- lda(kiln ~ ., data = M.all)
 
-pottery_new <- data.frame(
-  Al2O3 = 12.1,
-  Fe2O3 = 5.61,
-  MgO = 5.55,
-  CaO = 0.16,
-  Na2O = 0.19,
-  K2O = 4.45,
-  TiO2 = 0.71,
-  MnO = 0.991,
-  BaO = 0.016)
-predict(pottery_lda, pottery_new)
 ```
 
-> The posterior probability is >99% for kiln 3.
+> 
