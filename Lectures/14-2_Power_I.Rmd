@@ -1,0 +1,195 @@
+---
+title: "Experimental Design: Power I"
+author: 'Special Topics: Multivariate Statistics'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## Types of errors and statistical power
+
+|               | Reject H~0~    | Fail to reject H~0~   |
+|--------------:|:--------------:|:---------------------:|
+|H~0~ is true   | Type I error   | *Correct*             |
+|H~0~ is false  | *Correct*      | Type II error         |
+
+Type I error occurs when:
+
+- *P* is small by *random chance*, given that $\alpha$ is chosen ahead of the test
+
+Type II error probability depends on:
+
+- The value of $\alpha$
+- How "wrong" H~0~ is
+
+## Power
+
+- Probability that a random sample will lead to a rejection of H~0~
+- Dependent on how different the truth is from the null hypothesis
+- Inversely related to type II errors
+    - High power $\rightarrow$ low type II errors
+    - Low power $\rightarrow$ high type II errors
+
+## Power depends on effect size
+
+*Effect size*: The magnitude of the deviation from H~0~.
+
+If we can estimate effect size *before we do the study*, we can estimate the power.
+
+- Use previous information
+    - Your own pilot studies
+    - Other similar studies
+- Determine how big a difference we want to be able to detect
+    - A difference less than *X* is not biologically meaningful
+
+## Effect size
+
+> "An effect size is a standardized measure that quantifies the size of the difference between two groups or the strength of an association between two variables." [@Button2013-vg]
+
+Measures of effect size:
+
+1. Pearson's *r*
+1. *R*^2^: but note caveats of *R*^2^
+1. Cohen's *d*: *t*-tests [@Cohen1960-kq]
+1. Cohen's $f^2$, $\eta^2$: ANOVA-like [@Olejnik2003-km]
+1. Odds ratio (logistic regression)
+
+## Importance of effect size
+
+> "For example, if a sample size is 10 000, a significant *P* value is likely to be found even when the difference in outcomes between groups is negligible and may not justify an expensive or time-consuming intervention over another." [@Sullivan2012-rr]
+
+Consider an ordinary *t*-test:
+
+$$t=\frac{\bar{Y}_{1}-\bar{Y}_{2}}{SE_{Y_{1}-Y_{2}}}$$
+
+## Example calculation of effect size
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+M <- read_excel("../data/Mouse_Weaning_Data.xlsx", na = "NA")
+M <- M %>% mutate(Sex = ifelse(Sex == 0, "Female", "Male"))
+M$Sex <- factor(M$Sex)
+M_subs <- M %>% select(Sex, WnMass)
+M_subs <- M_subs %>% filter(complete.cases(.))
+ggplot(M_subs, aes(x = WnMass)) +
+  geom_histogram() +
+  facet_grid(Sex ~ .)
+```
+
+## Cohen's *d*
+
+Standardized differences measured in standard deviations.
+
+General guide for *t*-tests [also see @Sullivan2012-rr]:
+
+- 0.2 = "Small"
+- 0.5 = "Medium"
+- 0.8 = "Large"
+
+What you do with "small", "medium", and "large" is up to you.
+
+## According to Cohen
+
+> "there is a certain risk inherent in offering conventional operational definitions for those terms for use in power analysis in as diverse a field of inquiry as behavioral science"
+
+## Cohen's *d* using the `DescTools` package
+
+$$ d = \frac{\bar{Y_F} - \bar{Y_M}}{s_{\mbox{pooled}}} $$
+
+```{r}
+library(DescTools)
+Females <- M_subs$WnMass[M_subs$Sex == "Female"]
+Males <- M_subs$WnMass[M_subs$Sex == "Male"]
+CohenD(Females, Males)
+```
+
+## $\eta^2$ for jet lag data with `EtaSq()`
+
+Also in `DescTools`:
+
+```{r}
+data("JetLagKnees", package = "abd")
+fm <- lm(shift ~ treatment, data = JetLagKnees)
+EtaSq(fm)
+```
+
+## Power analysis is used for planning
+
+1. What sample size do I need?
+1. What is my power?
+1. How large of a difference can I detect?
+
+How much power is enough power? Some say 0.8.
+
+## Post-analysis power calculations
+
+Hoenig and Heisey [-@Hoenig2001-hz]:
+
+> "There is a large literature advicating that power calculation be made whenever one performs a statistical test of a hypothesis and one obtains a statitically nonsignificant result. ... This approach, which appears in various forms, is fundamentally flawed."
+
+- "Observed power" (power of an observed *P* value from a post-hoc power analysis) is mathematically tied to the *P* value.
+
+## Power analysis in R
+
+1. `pwr` package
+    - `pwr.t.test()`
+    - `pwr.anova.test()`
+    - `pwr.r.test()`
+1. Do it yourself (some examples later with Monte Carlo methods)
+
+## Commonalities
+
+1. *n* samples (*k* groups)
+1. *d* or *f* for hypothesized effect size (*r* hypothesized correlation)
+1. $\alpha$ level
+1. Power
+
+```{r}
+library(pwr)
+cohen.ES(test = "anov", size = "medium")
+```
+
+## Power analysis for a *t*-test
+
+Possible questions:
+
+1. What sample size do I need for a given effect size, $\alpha$, and power?
+1. What will my power be, for a given effect size, $\alpha$, and sample?
+1. What effect size will I be able to detect for a given sample, power, and $\alpha$? (This is difficult, because how do you know power?)
+
+## What sample size?
+
+```{r}
+pwr.t.test(d = 0.5, sig.level = 0.05, power = 0.80,
+           type = "two.sample")
+```
+
+## What is my power?
+
+```{r}
+pwr.t.test(d = 0.5, sig.level = 0.05, n = 15,
+           type = "two.sample")
+```
+
+## What effect size can I detect?
+
+```{r}
+pwr.t.test(power = 0.80, sig.level = 0.05, n = 1227,
+           type = "two.sample")
+```
+
+## Quiz 14-2
+
+Lecture 14-3
+
+## References {.references}

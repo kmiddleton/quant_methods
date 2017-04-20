@@ -1,0 +1,260 @@
+---
+title: "Experimental Design: Introduction"
+author: 'Special Topics: Multivariate Statistics'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## Readings
+
+- Hurlburt [-@Hurlbert1984-fn]: Pseudoreplication and the design of ecological field experiments
+
+## Other useful references
+
+- Button et al [-@Button2013-vg]: Power failure: why small sample size undermines the reliability of neuroscience
+- Colegrave and Ruxton [-@Colegrave2003-eb]: Confidence intervals are a more useful complement to nonsignificant tests than are power calculations
+- Hoenig and Heisey [-@Hoenig2001-hz]: The abuse of power: the pervasive fallacy of power calculations for data analysis
+- Sullivan and Feinn [-@Sullivan2012-rr]: Using effect size—or why the *P* value is not enough
+- http://www.nature.com/authors/policies/checklist.pdf
+
+## Subjectivity in data analysis
+
+> "None of this should be understood to mean that any statistical analysis is not inherently subjective, because of course it is--lots of little subjective decisions are involved in all parts of science. It's just that priors and Bayesian data analysis are no more inherently subjective than are likelihoods and the repeat sampling assumptions required for significance testing. Anyone who has visited a statistics help desk at a university has probably experienced this subjectivity--statisticians do not in general exactly agree on how to analyze anything but the simplest of problems." [@McElreath2015-no]
+
+## Why you should care about experimental design
+
+1. Ethics
+1. Time
+1. Money
+
+*More critical issues in the life sciences:*
+
+1. Random variation
+1. Confounding factors
+
+## Defining testable hypotheses
+
+*More important*:
+
+- Defining useful models
+
+**What biological processes could have produced the pattern I am observing?**
+
+- Although your analyses assume the opposite
+
+## Planning
+
+- What do I want to learn?
+- What data will I collect?
+- Do I have sufficient experimental power?
+- How will I analyze the data?
+    - What will the results tell me? Consider all the possibilities.
+
+## What to measure?
+
+What other data can I collect at the same time that might be useful at some unknown time in the future?
+
+- Keep everything
+
+## Randomization and confounding factors
+
+Independence is a critical assumption in (nearly) all your analyses
+
+- Non-random sampling precludes independence
+
+Can we really expect samples to be independent?
+
+- Museum specimens
+- Fossil record
+
+## Don't confound your groups
+
+Reviewer #3:
+
+> The authors are studying the osteohistological correlates of flight mode, yet the three adequately sampled species are completely confounded with both flight style and wing shape. Furthermore, two of the three are also closely related, further complicating the interpretation due to the phylogenetic relationships of two.
+
+## Replication and pseudoreplication
+
+**Replication is needed to estimate variation within a group.**
+
+- Replicates must be independent
+
+Think about:
+
+- Shared enclosures, common environments
+- Observations made in batches (days, months, years)
+- Repeated measures of a single individual
+- Measurements of genetically related units
+- Measurements of related species
+
+Some (all?) issues can be addressed statistically.
+
+## Repeatability of measurements
+
+Parsing out real variation vs. measurement error.
+
+How good are my observations?
+
+1. Discrete measurements: **interrater reliability**
+1. Continuous measurements: **intraclass correlation coefficient**
+
+## Interrater reliability
+
+How well do observers agree on an observation?
+
+- Different observers (should be randomized and blinded)
+- Same observer on different occasions (should be randomized and blinded)
+
+Measured by Cohen's $\kappa$. See Fleiss [-@Fleiss1971-pa] for details.
+
+- Fleiss's method generalizes Cohen's method to more than two observers (but works fine for only two).
+
+## Scoring archosaur suture morphology
+
+<center>
+<img src="images/Gator.png" width="80%" />
+</center>
+
+From Bailleul et al. [-@Bailleul2016-tk]
+
+## Characters {.smaller}
+
+```{r}
+M <- read_excel("../data/GatorObs.xlsx")
+M %>% filter(Specimen == "MOR-OST-1645")
+```
+
+## Data wrangling
+
+Extract observations as numeric vectors:
+
+```{r}
+Obs1 <- M %>% select(-Specimen) %>% filter(Observer == 1) %>%
+  as.matrix() %>% as.numeric()
+Obs2 <- M %>% select(-Specimen) %>% filter(Observer == 2) %>%
+  as.matrix() %>% as.numeric()
+```
+
+## Calculating IRR with `CohenKappa()`
+
+```{r}
+library(DescTools)
+CohenKappa(Obs1, Obs2, conf.level = 0.95)
+```
+
+Arbitrary discriptions:
+
+- > 0.75 = excellent
+- < 0.75 but > 0.4 = good to fair
+- < 0.4 = poor
+
+## Additional diagnostics
+
+```{r}
+cor.test(Obs1, Obs2, method = "spearman", exact = FALSE)
+sum(Obs1 != Obs2) / length(Obs1) # Percent disagreement
+```
+
+## Intraclass Correlation Coefficient
+
+For continuously varying measurements:
+
+$$\mbox{ICC} =\frac{\sigma_{A}^{2}}{\sigma_{A}^{2}+MS_{error}}$$
+
+$$\sigma_{A}^{2}=\frac{MS_{group}-MS_{error}}{n}$$
+
+- $n$ = Number of measurements per specimen (*not the sample size*).
+
+Uses the results of the one-way ANOVA:
+
+$$\mbox{Measurement} \sim \mbox{Specimen ID}$$
+
+## Repeatability of caliper measurements
+
+<center>
+<img src="images/Mouse_Bones.png" width="40%" />
+</center>
+
+## Calculation of ICC {.smaller}
+
+What is the ICC of repeated measurements of mouse bones?
+
+```{r}
+M <- read_excel("../data/G44_Morphometrics.xlsx")
+glimpse(M)
+```
+
+## Pairs of measurements
+
+```{r echo=FALSE}
+ggplot(M, aes(Len1, Len2)) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point() +
+  xlab("Femur Length #1 (mm)") +
+  ylab("Femur Length #2 (mm)")
+```
+
+## Data processing
+
+Want two columns: (1) measurement and (2) ID as a factor.
+
+```{r}
+Lengths <- data.frame(Fem_Len = c(M$Len1, M$Len2),
+                      MouseID = factor(c(M$MouseID, M$MouseID)))
+Lengths <- Lengths %>% drop_na()
+glimpse(Lengths)
+```
+
+## ICC via ANOVA
+
+```{r}
+fm <- aov(Fem_Len ~ MouseID, data = Lengths)
+print(summary(fm), digits = 5)
+```
+
+```{r}
+var_a <- (0.63579 - 0.00018) / 2
+var_a / (var_a + 0.00018)
+```
+
+ICC is 0.999 for these measurements.
+
+## With `ICCest()`
+
+```{r iccest, eval=FALSE}
+library(ICC)
+ICCest(MouseID,
+       Fem_Len,
+       data = Lengths,
+       alpha = 0.05,
+       CI.type = "Smith")
+```
+
+## With `ICCest()`
+
+```{r ref.label="iccest", echo=FALSE}
+```
+
+## Additional utility functions in `ICC` package
+
+`Nest()`: Given a predicted ICC and *k* measures per individual/group, this function will calculate the *N* individuals/groups required to obtain a desired confidence interval
+
+`effort()`: Given a fixed researcher effort (e.g., total number of assays able to be run), this function plots the optimum *k* measurements per individual to use in order to obtain the smallest confidence interval at an expected intraclass correlation coefficient (ICC) estimate.
+
+## Quiz 14-1
+
+Lecture 14-2
+
+## References {.references}

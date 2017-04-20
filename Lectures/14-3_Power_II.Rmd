@@ -1,0 +1,188 @@
+---
+title: "Experimental Design: Power II"
+author: 'Special Topics: Multivariate Statistics'
+date: 'Last updated: `r Sys.Date()`'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## Power analysis via simulation
+
+```{r}
+library(pwr)
+pwr.t.test(power = 0.8, d = 0.6)
+```
+
+## Power analysis via simulation
+
+Estimate power across a range of *d* and *n*:
+
+`d <- seq(0.1, 2, length.out = 50)`
+
+- Standardized mean differences from 0.1 to 2
+
+`n <- c(5, 10, 15, 20, 30, 50, 100)`
+
+- Sample sizes from 5 to 100
+
+## Power analysis via simulation
+
+```{r pwr_sim}
+d_seq <- seq(0.1, 2, length.out = 50)
+ns <- c(5, 10, 15, 20, 30, 50, 100)
+
+# data.frame with all combinations on d_seq and ns
+power_t <- expand.grid(d_seq, ns)
+names(power_t) <- c("d", "n")
+
+# Column for calculated power
+power_t$power <- numeric(nrow(power_t))
+
+for (i in 1:nrow(power_t)) {
+  d <- power_t$d[i]
+  n <- power_t$n[i]
+  power_t$power[i] <- pwr.t.test(n, d)$power
+}
+```
+
+## Power analysis via simulation
+
+```{r echo=FALSE}
+ggplot(power_t, aes(d, power, color = factor(n))) +
+  geom_hline(yintercept = 0.8, color = "darkblue") +
+  geom_line(size = 2) +
+  geom_point(aes(x = 0.6, y = 0.8), color = "red") +
+  ylim(c(0, 1)) +
+  scale_color_discrete(name = "n") +
+  theme(legend.justification = c(1, 0), legend.position = c(1, 0))
+```
+
+## Power analysis via simulation
+
+Generalizing to any type of analysis:
+
+1. Specify parameters (e.g., *n*, *d*, means, slope, intercept) in a biologically realistic range (reasonable variances)
+1. Simulate data that your process produces
+1. Determine if *P* value is less than $\alpha$.
+1. Repeat
+
+## Power analysis via simulation
+
+```{r pwr_manual_sim}
+set.seed(20)
+
+nsims <- 1e4
+d <- 0.4
+n <- 15
+alpha <- 0.05
+sig <- logical(nsims)  # Vector of TRUE/FALSE
+
+for (i in 1:nsims) {
+  x1 <- rnorm(n, mean = 0, sd = 1)
+  x2 <- rnorm(n, mean = d, sd = 1)
+  p <- t.test(x1, x2, var.equal = TRUE)$p.value
+  sig[i] <- p < alpha
+}
+```
+
+## Power analysis via simulation
+
+```{r}
+head(sig)
+mean(sig)
+pwr.t.test(n = 15, d = 0.4)$power
+```
+
+## Power analysis via simulation
+
+Simulate data from a exponential process:
+
+$$\mbox{Femur Length} = a \mbox{Mass}^b$$
+
+$$\log \mbox{Femur Length} = \log a + b \log \mbox{Mass}$$
+
+What is the power to detect deviations from isometry?
+
+- Simulate across a range of *n*
+- Use a range of slopes from 1/3 - 0.2 to 1/3 + 0.2
+
+## Power analysis via simulation
+
+```{r}
+nsims <- 1e4
+alpha <- 0.05
+ns <- c(5, 10, 25, 50, 100, 200, 400)
+b_null <- 1/3
+b_devs <- seq(-0.2, 0.2, length.out = 100)
+
+# Create data.frame with all combinations of ns and b_devs
+pwr_reg <- expand.grid(ns, b_devs)
+names(pwr_reg) <- c("n", "b_dev")
+pwr_reg$Power <- NA
+```
+
+## Power analysis via simulation  {.smaller}
+
+```{r pwr_sma, eval=FALSE}
+set.seed(912)
+# Iterate through the rows of `pwr_reg`
+for (i in 1:nrow(pwr_reg)) {
+  tic <- Sys.time()
+  message(i, " of ", nrow(pwr_reg))
+  n <- pwr_reg$n[i]
+  b_dev <- pwr_reg$b_dev[i]
+  sig <- logical(nsims)
+  
+  for (j in 1:nsims) {
+    log_Mass <- log(runif(n, 1, 1e3))
+    log_a <- rnorm(n, 1.31, 0.15)
+    log_Fem_Len <- log_a + (b_null + b_dev) * log_Mass
+    fm <- sma(log_Fem_Len ~ log_Mass, slope.test = b_null, method = "OLS")
+    sig[j] <- fm$slopetest[[1]]$p < alpha
+  }
+  pwr_reg$Power[i] <- mean(sig)
+  save(pwr_reg, file = "./data/pwr_reg_SMA.Rda")
+  message(Sys.time() - tic)
+}
+```
+
+- Mass uniformly distributed from 1 - 1000
+- $a$ normally distributed with a mean of 1.31
+- Calculate `log_Fem_Len`
+
+## Power analysis via simulation
+
+- 7,000,000 regressions
+- ~8 hours later...
+
+## Power analysis via simulation
+
+```{r echo=FALSE}
+load("../data/pwr_reg_SMA.Rda")
+p <- ggplot(pwr_reg, aes(b_dev, Power, color = as.factor(n))) +
+  geom_line() +
+  geom_line(size = 2) +
+  ylim(c(0, 1)) +
+  geom_hline(yintercept = 0.8, color = "blue", linetype = "dotted") +
+  geom_hline(yintercept = 0.05, color = "red", linetype = "dotted") +
+  scale_color_discrete(name = "n") +
+  labs(x = "Slope Deviation") +
+  theme(legend.justification = c(1, 0), legend.position = c(1, 0))
+p + theme(legend.background = element_rect(fill = "gray85", 
+    linetype = "solid"))
+```
+
+## Quiz 14-3
+
+End of lectures.
