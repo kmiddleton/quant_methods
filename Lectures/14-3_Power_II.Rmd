@@ -183,6 +183,43 @@ p + theme(legend.background = element_rect(fill = "gray85",
     linetype = "solid"))
 ```
 
+## Power in multi-parent genetic mapping populations (MPPs)
+
+<center>
+<img src="images/simmap1.png" width="100%" />
+</center>
+
+## Power in MPPs {.smaller}
+
+```{r echo=FALSE}
+genos <- rbinom(10,1,0.5)
+
+```
+
+```{r}
+
+eff <- 0.05
+envs <- rnorm(length(genos),0,sqrt(((1/eff)-1)*var(genos)))
+phenos <- genos + envs
+
+print(cbind(genos, phenos))
+print(c(mean(phenos[genos==0]),mean(phenos[genos==1])))
+```
+
+
+## Power in MPPs
+
+<center>
+<img src="images/simmap2.png" width="100%" />
+</center>
+
+## Power in MPPs
+
+<center>
+<img src="images/simmap3.png" width="60%" />
+</center>
+
+
 ## Quiz 14-3
 
 End of lectures.

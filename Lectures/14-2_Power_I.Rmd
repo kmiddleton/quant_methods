@@ -17,6 +17,23 @@ library(readxl)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
+## Significance Testing Mistakes
+
+Mistake #2: Concluding there IS NOT an effect when there IS actually an effect. 
+
+```{r}
+set.seed(93)
+nn <- 10
+group1.mean <- 5
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg <- c(rep('a',nn), rep('b',nn))
+options(scipen=999)
+print(signif(summary(lm(yy ~ gg))$coefficients,digits=3))
+```
+
+This is a Type II error = False Negative
+
 ## Types of errors and statistical power
 
 |               | Reject H~0~    | Fail to reject H~0~   |
@@ -35,7 +52,7 @@ Type II error probability depends on:
 
 ## Power
 
-- Probability that a random sample will lead to a rejection of H~0~
+- Given a true effect, the probability that a random sample will lead to a rejection of H~0~ (The proportion of times you DO NOT make mistake #2)
 - Dependent on how different the truth is from the null hypothesis
 - Inversely related to type II errors
     - High power $\rightarrow$ low type II errors
@@ -138,6 +155,7 @@ Hoenig and Heisey [-@Hoenig2001-hz]:
 > "There is a large literature advicating that power calculation be made whenever one performs a statistical test of a hypothesis and one obtains a statitically nonsignificant result. ... This approach, which appears in various forms, is fundamentally flawed."
 
 - "Observed power" (power of an observed *P* value from a post-hoc power analysis) is mathematically tied to the *P* value.
+
 
 ## Power analysis in R
 

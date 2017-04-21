@@ -20,6 +20,7 @@ knitr::opts_chunk$set(cache = TRUE)
 ## Readings
 
 - Hurlburt [-@Hurlbert1984-fn]: Pseudoreplication and the design of ecological field experiments
+- Leek paper http://www.nature.com/nrg/journal/v11/n10/full/nrg2825.html
 
 ## Other useful references
 
@@ -84,6 +85,14 @@ Can we really expect samples to be independent?
 Reviewer #3:
 
 > The authors are studying the osteohistological correlates of flight mode, yet the three adequately sampled species are completely confounded with both flight style and wing shape. Furthermore, two of the three are also closely related, further complicating the interpretation due to the phylogenetic relationships of two.
+
+## Beware of batch effects
+
+"Normalization" methods can correct for batch effects statistically, *unless they are confounded with variables of interest!*
+
+<center>
+<img src="images/IIS_PCA.png" width="80%" />
+</center>
 
 ## Replication and pseudoreplication
 
