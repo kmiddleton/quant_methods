@@ -20,7 +20,7 @@ knitr::opts_chunk$set(cache = TRUE)
 ## Readings
 
 - Hurlburt [-@Hurlbert1984-fn]: Pseudoreplication and the design of ecological field experiments
-- Leek paper http://www.nature.com/nrg/journal/v11/n10/full/nrg2825.html
+- Leek et al. (2010): Tackling the widespread and critical impact of batch effects in high-throughput data
 
 ## Other useful references
 
