@@ -1,0 +1,93 @@
+---
+title: 'Problem Set 14'
+author: "Your Name Here"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+---
+
+```{r setup, echo=TRUE, message=FALSE, warning=FALSE}
+# FIXME
+library(readxl)
+library(tidyverse)
+library(cowplot)
+library(pwr)
+```
+
+## Planning experiments
+
+Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
+
+### Activity
+
+Use `cohen.ES()` to look up the effect size for a "small" effect for a *t*-test.
+
+```{r}
+# FIXME
+cohen.ES(test = "t", size = "small")
+```
+
+Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
+
+```{r}
+# FIXME
+pwr.t.test(d = 0.2, power = 0.80, type = "two.sample")
+```
+
+Repeat the test above but for a paired *t*-test.
+
+```{r}
+# FIXME
+pwr.t.test(d = 0.2, power = 0.80, type = "paired")
+```
+
+Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
+
+```{r}
+# FIXME
+pwr.r.test(r = 0.6, power = 0.8)
+```
+
+Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
+
+```{r}
+# FIXME
+pwr.r.test(r = 0.4, n = 15)
+```
+
+## Calcium concentration in bird plasma
+
+The file `Bird_Plasma.xlsx` contains factorial data on blood plasma calcium concentration (`Calcium`, mg / 100 mL) in male and female birds (`Sex`) each of which was treated or not with a hormone (`Hormone`).
+
+### Activity
+
+Load the Excel file, and convert treatment and sex to factors.
+
+```{r}
+# FIXME
+M <- read_excel("../data/Bird_Plasma.xlsx")
+M <- M %>% mutate(Treatment = factor(Treatment),
+                  Sex = factor(Sex))
+```
+
+Use `group_by()` and `tally()` to determine the sample size in each of the groups.
+
+```{r}
+# FIXME
+M %>% group_by(Treatment, Sex) %>% tally()
+```
+
+Assume that the researchers who carried out this study had performed a power analysis prior to collecting data. Calculate the minimum effect size they could detect with their experimental design. Assume that there are 4 groups and power is 0.80.
+
+```{r}
+# FIXME
+pwr.anova.test(k = 4, n = 5, power = 0.80)
+```
+
+How do you interpret the minimum effect size that the researchers could detect at power of 0.8?
+
+> The effect has to be really large (> 0.8 standard deviations) in order to detect it.
+
+## 
