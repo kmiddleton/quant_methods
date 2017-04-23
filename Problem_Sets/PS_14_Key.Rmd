@@ -90,4 +90,104 @@ How do you interpret the minimum effect size that the researchers could detect a
 
 > The effect has to be really large (> 0.8 standard deviations) in order to detect it.
 
-## 
+## Power via simulation
+
+A more appropriate way to analyze the bird plasma data is to use a factorial ANOVA (both main effects and their interaction term). Imagine that you are planning just such an experiment:
+
+- Two treatment groups which each have two levels (a 2X2 design)
+- n = 5 in each group
+- Your alpha will be 0.05
+- You are interested in detecting main effects and interactions (full factorial model)
+
+We will simulate data with varying means, figure out the power across a range of different means, and make the assumption that within-group standard deviations are equal at 4 (for now).
+
+Start by considering the situation in which all four of the group means are equal. For simplicity, let's assume that all the means are 0 (they are actually either 0 or they have been centered).
+
+Generate two vectors, which will represent the range of differences in sex and treatment. For now, test from -10 to 10, with 10 steps in between.
+
+The `tidyr` package, which is loaded with `tidyverse` has a handy function `crossing()`, which will expand vectors with all pairwise combinations into a `tibble`. Use this function to cross the vectors. You should have a 100 X 2 `tibble`.
+
+```{r}
+# FIXME
+low <- -10
+high <- 10
+length.out <- 10
+
+diffs_sex <- seq(low, high, length = length.out)
+diffs_tx <- seq(low, high, length = length.out)
+
+pwr_sim <- crossing(diffs_sex, diffs_tx)
+```
+
+Use `mutate()` at add three additional `logical()` columns, one each for the power to detect a sex effect, treatment, and the sex X treatment interaction.
+
+```{r}
+# FIXME
+pwr_sim <- pwr_sim %>% 
+  mutate(sex = logical(length = nrow(pwr_sim)),
+         tx = logical(length = nrow(pwr_sim)),
+         sex_tx = logical(length = nrow(pwr_sim)))
+```
+
+10 iter = 2.2 s
+100 iter = 21 s
+200 iter = 47 s
+1000 iter = 215 s
+
+```{r}
+set.seed(2238746)
+niter <- 500
+alpha <- 0.05
+n <- 5
+stdev <- 2
+
+t1 <- Sys.time()
+
+for (ii in 1:nrow(pwr_sim)) {
+  sex <- pwr_sim$diffs_sex[ii]
+  tx <- pwr_sim$diffs_tx[ii]
+  
+  p_sex <- logical(length = niter)
+  p_tx <- logical(length = niter)
+  p_sex_tx <- logical(length = niter)
+  
+  for (jj in 1:niter) {
+    
+    y_sex0_tx0 <- rnorm(n, mean = 0, sd = stdev)
+    y_sex1_tx0 <- rnorm(n, mean = 0 + sex, sd = stdev)
+    y_sex0_tx1 <- rnorm(n, mean = 0 + tx, sd = stdev)
+    y_sex1_tx1 <- rnorm(n, mean = 0 + sex + tx, sd = stdev)
+    
+    D <- tibble(Calcium = c(y_sex0_tx0, y_sex1_tx0,
+                            y_sex0_tx1, y_sex1_tx1),
+                sex = factor(rep(c("F", "M", "F", "M"), each = 5)),
+                tx = factor(rep(c("None", "Hormone"), each = 10)))
+    
+    fm <- summary(lm(Calcium ~ sex * tx, data = D))
+    
+    p_sex[jj] <- fm$coefficients[2, 4] < alpha
+    p_tx[jj] <- fm$coefficients[3, 4] < alpha
+    p_sex_tx[jj] <- fm$coefficients[4, 4] < alpha
+  }
+  pwr_sim$sex[ii] <- mean(p_sex)
+  pwr_sim$tx[ii] <- mean(p_tx)
+  pwr_sim$sex_tx[ii] <- mean(p_sex_tx)
+}
+Sys.time() - t1
+
+save(pwr_sim, file = "pwr_sim.Rda")
+```
+
+```{r}
+load("pwr_sim.Rda")
+
+ggplot(pwr_sim, aes(x = diffs_sex, y = diffs_tx, color = sex)) +
+  geom_point(size = 6)
+
+ggplot(pwr_sim, aes(x = diffs_sex, y = diffs_tx, color = tx)) +
+  geom_point(size = 6)
+
+ggplot(pwr_sim, aes(x = diffs_sex, y = diffs_tx, color = sex_tx)) +
+  geom_point(size = 6)
+```
+
