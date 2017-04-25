@@ -79,7 +79,7 @@ Use `group_by()` and `tally()` to determine the sample size in each of the group
 M %>% group_by(Treatment, Sex) %>% tally()
 ```
 
-Assume that the researchers who carried out this study had performed a power analysis prior to collecting data. Calculate the minimum effect size they could detect with their experimental design. Assume that there are 4 groups and power is 0.80.
+Assume that the researchers who carried out this study had performed a power analysis prior to collecting data. Calculate the minimum effect size for a main effect they could detect with their experimental design if they use an ANOVA to analyze the data. Assume that there are 4 groups and power is 0.80.
 
 ```{r}
 # FIXME
@@ -90,6 +90,7 @@ How do you interpret the minimum effect size that the researchers could detect a
 
 > The effect has to be really large (> 0.8 standard deviations) in order to detect it.
 
+
 ## Power via simulation
 
 A more appropriate way to analyze the bird plasma data is to use a factorial ANOVA (both main effects and their interaction term). Imagine that you are planning just such an experiment:
@@ -99,11 +100,9 @@ A more appropriate way to analyze the bird plasma data is to use a factorial ANO
 - Your alpha will be 0.05
 - You are interested in detecting main effects and interactions (full factorial model)
 
-We will simulate data with varying means, figure out the power across a range of different means, and make the assumption that within-group standard deviations are equal at 4 (for now).
+We will simulate data where the main effect of one term varies and the interaction effect varies, figure out the power across a range of different means, and make the assumption that within-group standard deviations are equal at 4 and the main effect of the other variable does not change (for now). We will build up this simulation in steps, first considering one parameter combination and one iteration before setting up the entire simulation.
 
-Start by considering the situation in which all four of the group means are equal. For simplicity, let's assume that all the means are 0 (they are actually either 0 or they have been centered).
-
-Generate two vectors, which will represent the range of differences in sex and treatment. For now, test from -10 to 10, with 10 steps in between.
+a. Generate two vectors, which will represent the range of differences in treatment and the range of differences for the interaction. For now, test from -10 to 10, with 10 steps in between.
 
 The `tidyr` package, which is loaded with `tidyverse` has a handy function `crossing()`, which will expand vectors with all pairwise combinations into a `tibble`. Use this function to cross the vectors. You should have a 100 X 2 `tibble`.
 
@@ -113,21 +112,66 @@ low <- -10
 high <- 10
 length.out <- 10
 
-diffs_sex <- seq(low, high, length = length.out)
 diffs_tx <- seq(low, high, length = length.out)
+diffs_int <- seq(low, high, length = length.out)
 
-pwr_sim <- crossing(diffs_sex, diffs_tx)
+pwr_sim <- crossing(diffs_tx, diffs_int)
 ```
 
-Use `mutate()` at add three additional `logical()` columns, one each for the power to detect a sex effect, treatment, and the sex X treatment interaction.
+Use `mutate()` at add two additional `logical()` columns, one each for the power to detect a treatment effect and the sex X treatment interaction.
 
 ```{r}
 # FIXME
 pwr_sim <- pwr_sim %>% 
-  mutate(sex = logical(length = nrow(pwr_sim)),
-         tx = logical(length = nrow(pwr_sim)),
+  mutate(tx = logical(length = nrow(pwr_sim)),
          sex_tx = logical(length = nrow(pwr_sim)))
 ```
+
+b. Let's start by considering a single parameter combination: the first row of your `tibble` from above. First we will calculate the means for the four groups defined by sex and treatment (you might call these - s0t0, s1t0, s0t1, s1t1). Assign s0t0 to have a mean of zero. Because we are focusing only on treatment, we will not simulate a main effect of sex so assign s1t0 to also have a mean of zero. For the effect of treatment, because we are also simulating an interaction, we need to consider both when assigning the means. That is what an interaction is, the effect of one term is dependent on the state of the other. We will add the effect of the main effect and the interaction effect which will be conditional on sex. So, for s0t1, add the effect for treatment to 0.5 multiplied by the effect of the interaction. And for s1t1, add the effect for treatment to -0.5 multiplied by the effect of the interaction. This will create a set of means in which there is an overall main effect for treatment, no main effect for sex, and an interaction effect. Confirm this by looking at the values for your means.  
+
+```{r}
+
+s0t0 <- 0
+s1t0 <- 0
+s0t1 <- as.numeric(pwr_sim[1,1] + 0.5*pwr_sim[1,2])
+s1t1 <- as.numeric(pwr_sim[1,1] + -0.5*pwr_sim[1,2])
+
+print(c(s0t0,s1t0,s0t1,s1t1))
+
+```
+
+
+c. Now that you have code to assign the means for each group, we can move on to simulating one iteration for this parameter combination. We want to generate data for each group from a random normal distribution. All have the same standard deviation (4). Use the sample sizes for the groups defined above. Set up a `data.frame` with these data and labels for the groups (think about how `lm()` will need the data to be formatted). Then we will fit the ANOVA using `anova(lm())` and assign a TRUE/FALSE for the treatment term and interaction term that will tell us whether it is significant or not at our alpha level. Begin with your code from b.  
+
+```{r warning=FALSE}
+
+s0t0 <- 0
+s1t0 <- 0
+s0t1 <- as.numeric(pwr_sim[10,1] + 0.5*pwr_sim[10,2])
+s1t1 <- as.numeric(pwr_sim[10,1] + -0.5*pwr_sim[10,2])
+stdev <- 2
+nn <- 5
+alpha <- 0.05
+  
+y_sex0_tx0 <- rnorm(nn, mean = s0t0, sd = stdev)
+y_sex1_tx0 <- rnorm(nn, mean = s1t0, sd = stdev)
+y_sex0_tx1 <- rnorm(nn, mean = s0t1, sd = stdev)
+y_sex1_tx1 <- rnorm(nn, mean = s1t1, sd = stdev)
+    
+D <- tibble(Calcium = c(y_sex0_tx0, y_sex1_tx0,
+                        y_sex0_tx1, y_sex1_tx1),
+                        sex = factor(rep(c("F", "M", "F", "M"), each = nn)),
+                        tx = factor(rep(c("None", "Hormone"), each = nn*2)))
+    
+fm <- anova(lm(Calcium ~ sex * tx, data = D))
+fm
+
+p_tx <- fm$`Pr(>F)`[2] < alpha
+p_sex_tx <- fm$`Pr(>F)`[3] < alpha
+
+```
+
+d. You now have all of the code you need to do the simulation. You just need to set it up with two loops. You want to loop through each of your parameter combinations. Then, for each combination, you want to loop through several iterations. First set this up with a small number of iterations. Then scale up to 1000. Use `Sys.time()` to get a sense for how long your program will run when you scale up. 
 
 10 iter = 2.2 s
 100 iter = 21 s
@@ -136,40 +180,36 @@ pwr_sim <- pwr_sim %>%
 
 ```{r}
 set.seed(2238746)
-niter <- 500
+niter <- 1000
 alpha <- 0.05
-n <- 5
+nn <- 5
 stdev <- 2
 
 t1 <- Sys.time()
 
 for (ii in 1:nrow(pwr_sim)) {
-  sex <- pwr_sim$diffs_sex[ii]
-  tx <- pwr_sim$diffs_tx[ii]
-  
-  p_sex <- logical(length = niter)
-  p_tx <- logical(length = niter)
-  p_sex_tx <- logical(length = niter)
+  s0t0 <- 0
+  s1t0 <- 0
+  s0t1 <- as.numeric(pwr_sim[ii,1] + 0.5*pwr_sim[ii,2])
+  s1t1 <- as.numeric(pwr_sim[ii,1] + -0.5*pwr_sim[ii,2])
   
   for (jj in 1:niter) {
     
-    y_sex0_tx0 <- rnorm(n, mean = 0, sd = stdev)
-    y_sex1_tx0 <- rnorm(n, mean = 0 + sex, sd = stdev)
-    y_sex0_tx1 <- rnorm(n, mean = 0 + tx, sd = stdev)
-    y_sex1_tx1 <- rnorm(n, mean = 0 + sex + tx, sd = stdev)
+    y_sex0_tx0 <- rnorm(nn, mean = s0t0, sd = stdev)
+    y_sex1_tx0 <- rnorm(nn, mean = s1t0, sd = stdev)
+    y_sex0_tx1 <- rnorm(nn, mean = s0t1, sd = stdev)
+    y_sex1_tx1 <- rnorm(nn, mean = s1t1, sd = stdev)
     
     D <- tibble(Calcium = c(y_sex0_tx0, y_sex1_tx0,
-                            y_sex0_tx1, y_sex1_tx1),
-                sex = factor(rep(c("F", "M", "F", "M"), each = 5)),
-                tx = factor(rep(c("None", "Hormone"), each = 10)))
+                        y_sex0_tx1, y_sex1_tx1),
+                        sex = factor(rep(c("F", "M", "F", "M"), each = nn)),
+                        tx = factor(rep(c("None", "Hormone"), each = nn*2)))
     
-    fm <- summary(lm(Calcium ~ sex * tx, data = D))
+    fm <- anova(lm(Calcium ~ sex * tx, data = D))
     
-    p_sex[jj] <- fm$coefficients[2, 4] < alpha
-    p_tx[jj] <- fm$coefficients[3, 4] < alpha
-    p_sex_tx[jj] <- fm$coefficients[4, 4] < alpha
+    p_tx[jj] <- fm$`Pr(>F)`[2] < alpha
+    p_sex_tx[jj] <- fm$`Pr(>F)`[3] < alpha
   }
-  pwr_sim$sex[ii] <- mean(p_sex)
   pwr_sim$tx[ii] <- mean(p_tx)
   pwr_sim$sex_tx[ii] <- mean(p_sex_tx)
 }
@@ -178,16 +218,23 @@ Sys.time() - t1
 save(pwr_sim, file = "pwr_sim.Rda")
 ```
 
+
+e. Now we want to visualize the results. Two plots of with your sets of differences for the treatment and for the interaction on the x and y axes. Color the points by the power associated with the treatment effect in the first plot and by the power associated with the interaction effect in the second. 
+
 ```{r}
 load("pwr_sim.Rda")
 
-ggplot(pwr_sim, aes(x = diffs_sex, y = diffs_tx, color = sex)) +
+ggplot(pwr_sim, aes(x = diffs_tx, y = diffs_int, color = tx)) +
   geom_point(size = 6)
 
-ggplot(pwr_sim, aes(x = diffs_sex, y = diffs_tx, color = tx)) +
+ggplot(pwr_sim, aes(x = diffs_tx, y = diffs_int, color = sex_tx)) +
   geom_point(size = 6)
 
-ggplot(pwr_sim, aes(x = diffs_sex, y = diffs_tx, color = sex_tx)) +
-  geom_point(size = 6)
+ggplot(pwr_sim, aes(x=diffs_tx, y=tx)) +
+  geom_point()
+
+ggplot(pwr_sim, aes(x=diffs_int, y=sex_tx)) +
+  geom_point()
+
 ```
 
