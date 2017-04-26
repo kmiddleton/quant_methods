@@ -130,25 +130,24 @@ pwr_sim <- pwr_sim %>%
 b. Let's start by considering a single parameter combination: the first row of your `tibble` from above. First we will calculate the means for the four groups defined by sex and treatment (you might call these - s0t0, s1t0, s0t1, s1t1). Assign s0t0 to have a mean of zero. Because we are focusing only on treatment, we will not simulate a main effect of sex so assign s1t0 to also have a mean of zero. For the effect of treatment, because we are also simulating an interaction, we need to consider both when assigning the means. That is what an interaction is, the effect of one term is dependent on the state of the other. We will add the effect of the main effect and the interaction effect which will be conditional on sex. So, for s0t1, add the effect for treatment to 0.5 multiplied by the effect of the interaction. And for s1t1, add the effect for treatment to -0.5 multiplied by the effect of the interaction. This will create a set of means in which there is an overall main effect for treatment, no main effect for sex, and an interaction effect. Confirm this by looking at the values for your means.  
 
 ```{r}
-
+# FIXME
 s0t0 <- 0
 s1t0 <- 0
-s0t1 <- as.numeric(pwr_sim[1,1] + 0.5*pwr_sim[1,2])
-s1t1 <- as.numeric(pwr_sim[1,1] + -0.5*pwr_sim[1,2])
+s0t1 <- as.numeric(pwr_sim[1, 1] + 0.5 * pwr_sim[1, 2])
+s1t1 <- as.numeric(pwr_sim[1, 1] + -0.5 * pwr_sim[1, 2])
 
-print(c(s0t0,s1t0,s0t1,s1t1))
-
+print(c(s0t0, s1t0, s0t1, s1t1))
 ```
 
 
 c. Now that you have code to assign the means for each group, we can move on to simulating one iteration for this parameter combination. We want to generate data for each group from a random normal distribution. All have the same standard deviation (4). Use the sample sizes for the groups defined above. Set up a `data.frame` with these data and labels for the groups (think about how `lm()` will need the data to be formatted). Then we will fit the ANOVA using `anova(lm())` and assign a TRUE/FALSE for the treatment term and interaction term that will tell us whether it is significant or not at our alpha level. Begin with your code from b.  
 
 ```{r warning=FALSE}
-
+# FIXME
 s0t0 <- 0
 s1t0 <- 0
-s0t1 <- as.numeric(pwr_sim[10,1] + 0.5*pwr_sim[10,2])
-s1t1 <- as.numeric(pwr_sim[10,1] + -0.5*pwr_sim[10,2])
+s0t1 <- as.numeric(pwr_sim[10, 1] + 0.5 * pwr_sim[10, 2])
+s1t1 <- as.numeric(pwr_sim[10, 1] + -0.5 * pwr_sim[10, 2])
 stdev <- 2
 nn <- 5
 alpha <- 0.05
@@ -160,23 +159,19 @@ y_sex1_tx1 <- rnorm(nn, mean = s1t1, sd = stdev)
     
 D <- tibble(Calcium = c(y_sex0_tx0, y_sex1_tx0,
                         y_sex0_tx1, y_sex1_tx1),
-                        sex = factor(rep(c("F", "M", "F", "M"), each = nn)),
-                        tx = factor(rep(c("None", "Hormone"), each = nn*2)))
-    
+            sex = factor(rep(c("F", "M", "F", "M"), each = nn)),
+            tx = factor(rep(c("None", "Hormone"), each = nn * 2)))
+
 fm <- anova(lm(Calcium ~ sex * tx, data = D))
 fm
 
 p_tx <- fm$`Pr(>F)`[2] < alpha
 p_sex_tx <- fm$`Pr(>F)`[3] < alpha
-
 ```
 
-d. You now have all of the code you need to do the simulation. You just need to set it up with two loops. You want to loop through each of your parameter combinations. Then, for each combination, you want to loop through several iterations. First set this up with a small number of iterations. Then scale up to 1000. Use `Sys.time()` to get a sense for how long your program will run when you scale up. 
+d. You now have all of the code you need to do the simulation. You just need to set it up with two loops. You want to loop through each of your parameter combinations. Then, for each combination, you want to loop through several iterations. First set this up with a small number of iterations. Then scale up to 1000.
 
-10 iter = 2.2 s
-100 iter = 21 s
-200 iter = 47 s
-1000 iter = 215 s
+Use `Sys.time()` to get a sense for how long your program will run when you scale up. Start by assigning the output of `Sys.time()` to a variable before you loop starts (`t_start <- Sys.time()`). After your loop, subtract that from `Sys.time()` (e.g., `Sys.time() - t_start`).
 
 ```{r}
 set.seed(2238746)
@@ -190,8 +185,8 @@ t1 <- Sys.time()
 for (ii in 1:nrow(pwr_sim)) {
   s0t0 <- 0
   s1t0 <- 0
-  s0t1 <- as.numeric(pwr_sim[ii,1] + 0.5*pwr_sim[ii,2])
-  s1t1 <- as.numeric(pwr_sim[ii,1] + -0.5*pwr_sim[ii,2])
+  s0t1 <- as.numeric(pwr_sim[ii, 1] + 0.5 * pwr_sim[ii, 2])
+  s1t1 <- as.numeric(pwr_sim[ii, 1] + -0.5 * pwr_sim[ii, 2])
   
   for (jj in 1:niter) {
     
@@ -201,9 +196,9 @@ for (ii in 1:nrow(pwr_sim)) {
     y_sex1_tx1 <- rnorm(nn, mean = s1t1, sd = stdev)
     
     D <- tibble(Calcium = c(y_sex0_tx0, y_sex1_tx0,
-                        y_sex0_tx1, y_sex1_tx1),
-                        sex = factor(rep(c("F", "M", "F", "M"), each = nn)),
-                        tx = factor(rep(c("None", "Hormone"), each = nn*2)))
+                            y_sex0_tx1, y_sex1_tx1),
+                sex = factor(rep(c("F", "M", "F", "M"), each = nn)),
+                tx = factor(rep(c("None", "Hormone"), each = nn * 2)))
     
     fm <- anova(lm(Calcium ~ sex * tx, data = D))
     
@@ -219,7 +214,7 @@ save(pwr_sim, file = "pwr_sim.Rda")
 ```
 
 
-e. Now we want to visualize the results. Two plots of with your sets of differences for the treatment and for the interaction on the x and y axes. Color the points by the power associated with the treatment effect in the first plot and by the power associated with the interaction effect in the second. 
+e. Now we want to visualize the results. Make separate plots of with your sets of differences for the treatment and for the interaction on the x and y axes. Color the points by the power associated with the treatment effect in the first plot and by the power associated with the interaction effect in the second. The output should look like a grid of points (one for each combination of values) that are color coded by power. This is a kind of manual heatmap.
 
 ```{r}
 load("pwr_sim.Rda")
@@ -235,6 +230,5 @@ ggplot(pwr_sim, aes(x=diffs_tx, y=tx)) +
 
 ggplot(pwr_sim, aes(x=diffs_int, y=sex_tx)) +
   geom_point()
-
 ```
 
