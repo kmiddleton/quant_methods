@@ -118,7 +118,7 @@ diffs_int <- seq(low, high, length = length.out)
 pwr_sim <- crossing(diffs_tx, diffs_int)
 ```
 
-Use `mutate()` at add two additional `logical()` columns, one each for the power to detect a treatment effect and the sex X treatment interaction.
+Use `mutate()` at add two additional `numeric()` columns, one each for the power to detect a treatment effect and the sex X treatment interaction.
 
 ```{r}
 # FIXME
@@ -139,7 +139,6 @@ s1t1 <- as.numeric(pwr_sim[1, 1] + -0.5 * pwr_sim[1, 2])
 print(c(s0t0, s1t0, s0t1, s1t1))
 ```
 
-
 c. Now that you have code to assign the means for each group, we can move on to simulating one iteration for this parameter combination. We want to generate data for each group from a random normal distribution. All have the same standard deviation (4). Use the sample sizes for the groups defined above. Set up a `data.frame` with these data and labels for the groups (think about how `lm()` will need the data to be formatted). Then we will fit the ANOVA using `anova(lm())` and assign a TRUE/FALSE for the treatment term and interaction term that will tell us whether it is significant or not at our alpha level. Begin with your code from b.  
 
 ```{r warning=FALSE}
@@ -148,7 +147,7 @@ s0t0 <- 0
 s1t0 <- 0
 s0t1 <- as.numeric(pwr_sim[10, 1] + 0.5 * pwr_sim[10, 2])
 s1t1 <- as.numeric(pwr_sim[10, 1] + -0.5 * pwr_sim[10, 2])
-stdev <- 2
+stdev <- 4
 nn <- 5
 alpha <- 0.05
   
@@ -178,7 +177,7 @@ set.seed(2238746)
 niter <- 1000
 alpha <- 0.05
 nn <- 5
-stdev <- 2
+stdev <- 4
 
 t1 <- Sys.time()
 
@@ -212,7 +211,6 @@ Sys.time() - t1
 
 save(pwr_sim, file = "pwr_sim.Rda")
 ```
-
 
 e. Now we want to visualize the results. Make separate plots of with your sets of differences for the treatment and for the interaction on the x and y axes. Color the points by the power associated with the treatment effect in the first plot and by the power associated with the interaction effect in the second. The output should look like a grid of points (one for each combination of values) that are color coded by power. This is a kind of manual heatmap.
 

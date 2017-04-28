@@ -96,7 +96,7 @@ The `tidyr` package, which is loaded with `tidyverse` has a handy function `cros
 
 ```
 
-Use `mutate()` at add two additional `logical()` columns, one each for the power to detect a treatment effect and the sex X treatment interaction.
+Use `mutate()` at add two additional `numeric()` columns, one each for the power to detect a treatment effect and the sex X treatment interaction.
 
 ```{r}
 
