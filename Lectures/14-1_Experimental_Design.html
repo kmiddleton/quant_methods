@@ -94,7 +94,7 @@
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
       <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
       <p data-config-presenter><!-- populated from slide_config.json --></p>
-            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-04-20</p>
+            <p style="margin-top: 6px; margin-left: -2px;">Last updated: 2017-04-27</p>
           </hgroup>
   </slide>
 
@@ -102,7 +102,7 @@
 
 <ul>
 <li>Hurlburt <span class="cite">(1984)</span>: Pseudoreplication and the design of ecological field experiments</li>
-<li>Leek et al. (2010): Tackling the widespread and critical impact of batch effects in high-throughput data</li>
+<li>Leek et al. <span class="cite">(2010)</span>: Tackling the widespread and critical impact of batch effects in high-throughput data</li>
 </ul>
 
 </article></slide><slide class=''><hgroup><h2>Other useful references</h2></hgroup><article  id="other-useful-references">
@@ -292,6 +292,12 @@ Obs2 &lt;- M %&gt;% select(-Specimen) %&gt;% filter(Observer == 2) %&gt;%
 <pre class = 'prettyprint lang-r'>library(DescTools)
 CohenKappa(Obs1, Obs2, conf.level = 0.95)</pre>
 
+<pre >## Warning in c(1, -1) * qnorm((1 - conf.level)/2) * s: Recycling array of length 1 in vector-array arithmetic is deprecated.
+##   Use c() or as.vector() instead.</pre>
+
+<pre >## Warning in k + c(1, -1) * qnorm((1 - conf.level)/2) * s: Recycling array of length 1 in array-vector arithmetic is deprecated.
+##   Use c() or as.vector() instead.</pre>
+
 <pre >##     kappa    lwr.ci    upr.ci 
 ## 0.5982218 0.5309537 0.6654900</pre>
 
@@ -395,11 +401,9 @@ glimpse(Lengths)</pre>
 <pre class = 'prettyprint lang-r'>fm &lt;- aov(Fem_Len ~ MouseID, data = Lengths)
 print(summary(fm), digits = 5)</pre>
 
-<pre >##              Df Sum Sq Mean Sq F value    Pr(&gt;F)    
-## MouseID     118 75.023 0.63579  3510.8 &lt; 2.2e-16 ***
-## Residuals   119  0.022 0.00018                      
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+<pre >##              Df Sum Sq Mean Sq F value    Pr(&gt;F)
+## MouseID     118 75.023 0.63579  3510.8 &lt; 2.2e-16
+## Residuals   119  0.022 0.00018</pre>
 
 <pre class = 'prettyprint lang-r'>var_a &lt;- (0.63579 - 0.00018) / 2
 var_a / (var_a + 0.00018)</pre>
@@ -471,6 +475,9 @@ ICCest(MouseID,
 <div id="ref-Hurlbert1984-fn">
 <p>Hurlbert, S. 1984. Pseudoreplication and the Design of Ecological Field Experiments. <em>Ecological monographs</em> 54:187–211.</p></div>
 
+<div id="ref-Leek2010-gx">
+<p>Leek, J. T., R. B. Scharpf, H. C. Bravo, D. Simcha, B. Langmead, W. E. Johnson, D. Geman, K. Baggerly, and R. A. Irizarry. 2010. Tackling the Widespread and Critical Impact of Batch Effects in High-Throughput Data. <em>Nature reviews. Genetics</em> 11:733–739.</p></div>
+
 <div id="ref-McElreath2015-no">
 <p>McElreath, R. 2015. <em>Statistical Rethinking: A Bayesian Course with Examples in R and Stan</em>. Chapman; Hall/CRC, Boca Raton, FL.</p></div>
 
@@ -487,7 +494,7 @@ ICCest(MouseID,
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
