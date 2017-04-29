@@ -381,20 +381,13 @@ Notes:
 
   - Multiple regression tries to figure out which variable is the important one. e.g., shape doesn't make sense
   - Logisitc regression and DFA
-
----
-
-Week 14: Composite variables
-
-Goals:
-
-- difference between figuring out which is most important variable and a more holistic ?
+  - difference between figuring out which is most important variable and a more holistic ?
 
 possible application:pop structure
 
 ---
 
-Week 15: Experimental design
+Week 14: Experimental design
 
 mouse example subsample n
 
@@ -405,6 +398,18 @@ Goals:
 - Power analysis (formal)
 - Power analysis (via simulation)
 
+---
+
+Final exam
+
+- Data cleaning and visualization
+- Linear models
+  - Randomization
+  - Model comprison
+- Power analysis / experimental design
+- Composite variables
+
+---
 
 Next Year:
 
