@@ -1,0 +1,463 @@
+---
+title: "Quantitative Methods Final"
+author: "Your Name Here"
+date: "Due 05/10/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+
+library(tidyverse)
+library(readxl)
+library(cowplot)
+library(nlme)
+library(car)
+library(multcomp)
+library(GGally)
+library(AICcmodavg)
+```
+
+## Strawberry Poison Frog Mate Preference
+
+```{r}
+# SETUP DELETE ME
+# http://datadryad.org/resource/doi:10.5061/dryad.hm505
+# http://onlinelibrary.wiley.com/doi/10.1111/evo.13079/full
+
+M <- read_excel("DB Lab Mate Choice.xlsx",
+                sheet = "DB Lab Mate Choice") %>% 
+  filter(Population != "DB")
+write_csv(M, path = "Strawberry_Frog.csv")
+```
+
+The Strawberry Poison Frog (*Oophaga pumilio*) is a ~2 cm terrestrial frog that inhabits the Bocas del Toro archipelago along the eastern coast of Panama. Males defend territory and court females, which have larger ranges, allowing them to interact with many different males.
+
+This frog has two divergent color morphs: blue and red (shown below).
+
+![](https://static.inaturalist.org/photos/34042/medium.JPG?1401921860)
+
+The blue and red morphs are geographically separated, but a transition zone, with an intermediate color morph is present between the populations. Researchers are interested in the mechanisms of reproductive isolation in this frog species and wish to determine whether female preference has diverged with color (i.e., that females will prefer their own color morph over either of the other morphs).
+
+Females (n = 59 total) from two regions were selected because they were monomorphic for one of the two color morphs:
+
+1. Red (`R`): Almirante (coded `AL` in the data)
+2. Blue (`B`): Rana Azul (coded `RA` in the data)
+
+Each female was placed in an arena with three males, one from each of the three color morphs (`Male_Color`): red (`R`), blue (`B`), and intermediate (`I`). The researchers measured the amount of time (s) that the female associated with each male (`Association_Time`) during a fixed period of time. They also counted the number of times that the female approached each male (`Approaches`) during the same time period. The frogs were separated by clear plastic domes, which should exclude tactile and/or odorants as factors in determining mate preference.
+
+a. We will analyze association time. Load the data (`Strawberry_Frog.csv`) and visualize the relationship between association time, male color, and female color. Note that each female color is uniquely matched to one of the populations, so this information is redundant.
+
+```{r}
+# FIXME
+M <- read_csv("Strawberry_Frog.csv")
+
+M %>% group_by(Male_Color, Female_Color) %>% tally()
+
+M %>% 
+  ggplot(aes(x = Female_Color, y = Association_Time,
+             color = Female_Color)) +
+  scale_color_manual(values = c("blue", "red")) +
+  geom_point(position = position_jitter(width = 0.1, height = 0)) +
+  facet_grid(Male_Color ~ .)
+```
+
+b. Transform association time as necessary (note that some females had 0 association time to some males), and replot to make sure that you are meeting the assumption of approximate normality for a linear model.
+
+```{r}
+# FIXME
+M <- M %>% 
+  mutate(log_Association_Time = log10(Association_Time + 1),
+         Frog_ID = factor(Frog_ID),
+         Male_Color = factor(Male_Color))
+
+M %>% 
+  ggplot(aes(x = Female_Color, y = log_Association_Time,
+             color = Female_Color)) +
+  scale_color_manual(values = c("blue", "red")) +
+  geom_point(position = position_jitter(width = 0.1, height = 0)) +
+  facet_grid(Male_Color ~ .)
+```
+
+c. Fit two separate hierarchical (mixed) models. For each female color (red and blue), predict (transformed) association time by male color, with the female's ID as a random effect, because each female was tested against three males. This model will account for female-to-female differences in association time.
+
+You will have two separate models, which will require subsetting/filtering out females of each color (note that `lme()` has a `subset` option, which you can explore). For each, test for overall significance of the linear models using Type III sums of squares. If the overall model is significant ($\alpha$ = 0.05), then use the `multcomp` package to test all pairwise post hoc group differences using a Tukey-Kramer test.
+
+```{r}
+# FIXME
+fm_log_R <- lme(log_Association_Time ~ Male_Color,
+              random = ~ 1 | Frog_ID,
+              data = M,
+              subset = Female_Color == "R")
+Anova(fm_log_R, type = "III")
+summary(glht(fm_log_R, 
+             linfct = mcp(Male_Color = "Tukey")))
+
+fm_log_B <- lme(log_Association_Time ~ Male_Color,
+              random = ~ 1 | Frog_ID,
+              data = M,
+              subset = Female_Color == "B")
+Anova(fm_log_B, type = "III")
+summary(glht(fm_log_B, 
+             linfct = mcp(Male_Color = "Tukey")))
+
+```
+
+d. Interpret the results of the two linear models, including the post hoc tests. What can you say about female mating preference for each of red and blue morphs of female strawberry poison frogs relative to the three male colors?
+
+> 
+
+e. Return to the original (untransformed) association time data. Fit the same models as above, but this time assess overall significance via a randomization procedure. Again use type III sums of squares. You *do not* need to perform post hoc comparisons. Be sure to visualize the randomized test statistics.
+
+```{r}
+# FIXME
+niter <- 1000
+
+## Red Females
+Chisqs <- numeric(length = niter)
+Chisqs[1] <- Anova(fm_log_R, type = "III")$Chisq[2]
+
+for (ii in 2:niter) {
+  fm_rand <- lme(sample(Association_Time) ~ Male_Color,
+                 random = ~ 1 | Frog_ID,
+                 data = M,
+                 subset = Female_Color == "R")
+  Chisqs[ii] <- Anova(fm_rand, type = "III")$Chisq[2]
+}
+
+tibble(Chisqs) %>% 
+  ggplot(aes(Chisqs)) +
+  geom_histogram() +
+  geom_vline(xintercept = Chisqs[1], color = "red") +
+  ggtitle("Red Females")
+mean(Chisqs >= Chisqs[1])
+
+# Blue Females
+Chisqs <- numeric(length = niter)
+Chisqs[1] <- Anova(fm_log_B, type = "III")$Chisq[2]
+
+for (ii in 2:niter) {
+  fm_rand <- lme(sample(Association_Time) ~ Male_Color,
+                 random = ~ 1 | Frog_ID,
+                 data = M,
+                 subset = Female_Color == "B")
+  Chisqs[ii] <- Anova(fm_rand, type = "III")$Chisq[2]
+}
+
+tibble(Chisqs) %>% 
+  ggplot(aes(Chisqs)) +
+  geom_histogram() +
+  geom_vline(xintercept = Chisqs[1], color = "blue") +
+  ggtitle("Blue Females")
+mean(Chisqs >= Chisqs[1])
+
+```
+
+f. Interpret the results of your randomization tests in the context of the analysis of transformed data above.
+
+> 
+
+g. The `Approaches` column has data on the number of times that the female approached each male during the fixed observation period. Visualize the relationship between approaches, male color, and female color.
+
+```{r}
+# FIXME
+M %>% 
+  ggplot(aes(x = Population, y = Approaches,
+             color = Female_Color)) +
+  geom_point(position = position_jitter(width = 0.1, height = 0)) +
+  facet_grid(Male_Color ~ .)
+```
+
+h. What kind of model would you use to analyze this relationship? Consider the models you fit above and the distribution that the count of approaches is likely to follow. You do not need to actually fit the model.
+
+> 
+
+## African Wild Dogs
+
+Researchers conducted a study of den selection in African Wild Dogs in the Hluhluwe-iMfolozi Park in South Africa. They used an airborne imaging system to measure the characteristics of den locations and of random sites. The `site` column indicates whether a given site is an occupied den or an unoccupied random site. The environmental variables they focus on are:
+
+- `viewshed`: the area visible and accessible from each site based on the height of an average dog's head
+- `vrm`: terrain ruggedness 
+- `slope`: the slope of the ground at the site
+- `fence_dist`: distance to the fence surrounding the park
+
+
+<div style="width:450px">
+![](https://c402277.ssl.cf1.rackcdn.com/photos/10341/images/hero_small/wild_dogs-web.jpg?1447180370)
+</div>
+
+a. Load the data (`AfricanWildDog_dens.csv`) and visualize the distributions and relationships between the environment variables. Note any issues of concern and perform a transformation or other procedure to address these issues. 
+
+```{r }
+# FIXME
+den <- read_csv("dens_random_sites.csv") %>% as.data.frame()
+
+den$site[den$site == 1] <- "occupied"
+den$site[den$site == 0] <- "unoccupied"
+
+den <- den[, c('ID','site','viewshed', 'vrm','slope','fence_dist')]
+
+write_csv(den, path = "AfricanWildDog_dens.csv")
+
+den <- read_csv("AfricanWildDog_dens.csv") %>% as.data.frame()
+den$viewshed <- log(den$viewshed + 1)
+den$vrm <- log(den$vrm)
+den$slope <- log(den$slope)
+den$fence_dist <- log(den$fence_dist)
+
+ggscatmat(den[ , c("viewshed","vrm","slope","fence_dist")])
+```
+
+> 
+
+b. Perform a logistic regression predicting den occupancy from all four measured variables. Fit all possible models that include both `viewshed` and `vrm`. Do not consider any interaction terms here. You will have four models. Use AICc to compare these models and summarize your conclusions. 
+
+```{r }
+den$site <- as.factor(den$site)
+
+mod1 <- glm(site ~ viewshed + vrm, data = den, family = 'binomial')
+summary(mod1)
+
+mod2 <- glm(site ~ viewshed + vrm + fence_dist, data = den,
+            family = 'binomial')
+summary(mod2)
+
+mod3 <- glm(site ~ viewshed + vrm + slope, data = den,
+            family = 'binomial')
+summary(mod3)
+
+mod4 <- glm(site ~ viewshed + vrm + slope + fence_dist, data = den, 
+            family = 'binomial')
+summary(mod4)
+
+aictab(cand.set = list(mod1, mod2, mod3, mod4))
+```
+
+What can you conclude about these models?
+
+> 
+
+c. For the selected model (the top performing model), visualize the relationship between each environmental variable and den occupancy. Include a fitted line. 
+
+``` {r}
+p1 <- ggplot(den, aes(x = viewshed,
+                   y = as.numeric(site)-1)) + 
+  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_smooth(method = "glm",
+              method.args = list(family = "binomial"),
+              se = FALSE, size = 2) + 
+  geom_point(size = 3) +
+  ylab("Probability of Occupancy") +
+  xlab("ln(viewshed)") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+
+p2 <- ggplot(den, aes(x = vrm,
+                   y = as.numeric(site)-1)) + 
+  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_smooth(method = "glm",
+              method.args = list(family = "binomial"),
+              se = FALSE, size = 2) + 
+  geom_point(size = 3) +
+  ylab("Probability of Occupancy") +
+  xlab("ln(vrm)") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+
+p3 <- ggplot(den, aes(x = fence_dist,
+                   y = as.numeric(site)-1)) + 
+  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_smooth(method = "glm",
+              method.args = list(family = "binomial"),
+              se = FALSE, size = 2) + 
+  geom_point(size = 3) +
+  ylab("Probability of Occupancy") +
+  xlab("ln(Fence Distance)") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+
+plot_grid(p1, p2, p3, ncol = 3)
+```
+
+d. Let's try to take a more holistic approach to the environmental variables. Perform a principal components analysis on the environmental variables.
+
+```{r}
+pp <- prcomp(~ viewshed + vrm + slope + fence_dist, data = den,
+             center = TRUE, scale. = TRUE)
+
+pp$rotation
+summary(pp)
+```
+
+Examine the loadings and eigenvalues. How well does the principal components analysis reduce the environmental variables to a smaller number of composite axes?
+
+> 
+
+e. Predict den occupancy by fitting the scores from the first two principal components.
+
+```{r}
+modp2 <- glm(site ~ pp$x[,1] + pp$x[,2], data = den,
+             family = 'binomial')
+summary(modp2)
+
+den$PC1 <- pp$x[,1]
+
+ggplot(den, aes(x = PC1,
+                y = as.numeric(site) - 1)) + 
+  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_smooth(method = "glm",
+              method.args = list(family = "binomial"),
+              se = FALSE, size = 2) + 
+  geom_point(size = 3) +
+  ylab("Probability of Occupancy") +
+  xlab("PC1 Scores") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1))
+```
+
+Interpret the results of the model in the context of the loadings on the principal components and visualize the relationship between PC1 and den occupancy as in c. 
+
+> 
+
+f. Which approach (part b & c vs. part d & e) do you think is most appropriate and informative for this dataset? Explain your answer and discuss what aspects of the dataset would make each approach more appropriate.
+
+> 
+
+## *Drosophila* Longevity
+
+You are planning an experiment to test the longevity of fruit flies with two different genotypes. You plan to set up 40 vials with flies from each genotype (80 vials in total). You will record the number of flies in each vial daily until all flies have died. You will then calculate the mean longevity (days) *per vial* (i.e., the mean longevity of all flies in a vial), which will be the outcome variable.
+
+You expect a large effect size of genotype on longevity ($d = 0.8$). Calculate your power to detect a difference in longevity given an $\alpha$-level of 0.05.
+
+```{r}
+# FIXME
+library(pwr)
+
+pwr.t.test(n = 40, d = 0.8, sig.level = 0.05, type = "two.sample")
+```
+
+What will your power be with this experimental design?
+
+> 0.94
+
+```{r}
+# FIXME
+set.seed(238476)
+
+n <- 40
+mu1 <- 30
+mu2 <- 32
+stdev <- 6
+
+M <- tibble(Longevity = c(rnorm(n, mu1, stdev), rnorm(n, mu2, stdev)),
+            Genotype = factor(rep(c("A", "B"), each = n)))
+
+M %>% 
+  ggplot(aes(x = Genotype, y = Longevity)) +
+  geom_point()
+
+summary(lm(Longevity ~ Genotype, data = M))
+```
+
+You carry out the experiment and analyze the results. The linear model is summarized:
+
+```
+Call:
+lm(formula = Longevity ~ Genotype, data = M)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-11.6731  -3.0243  -0.2894   3.6579  16.8099 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept)  30.0649     0.8316  36.152   <2e-16
+GenotypeB     2.1378     1.1761   1.818    0.073
+
+Residual standard error: 5.26 on 78 degrees of freedom
+Multiple R-squared:  0.04064,	Adjusted R-squared:  0.02834 
+F-statistic: 3.304 on 1 and 78 DF,  p-value: 0.07295
+```
+What is the mean difference in longevity between the genotypes?
+
+> 2.1 days.
+
+Interpret the results of the experiment in the context of the power you calculated above. How do you explain the "failure" of the experiment?
+
+> Apparently the realized effect size was smaller than what you had thought. The experiment had plenty of power to detect a large effect (power was 0.94), so the actual effect must have been much less.
+
+## *Arabidopsis* growth
+
+You are reading a paper on growth of *Arabidopsis* in two different treatments: control (water only) and an organic fertilizer dissolved in water. The results section contains the following:
+
+> We measured aboveground biomass of plants after six weeks of growth in each of two treatment groups (n = 1000 per group). The means were 10.31 g (SEM = 0.001) for the control group and 10.42 (SEM = 0.002) for the fertilizer treatment group. A paired t-test showed highly significant difference of treatment ($t_{1998}$ = 52.4, P << 0.0001).
+
+What is your interpretation of these results? Do you think that the fertilizer has an important biological effect? Why or why not?
+
+> 
+
+## t-test assumption
+
+One of the assumptions of a two-sample t-test is equality of variances and that violating this assumption can increase the type 1 error rate. You have heard the t-test is "somewhat robust" to this assumption. Perform a small simulation of two groups that do not differ in their means to test the effect of differences in the variances of the groups on the type 1 error rate. Simulate the following scenarios iterating 10000 times each assuming a sample size of 10 in each group:
+
+1) Equal means (0 and 0) and equal variances (1 and 1)
+2) Equal means (0 and 0) and unequal variances (1 and 4)
+3) Equal means (0 and 0) and unequal variances (1 and 16)
+
+In each case, calculate the type 1 error rate. Remember that `t.test()` by default assumes *unequal* variances.
+
+```{r}
+# FIXME
+set.seed(82346)
+m1 <- 0
+m2 <- 0
+
+sds <- cbind(c(1, 1, 1), c(1, 2, 4))
+
+t1 <- numeric(3)
+ss <- 10
+niter <- 10000
+
+for (ii in 1:3) {
+  ps <- logical(length = niter)
+  for (jj in 1:niter) {
+    mod <- t.test(rnorm(ss, m1, sds[ii, 1]),
+                  rnorm(ss, m2, sds[ii, 2]),
+                  var.equal = TRUE)
+    ps[jj] <- mod$p.value < 0.05
+  }
+  t1[ii] <- mean(ps)
+}
+t1
+```
+
+What do the results of your simulation show?
+
+> 
+
+Repeat the simulation, allowing `t.test()` to use Welch's correction for unequal variances.
+
+```{r}
+# FIXME
+set.seed(234978)
+m1 <- 0
+m2 <- 0
+
+sds <- cbind(c(1, 1, 1), c(1, 2, 16))
+
+t1 <- numeric(3)
+ss <- 10
+niter <- 10000
+
+for (ii in 1:3) {
+  ps <- logical(length = niter)
+  for (jj in 1:niter) {
+    mod <- t.test(rnorm(ss, m1, sds[ii, 1]),
+                  rnorm(ss, m2, sds[ii, 2]),
+                  var.equal = FALSE)
+    ps[jj] <- mod$p.value < 0.05
+  }
+  t1[ii] <- mean(ps)
+}
+t1
+```
+
+Compare the results.
+
+> 
