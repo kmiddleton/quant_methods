@@ -183,7 +183,7 @@ Interpret the results of the experiment in the context of the power you calculat
 
 You are reading a paper on growth of *Arabidopsis* in two different treatments: control (water only) and an organic fertilizer dissolved in water. The results section contains the following:
 
-> 
+> We measured aboveground biomass of plants after six weeks of growth in each of two treatment groups (n = 1000 per group). The means were 10.31 g (SEM = 0.001) for the control group and 10.42 (SEM = 0.002) for the fertilizer treatment group. A paired t-test showed highly significant difference of treatment ($t_{1998}$ = 52.4, P << 0.0001).
 
 What is your interpretation of these results? Do you think that the fertilizer has an important biological effect? Why or why not?
 
