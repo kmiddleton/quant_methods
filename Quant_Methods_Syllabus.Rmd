@@ -3,15 +3,15 @@ title: "Quantitative Methods in Life Sciences"
 author: "Elizabeth King and Kevin Middleton"
 date: "Spring 2017"
 output:
+  html_document:
+    smart: no
+    theme: flatly
   pdf_document:
     fig_caption: yes
     fig_height: 3
     fig_width: 6.5
     latex_engine: xelatex
     number_sections: no
-  html_document:
-    smart: no
-    theme: flatly
 geometry: margin=1in
 mainfont: Helvetica
 mathfont: Helvetica
@@ -118,6 +118,8 @@ You will be required to choose a recent publication that includes a substantial 
 ## Schedule
 
 Note that this is a general outline. The schedule of topics is subject to change.
+
+[Link to YouTube playlist with all lectures](https://www.youtube.com/playlist?list=PLGfz3WdHKS0H4m6VRpRIqW9oBXlmBGSsv)
 
 _#_  | _Date_  | _Topic_                          |
 -----|---------|----------------------------------|
