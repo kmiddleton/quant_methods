@@ -37,6 +37,7 @@ Recommended:
 In this class, when we discuss reproducible research, this is what we will mean. Outside of this course, these terms are often used more generally or interchangeably. 
 
 ## Problems you are trying to avoid
+
 1. How did I make this figure?
 1. Why did I eliminate those data points?
 1. Where are the data I eliminated?
@@ -55,9 +56,7 @@ In this class, when we discuss reproducible research, this is what we will mean.
 
 ## Insulating data from analysis
 
-Treat raw data like an endangered species. Don't mess with it!
-
-In data science speak, raw data should always be read-only.
+Treat raw data like an endangered species. Don't mess with it! In data science speak, raw data should always be read-only.
 
 - /Project
     - /RawData
@@ -120,7 +119,7 @@ In data science speak, raw data should always be read-only.
 - RStudio is an interface to R
 - R can be run without RStudio.
     - The reverse is not true.
-- RStudio is one of the most important thing to ever happen to R
+- RStudio is one of the most important things to ever happen to R
 - These slides were written in R, using RStudio and R Markdown.
 
 ## R Markdown {.smaller}
@@ -139,7 +138,7 @@ In data science speak, raw data should always be read-only.
 
 ## Reproducibility is an investment for your future self
 
-Doing things “the hard way” now is the easy way in the long run.
+Doing things "the hard way" now is the easy way in the long run.
 
 Be kind to your future self.
 
