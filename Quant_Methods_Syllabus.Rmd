@@ -1,7 +1,7 @@
 ---
 title: "Quantitative Methods in Life Sciences"
 author: "Elizabeth King and Kevin Middleton"
-date: "Spring 2017"
+date: "Spring 2019"
 output:
   html_document:
     smart: no
@@ -33,7 +33,7 @@ By the end of this course, you will have a foundation in the quantitative method
 
 ### Background knowledge
 
-**If you have never used R before**, you must attend the pre-course workshop (01/13) to install R on your laptop and work through some Swirl tutorials (http://swirlstats.com/) prior to the first course meeting (01/20).
+**If you have never used R before**, you must attend the pre-course workshop (01/18) to install R on your laptop and work through some Swirl tutorials (http://swirlstats.com/) prior to the first course meeting (01/25).
 
 We will start with the assumption of some previous exposure to the following topics:
 
@@ -85,6 +85,8 @@ We expect you to be an active participant in class. If you do not understand som
 - No mystery numbers are allowed. It should be clear where every number comes from.
 - Plot the data. The answer you get from your statistical test should be apparent from thoughtful plots of your data.
 
+If you fail to do the first assignment and/or show up to the first class we reserve the right to drop you from the course to allow someone else to take it.
+
 ### Quiz questions
 
 Each set of lecture videos will have associated quiz questions. Complete these before our weekly meeting. These questions are not graded for correctness, only for completion. They will help your instructors guide the discussion during out meetings, so please take these questions seriously.
@@ -110,7 +112,7 @@ You will be required to choose a recent publication that includes a substantial 
     1. In class contributions
 2. Review Project (10%)
 3. Final Exam (40%)
-    - The final exam will be distributed at the beginning of May and will be due on 5/10. *You can not work with other members of the class or anyone else on this exam*. You will be able to use all other available resources (books, notes, lectures, internet, etc.).
+    - The final exam will be distributed at the beginning of May and will be due on 5/15. *You can not work with other members of the class or anyone else on this exam*. You will be able to use all other available resources (books, notes, lectures, internet, etc.).
 
 ----
 \newpage
@@ -119,32 +121,30 @@ You will be required to choose a recent publication that includes a substantial 
 
 Note that this is a general outline. The schedule of topics is subject to change.
 
-[Link to YouTube playlist with all lectures](https://www.youtube.com/playlist?list=PLGfz3WdHKS0H4m6VRpRIqW9oBXlmBGSsv)
-
 _#_  | _Date_  | _Topic_                          |
 -----|---------|----------------------------------|
-00   | F 1/13  | Pre-workshop. Installing R, etc. |
-01   | F 1/20  | Reproducible research, programming with data |
-02   | F 1/27  | Data cleaning, organization, visualization |
-03   | F 2/03  | Basic probability |
-04   | F 2/10  | Likelihood, Bayesian concepts, frequentist framework |
-05   | F 2/17  | Applications of three inference frameworks |
-06   | F 2/24  | Parameter estimation, significance testing |
-07   | F 3/03  | Randomization, multiple testing |
-08   | F 3/10  | Generalized linear models |
-09   | F 3/17  | Generalized linear models |
-10   | F 3/24  | Model comparison, model based inference |
-11   | F 4/07  | Kinship and phylogenetic methods |
-12   | F 4/14  | Multiple comparisons procedures |
-13   | F 4/21  | Composite variables |
-14   | F 4/28  | Composite variables |
-15   | F 5/05  | Experimental design |
+00   | F 1/18  | Pre-workshop. Installing R, etc. |
+01   | F 1/25  | Reproducible research, programming with data |
+02   | F 2/01  | Data cleaning, organization, visualization |
+03   | F 2/08  | Basic probability |
+04   | F 2/15  | Likelihood, Bayesian concepts, frequentist framework |
+05   | F 2/22  | Applications of three inference frameworks |
+06   | F 3/01  | Parameter estimation, significance testing |
+07   | F 3/08  | Randomization, multiple testing |
+08   | F 3/15  | Generalized linear models |
+09   | F 3/22  | Generalized linear models |
+10   | F 4/05  | Model comparison, model based inference |
+11   | F 4/12  | Kinship and phylogenetic methods |
+12   | F 4/19  | Multiple comparisons procedures |
+13   | F 4/26  | Composite variables |
+14   | F 5/03  | Composite variables |
+15   | F 5/10  | Experimental design |
 
 Other key dates:
 
-- 4/07 (Friday): Review project paper approval required
-- 5/10 (Wednesday): Final exam due
-- 5/12 (Friday): Review project due
+- 4/19 (Friday): Review project paper approval required
+- 5/15 (Wednesday): Final exam due
+- 5/17 (Friday): Review project due
 
 ## Academic Dishonesty
 
