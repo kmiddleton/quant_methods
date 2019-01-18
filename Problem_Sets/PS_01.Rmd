@@ -239,16 +239,16 @@ Use your data.frame from the question above. Extract the following subsets:
 # 1
 
 
-#2
+# 2
 
 
-#3
+# 3
 
 
-#4
+# 4
 
 
-#5
+# 5
 
 ```
 
