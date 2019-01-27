@@ -116,7 +116,7 @@ Binary operations are very important in R for selecting, subsetting, and choosin
 - `>` Greater than
 - `<` Less than
 - `>=` Greater than or equal to
-- `>=` Less than or equal to
+- `<=` Less than or equal to
 - `%in%` Is the comparator in the set?
 
 When these operators are applied to vectors, the result is a vector of logicals (`TRUE`s and `FALSE`s).
