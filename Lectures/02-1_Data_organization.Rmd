@@ -20,6 +20,10 @@ library(readxl)
 
 ## Readings
 
+Required:
+
+Broman and Woo (2018) Data Organization in Spreadsheets. The American Statistician, 72:1, 2-10.
+
 Suggested:
 
 - Ted Garland [*How to Structure and Name Data Files*](http://biology.ucr.edu/people/faculty/Garland/How_to_Structure_and_Name_Data_Files_1.pdf)
