@@ -74,7 +74,7 @@ It means that the package is not installed. First install the package (note that
 install.packages("tidyverse")
 ```
 
-and then rerun the code chunk that includes the `library()` commands. `cowplot` is a package that changes some of the ggplot defaults to be a little more friendly.
+and then rerun the code chunk that includes the `library()`^[Inside the call to `library()`, package names do notneed to be quoted (but they can be without incident). `install.packages()`, on the other hand, expects to receive a string or vector of strings, so you do need quotes.] commands. `cowplot` is a package that changes some of the ggplot defaults to be a little more friendly.
 
 ### Best practices (things to remember)
 
@@ -99,13 +99,13 @@ Sexual size dimorphism (SSD) refers to the difference in size between males and 
 The golden silk orb weaver (*Nephila clavipes*) is a species of spider that shows extreme SSD, in which males are about 2/3 smaller than females. This picture shows the size disparity between a female and male:
 
 <div style="width:350px">
-![](http://djringer.com/photos/d/8304-2/golden-silk-orbweaver-nephila-clavipes-female-male.jpg)
+![](https://cdn.shopify.com/s/files/1/0841/0073/products/il_570xN.917073770_s7se.jpg)
 </div>
 
 In contrast, in the wolf spider (*Pardosa ramulosa*), males and females do not show large size differences.
 
 <div style="width:350px">
-![](http://crawford.tardigrade.net/journal/album/fordramulosa.jpg)
+![](https://crawford.tardigrade.net/journal/album/fordramulosa.jpg)
 </div>
 
 The file `Size_Dimorphism.xlsx` contains data on body mass and body length for males and females in these two species. 
@@ -230,7 +230,7 @@ To give you some practice filtering, filter your data in the following ways usin
 
 To start looking at sexual size dimorphism, we will make some histograms. This is the easiest method to visualize univariate data.
 
-###Activity
+### Activity
 
 Start with a histogram of body length overall. 
 
