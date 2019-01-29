@@ -94,8 +94,14 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
+}
+summary {
+  display: list-item;
 }
 </style>
 
@@ -104,14 +110,74 @@ button.code-folding-btn:focus {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -218,7 +284,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Problem Set 01</h1>
 <h4 class="author"><em>Your Name Here: Group X</em></h4>
-<h4 class="date"><em>Last updated: 2019-01-25</em></h4>
+<h4 class="date"><em>Last updated: 2019-01-28</em></h4>
 
 </div>
 
@@ -379,7 +445,7 @@ a</code></pre>
 <p>Create a data.frame with the following columns:</p>
 <ul>
 <li>A character vector <code>Tx_Group</code> with the values &quot;control&quot; and &quot;high&quot;, each repeated 10 times.</li>
-<li>A numeric vector <code>Replicate</code> with values 1 and 2, each repeated 5 times for each of the 10 values of &quot;control&quot; and &quot;high&quot; in <code>Tx_Group</code>.</li>
+<li>A numeric vector <code>Replicate</code> with values 1 and 2, repeated 5 times each for both values in <code>Tx_Group</code>.</li>
 <li>A numeric vector <code>Productivity</code>, where the first 10 values are normally distributed with a mean of 5 and standard deviation of 2 and the second 10 values are normally distributed with a mean of 8 and standard deviation of 2. <code>c()</code> will be useful here.</li>
 </ul>
 <p>Include the argument <code>stringsAsFactors = FALSE</code> to tell R not to convert the strings to factors.</p>
