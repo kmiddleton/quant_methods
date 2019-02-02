@@ -270,7 +270,7 @@ Compare the results of the column means with the results of part (c). What is R 
 Create a data.frame with the following columns:
 
 - A character vector `Tx_Group` with the values "control" and "high", each repeated 10 times.
-- A numeric vector `Replicate` with values 1 and 2, each repeated 5 times for each of the 10 values of "control" and "high" in `Tx_Group`.
+- A numeric vector `Replicate` with values 1 and 2, repeated 5 times each for both values in `Tx_Group`.
 - A numeric vector `Productivity`, where the first 10 values are normally distributed with a mean of 5 and standard deviation of 2 and the second 10 values are normally distributed with a mean of 8 and standard deviation of 2. `c()` will be useful here.
 
 Include the argument `stringsAsFactors = FALSE` to tell R not to convert the strings to factors.
