@@ -75,10 +75,10 @@ A **sample** is a representative subset of a population, ideally randomly chosen
 
 **Bias/Inaccuracy** is the *systematic departure* of an estimate from the population parameter being estimated.
 
-## Goals of data collection: Low sampling error and low bias
+## Goals of data collection: Low sampling error and low bias {#myImagePage}
 
 <center>
-<img src="images/bias.png" width="65%" />
+<img src="https://i.imgur.com/eP5dSny.png" style="width: 55%"/>
 </center>
 
 ## Thinking about sampling error and bias
@@ -143,7 +143,9 @@ Standard assumption of most statistical tests.
 
 Randomly select 20 trees (left) or randomly select 20 square quadrats with 0 or more trees (right).
 
- ![](images/sampling.png)
+<center>
+<img src="https://i.imgur.com/KcKmZYi.png" style="width: 90%"/>
+</center>
 
 How realistic is this?
 
