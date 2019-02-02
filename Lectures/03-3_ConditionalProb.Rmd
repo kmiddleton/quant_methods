@@ -2,7 +2,6 @@
 title: "Conditional Probability"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -32,19 +31,19 @@ The **conditional probability** of a dependent event is the probability of that 
 <center>
 <img src="http://scitechdaily.com/images/Leptopilina_boulardi.jpg" width="60%" />
 
-<i>Leptopilina boulardi</i>
+*Leptopilina boulardi*
 </center>
 
 ## Conditional probability
 
 <center>
-<img src="images/dec_tree.png" width="75%" />
+<img src="https://i.imgur.com/kI2YAMH.png" width="75%" />
 </center>
 
 ## Conditional probability
 
 <center>
-<img src="images/cond_prob.png" width="50%" />
+<img src="https://i.imgur.com/S56RM5u.png" width="50%" />
 </center>
 
 ## Bayes' Rule
@@ -63,20 +62,20 @@ The conditional probability of $A$ given $B$ relies not only on the probability 
 Suppose that you wake up one day with spots all over your face. The doctor tells you that 90% of people who have smallpox have the same symptoms as you.
 
 <center>
-<img src="images/pox.jpg" width="70%" />
+<img src="https://i.imgur.com/l0XzqV5.jpg" width="70%" />
 </center>
+
+## Bayes' Rule
+[Imgur]()
+<center>
+<img src="https://i.imgur.com/VCRHJoG.jpg" width="80%" />
+</center>
+
 
 ## Bayes' Rule
 
 <center>
-<img src="images/pox2.jpg" width="80%" />
-</center>
-
-
-## Bayes' Rule
-
-<center>
-<img src="images/dec_tree.png" width="60%" />
+<img src="https://i.imgur.com/l0XzqV5.jpg" width="70%" />
 </center>
 
 $$Pr[M|P] = \frac{Pr[P|M] \times Pr[M]}{Pr[P]}$$
@@ -178,10 +177,12 @@ Or just $12.987 / (12.987 + 9.9987)$ because the 100000s cancel out, which is th
 
 ## Uncertainty
 
-> "In scientific research, measurements are replete with randomness. Extraneous influences contaminate the measurements despite tremendous efforts to limit their intrusion." [@kruschke_doing_2015]
+> "In scientific research, measurements are replete with randomness. Extraneous influences contaminate the measurements despite tremendous efforts to limit their intrusion." [@Kruschke2015-rp]
 
 ## Quiz 03-3
 
 On Canvas, complete quiz 03-3.
 
 Move on to lecture 03-4.
+
+## References
