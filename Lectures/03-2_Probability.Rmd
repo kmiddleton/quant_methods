@@ -2,7 +2,6 @@
 title: "Probability"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -62,7 +61,7 @@ The probability of an event is the **proportion** of times the event **would** o
 The probability of an event is the **proportion** of times the event **would** occur **if** a **random** trial is repeated **infinitely** under **constant conditions**.
 
 <center>
-<img src="images/weather1.png" width="100%" />
+<img src="https://i.imgur.com/WFKHq4N.png" width="100%" />
 </center>
 
 
@@ -120,7 +119,7 @@ In three successive dice rolls, what is the probability of rolling  a 1 *followe
 $$Pr[A, B] = Pr[A] \times Pr[B]$$
 
 <center>
-<img src="images/boy_girl.png" width="70%" />
+<img src="https://i.imgur.com/DBuO6ZI.png" width="70%" />
 </center>
 
 
@@ -131,7 +130,7 @@ KM's sister has 4 children of which 4 are girls.
 What is the probability of having 4 children that are all girls if $Pr[girl]=0.488$?
 
 <center>
-<img src="images/boy_girl.png" width="60%" />
+<img src="https://i.imgur.com/DBuO6ZI.png" width="60%" />
 </center>
 
 ## Binomial probabilities
