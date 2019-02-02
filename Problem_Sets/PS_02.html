@@ -1555,17 +1555,13 @@ div.tocify {
 
 <h1 class="title toc-ignore">Problem Set 02</h1>
 <h4 class="author"><em>Your Name Here: Group X</em></h4>
-<h4 class="date"><em>Last updated: 2019-01-27</em></h4>
+<h4 class="date"><em>Last updated: 2019-02-02</em></h4>
 
 </div>
 
 
 <div id="setup" class="section level2">
 <h2>Setup</h2>
-<pre class="r"><code># Load packages in this R code chunk
-# Come back here and include the commands to load all the packages
-# you will need to complete this problem set. We like to load all the
-# packages we will need for an analysis at the top.</code></pre>
 </div>
 <div id="working-directory" class="section level2">
 <h2>Working Directory</h2>
@@ -1622,6 +1618,7 @@ div.tocify {
 <div id="best-practices-things-to-remember" class="section level3">
 <h3>Best practices (things to remember)</h3>
 <ul>
+<li>It is best to install packages (e.g., <code>install.packages(&quot;cowplot&quot;)</code>) from the command line only. If you include this code in a R code chunk, you risk R trying to reinstall the package each time you knit your file.</li>
 <li>Packages only need to be installed once on each computer. They are stored locally.</li>
 <li>Packages need to be loaded (<code>library()</code>) each time you restart R. Loaded packages are not persistent across R sessions.</li>
 <li>Load all of the packages you need at the start of a document to keep track of what packages your analysis needs.</li>
@@ -1629,7 +1626,7 @@ div.tocify {
 </div>
 <div id="activity-1" class="section level3">
 <h3>Activity</h3>
-<p>In the <em>Setup</em> section at the beginning of this document, add code to load the following packages, which you will need for this problem set:</p>
+<p>In the <em>Setup</em> code chunk at the beginning of this document, add code to load the following packages, which you will need for this problem set:</p>
 <ol style="list-style-type: decimal">
 <li><code>tidyverse</code></li>
 <li><code>readxl</code></li>
@@ -1688,14 +1685,15 @@ div.tocify {
 <p>This experiment is balanced, meaning there are equal numbers of males and females in each species (50 of each).</p>
 <div id="activity-4" class="section level3">
 <h3>Activity</h3>
-<p>Check that this is the case by creating a logical and summing the resulting TRUE/FALSE vector. I.e. how many female <em>Nephila clavipes</em> are there?</p>
-<p>It looks like something is not right. There are a few ways to figure out what might be going on. Try using the <code>unique()</code> function to check for typos in the Sex column. If you pass a vector to <code>unique()</code> it will return all unique values in that vector. If all of our data is coded correctly, the result <em>should</em> be just two values: “M”, and “F”. Use the <code>which()</code> function to identify the observations with typos. (<code>%in%</code> might be useful here but there are other ways to do this.)</p>
+<p>Check that this is the case by creating a logical vector and summing the resulting TRUE/FALSE vector. i.e. how many female <em>Nephila clavipes</em> are there?</p>
+<p>It looks like something is not right. There are a few ways to figure out what might be going on. Try using the <code>unique()</code> function to check for typos in the <code>Sex</code> column. If you pass a vector to <code>unique()</code> it will return all unique values in that vector. If all of our data is coded correctly, the result <em>should</em> be just two values: “M”, and “F”. Use the <code>which()</code> function to identify the observations with typos. (<code>%in%</code> might be useful here but there are other ways to do this.)</p>
 <p>You could use the results of your <code>which()</code> calls to find and correct your excel file after making a back up copy just in case you make a mistake (or use version control!). If you were planning to do more editing in excel, this would be preferable. For this exercise will correct these within R here. We’ve given you the syntax for fixing one. Use this same format to fix the others. Run <code>unique()</code> again to make sure you got them all.</p>
-<p>First change <code>eval=FALSE</code> to <code>eval=TRUE</code>.</p>
-<pre class="r"><code>M$Sex[M$Sex == &#39;F &#39;] &lt;- &#39;F&#39;</code></pre>
+<p>First change <code>eval=FALSE</code> to <code>eval=TRUE</code>. Changing this flag in the chunk header will cause RStudio to evaluate the chunk when it is knitting the document. When <code>eval</code> is <code>FALSE</code>, the chunk will be skipped. This is something that we need to do when writing the problem sets, so that they will compile.</p>
+<pre class="r"><code>M$Sex[M$Sex == &#39;f&#39;] &lt;- &#39;F&#39;</code></pre>
 <p>Now check the <code>Species</code> column in the same way. Fix any errors that you find.</p>
 <p>Saving yourself the trouble of doing this exercise is one big reason to be careful when you enter data!!</p>
 <p>One last step, let’s write out your new, typo-free data. Look at the help for <code>write_csv()</code>, and write out your data to a new csv file named, <code>Size_Dimorphism_corrected.csv</code>.</p>
+<p>We prefer to use <code>write_csv()</code>, which is part of tidyverse, to R’s built-in <code>write.csv()</code> (note _ vs. .). <code>write_csv()</code> has some friendlier defaults settings.</p>
 <p>Now read your new file back in as if this next section is a new script. Feel free to overwrite your previous object, <code>M</code>. This is a good idea to avoid confusion. Use <code>read_csv()</code>.</p>
 </div>
 </div>
@@ -1718,8 +1716,8 @@ div.tocify {
 <li>All <em>Pardosa ramulosa</em></li>
 <li>All females of both species</li>
 <li>Body mass and sex for <em>Nephila clavipes</em></li>
-<li>Rows 1-50</li>
-<li>Mass of the largest female in each species</li>
+<li>Rows 1-50 (either using base R or the <code>slice()</code> function from tidyverse)</li>
+<li>Mass of the largest female (by mass) in each species</li>
 <li>Male <em>Pardosa ramulosa</em> with body lengths less than 4 or greater than 6</li>
 </ol>
 </div>
@@ -1729,9 +1727,9 @@ div.tocify {
 <p>To start looking at sexual size dimorphism, we will make some histograms. This is the easiest method to visualize univariate data.</p>
 <div id="activity-7" class="section level3">
 <h3>Activity</h3>
-<p>Start with a histogram of body length overall.</p>
+<p>Start with a histogram of body length overall. Follow the code in the lectures if you need to.</p>
 <p>There are some obvious groupings here, but we don’t know which species or sex the clusters represent. We need to separate both species and sex. One approach is to make a plot for each species with <code>fill</code> coding for sex (this is analogous to using color, but works better with histograms). Try this.</p>
-<p>You will get a message saying that “<code>stat_bin()</code> using <code>bins = 30</code>. Pick better value with <code>binwidth</code>.” That just means that you are using the default bin size for your histograms. In some situations, you would want to specify that value explicitly. For now, using the default value of 30 is fine.</p>
+<p>You will get a message saying that “<code>stat_bin()</code> using <code>bins = 30</code>. Pick better value with <code>binwidth</code>.” That just means that you are using the default bin size for your histograms. In some situations, you would want to specify that value explicitly. For now, using the default value of 30 is fine. Later you can use the <code>binwidth</code> option to choose a different size.</p>
 <p>We could also visualize all groups with <code>facet_grid()</code>. Here is an example:</p>
 <pre class="r"><code># Change eval=FALSE to eval=TRUE
 ggplot(M, aes(BodyLength)) +
@@ -1761,7 +1759,7 @@ ggplot(M, aes(BodyLength)) +
 </blockquote>
 <p>Because body length and body mass are related by an exponential power, if we take advantage of the math of logarithms and log-transform the data, that will linearize the relationship. Ignoring the y-intercepts:</p>
 <p><span class="math display">\[Mass \propto Length^b\]</span> <span class="math display">\[\log(Mass) \propto b \log(Length)\]</span></p>
-<p>Make two new variables that are the log10-transformations of body length and body mass using <code>mutate</code> and plot the data again. Add new axis labels.</p>
+<p>Make two new variables that are the log10-transformations of body length and body mass using <code>mutate()</code> and plot the data again. Add new axis labels.</p>
 <p>What does this plot tell you? Do you think this is a more effective visualization of the data?</p>
 <blockquote>
 

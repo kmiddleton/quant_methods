@@ -13,10 +13,6 @@ output:
 ## Setup
 
 ```{r setup, message=FALSE, warning=FALSE}
-# Load packages in this R code chunk
-# Come back here and include the commands to load all the packages
-# you will need to complete this problem set. We like to load all the
-# packages we will need for an analysis at the top.
 
 ```
 
@@ -78,13 +74,14 @@ and then rerun the code chunk that includes the `library()`^[Inside the call to 
 
 ### Best practices (things to remember)
 
+- It is best to install packages (e.g., `install.packages("cowplot")`) from the command line only. If you include this code in a R code chunk, you risk R trying to reinstall the package each time you knit your file. 
 - Packages only need to be installed once on each computer. They are stored locally.
 - Packages need to be loaded (`library()`) each time you restart R. Loaded packages are not persistent across R sessions.
 - Load all of the packages you need at the start of a document to keep track of what packages your analysis needs.
 
 ### Activity
 
-In the *Setup* section at the beginning of this document, add code to load the following packages, which you will need for this problem set:
+In the *Setup* code chunk at the beginning of this document, add code to load the following packages, which you will need for this problem set:
 
 1. `tidyverse`
 1. `readxl`
@@ -152,13 +149,13 @@ This experiment is balanced, meaning there are equal numbers of males and female
 
 ### Activity 
 
-Check that this is the case by creating a logical and summing the resulting TRUE/FALSE vector. I.e. how many female *Nephila clavipes* are there? 
+Check that this is the case by creating a logical vector and summing the resulting TRUE/FALSE vector. i.e. how many female *Nephila clavipes* are there?
 
 ```{r}
 
 ```
 
-It looks like something is not right. There are a few ways to figure out what might be going on. Try using the `unique()` function to check for typos in the Sex column. If you pass a vector to `unique()` it will return all unique values in that vector. If all of our data is coded correctly, the result *should* be just two values: "M", and "F". Use the `which()` function to identify the observations with typos. (`%in%` might be useful here but there are other ways to do this.)
+It looks like something is not right. There are a few ways to figure out what might be going on. Try using the `unique()` function to check for typos in the `Sex` column. If you pass a vector to `unique()` it will return all unique values in that vector. If all of our data is coded correctly, the result *should* be just two values: "M", and "F". Use the `which()` function to identify the observations with typos. (`%in%` might be useful here but there are other ways to do this.)
 
 ```{r}
 
@@ -166,10 +163,10 @@ It looks like something is not right. There are a few ways to figure out what mi
 
 You could use the results of your `which()` calls to find and correct your excel file after making a back up copy just in case you make a mistake (or use version control!). If you were planning to do more editing in excel, this would be preferable. For this exercise will correct these within R here. We've given you the syntax for fixing one. Use this same format to fix the others. Run `unique()` again to make sure you got them all. 
 
-First change `eval=FALSE` to `eval=TRUE`.
+First change `eval=FALSE` to `eval=TRUE`. Changing this flag in the chunk header will cause RStudio to evaluate the chunk when it is knitting the document. When `eval` is `FALSE`, the chunk will be skipped. This is something that we need to do when writing the problem sets, so that they will compile.
 
 ```{r eval=FALSE}
-M$Sex[M$Sex == 'F '] <- 'F'
+M$Sex[M$Sex == 'f'] <- 'F'
 
 ```
 
@@ -181,7 +178,9 @@ Now check the `Species` column in the same way. Fix any errors that you find.
 
 Saving yourself the trouble of doing this exercise is one big reason to be careful when you enter data!!
 
-One last step, let's write out your new, typo-free data. Look at the help for `write_csv()`, and write out your data to a new csv file named, `Size_Dimorphism_corrected.csv`. 
+One last step, let's write out your new, typo-free data. Look at the help for `write_csv()`, and write out your data to a new csv file named, `Size_Dimorphism_corrected.csv`.
+
+We prefer to use `write_csv()`, which is part of tidyverse, to R's built-in `write.csv()` (note _ vs. .). `write_csv()` has some friendlier defaults settings.
 
 ```{r}
 
@@ -218,8 +217,8 @@ To give you some practice filtering, filter your data in the following ways usin
 1. All *Pardosa ramulosa* 
 2. All females of both species
 3. Body mass and sex for *Nephila clavipes*
-4. Rows 1-50
-5. Mass of the largest female in each species
+4. Rows 1-50 (either using base R or the `slice()` function from tidyverse)
+5. Mass of the largest female (by mass) in each species
 6. Male *Pardosa ramulosa* with body lengths less than 4 or greater than 6
 
 ```{r}
@@ -232,7 +231,7 @@ To start looking at sexual size dimorphism, we will make some histograms. This i
 
 ### Activity
 
-Start with a histogram of body length overall. 
+Start with a histogram of body length overall. Follow the code in the lectures if you need to.
 
 ```{r}
 
@@ -244,7 +243,7 @@ There are some obvious groupings here, but we don't know which species or sex th
 
 ```
 
-You will get a message saying that "`stat_bin()` using `bins = 30`. Pick better value with `binwidth`." That just means that you are using the default bin size for your histograms. In some situations, you would want to specify that value explicitly. For now, using the default value of 30 is fine.
+You will get a message saying that "`stat_bin()` using `bins = 30`. Pick better value with `binwidth`." That just means that you are using the default bin size for your histograms. In some situations, you would want to specify that value explicitly. For now, using the default value of 30 is fine. Later you can use the `binwidth` option to choose a different size. 
 
 We could also visualize all groups with `facet_grid()`. Here is an example:
 
@@ -292,7 +291,7 @@ Because body length and body mass are related by an exponential power, if we tak
 $$Mass \propto Length^b$$
 $$\log(Mass) \propto b \log(Length)$$
 
-Make two new variables that are the log10-transformations of body length and body mass using `mutate` and plot the data again. Add new axis labels.
+Make two new variables that are the log10-transformations of body length and body mass using `mutate()` and plot the data again. Add new axis labels.
 
 ```{r}
 
