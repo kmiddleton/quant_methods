@@ -2,7 +2,6 @@
 title: "Applications of Inference Frameworks: Difference of Means"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -22,7 +21,7 @@ library(wesanderson)
 ## Horned lizard predation
 
 <center>
-<img src="http://ichef.bbci.co.uk/wwfeatures/wm/live/624_351/images/live/p0/37/4s/p0374s1q.jpg" width="100%" />
+<img src="https://i.imgur.com/6GSiaAy.jpg" width="100%" />
 </center>
 
 ## Horned lizard predation
@@ -82,7 +81,7 @@ Imagine you collected 100 live horned lizards and randomly assigned 50 to each o
 
 <div class="columns-2">
 <center>
-<img src="http://3.bp.blogspot.com/_6dWrARvFLx4/TFo-Vo1cdyI/AAAAAAAABqg/ITJBYWI8q3s/s1600/horned+lizard+4.JPG" width="100%" />
+<img src="https://i.imgur.com/EIfjPa0.jpg" width="100%" />
 <br />
 <br />
 <br />
@@ -90,18 +89,18 @@ Imagine you collected 100 live horned lizards and randomly assigned 50 to each o
 
 - Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 3)
 - Randomly catch two groups of $n = 50$ from this population
-- How different are they?
+- How different are the groups?
 </div>
 
 ## How large of a difference do we expect to see from sampling error?
 
 ```{r}
 set.seed(883231)
-mu.horn <- 24 # mean
-sd.horn <- 3 # standard deviation
+mu.horn <- 24   # mean
+sd.horn <- 3    # standard deviation
 n.iter <- 10000 # number of iterations
-n.samp <- 50 # number in each sample
-sim.diff <- data_frame(dd = numeric(length = n.iter)) # vector for output  
+n.samp <- 50    # number in each sample
+sim.diff <- tibble(dd = numeric(length = n.iter)) # vector for output  
 
 for (zz in 1:n.iter) {
   s1 <- rnorm(n.samp, mu.horn, sd.horn) # sample 1
@@ -169,7 +168,9 @@ p2 <- HL %>%
 plot_grid(p2, p1, ncol = 2)
 ```
 
-Difference: `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(HL$horn_length[HL$group == "dead"]), 2)`
+<center>
+Difference = `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
+</center>
 
 ## Frameworks for inference
 
@@ -183,14 +184,14 @@ Difference: `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(
 ```{r t_plot, message=FALSE, fig.height=2.5, echo=FALSE, warning=FALSE}
 x <- seq(-3, 3, by = 0.001)
 
-sim <- data_frame(df = c(2, 10, 50)) %>%
+sim <- tibble(df = c(2, 10, 50)) %>%
   group_by(df) %>%
-  do(data_frame(x = x, y = dt(x, .$df))) %>%
+  do(tibble(x = x, y = dt(x, .$df))) %>%
   mutate(Parameters = paste0("df = ", df)) %>%
   ungroup() %>%
   mutate(Parameters = factor(Parameters, levels = unique(Parameters)))
 
-norm <- data_frame(
+norm <- tibble(
   x = x,
   y = dnorm(x, 0, 1)
 )
@@ -286,10 +287,10 @@ for (i in 2:reps) {
 ## Difference of means
 
 ```{r echo=FALSE}
-data_frame(diffs) %>% 
+tibble(diffs) %>% 
   ggplot(aes(diffs)) + 
   geom_histogram(bins = 30) +
-  geom_vline(xintercept = diffs[1], color = "red") +
+  geom_vline(xintercept = diffs[1], color = "red", size = 2) +
   labs(x = "Difference (mm)", y = "Count")
 ```
 
@@ -327,7 +328,7 @@ Prior for group means (alive, dead) ~  $\mathcal{N}(\mu = 23.9, \sigma = 5)$
 - Estimate posterior distribution of each group simultaneously
 
 ```{r echo=FALSE, fig.height = 2}
-data_frame(x = seq(10, 38, length = 100),
+tibble(x = seq(10, 38, length = 100),
            y = dnorm(x, 23.9, 5)) %>% 
   ggplot(aes(x, y)) +
   geom_line() +
@@ -362,7 +363,7 @@ post <- extract.samples(fm2)
 alive <- post$a[, 1]
 dead <- post$a[, 2]
 
-data_frame(alive, dead) %>%
+tibble(alive, dead) %>%
   gather(group, horn) %>% 
   ggplot(aes(horn, color = group)) +
   geom_line(stat = "density", size = 1.5) +
@@ -386,7 +387,7 @@ HL %>% group_by(group) %>%
 diff <- alive - dead
 hdint <- HPDI(diff)
 
-data_frame(diff) %>% 
+tibble(diff) %>% 
   ggplot(aes(diff)) +
   geom_line(stat = "density", size = 1.5) +
   geom_vline(xintercept = hdint[1], color = "lightblue", size = 1.5) +
