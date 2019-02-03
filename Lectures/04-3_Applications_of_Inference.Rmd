@@ -2,7 +2,6 @@
 title: "Applications of Inference Frameworks"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -69,7 +68,7 @@ What is the mean undulation rate for this sample of flying snakes?
 ## Undulation rate
 
 ```{r undulation_plot, message=FALSE, echo=FALSE}
-ggplot(data_frame(undulation_rate), aes(undulation_rate)) +
+ggplot(tibble(undulation_rate), aes(undulation_rate)) +
   geom_histogram() +
   labs(x = "Undulation Rate (Hz)", y = "Count")
 ```
@@ -102,7 +101,7 @@ dnorm(0, mean = 0, sd = 1)
 ```
 
 ```{r normal_plot, echo=FALSE, fig.height=4}
-M <- data_frame(x = seq(-3, 3, length = 100),
+M <- tibble(x = seq(-3, 3, length = 100),
                 y = dnorm(x))
 ggplot(M, aes(x, y)) + geom_line() +
   labs(x = "Y", y = "Relative Likelihood")
@@ -220,7 +219,7 @@ sigmas <- seq(0.1, 2, length = n) # Vector of sigma
 grid_mu_sigma <- mesh(mus, sigmas) # Generate grid
 
 # To hold the output
-grid_approx <- data_frame(
+grid_approx <- tibble(
   mu = as.numeric(grid_mu_sigma$x),
   sigma = as.numeric(grid_mu_sigma$y),
   log_lik = rep(NA, length = n ^ 2)
@@ -344,7 +343,7 @@ for (i in 1:reps) {
 ## Resampling inference of the mean
 
 ```{r echo=FALSE, message = FALSE}
-data_frame(resampled_mean) %>% 
+tibble(resampled_mean) %>% 
   ggplot(aes(resampled_mean)) +
   geom_histogram(bins = 20) +
   labs(x = "Resampled Mean", y = "Count") +
@@ -400,7 +399,7 @@ Can we do better? Yes, Bayesian priors.
 Cauchy distribution (location = 0, scale = 5)
 
 ```{r, echo=FALSE, message=FALSE}
-data_frame(
+tibble(
   x = seq(0, 10, length = 100),
   y = dcauchy(x, scale = 5)) %>% 
   ggplot(aes(x, y)) + geom_line() +
@@ -444,7 +443,7 @@ fm_priors <- stan(
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 samp <- fm_priors@sim$samples
-mu <- data_frame(Iteration = 1:length(samp[[1]]$mu),
+mu <- tibble(Iteration = 1:length(samp[[1]]$mu),
                  Chain_1 = samp[[1]]$mu,
                  Chain_2 = samp[[2]]$mu,
                  Chain_3 = samp[[3]]$mu,
@@ -461,7 +460,7 @@ mu %>%
 
 ```{r, echo=FALSE}
 post <- extract(fm_priors) %>% 
-  as_data_frame() %>% 
+  as_tibble() %>% 
   select(mu)
 post %>%
   ggplot(aes(mu)) +

@@ -2,7 +2,6 @@
 title: "Frameworks for Inference"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -29,7 +28,7 @@ Success depends on evaluating the relative support for different *models*
 <div class="columns-2">
 
 <center>
-<img src="images/GFIRMUS2.jpg" width="100%" />
+<img src="https://i.imgur.com/kgPmw0b.jpg" width="100%" />
 <br />
 <br />
 <br />
@@ -51,7 +50,7 @@ Controlling for body mass,
 
 <center>
 <br />
-<img src="images/corn_oil.jpg" width="100%" />
+<img src="https://i.imgur.com/w6z5m2e.jpg" width="100%" />
 <br />
 <br />
 <br />
@@ -73,7 +72,7 @@ Controlling for body mass,
 <div class="columns-2">
 
 <center>
-<img src="images/Dog_Tree.png" width="100%" />
+<img src="https://i.imgur.com/spdaSkP.jpg" width="100%" />
 <br />
 <br />
 
@@ -94,7 +93,7 @@ Controlling for body mass,
 
 <center>
 <br />
-<img src="images/metacarpal1.png" width="90%" />
+<img src="https://i.imgur.com/cQ1Kl1v.png" width="90%" />
 <br />
 <br />
 <br />
@@ -113,7 +112,7 @@ Controlling for body mass,
 
 <center>
 <br />
-<img src="images/Gator_Growth1.png" width="100%" />
+<img src="https://i.imgur.com/yvphu7u.png" width="100%" />
 <br />
 <br />
 <br />
@@ -147,7 +146,7 @@ $$Femoral~Length\left(Age\right) = a + b \cdot Age + c \cdot Age^2$$
 ## Example: Alligator growth
 
 <center>
-<img src="images/Gator_Growth2.png" width="100%" />
+<img src="https://i.imgur.com/scZSjNE.png" width="100%" />
 </center>
 
 ## Example: Your Research
@@ -157,7 +156,7 @@ $$Femoral~Length\left(Age\right) = a + b \cdot Age + c \cdot Age^2$$
 <div class="columns-2">
 
 <center>
-<img src="images/Biodiversity.jpg" width="100%" />
+<img src="https://i.imgur.com/ETBeDVR.jpg" width="100%" />
 <br />
 <br />
 <br />
@@ -197,7 +196,7 @@ $$b = \frac{\sum\left(X_{i}-\bar{X}\right)\left(Y_{i}-\bar{Y}\right)}{\sum\left(
 ## Formulas can get unwieldy
 
 <center>
-<img src="images/anova_formulas.png" width="100%" />
+<img src="https://i.imgur.com/g6AzywG.png" width="100%" />
 </center>
 
 ## Maximum likelihood
@@ -209,7 +208,7 @@ For a given mean, how likely is observing my data?
 Analytical solutions are generally equal to the maximum likelihood solutions (for set of assumptions).
 
 <center>
-<img src="http://blogs.sas.com/content/iml/files/2011/10/mlenormal.png" width="50%" />
+<img src="https://i.imgur.com/L0oa58u.png" width="50%" />
 </center>
 
 ## Resampling & randomization
