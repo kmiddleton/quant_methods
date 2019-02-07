@@ -213,7 +213,7 @@ Utility functions for existing variables:
 
 ```{r echo=FALSE}
 set.seed(5)
-LS <- data_frame(
+LS <- tibble(
   Line = rep(1:2, each = 2),
   Diet = rep(c("C", "H"), times = 2),
   Lifespan = rpois(4, 35),

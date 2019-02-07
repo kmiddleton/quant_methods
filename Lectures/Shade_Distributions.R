@@ -2,7 +2,7 @@ shade_normal <- function(q, tail = "both", mean = 0, sd = 1) {
   require(tidyverse, quietly = TRUE)
   require(cowplot)
   crit <- qnorm(q, mean, sd)
-  M <- data_frame(x = seq(-4, 4, length = 200),
+  M <- tibble(x = seq(-4, 4, length = 200),
                   y = dnorm(x))
   p <- ggplot(M, aes(x, y)) +
     geom_line() +
@@ -24,7 +24,7 @@ shade_t <- function(q, df, tail = "both") {
   require(cowplot)
   require(latex2exp, quietly = TRUE)
   crit <- qt(q, df)
-  M <- data_frame(x = seq(-4, 4, length = 200),
+  M <- tibble(x = seq(-4, 4, length = 200),
                   y = dt(x, df))
   p <- ggplot(M, aes(x, y)) +
     geom_line() +
@@ -51,7 +51,7 @@ shade_F <- function(q, df1, df2, vline = NULL) {
   } else {
     x_max <- crit * 1.5
   }
-  M <- data_frame(x = seq(0.001, x_max, length = 200),
+  M <- tibble(x = seq(0.001, x_max, length = 200),
                   y = df(x, df1, df2))
   p <- ggplot(M, aes(x, y)) +
     geom_line() +
@@ -68,7 +68,7 @@ shade_chisq <- function(q, df) {
   require(cowplot)
   require(latex2exp, quietly = TRUE)
   crit <- qchisq(q, df, lower.tail = FALSE)
-  M <- data_frame(x = seq(0.1, crit * 1.5, length = 200),
+  M <- tibble(x = seq(0.1, crit * 1.5, length = 200),
                   y = dchisq(x, df))
   p <- ggplot(M, aes(x, y)) +
     geom_line() +

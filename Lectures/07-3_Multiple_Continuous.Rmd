@@ -2,7 +2,6 @@
 title: "Linear Models: Multiple Continuous Predictors"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -127,7 +126,7 @@ p1 <- M %>%
 
 res <- fm$residuals
 
-p2 <- data_frame(res) %>% 
+p2 <- tibble(res) %>% 
   ggplot(aes(res)) +
   geom_dotplot() +
   labs(x = "Residual", y = "Relative Count")

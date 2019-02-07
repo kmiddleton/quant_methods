@@ -153,7 +153,7 @@ If we flip a coin once, possible outcomes are H or T. How many ways are there to
 
 ```{r echo=FALSE, fig.height=4}
 
-flip1 <- data_frame(
+flip1 <- tibble(
  Ways = c(1, 1),
  Flips = c("1 Head", "1 Tail")
 )
@@ -172,7 +172,7 @@ If we flip a coin twice, what are the possible outcomes?
 
 ```{r echo=FALSE,fig.height=3}
 
-flip2 <- data_frame(
+flip2 <- tibble(
  Ways = c(1, 2, 1),
  Flips = c("2 Head", "1 Head, 1 Tail", "2 Tail")) %>% 
  mutate(Flips = fct_inorder(Flips))
@@ -192,7 +192,7 @@ If we flip a coin 3 times, what are the possible outcomes?
 
 ```{r echo=FALSE, fig.height=3}
 
-flip3 <- data_frame(
+flip3 <- tibble(
  Ways = c(1, 3, 3, 1),
  Flips = c("3 Head", "2 Head, 1 Tail", "1 Head, 2 Tail",
            "3 Tail")) %>% 
@@ -214,7 +214,7 @@ If we flip a coin 4 times, what are the possible outcomes?
 
 ```{r echo=FALSE, fig.height=3}
 
-flip4 <- data_frame(
+flip4 <- tibble(
  Ways = c(1, 4, 6, 4, 1),
  Flips = c("4 Head", "3 Head, 1 Tail", "2 Head, 2 Tail",
            "1 Head, 3 Tail", "4 Tail")) %>% 
@@ -231,7 +231,7 @@ If we flip a coin 6 times, what are the possible outcomes?
 
 ```{r echo=FALSE, fig.height=5}
 
-flip6 <- data_frame(
+flip6 <- tibble(
  Ways = c(1, 6, 15, 20, 15, 6, 1),
  Flips = c("6 H", "5 H, 1 T", "4 H, 2 T",
            "3 H, 3 T", "2 H, 4 T", 

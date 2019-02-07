@@ -2,7 +2,6 @@
 title: "Multiple Comparisons Procedures"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -21,42 +20,40 @@ library(readxl)
 
 *P* values resulting from chance alone have a uniform distribution
 
-```{r echo=FALSE,  message = FALSE}
+```{r echo=FALSE, message=FALSE, cache=TRUE}
 set.seed(3210)
 nn <- 10
 group1.mean <- 6
 group2.mean <- 6
-niter <- 1000
-ps<-data.frame('p1'=numeric(length=niter),
-               'p2'=numeric(length=niter))
+niter <- 10000
+ps<-data.frame('p1' = numeric(length = niter),
+               'p2' = numeric(length = niter))
 
-for(ii in 1:niter)
-{
-yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-gg <- c(rep('a',nn), rep('b',nn))
-ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
-ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
-
+for(ii in 1:niter) {
+  yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+  yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+  gg <- c(rep('a',nn), rep('b',nn))
+  ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
+  ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
 }
 
-ggplot(ps, aes(x=p1)) +
+ggplot(ps, aes(x = p1)) +
   geom_histogram() +
-  xlim(c(0,1))
-
+  labs(x = "P value")
 ```
 
 ## Distribution of *P* values 
 
 *P* values resulting from chance alone have a uniform distribution
 
-```{r echo=FALSE, message = FALSE}
+```{r echo=FALSE, message=FALSE}
 Ps <- ps %>% arrange(-log10(p1))
-Pp <- data.frame("P"= -log10(Ps$p1), "X"=sort(-log10(runif(nrow(ps),0,1)))) 
-ggplot(Pp, aes(x=X, y=P)) + 
+Pp <- data.frame("P"= -log10(Ps$p1),
+                 "X" = sort(-log10(runif(nrow(ps), 0, 1)))) 
+ggplot(Pp, aes(x = X, y = P)) + 
   geom_point() +
-  geom_abline(intercept=0, slope=1) +
-  xlim(c(0,5)) +
+  geom_abline(intercept = 0, slope = 1) +
+  xlim(c(0, 5)) +
   ylab("Observed P values") +
   xlab("Expected P values")
 ```
@@ -80,9 +77,9 @@ p2 <- p1 - 0.1
 F1 <- qf(p = p1, df1, df2, lower.tail = FALSE)
 F2 <- qf(p = p2, df1, df2, lower.tail = FALSE)
 
-#data_frame(p1, p2, F1, F2)
+#tibble(p1, p2, F1, F2)
 x_max <- max(F1) * 2
-M <- data_frame(x = seq(0.001, x_max, length = 20000),
+M <- tibble(x = seq(0.001, x_max, length = 20000),
                y = df(x, df1, df2))
 p <- ggplot(M, aes(x, y)) +
  geom_line() +

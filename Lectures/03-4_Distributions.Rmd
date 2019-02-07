@@ -24,7 +24,7 @@ If we flip a coin 6 times, what are the possible outcomes?
 
 ```{r echo=FALSE, fig.height=5}
 
-flip6 <- data_frame(
+flip6 <- tibble(
  Ways = c(1, 6, 15, 20, 15, 6, 1),
  Flips = c("0 H", "1 H, 5 T", "2 H, 4 T",
            "3 H, 3 T", "4 H, 2 T", 
@@ -55,7 +55,7 @@ flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
 ## Frequency Distribution of Heads | 6 Flips
 
 ```{r echo=FALSE, fig.height=4.5}
-flips <- data_frame(
+flips <- tibble(
   Ways = c(1, 6, 15, 20, 15, 6, 1),
   Flips = c("0 H", "1 H", "2 H",
             "3 H", "4 H", 
@@ -90,7 +90,7 @@ flips$Ways / sum(flips$Ways)
 ## Probability Distribution of Heads | 6 Flips
 
 ```{r echo=FALSE, fig.height=4.5}
-flip6 <- data_frame(
+flip6 <- tibble(
   Ways = c(1, 6, 15, 20, 15, 6, 1),
   Flips = c("0 H", "1 H", "2 H",
             "3 H", "4 H", 
@@ -119,7 +119,7 @@ set.seed(5)
 
 # Random numbers with a mean of 0 and standard deviation of 1
 x <- rnorm(200)
-M <- data_frame(x)  # Make a data_frame for ggplot
+M <- tibble(x)  # Make a tibble for ggplot
 ```
 
 ## Frequency distributions: Continuous data
@@ -201,7 +201,7 @@ normal <- function(Y, mu = 0, sigma = 1){
 ```{r echo=FALSE, message=FALSE}
 Y <- seq(-3, 3, length = 200)
 prob <- normal(Y)
-M_prob <- data_frame(Y, prob)
+M_prob <- tibble(Y, prob)
 
 ggplot(M, aes(x = x)) +
   geom_histogram(aes(y = ..density..), fill = "gray") +
@@ -223,7 +223,7 @@ Distribution of variables you might encounter
 ## Normal (Gaussian)
 
 ```{r echo=FALSE}
-M <- data_frame(
+M <- tibble(
   x = seq(-4, 4, length = 200),
   y = dnorm(x)) 
 ggplot(M, aes(x, y)) + geom_line() +
@@ -233,7 +233,7 @@ ggplot(M, aes(x, y)) + geom_line() +
 ## Binomial
 
 ```{r echo=FALSE}
-M <- data_frame(Successes = 0:10,
+M <- tibble(Successes = 0:10,
                 Probability = dbinom(0:10, 10, prob = 0.8))
 ggplot(M, aes(Successes, Probability)) + 
   geom_bar(stat = "identity") +
@@ -245,7 +245,7 @@ ggplot(M, aes(Successes, Probability)) +
 
 ```{r echo=FALSE}
 trials <- 20
-M <- data_frame(Successes = 0:trials,
+M <- tibble(Successes = 0:trials,
                 Probability = dpois(0:trials, lambda = 5))
 ggplot(M, aes(Successes, Probability)) + 
   geom_bar(stat = "identity") +

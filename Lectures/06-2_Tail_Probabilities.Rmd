@@ -25,10 +25,10 @@ source("Shade_Distributions.R")
 ```{r}
 set.seed(832476)
 # 3
-xx3 <- data_frame(num = rnorm(100000, 5, 1))
+xx3 <- tibble(num = rnorm(100000, 5, 1))
 
 # 6
-xx6 <- data_frame(num = rnorm(100000, 5, 5))
+xx6 <- tibble(num = rnorm(100000, 5, 5))
 ```
 
 ## Plots of random normal values
