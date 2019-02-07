@@ -107,11 +107,11 @@ Without setting the seed, generate two objects named AA and BB consisting of 5 n
 # FIXME
 AA <- rnorm(5)
 BB <- rnorm(5)
-cat(AA, "\n", BB)
+data.frame(AA, BB)
 
 AA <- rnorm(5)
 BB <- rnorm(5)
-cat(AA, "\n", BB)
+data.frame(AA, BB)
 ```
 
 > No. You get different answers each time.
@@ -123,12 +123,12 @@ Now, set the seed and do the same as above. Chose any number and place it in `se
 set.seed(34288)
 AA <- rnorm(5)
 BB <- rnorm(5)
-cat(AA, "\n", BB)
+data.frame(AA, BB)
 
 set.seed(34288)
 AA <- rnorm(5)
 BB <- rnorm(5)
-cat(AA, "\n", BB)
+data.frame(AA, BB)
 ```
 
 > Yes. Now the sets are the same, but AA and BB are different.
@@ -141,7 +141,7 @@ set.seed(34288)
 AA <- rnorm(5)
 set.seed(34288)
 BB <- rnorm(5)
-cat(AA, "\n", BB)
+data.frame(AA, BB)
 ```
 
 > AA and BB are now equal.

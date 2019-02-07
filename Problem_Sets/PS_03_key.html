@@ -1693,14 +1693,22 @@ library(cowplot)</code></pre>
 <pre class="r"><code># FIXME
 AA &lt;- rnorm(5)
 BB &lt;- rnorm(5)
-cat(AA, &quot;\n&quot;, BB)</code></pre>
-<pre><code>## 0.007417243 1.670816 0.4615992 0.4076873 1.54995 
-##  -0.3176275 0.5937196 -0.2459403 -1.25515 0.2759229</code></pre>
+data.frame(AA, BB)</code></pre>
+<pre><code>##           AA         BB
+## 1 -1.6412705  0.4253824
+## 2  1.0712006 -0.2918055
+## 3 -0.8878878  0.5432846
+## 4 -0.8783653 -0.3508785
+## 5  1.2345543 -0.1182406</code></pre>
 <pre class="r"><code>AA &lt;- rnorm(5)
 BB &lt;- rnorm(5)
-cat(AA, &quot;\n&quot;, BB)</code></pre>
-<pre><code>## -0.3048925 -1.19357 -1.398794 1.453002 -1.763495 
-##  0.2917359 -0.7344377 1.85439 -0.2125675 0.6964415</code></pre>
+data.frame(AA, BB)</code></pre>
+<pre><code>##            AA          BB
+## 1  2.07637304  0.80577323
+## 2  0.95393284  1.86935409
+## 3 -0.24137190 -1.14316155
+## 4 -0.36012385 -1.34038188
+## 5 -0.09904311 -0.06203788</code></pre>
 <blockquote>
 <p>No. You get different answers each time.</p>
 </blockquote>
@@ -1709,15 +1717,23 @@ cat(AA, &quot;\n&quot;, BB)</code></pre>
 set.seed(34288)
 AA &lt;- rnorm(5)
 BB &lt;- rnorm(5)
-cat(AA, &quot;\n&quot;, BB)</code></pre>
-<pre><code>## -0.8017041 -0.4840388 0.04709971 0.06188621 -1.6347 
-##  0.3021404 0.02563105 -0.7550095 -1.008435 0.1884099</code></pre>
+data.frame(AA, BB)</code></pre>
+<pre><code>##            AA          BB
+## 1 -0.80170409  0.30214036
+## 2 -0.48403878  0.02563105
+## 3  0.04709971 -0.75500945
+## 4  0.06188621 -1.00843534
+## 5 -1.63469964  0.18840986</code></pre>
 <pre class="r"><code>set.seed(34288)
 AA &lt;- rnorm(5)
 BB &lt;- rnorm(5)
-cat(AA, &quot;\n&quot;, BB)</code></pre>
-<pre><code>## -0.8017041 -0.4840388 0.04709971 0.06188621 -1.6347 
-##  0.3021404 0.02563105 -0.7550095 -1.008435 0.1884099</code></pre>
+data.frame(AA, BB)</code></pre>
+<pre><code>##            AA          BB
+## 1 -0.80170409  0.30214036
+## 2 -0.48403878  0.02563105
+## 3  0.04709971 -0.75500945
+## 4  0.06188621 -1.00843534
+## 5 -1.63469964  0.18840986</code></pre>
 <blockquote>
 <p>Yes. Now the sets are the same, but AA and BB are different.</p>
 </blockquote>
@@ -1727,9 +1743,13 @@ set.seed(34288)
 AA &lt;- rnorm(5)
 set.seed(34288)
 BB &lt;- rnorm(5)
-cat(AA, &quot;\n&quot;, BB)</code></pre>
-<pre><code>## -0.8017041 -0.4840388 0.04709971 0.06188621 -1.6347 
-##  -0.8017041 -0.4840388 0.04709971 0.06188621 -1.6347</code></pre>
+data.frame(AA, BB)</code></pre>
+<pre><code>##            AA          BB
+## 1 -0.80170409 -0.80170409
+## 2 -0.48403878 -0.48403878
+## 3  0.04709971  0.04709971
+## 4  0.06188621  0.06188621
+## 5 -1.63469964 -1.63469964</code></pre>
 <blockquote>
 <p>AA and BB are now equal.</p>
 </blockquote>
