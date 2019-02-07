@@ -20,14 +20,16 @@ library(cowplot)
 
 Among a hypothetical population, blood type probabilities for all the combinations of AB antigens and RhD status:
 
-- O+: 0.39
-- O-: 0.01
-- A+: 0.27
-- A-: 0.005
-- B+: 0.25
-- B-: 0.004
-- AB+: 0.07
-- AB-: 0.001
+|Type |Probability|
+|-----|-----------|
+| O+  |     0.39  |
+| O-  |     0.01  |
+| A+  |     0.27  |
+| A-  |     0.005 |
+| B+  |     0.25  |
+| B-  |     0.004 |
+| AB+ |     0.07  |
+| AB- |     0.001 |
 
 ### Activity
 
@@ -102,17 +104,19 @@ One key feature for simulating randomness in R is the `sample()` function. Imagi
 
 Look at the help file for `sample()` and see what the arguments below mean.
 
+`tibble()` is a function that makes a structure that is like a `data.frame()` but does not create factors from strings by default. You can use it wherever you would normally use `data.frame()`.
+
 ```{r}
 set.seed(592777)
-pp_all <- data_frame(id = letters[1:26],
-                     sex = sample(c('m', 'f'), 26, replace = TRUE))
+pp_all <- tibble(id = letters[1:26],
+                 sex = sample(c('m', 'f'), 26, replace = TRUE))
 
 ```
 
 Try the following:
 
 1. Get a random sample of 5 elements from the `id` column without replacement
-2. Get a random sample of 5 ids with their associated sex (hint: sample the set of row indices (1 to 26) and grab those rows)
+2. Get a random sample of 5 ids with their associated sex (hint: sample the set of row indices [1 to 26] and take only those rows)
 
   
 ```{r}
