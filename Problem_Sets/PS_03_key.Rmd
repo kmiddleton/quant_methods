@@ -101,7 +101,7 @@ R has a random number generator (actually a [pseudorandom number generator](http
 
 ### Activity
 
-Without setting the seed, generate two objects named AA and BB consisting of 5 numbers from the normal distribution with a mean of 0 and a standard deviation of 1 using  `rnorm()` and print AA and BB. Run this chunk more than once. Do you get the same answer each time? 
+Without setting the seed, generate two objects named AA and BB consisting of 5 numbers from the normal distribution with a mean of 0 and a standard deviation of 1 using  `rnorm()` and print AA and BB. Run this chunk more than once. Do you get the same answer each time?
 
 ```{r}
 # FIXME
@@ -163,7 +163,7 @@ Try the following:
 1. Get a random sample of 5 elements from the `id` column without replacement
 2. Get a random sample of 5 ids with their associated sex (hint: sample the set of row indices [1 to 26] and take only those rows)
 
-  
+
 ```{r}
 # FIXME
 sample(pp_all$id, 5)
@@ -187,37 +187,37 @@ For each of the following, generate a set of values and plot a histogram. You ma
 
 ```{r}
 # 1
-xx1 <- data_frame(num = rnorm(5, 5, 1))
+xx1 <- tibble(num = rnorm(5, 5, 1))
 
 xx1 %>% ggplot(aes(num)) +
   geom_histogram(bins = 4)
 
 # 2
-xx2 <- data_frame(num = rnorm(100, 5, 1))
+xx2 <- tibble(num = rnorm(100, 5, 1))
 
 xx2 %>% ggplot(aes(num)) +
   geom_histogram(bins = 30)
 
 # 3
-xx3 <- data_frame(num = rnorm(100000, 5, 1))
+xx3 <- tibble(num = rnorm(100000, 5, 1))
 
 xx3 %>% ggplot(aes(num)) +
   geom_histogram(bins = 50)
 
 # 4
-xx4 <- data_frame(num = rnorm(5, 5, 5)) 
+xx4 <- tibble(num = rnorm(5, 5, 5))
 
 xx4 %>% ggplot(aes(num)) +
   geom_histogram(bins = 4)
 
 # 5
-xx5 <- data_frame(num = rnorm(100, 5, 5))
+xx5 <- tibble(num = rnorm(100, 5, 5))
 
 xx5 %>% ggplot(aes(num)) +
   geom_histogram(bins = 30)
 
 # 6
-xx6 <- data_frame(num = rnorm(100000, 5, 5))
+xx6 <- tibble(num = rnorm(100000, 5, 5))
 
 xx6 %>% ggplot(aes(num)) +
   geom_histogram(bins = 50)
@@ -227,7 +227,7 @@ Create a density plot for #3 and #6 above on the same plot. First create a singl
 
 ```{r}
 n <- 100000
-xx.b <- data_frame(id = rep(c('a', 'b'), each = n),
+xx.b <- tibble(id = rep(c('a', 'b'), each = n),
                    value = c(rnorm(n, 5, 1), rnorm(n, 5, 5)))
 
 ggplot(xx.b, aes(x = value, color = id)) +
@@ -250,11 +250,11 @@ ggplot(xx.b, aes(x = value, color = id, fill = id)) +
 Consider #3 and #6 from above. What proportion of values from each set are above 7?
 
 ```{r}
-xx.b %>% 
-  group_by(id) %>% 
+xx.b %>%
+  group_by(id) %>%
   summarize(pct = sum(value > 7) / n)
 
-#3 
+#3
 nrow(xx3[xx3$num > 7, ]) / nrow(xx3)
 
 #6

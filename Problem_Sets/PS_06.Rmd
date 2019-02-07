@@ -46,7 +46,7 @@ Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plo
 
 Considering the plot you just made, do you think that mean survivorship is significantly different in the Absent/Present treatment groups? Do you think that the two sets of data are different from one another?
 
-> 
+>
 
 First, fit a linear model to **your data** (from `BrookTrout1.csv`), in which the proportion of salmon surviving is modeled by presence or absence of trout. Print out the `summary()` of this linear model.
 
@@ -56,7 +56,7 @@ First, fit a linear model to **your data** (from `BrookTrout1.csv`), in which th
 
 How do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
 
-> 
+>
 
 Now fit the same model to your **collaborator's data** (from `BrookTrout2.csv`).
 
@@ -66,16 +66,16 @@ Now fit the same model to your **collaborator's data** (from `BrookTrout2.csv`).
 
 What do you conclude about your collaborator's data?
 
-> 
+>
 
 How do you feel about the results of these two studies?
 
-> 
+>
 
 Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the aggregate data, which might look something like this table:
 
 ```{r echo=FALSE}
-M <- data_frame(Survival = c("Survived", "Did not survive"),
+M <- tibble(Survival = c("Survived", "Did not survive"),
                 `Trout absent` = c(946, 3470),
                 `Trout present` = c(919, 3876))
 knitr::kable(M)
@@ -83,7 +83,7 @@ knitr::kable(M)
 
 Why is this test not advisable in this case?
 
-> 
+>
 
 ## Exact confidence intervals
 

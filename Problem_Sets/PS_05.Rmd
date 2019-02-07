@@ -26,32 +26,32 @@ The `Stalkies.csv` data file contains data for an experiment in which male stalk
 
 ### Activity 1
 
-Load the Stalkies.csv file. 
+Load the Stalkies.csv file.
 
 ```{r}
 
 ```
 
-Visualize the dataset in two ways: 
+Visualize the dataset in two ways:
 
-1. Make a boxplot showing each food type on the x axis. 
-2. Plot the raw data (points) for the two groups. For the points, include jitter and transparancy. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparancy is most appropriate. Change the axis labels to what you would expect on a publication ready figure. 
+1. Make a boxplot showing each food type on the x axis.
+2. Plot the raw data (points) for the two groups. For the points, include jitter and transparancy. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparancy is most appropriate. Change the axis labels to what you would expect on a publication ready figure.
 
 ```{r }
 
 ```
 
-Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show? 
+Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show?
 
-> 
+>
 
 We will first use the analytical method to determine if the group means are significantly different. In this case, a *t*-test is most appropriate.
 
-By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE` if you decide that is appropriate here. 
+By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE` if you decide that is appropriate here.
 
 ### Activity 2
 
-Perform a *t*-test using the formula method to specify the groups to test (follow the example in lecture if you need to). Print the results. 
+Perform a *t*-test using the formula method to specify the groups to test (follow the example in lecture if you need to). Print the results.
 
 ```{r}
 
@@ -59,10 +59,10 @@ Perform a *t*-test using the formula method to specify the groups to test (follo
 
 What can you conclude from these results?
 
-> 
+>
 
 ### Activity 3
- 
+
 `t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). `lm()` is a general function that fits many many different kinds of linear models. We will talk quite a lot about linear models in the coming weeks.
 
 A *t*-test is a kind of linear model, so we can also fit the same model using `lm()`.
@@ -76,7 +76,7 @@ A *t*-test is a kind of linear model, so we can also fit the same model using `l
 
 Compare the results of the linear model with the results of the *t*-test above. Do you recognize any of the estimates?
 
-> 
+>
 
 ### Activity 4
 
@@ -89,7 +89,7 @@ For now, we will give you most of the steps along the way. Study carefully, so t
 SS <- function(x, x_bar = NULL) {
   # If x_bar is not provided, use the mean of x
   if (is.null(x_bar)) x_bar <- mean(x)
-  
+
   # Return sum of squares
   return(sum((x - x_bar) ^ 2))
 }
@@ -149,11 +149,11 @@ Use the calculations we have given you above to calculate the Bayes Factor for m
 
 What do you conclude based on the Bayes Factor comparison?
 
-> 
+>
 
 We have actually violated one of the assumptions of the likelihood calculations that we did. What is it?
 
-> 
+>
 
 ## Confidence intervals
 
@@ -161,7 +161,7 @@ We will use the same data to explore confidence intervals.
 
 ### Activity
 
-Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture mu +/- 2 * SEM. 
+Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture mu +/- 2 * SEM.
 
 ```{r}
 
@@ -171,7 +171,7 @@ We can simulate what we would expect assuming the means and standard deviation a
 
 1. Generate simulated data from a normal distribution matching the number of observations, mean, and standard deviation (note sd not SEM) for each group.
 2. Calculate the mean for each group and the upper and lower bounds of the confidence interval.
-3. Put these values into a `data_frame`
+3. Put these values into a `tibble`
 4. Repeat this 1000 times
 5. Calculate the proportion of times the mean for each group falls within the confidence interval
 
@@ -182,11 +182,11 @@ We can simulate what we would expect assuming the means and standard deviation a
 
 What do you conclude based on this simulation?
 
-> 
+>
 
 Is it correct to say that there is a 95% probabiliity that the true mean is within a 95% confidence interval? Why or why not? Think about what you just showed with your simulation.
 
-> 
+>
 
 ## OLS Regression
 
@@ -206,7 +206,7 @@ Load the earwigs data:
 
 ```
 
-Make a scatterplot of the proportion of earwigs with forceps vs. density. 
+Make a scatterplot of the proportion of earwigs with forceps vs. density.
 
 ```{r}
 
@@ -226,8 +226,8 @@ Use `lm()` to fit a linear model in which the proportion of earwigs with forceps
 
 See if you can figure out what the coefficients represent. You will find estimates for the slope and intercept of the line, their respective standard errors,^[remember that standard errors tell us about the uncertainty in parameter estimates] and a *t*-test, which tests each parameter estimate vs. 0. Try to figure out how the *t*-value is calculated (divide one thing by another).
 
-> 
+>
 
 The data we gave you here is a proportion. What is anoter format that the data could have been in? Think about the source of the portion values.
 
-> 
+>

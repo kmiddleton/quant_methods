@@ -29,17 +29,17 @@ The `Stalkies.csv` data file contains data for an experiment in which male stalk
 
 ### Activity 1
 
-Load the Stalkies.csv file. 
+Load the Stalkies.csv file.
 
 ```{r}
 # FIXME
 stalk <- read_csv("../data/Stalkies.csv")
 ```
 
-Visualize the dataset in two ways: 
+Visualize the dataset in two ways:
 
-1. Make a boxplot showing each food type on the x axis. 
-2. Plot the raw data (points) for the two groups. For the points, include jitter and transparency. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate. Change the axis labels to what you would expect on a publication ready figure. 
+1. Make a boxplot showing each food type on the x axis.
+2. Plot the raw data (points) for the two groups. For the points, include jitter and transparency. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate. Change the axis labels to what you would expect on a publication ready figure.
 
 ```{r }
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
@@ -47,27 +47,27 @@ ggplot(stalk, aes(x = food_source, y = eye_span)) +
 
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Food Source", y = "Eye Span")
 ```
 
-Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show? 
+Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show?
 
-> The mean eye span is higher for flies reared on corn than on cotton. The variance also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups. 
+> The mean eye span is higher for flies reared on corn than on cotton. The variance also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups.
 
 We will first use the analytical method to determine if the group means are significantly different. In this case, a *t*-test is most appropriate.
 
-By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE` if you decide that is appropriate here. 
+By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE` if you decide that is appropriate here.
 
 ### Activity 2
 
-Perform a *t*-test using the formula method to specify the groups to test (follow the example in lecture if you need to). Print the results. 
+Perform a *t*-test using the formula method to specify the groups to test (follow the example in lecture if you need to). Print the results.
 
 ```{r }
 # FIXME
-myT <- t.test(eye_span ~ food_source, data = stalk) 
+myT <- t.test(eye_span ~ food_source, data = stalk)
 myT
 ```
 
@@ -76,7 +76,7 @@ What can you conclude from these results?
 > The hypothesis that the means for the two groups are equal is very unlikely. There is a statistically significant difference between the groups.
 
 ### Activity 3
- 
+
 `t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). `lm()` is a general function that fits many many different kinds of linear models. We will talk quite a lot about linear models in the coming weeks.
 
 A *t*-test is a kind of linear model, so we can also fit the same model using `lm()`.
@@ -105,7 +105,7 @@ For now, we will give you most of the steps along the way. Study carefully, so t
 SS <- function(x, x_bar = NULL) {
   # If x_bar is not provided, use the mean of x
   if (is.null(x_bar)) x_bar <- mean(x)
-  
+
   # Return sum of squares
   return(sum((x - x_bar) ^ 2))
 }
@@ -179,42 +179,42 @@ We will use the same data to explore confidence intervals.
 
 ### Activity
 
-Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture mu +/- 2 * SEM. 
+Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture mu +/- 2 * SEM.
 
 ```{r}
 # FIXME
 mean(stalk$eye_span[stalk$food_source == 'Cotton']) -
-  2 * sd(stalk$eye_span[stalk$food_source == 'Cotton'] / 
+  2 * sd(stalk$eye_span[stalk$food_source == 'Cotton'] /
            sqrt(length(stalk$eye_span[stalk$food_source == 'Cotton'])))
 
 mean(stalk$eye_span[stalk$food_source == 'Cotton']) +
-  2 * sd(stalk$eye_span[stalk$food_source == 'Cotton'] / 
+  2 * sd(stalk$eye_span[stalk$food_source == 'Cotton'] /
            sqrt(length(stalk$eye_span[stalk$food_source == 'Cotton'])))
 
 mean(stalk$eye_span[stalk$food_source == 'Corn']) -
-  2 * sd(stalk$eye_span[stalk$food_source == 'Corn'] / 
+  2 * sd(stalk$eye_span[stalk$food_source == 'Corn'] /
            sqrt(length(stalk$eye_span[stalk$food_source == 'Corn'])))
 
-mean(stalk$eye_span[stalk$food_source == 'Corn']) + 
-  2 * sd(stalk$eye_span[stalk$food_source == 'Corn'] / 
+mean(stalk$eye_span[stalk$food_source == 'Corn']) +
+  2 * sd(stalk$eye_span[stalk$food_source == 'Corn'] /
            sqrt(length(stalk$eye_span[stalk$food_source == 'Corn'])))
 
 ## We can write functions to do the SEM and approximate CI
-## approx_CI returns a data_frame with the lower and upper
+## approx_CI returns a tibble with the lower and upper
 ## bounds of the CI. Notice that the "do" function can take
-## the data_frame from approx_CI and turn it into a data_frame
-## with both CI bounds. This is a general way to handle 
+## the tibble from approx_CI and turn it into a tibble
+## with both CI bounds. This is a general way to handle
 ## summarizing from functions that return multiple variables.
 SEM <- function(x) return(sd(x) / sqrt(length(x)))
 
 approx_CI <- function(x) {
   upper <- mean(x) + 2 * SEM(x)
   lower <- mean(x) - 2 * SEM(x)
-  return(data_frame(lower, upper))
+  return(tibble(lower, upper))
 }
 
-stalk %>% 
-  group_by(food_source) %>% 
+stalk %>%
+  group_by(food_source) %>%
   do(approx_CI(.$eye_span))
 ```
 
@@ -222,7 +222,7 @@ We can simulate what we would expect assuming the means and standard deviation a
 
 1. Generate simulated data from a normal distribution matching the number of observations, mean, and standard deviation (note sd not SEM) for each group.
 2. Calculate the mean for each group and the upper and lower bounds of the confidence interval.
-3. Put these values into a `data_frame`
+3. Put these values into a `tibble`
 4. Repeat this 1000 times
 5. Calculate the proportion of times the mean for each group falls within the confidence interval
 
@@ -238,25 +238,25 @@ sd.cotton <- sd(stalk$eye_span[stalk$food_source == 'Cotton'])
 n.corn <- length(stalk$eye_span[stalk$food_source == 'Corn'])
 n.cotton <- length(stalk$eye_span[stalk$food_source == 'Cotton'])
 
-corn.cis <- data_frame(mm = numeric(length = niter),
+corn.cis <- tibble(mm = numeric(length = niter),
                        ll = numeric(length = niter),
                        uu = numeric(length = niter))
-cotton.cis <- data_frame(mm = numeric(length = niter),
+cotton.cis <- tibble(mm = numeric(length = niter),
                          ll = numeric(length = niter),
                          uu = numeric(length = niter))
 
 for (jj in 1:niter) {
   corn.s <- rnorm(n.corn, mu.corn, sd.corn)
   cotton.s <- rnorm(n.cotton, mu.cotton, sd.cotton)
-  
+
   corn.cis[jj, ] <- c(
     mean(corn.s),
     mean(corn.s) - 2 * (sd(corn.s) / sqrt(n.corn)),
-    mean(corn.s) + 2 * (sd(corn.s) / sqrt(n.corn))) 
+    mean(corn.s) + 2 * (sd(corn.s) / sqrt(n.corn)))
   cotton.cis[jj, ] <- c(
     mean(cotton.s),
     mean(cotton.s) - 2 * (sd(cotton.s) / sqrt(n.cotton)),
-    mean(cotton.s) + 2 * (sd(cotton.s) / sqrt(n.cotton))) 
+    mean(cotton.s) + 2 * (sd(cotton.s) / sqrt(n.cotton)))
 }
 
 (sum(mu.corn < corn.cis$ll) + sum(mu.corn > corn.cis$uu)) / niter
@@ -290,7 +290,7 @@ Load the earwigs data:
 EW <- read_csv("../data/Earwigs.csv")
 ```
 
-Make a scatterplot of the proportion of earwigs with forceps vs. density. 
+Make a scatterplot of the proportion of earwigs with forceps vs. density.
 
 ```{r}
 # FIXME

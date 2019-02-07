@@ -268,7 +268,7 @@ gg &lt;- apply(gg, 2, function(x) quant.norm(x))
 colnames(gg) &lt;- gene.names
 rownames(gg) &lt;- rr.temp
 gg &lt;- bind_cols(
-  data_frame(ID = str_replace_all(row.names(gg), &quot;-&quot;, &quot;_&quot;)),
+  tibble(ID = str_replace_all(row.names(gg), &quot;-&quot;, &quot;_&quot;)),
   as.data.frame(gg))
 
 ngenes &lt;- 100
@@ -376,7 +376,7 @@ ggplot(qqP, aes(x = expected, y = observed)) +
 <p>Use R's built-in <code>p.adjust()</code> function to adjust the P-values using the sequential Bonferroni correction (Holmes procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a <code>data.frame</code> with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.</p>
 <pre class="r"><code># FIXME
 seq_bonf &lt;- p.adjust(obsP$P, method = &quot;holm&quot;)
-data_frame(P = obsP$P,
+tibble(P = obsP$P,
            seq_bonf) %&gt;% 
   arrange(P) %&gt;% 
   filter(seq_bonf &lt;= 0.05)</code></pre>
@@ -395,7 +395,7 @@ data_frame(P = obsP$P,
 <p>Repeat the procedure above, but now use the false discovery rate procedure of Benjamini and Hochberg.</p>
 <pre class="r"><code># FIXME
 fdr &lt;- p.adjust(obsP$P, method = &quot;fdr&quot;)
-data_frame(P = obsP$P,
+tibble(P = obsP$P,
            fdr) %&gt;% 
   arrange(P) %&gt;% 
   filter(fdr &lt;= 0.05)</code></pre>

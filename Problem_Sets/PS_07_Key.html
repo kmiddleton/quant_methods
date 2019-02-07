@@ -232,7 +232,7 @@ library(knitr)</code></pre>
 <h2>Variation Within and Between Groups</h2>
 <p>In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, <code>apply()</code>.</p>
 <p>Before we try the simulation, we will learn apply. <code>apply()</code> is part of a family of functions that all &quot;apply&quot;<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is <code>lapply()</code>). <code>apply()</code> takes three arguments: the <code>data.frame</code> or <code>matrix</code>, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called &quot;anonymous&quot; functions. We'll show you the syntax here. Run the following and make sure you understand what is happening.</p>
-<pre class="r"><code>ap.test &lt;- data_frame(x1 = seq(1, 10),
+<pre class="r"><code>ap.test &lt;- tibble(x1 = seq(1, 10),
                       x2 = rep(5, 10),
                       x3 = seq(20, 65, length = 10))
 

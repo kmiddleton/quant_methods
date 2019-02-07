@@ -370,7 +370,7 @@ mult(2, 17.4)</code></pre>
 <pre class="r"><code># FIXME
 theta &lt;- seq(0.05, 0.95, by  = 0.05)
 log_lik &lt;- log(dbinom(5, 20, prob = theta))
-p &lt;- data_frame(theta, log_lik) %&gt;% 
+p &lt;- tibble(theta, log_lik) %&gt;% 
   ggplot(aes(theta, log_lik)) +
   geom_line()
 p # Print the plot.</code></pre>

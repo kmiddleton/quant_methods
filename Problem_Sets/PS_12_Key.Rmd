@@ -28,14 +28,14 @@ quant.norm <- function(y) {
 
 sid <- read_csv("../data/Butteryfly_IDs.csv",
                 col_names = c("ID", "Treatment", "Sex", "Population"))
-sid <- sid %>% 
+sid <- sid %>%
   mutate(Treatment = str_replace(Treatment, "treatment: ", ""),
          Sex = str_replace(Sex, "Sex: ", ""),
          Population = str_replace(Population, "population: ", ""),
          ID2 = str_split(ID, "_", simplify = TRUE)[, 2],
          ID = str_split(ID, "_", simplify = TRUE)[, 1],
-         ID = str_replace_all(ID, "-", "_")) %>% 
-  filter(ID2 == 450) %>% 
+         ID = str_replace_all(ID, "-", "_")) %>%
+  filter(ID2 == 450) %>%
   dplyr::select(-ID2)
 
 gg <- read_delim("../data/Butterfly_NormalizedCountsGenes.txt",
@@ -48,7 +48,7 @@ gg <- apply(gg, 2, function(x) quant.norm(x))
 colnames(gg) <- gene.names
 rownames(gg) <- rr.temp
 gg <- bind_cols(
-  data_frame(ID = str_replace_all(row.names(gg), "-", "_")),
+  tibble(ID = str_replace_all(row.names(gg), "-", "_")),
   as.data.frame(gg))
 
 ngenes <- 100
@@ -119,16 +119,16 @@ ggplot(qqP, aes(x = expected, y = observed)) +
 
 Based on these visualizations, do you think there are true positives in this data set?
 
-> Probably. The P-values deviate pretty strongly from the expected line. 
+> Probably. The P-values deviate pretty strongly from the expected line.
 
 Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction (Holmes procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a `data.frame` with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.
 
 ```{r}
 # FIXME
 seq_bonf <- p.adjust(obsP$P, method = "holm")
-data_frame(P = obsP$P,
-           seq_bonf) %>% 
-  arrange(P) %>% 
+tibble(P = obsP$P,
+           seq_bonf) %>%
+  arrange(P) %>%
   filter(seq_bonf <= 0.05)
 sum(seq_bonf < 0.05)
 ```
@@ -138,9 +138,9 @@ Repeat the procedure above, but now use the false discovery rate procedure of Be
 ```{r}
 # FIXME
 fdr <- p.adjust(obsP$P, method = "fdr")
-data_frame(P = obsP$P,
-           fdr) %>% 
-  arrange(P) %>% 
+tibble(P = obsP$P,
+           fdr) %>%
+  arrange(P) %>%
   filter(fdr <= 0.05)
 sum(fdr < 0.05)
 ```
@@ -167,7 +167,7 @@ What is an adjusted $\alpha$-level that will control pDFR at 0.05?
 max(qobj$pvalues[qobj$qvalues <= 0.05])
 ```
 
-Perform a randomization to estimate the number of expected false positives for this experiment. 1) You will want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) Perform your set of 100 tests in the same way that you did above. 3) Collect the associated p values using the `getP` function. 4) Keep these in a 1000 x 100 matrix with each column as one iteration. This process will take a few minutes to run. You may want to test the steps with a small number of iterations first.  
+Perform a randomization to estimate the number of expected false positives for this experiment. 1) You will want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) Perform your set of 100 tests in the same way that you did above. 3) Collect the associated p values using the `getP` function. 4) Keep these in a 1000 x 100 matrix with each column as one iteration. This process will take a few minutes to run. You may want to test the steps with a small number of iterations first.
 
 ```{r randomization, cache=TRUE}
 #FIXME
@@ -204,7 +204,7 @@ For each iteration, get a count of the number of positives at a threshold of 0.0
 
 - Calculate the average number of false positives and the average false positive rate at a threshold of 0.05.
 - Now calculate the Family-Wise Error Rate (FWER) at a threshold of 0.05 by calculating the proportion of iterations that result in at least one significant result.
-- Use your average estimated number of false positives to calculate the false discovery rate at a threshold of 0.05. Note you will need to consider your observed number of positives for this calculation. 
+- Use your average estimated number of false positives to calculate the false discovery rate at a threshold of 0.05. Note you will need to consider your observed number of positives for this calculation.
 
 
 ```{r}
@@ -232,9 +232,9 @@ thresholds <- seq(0.0005, 0.05 , length = 200)
 
 #FIXME
 output <- data.frame('threshold' = thresholds,
-                      'FP' = numeric(length(thresholds)), 
+                      'FP' = numeric(length(thresholds)),
                      'FWER' = numeric(length(thresholds)),
-                     'FDR' = numeric(length(thresholds))) 
+                     'FDR' = numeric(length(thresholds)))
 
 for (tt in 1:length(thresholds)) {
   th <- thresholds[tt]
@@ -268,11 +268,11 @@ output %>%
   geom_hline(yintercept = 0.05)
 ```
 
-Inspecting the `data.frame` you made above, what P-value threshold should you use if you want a false discovery rate of 5%? 
+Inspecting the `data.frame` you made above, what P-value threshold should you use if you want a false discovery rate of 5%?
 
-> 
+>
 
-Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here. 
+Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here.
 
 ```{r}
 minP <- apply(allP, 2, min)

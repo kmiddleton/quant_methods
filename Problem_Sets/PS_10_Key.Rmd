@@ -36,7 +36,7 @@ This week we will approach hypothesis testing for several of the models we have 
 1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
 1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
 
-Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide. 
+Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide.
 
 Remember to start with a small number of iterations (10 or 100) until you get the code working correctly. Then increase to 10,000 for a final analysis.
 
@@ -51,7 +51,7 @@ stalk <- read_csv("../data/Stalkies.csv")
 # Some thoughtful plotting
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Food Source", y = "Eye Span")
@@ -65,7 +65,7 @@ for (ii in 2:nreps) {
   t_stats[ii] <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
 }
 
-data_frame(t_stats) %>% 
+tibble(t_stats) %>%
   ggplot(aes(t_stats)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1], color = "red") +
@@ -152,7 +152,7 @@ for (ii in 2:nreps) {
   t_stats[ii] <- summary(fm_rnd)$coefficients[2, 3]
 }
 
-data_frame(t_stats) %>% 
+tibble(t_stats) %>%
   ggplot(aes(t_stats)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1], color = "red") +
@@ -168,12 +168,12 @@ factorial(7)
 For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
 
 ```{r heart_transplants}
-M <- read_excel("../data/Heart_Transplants.xlsx") %>% 
+M <- read_excel("../data/Heart_Transplants.xlsx") %>%
   mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
 
 ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Mismatch Degree", y = "Survival (days)")
@@ -192,7 +192,7 @@ for (ii in 2:nreps) {
   F_stats[ii] <- summary(fm_rand)$fstatistic["value"]
 }
 
-data_frame(F_stats) %>% 
+tibble(F_stats) %>%
   ggplot(aes(F_stats)) +
   geom_histogram() +
   geom_vline(xintercept = F_stats[1], color = "red") +
@@ -203,7 +203,7 @@ mean(F_stats >= F_stats[1])
 
 ## Bird abundance (PS 07)
 
-We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors. 
+We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors.
 
 There are four predictors, you will have 5 tests:
 
@@ -235,7 +235,7 @@ for (ii in 2:nreps) {
 }
 
 # Dist_to_Island
-data_frame(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>% 
+tibble(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
   ggplot(aes(Dist_to_Island)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1, "Dist_to_Island"],
@@ -245,7 +245,7 @@ data_frame(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
 2 * mean(t_stats[, "Dist_to_Island"] >= t_stats[1, "Dist_to_Island"])
 
 # Elevation
-data_frame(Elevation = t_stats[, "Elevation"]) %>% 
+tibble(Elevation = t_stats[, "Elevation"]) %>%
   ggplot(aes(Elevation)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1, "Elevation"],
@@ -255,7 +255,7 @@ data_frame(Elevation = t_stats[, "Elevation"]) %>%
 2 * mean(t_stats[, "Elevation"] >= t_stats[1, "Elevation"])
 
 # Area
-data_frame(Area = t_stats[, "Area"]) %>% 
+tibble(Area = t_stats[, "Area"]) %>%
   ggplot(aes(Area)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1, "Area"],
@@ -265,7 +265,7 @@ data_frame(Area = t_stats[, "Area"]) %>%
 2 * mean(t_stats[, "Area"] >= t_stats[1, "Area"])
 
 # Elevation
-data_frame(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>% 
+tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
   ggplot(aes(Dist_to_Ecuador)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1, "Dist_to_Ecuador"],
@@ -280,7 +280,7 @@ data_frame(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
 In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use.
 
 ```{r aspirin1}
-M <- read_csv("../data/Aspirin.csv") %>% 
+M <- read_csv("../data/Aspirin.csv") %>%
   mutate_each("factor")
 fm <- glm(Cancer ~ Treatment, M, family = "binomial")
 
@@ -296,7 +296,7 @@ system.time({
   }
 })
 
-data_frame(devs) %>% 
+tibble(devs) %>%
   ggplot(aes(devs)) +
   geom_histogram() +
   geom_vline(xintercept = devs[1], color = "red") +
@@ -321,7 +321,7 @@ system.time({
   }
 })
 
-data_frame(chisqs) %>% 
+tibble(chisqs) %>%
   ggplot(aes(chisqs)) +
   geom_histogram() +
   geom_vline(xintercept = chisqs[1], color = "red") +
@@ -347,7 +347,7 @@ for (ii in 2:nreps) {
   corrs[ii] <- cor(sample(M$Area), M$Elevation)
 }
 
-data_frame(corrs) %>% 
+tibble(corrs) %>%
   ggplot(aes(corrs)) +
   geom_histogram() +
   geom_vline(xintercept = corrs[1], color = "red") +

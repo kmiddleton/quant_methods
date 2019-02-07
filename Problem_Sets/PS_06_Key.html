@@ -373,7 +373,7 @@ summary(fm2)</code></pre>
 <h3>Activity</h3>
 <p>Make a plot of the critical value for a <em>t</em>-distribution for the 0.975 quantile (upper tail of 2.5%) where the degrees of freedom ranges from 2 to 100. First set up the vector of degrees of freedom (don't call it df, because that is the name of an R function). Then calculate the critical values. Make a data.frame and plot the results. Then add a differently colored horizontal line at the critical value for the 0.975 quantile for a standard normal distribution. Note that the critical value approaches the asymptotic limit as the degrees of freedom increases.</p>
 <pre class="r"><code># FIXME
-CVs &lt;- data_frame(dfs = seq(2, 100, by = 1),
+CVs &lt;- tibble(dfs = seq(2, 100, by = 1),
                   crit_vals = qt(0.975, df = dfs,
                                  lower.tail = TRUE))
 
@@ -397,7 +397,7 @@ exact_CI &lt;- function(x, prob = 0.95) {
                lower.tail = FALSE)
   Upper &lt;- mean(x) + t_crit * SEM(x)
   Lower &lt;- mean(x) - t_crit * SEM(x)
-  return(data_frame(Lower, Mean = mean(x), Upper))
+  return(tibble(Lower, Mean = mean(x), Upper))
 }
 
 CIs &lt;- BT1 %&gt;% 

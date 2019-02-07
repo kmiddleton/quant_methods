@@ -24,7 +24,7 @@ library(knitr)
 # P = 0.0495
 n <- 15
 set.seed(1064)
-M1 <- data_frame(
+M1 <- tibble(
   Proportion_Surviving = c(rnorm(n, 0.28, 0.07),
                            rnorm(n, 0.242, 0.07)),
   Trout = factor(rep(c("Absent", "Present"), each = n))
@@ -33,7 +33,7 @@ write_csv(M1, path = "../data/BrookTrout1.csv")
 
 ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Trout", y = "Survival", title = "BrookTrout1")
@@ -43,7 +43,7 @@ summary(lm(Proportion_Surviving ~ Trout, M1))
 # P = 0.0536
 n <- 15
 set.seed(1064)
-M2 <- data_frame(
+M2 <- tibble(
   Proportion_Surviving = c(rnorm(n, 0.282, 0.07),
                            rnorm(n, 0.245, 0.07)),
   Trout = factor(rep(c("Absent", "Present"), each = n))
@@ -52,7 +52,7 @@ write_csv(M2, path = "../data/BrookTrout2.csv")
 
 ggplot(M2, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Trout", y = "Survival", title = "BrookTrout2")
@@ -89,13 +89,13 @@ Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plo
 # FIXME
 p1 <- ggplot(BT1, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Trout", y = "Survival", title = "My Data")
 p2 <- ggplot(BT2, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Trout", y = "Survival", title = "My Collaborator's Data")
@@ -138,7 +138,7 @@ How do you feel about the results of these two studies?
 Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the aggregate data, which might look something like this table:
 
 ```{r echo=FALSE}
-M <- data_frame(Survival = c("Survived", "Did not survive"),
+M <- tibble(Survival = c("Survived", "Did not survive"),
                 `Trout absent` = c(946, 3470),
                 `Trout present` = c(919, 3876))
 knitr::kable(M)
@@ -158,11 +158,11 @@ Make a plot of the critical value for a *t*-distribution for the 0.975 quantile 
 
 ```{r}
 # FIXME
-CVs <- data_frame(dfs = seq(2, 100, by = 1),
+CVs <- tibble(dfs = seq(2, 100, by = 1),
                   crit_vals = qt(0.975, df = dfs,
                                  lower.tail = TRUE))
 
-CVs %>% 
+CVs %>%
   ggplot(aes(dfs, crit_vals)) +
   geom_line() +
   geom_hline(yintercept = qnorm(0.025, lower.tail = FALSE),
@@ -185,11 +185,11 @@ exact_CI <- function(x, prob = 0.95) {
                lower.tail = FALSE)
   Upper <- mean(x) + t_crit * SEM(x)
   Lower <- mean(x) - t_crit * SEM(x)
-  return(data_frame(Lower, Mean = mean(x), Upper))
+  return(tibble(Lower, Mean = mean(x), Upper))
 }
 
-CIs <- BT1 %>% 
-  group_by(Trout) %>% 
+CIs <- BT1 %>%
+  group_by(Trout) %>%
   do(exact_CI(.$Proportion_Surviving))
 
 knitr::kable(CIs)
@@ -243,7 +243,7 @@ This is all we need for the setup. At this point, you have the data, two vectors
 
 ```{r warning=FALSE}
 # FIXME
-M <- read_excel("../data/mammals.xlsx", na = "NA") %>% 
+M <- read_excel("../data/mammals.xlsx", na = "NA") %>%
   mutate(log_Mass = log10(adult_body_mass_g),
          log_BMR = log10(basal_met_rate_m_l_o2hr))
 

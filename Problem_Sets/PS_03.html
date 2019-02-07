@@ -1677,9 +1677,9 @@ library(cowplot)</code></pre>
 <p>One key feature for simulating randomness in R is the <code>sample()</code> function. Imagine you had a list of potential participants for a study (e.g., the list of likely voters in the U.S.). You could use <code>sample()</code> to choose a random set. Let’s try this with a set of letters representing people and we will randomly assign each a sex by sampling <code>c(&#39;m&#39;,&#39;f&#39;)</code> with replacement.</p>
 <p>Look at the help file for <code>sample()</code> and see what the arguments below mean.</p>
 <pre class="r"><code>set.seed(592777)
-pp_all &lt;- data_frame(id = letters[1:26],
+pp_all &lt;- tibble(id = letters[1:26],
                      sex = sample(c(&#39;m&#39;, &#39;f&#39;), 26, replace = TRUE))</code></pre>
-<pre><code>## Warning: `data_frame()` is deprecated, use `tibble()`.
+<pre><code>## Warning: `tibble()` is deprecated, use `tibble()`.
 ## This warning is displayed once per session.</code></pre>
 <p>Try the following:</p>
 <ol style="list-style-type: decimal">

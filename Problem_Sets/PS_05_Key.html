@@ -408,9 +408,9 @@ mean(stalk$eye_span[stalk$food_source == 'Cotton']) -
            sqrt(length(stalk$eye_span[stalk$food_source == 'Corn'])))</code></pre>
 <pre><code>## [1] 2.079749</code></pre>
 <pre class="r"><code>## We can write functions to do the SEM and approximate CI
-## approx_CI returns a data_frame with the lower and upper
+## approx_CI returns a tibble with the lower and upper
 ## bounds of the CI. Notice that the &quot;do&quot; function can take
-## the data_frame from approx_CI and turn it into a data_frame
+## the tibble from approx_CI and turn it into a tibble
 ## with both CI bounds. This is a general way to handle 
 ## summarizing from functions that return multiple variables.
 SEM &lt;- function(x) return(sd(x) / sqrt(length(x)))
@@ -418,7 +418,7 @@ SEM &lt;- function(x) return(sd(x) / sqrt(length(x)))
 approx_CI &lt;- function(x) {
   upper &lt;- mean(x) + 2 * SEM(x)
   lower &lt;- mean(x) - 2 * SEM(x)
-  return(data_frame(lower, upper))
+  return(tibble(lower, upper))
 }
 
 stalk %&gt;% 
@@ -435,7 +435,7 @@ stalk %&gt;%
 <ol style="list-style-type: decimal">
 <li>Generate simulated data from a normal distribution matching the number of observations, mean, and standard deviation (note sd not SEM) for each group.</li>
 <li>Calculate the mean for each group and the upper and lower bounds of the confidence interval.</li>
-<li>Put these values into a <code>data_frame</code></li>
+<li>Put these values into a <code>tibble</code></li>
 <li>Repeat this 1000 times</li>
 <li>Calculate the proportion of times the mean for each group falls within the confidence interval</li>
 </ol>
@@ -449,10 +449,10 @@ sd.cotton &lt;- sd(stalk$eye_span[stalk$food_source == 'Cotton'])
 n.corn &lt;- length(stalk$eye_span[stalk$food_source == 'Corn'])
 n.cotton &lt;- length(stalk$eye_span[stalk$food_source == 'Cotton'])
 
-corn.cis &lt;- data_frame(mm = numeric(length = niter),
+corn.cis &lt;- tibble(mm = numeric(length = niter),
                        ll = numeric(length = niter),
                        uu = numeric(length = niter))
-cotton.cis &lt;- data_frame(mm = numeric(length = niter),
+cotton.cis &lt;- tibble(mm = numeric(length = niter),
                          ll = numeric(length = niter),
                          uu = numeric(length = niter))
 

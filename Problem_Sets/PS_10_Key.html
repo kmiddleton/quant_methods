@@ -272,7 +272,7 @@ for (ii in 2:nreps) {
   t_stats[ii] &lt;- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
 }
 
-data_frame(t_stats) %&gt;% 
+tibble(t_stats) %&gt;% 
   ggplot(aes(t_stats)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1], color = &quot;red&quot;) +
@@ -376,7 +376,7 @@ for (ii in 2:nreps) {
   t_stats[ii] &lt;- summary(fm_rnd)$coefficients[2, 3]
 }
 
-data_frame(t_stats) %&gt;% 
+tibble(t_stats) %&gt;% 
   ggplot(aes(t_stats)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1], color = &quot;red&quot;) +
@@ -415,7 +415,7 @@ for (ii in 2:nreps) {
   F_stats[ii] &lt;- summary(fm_rand)$fstatistic[&quot;value&quot;]
 }
 
-data_frame(F_stats) %&gt;% 
+tibble(F_stats) %&gt;% 
   ggplot(aes(F_stats)) +
   geom_histogram() +
   geom_vline(xintercept = F_stats[1], color = &quot;red&quot;) +
@@ -456,7 +456,7 @@ for (ii in 2:nreps) {
 }
 
 # Dist_to_Island
-data_frame(Dist_to_Island = t_stats[, &quot;Dist_to_Island&quot;]) %&gt;% 
+tibble(Dist_to_Island = t_stats[, &quot;Dist_to_Island&quot;]) %&gt;% 
   ggplot(aes(Dist_to_Island)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1, &quot;Dist_to_Island&quot;],
@@ -467,7 +467,7 @@ data_frame(Dist_to_Island = t_stats[, &quot;Dist_to_Island&quot;]) %&gt;%
 <pre class="r"><code>2 * mean(t_stats[, &quot;Dist_to_Island&quot;] &gt;= t_stats[1, &quot;Dist_to_Island&quot;])</code></pre>
 <pre><code>## [1] 0.8204</code></pre>
 <pre class="r"><code># Elevation
-data_frame(Elevation = t_stats[, &quot;Elevation&quot;]) %&gt;% 
+tibble(Elevation = t_stats[, &quot;Elevation&quot;]) %&gt;% 
   ggplot(aes(Elevation)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1, &quot;Elevation&quot;],
@@ -478,7 +478,7 @@ data_frame(Elevation = t_stats[, &quot;Elevation&quot;]) %&gt;%
 <pre class="r"><code>2 * mean(t_stats[, &quot;Elevation&quot;] &gt;= t_stats[1, &quot;Elevation&quot;])</code></pre>
 <pre><code>## [1] 0.4794</code></pre>
 <pre class="r"><code># Area
-data_frame(Area = t_stats[, &quot;Area&quot;]) %&gt;% 
+tibble(Area = t_stats[, &quot;Area&quot;]) %&gt;% 
   ggplot(aes(Area)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1, &quot;Area&quot;],
@@ -489,7 +489,7 @@ data_frame(Area = t_stats[, &quot;Area&quot;]) %&gt;%
 <pre class="r"><code>2 * mean(t_stats[, &quot;Area&quot;] &gt;= t_stats[1, &quot;Area&quot;])</code></pre>
 <pre><code>## [1] 0.1208</code></pre>
 <pre class="r"><code># Elevation
-data_frame(Dist_to_Ecuador = t_stats[, &quot;Dist_to_Ecuador&quot;]) %&gt;% 
+tibble(Dist_to_Ecuador = t_stats[, &quot;Dist_to_Ecuador&quot;]) %&gt;% 
   ggplot(aes(Dist_to_Ecuador)) +
   geom_histogram() +
   geom_vline(xintercept = t_stats[1, &quot;Dist_to_Ecuador&quot;],
@@ -525,7 +525,7 @@ system.time({
 })</code></pre>
 <pre><code>##    user  system elapsed 
 ## 215.229  31.548 299.455</code></pre>
-<pre class="r"><code>data_frame(devs) %&gt;% 
+<pre class="r"><code>tibble(devs) %&gt;% 
   ggplot(aes(devs)) +
   geom_histogram() +
   geom_vline(xintercept = devs[1], color = &quot;red&quot;) +
@@ -550,7 +550,7 @@ system.time({
 })</code></pre>
 <pre><code>##    user  system elapsed 
 ##  11.602   2.523  14.258</code></pre>
-<pre class="r"><code>data_frame(chisqs) %&gt;% 
+<pre class="r"><code>tibble(chisqs) %&gt;% 
   ggplot(aes(chisqs)) +
   geom_histogram() +
   geom_vline(xintercept = chisqs[1], color = &quot;red&quot;) +
@@ -575,7 +575,7 @@ for (ii in 2:nreps) {
   corrs[ii] &lt;- cor(sample(M$Area), M$Elevation)
 }
 
-data_frame(corrs) %&gt;% 
+tibble(corrs) %&gt;% 
   ggplot(aes(corrs)) +
   geom_histogram() +
   geom_vline(xintercept = corrs[1], color = &quot;red&quot;) +

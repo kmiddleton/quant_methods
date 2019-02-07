@@ -22,12 +22,12 @@ library(knitr)
 
 ## Variation Within and Between Groups
 
-In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`. 
+In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`.
 
 Before we try the simulation, we will learn apply. `apply()` is part of a family of functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions. We'll show you the syntax here. Run the following and make sure you understand what is happening.
 
 ```{r}
-ap.test <- data_frame(x1 = seq(1, 10),
+ap.test <- tibble(x1 = seq(1, 10),
                       x2 = rep(5, 10),
                       x3 = seq(20, 65, length = 10))
 
@@ -40,7 +40,7 @@ ap.test <- data_frame(x1 = seq(1, 10),
 
 (mean.ap.col <- apply(ap.test, 2, mean)) # == colMeans()
 
-# Anonymous function in the apply(). 
+# Anonymous function in the apply().
 (ss <- apply(ap.test, 1, function(x) (x[1] * x[2]) / x[3]))
 ```
 
@@ -49,18 +49,18 @@ ap.test <- data_frame(x1 = seq(1, 10),
 Now let's try our simulation. We will simulate two groups that have different means (the true means are different) but change the variance and see how F is affected. Here is the pseudocode:
 
 1) Write a function called `getF`. (hint: try getting this to work for one set of values before making it a function)
-    
-    - Pass the function the following: mean for group 1 (`mu1`), mean for group 2 (`mu2`), a single standard deviation for both groups (`sd_both`), a single number of observations in the groups (`nobs`). 
-    - Inside the function, create a `data.frame` with two columns: `y` and `x`. `x` is the group id (repeat 1 and 2 each for the number of observations). `y` is the outcome. Pull values for the number of observations from a normal distribution with the mean for each group, the standard deviation. Fit a linear model and then ANOVA using `anova(lm())` and assign this to an object named `aa`. 
+
+    - Pass the function the following: mean for group 1 (`mu1`), mean for group 2 (`mu2`), a single standard deviation for both groups (`sd_both`), a single number of observations in the groups (`nobs`).
+    - Inside the function, create a `data.frame` with two columns: `y` and `x`. `x` is the group id (repeat 1 and 2 each for the number of observations). `y` is the outcome. Pull values for the number of observations from a normal distribution with the mean for each group, the standard deviation. Fit a linear model and then ANOVA using `anova(lm())` and assign this to an object named `aa`.
     - Look at the structure of `aa`. Try to figure out how to extract just the F-value from this object.
     - Set up the function to return the F-value
     - Test out your function to see that it works.
 
 2) Set up a `data.frame()` with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).
 
-3) Use apply to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful about the order you pass the values to your function and the order your function is expecting them to be in.  
+3) Use apply to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful about the order you pass the values to your function and the order your function is expecting them to be in.
 
-4) Plot the F-value vs. the standard deviation. Add a horizontal line at the critical value for an $\alpha$ of 0.05. 
+4) Plot the F-value vs. the standard deviation. Add a horizontal line at the critical value for an $\alpha$ of 0.05.
 
 5) There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Return to your function and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value.
 
@@ -228,11 +228,11 @@ Add `library(forcats)` to the setup chunk at the beginning of this file. You mig
 
 Because the data or organized so that the `Low` group is first, we can use `fct_inorder()` to make the factor in the sequence that we want.
 
-Use `mutate()` and `fct_inorder()` to make `Mismatch_Degree` into a factor. 
+Use `mutate()` and `fct_inorder()` to make `Mismatch_Degree` into a factor.
 
 ```{r}
 # FIXME
-M <- M %>% 
+M <- M %>%
   mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
 ```
 
@@ -241,7 +241,7 @@ There are only 39 observations total, so we may as well plot the raw data. Modif
 ```{r}
 ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") + 
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Mismatch Degree", y = "Survival (days)")
