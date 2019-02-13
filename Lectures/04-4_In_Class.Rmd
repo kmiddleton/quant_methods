@@ -210,7 +210,7 @@ str(M)
 ```{r mass_plot, echo=TRUE, eval=FALSE}
 M %>% 
   ggplot(aes(WnMass, color = Sex_f)) +
-  geom_density(size = 1.5) +
+  geom_line(stat = "density", size = 1.5) +
   facet_grid(Sex_f ~ .) +
   scale_color_manual(values = c("Orange", "Purple"), name = "Sex") +
   labs(x = "Wean Mass (g)", y = "Density", title = "Weaning Mass")
@@ -288,17 +288,11 @@ Set up the grid:
 
 ```{r}
 n <- 100 # How fine is the grid
-mus <- seq(5, 20, length = n) # Vector of mu
-sigmas <- seq(0.1, 5, length = n) # Vector of sigma
+mu <- seq(5, 20, length = n) # Vector of mu
+sigma <- seq(0.1, 5, length = n) # Vector of sigma
 
-grid_mu_sigma <- plot3D::mesh(mus, sigmas) # mesh() generates grid
-
-# To hold the output
-grid_approx <- tibble(
-  mu = as.numeric(grid_mu_sigma$x),
-  sigma = as.numeric(grid_mu_sigma$y),
-  log_lik = rep(NA, length = n ^ 2)
-)
+grid_approx <- crossing(mu, sigma) %>% 
+  mutate(log_lik = NA)
 ```
 
 ---
@@ -310,15 +304,15 @@ grid_approx
 ## Grid approximation
 
 ```{r grid_approx, cache=TRUE}
-for (i in 1:nrow(grid_approx)) {
-  grid_approx[i, "log_lik"] <- 
+for (ii in 1:nrow(grid_approx)) {
+  grid_approx[ii, "log_lik"] <- 
     sum(log(dnorm(Males$WnMass,
-                  mean = grid_approx$mu[i],
-                  sd = grid_approx$sigma[i])))
+                  mean = grid_approx$mu[ii],
+                  sd = grid_approx$sigma[ii])))
 }
 ```
 
-- Iterate through the rows ($i$) of `grid_approx`
+- Iterate through the rows ($ii$) of `grid_approx`
 - For each row, assign the model log-likelihood calculated for that `mu` and `sigma` to `log_lik`
 
 ---
@@ -335,10 +329,12 @@ This approach is coarse, time consuming, and not feasible for fine grids or many
 ## Grid approximation
 
 ```{r echo=FALSE}
-grid_approx <- do.call(data.frame,
-                       lapply(grid_approx,
-                              function(x) replace(x, is.infinite(x), NA)))
-scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
+grid_approx <- do.call(
+  data.frame,
+  lapply(grid_approx,
+         function(x) replace(x, is.infinite(x), NA)))
+scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik,
+          pch = 16,
           labels = c("mu", "sigma", "log-likelihood"))
 ```
 

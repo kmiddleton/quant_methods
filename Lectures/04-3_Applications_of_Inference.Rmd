@@ -213,17 +213,11 @@ Set up the grid:
 
 ```{r}
 n <- 100 # How fine is the grid
-mus <- seq(0.1, 5, length = n) # Vector of mu
-sigmas <- seq(0.1, 2, length = n) # Vector of sigma
+mu <- seq(0.1, 5, length = n) # Vector of mu
+sigma <- seq(0.1, 2, length = n) # Vector of sigma
 
-grid_mu_sigma <- mesh(mus, sigmas) # Generate grid
-
-# To hold the output
-grid_approx <- tibble(
-  mu = as.numeric(grid_mu_sigma$x),
-  sigma = as.numeric(grid_mu_sigma$y),
-  log_lik = rep(NA, length = n ^ 2)
-)
+grid_approx <- crossing(mu, sigma) %>% 
+  mutate(log_lik = NA)
 ```
 
 ---
@@ -235,15 +229,15 @@ grid_approx
 ## Grid approximation
 
 ```{r grid_approx, cache=TRUE}
-for (i in 1:nrow(grid_approx)) {
-  grid_approx[i, "log_lik"] <- 
+for (ii in 1:nrow(grid_approx)) {
+  grid_approx[ii, "log_lik"] <- 
     sum(log(dnorm(undulation_rate,
-                  mean = grid_approx$mu[i],
-                  sd = grid_approx$sigma[i])))
+                  mean = grid_approx$mu[ii],
+                  sd = grid_approx$sigma[ii])))
 }
 ```
 
-- Iterate through the rows ($i$) of `grid_approx`
+- Iterate through the rows ($ii$) of `grid_approx`
 - For each row, assign the model log-likelihood calculated for that `mu` and `sigma` to `log_lik`
 
 ---
