@@ -27,16 +27,24 @@ knit_hooks$set(webgl = hook_webgl)
 
 - Loops and functions
     - This week's problem set
-- What is likelihood & what does it mean
+- What is likelihood and what does it mean?
+- Likelihood vs. *relative* likelihood vs. probability
+    - https://stats.stackexchange.com/a/156937/597
 - Grid approximation vs. optimization
 - How Bayesian methods work "under the hood"
     - More coming soon
     - Bayes rule
+
+$$P[\Theta | Data] = \frac{P[Data | \Theta] \times P[\Theta]}{P[Data]}$$
+
+## Themes
+
 - Big picture of analytical vs. ML vs. resampling vs. Bayesian
-    - Practical examples
+    - What do we want you to understand about them?
+    - More practical examples
     - When to use each
-    - Does needing to use one imply bad design
-    
+    - Does needing to use one imply bad design?
+
 ## Mouse weaning data
 
 ```{r warning=FALSE}
@@ -238,7 +246,7 @@ $$\phi\left(Y_i; \mu, \sigma\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-
 - For any $\mu$ and $\sigma$ we can calculate the likelihood of *that* observation
 - Some values of $\mu$ and $\sigma$ will maximize the likelhood for *that* observation
 
-What values of $\mu$ and $\sigma$ maximize the likelihood for *all* the observations?
+What values of $\mu$ and $\sigma$ *simultaneously* maximize the likelihood for *all* the observations?
 
 ## Model Likelihood ($\mathcal{L}$)
 
@@ -277,8 +285,9 @@ log_lik <- function(x, Y){
 }
 ```
 
-- Pass a vector of `x <- (mu, sigma)` and vector of `Y`
-- Return the sum of log-likelihoods
+- Pass a vector of `x <- c(mu, sigma)` and vector of `Y` values
+- Calculate the likelihoods (probability densities) for each `Y` given the mean and standard deviation
+- Return the sum of the logs of the likelihoods
 
 ## Grid approximation
 
@@ -341,9 +350,6 @@ scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik,
 ## Grid approximation
 
 ```{r testgl, webgl=TRUE, echo=FALSE}
-x <- sort(rnorm(1000))
-y <- rnorm(1000)
-z <- rnorm(1000) + atan2(x,y)
 plot3d(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik,
        xlab = "mu", ylab = "sigma", zlab = "log-likelihood",
        col = "red")
@@ -361,6 +367,20 @@ The analytical estimate is:
 
 ```{r}
 mean(Males$WnMass)
+```
+
+## Grid approximation
+
+```{r testgl2, webgl=TRUE, echo=FALSE}
+plot3d(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik,
+       xlab = "mu", ylab = "sigma", zlab = "log-likelihood",
+       col = "red")
+plot3d(grid_approx$mu[which.max(grid_approx$log_lik)],
+       grid_approx$sigma[which.max(grid_approx$log_lik)],
+       grid_approx$log_lik[which.max(grid_approx$log_lik)],
+       col = "blue",
+       size = 10,
+       add = TRUE)
 ```
 
 ## Maximum likelihood via optimization
@@ -387,7 +407,8 @@ print(MLE)
 ## ML considerations
 
 - `glm()` uses an optimization routine
-- Custom likelihood function
+- ML can get stuck in a local maximum (that isn't the global maximum)
+- Write your own custom likelihood function
 
 ## Resampling inference of the mean {.smaller}
 
