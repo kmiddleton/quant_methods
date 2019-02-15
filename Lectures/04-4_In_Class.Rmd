@@ -25,18 +25,18 @@ knit_hooks$set(webgl = hook_webgl)
 
 ## Themes
 
-- Loops and functions (many questions)
-    - Resampling
+- Loops and functions
     - This week's problem set
+- What is likelihood & what does it mean
 - Grid approximation vs. optimization
-- Model comparison (many questions)
-    - Some this and next week
-    - More explicitly later in the course
-    - Models as hypotheses
+- How Bayesian methods work "under the hood"
+    - More coming soon
+    - Bayes rule
 - Big picture of analytical vs. ML vs. resampling vs. Bayesian
-    - Practical examples, phylogenetic
-- Fine tuning plots in ggplot
-
+    - Practical examples
+    - When to use each
+    - Does needing to use one imply bad design
+    
 ## Mouse weaning data
 
 ```{r warning=FALSE}
@@ -388,7 +388,6 @@ print(MLE)
 
 - `glm()` uses an optimization routine
 - Custom likelihood function
-- Phylogenetic estimation models
 
 ## Resampling inference of the mean {.smaller}
 
@@ -474,6 +473,7 @@ R, Python, MATLAB, etc. interfaces to samplers #2-4.
 
 - `rstan`: Build your own models
 - `rethinking`: Convenience interface to `rstan`.
+- `brms` and `rstanarm`: High level model syntax
 
 ## Bayesian model for mean $\mathcal{N}(14, 5)$
 
