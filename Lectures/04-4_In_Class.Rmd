@@ -315,9 +315,8 @@ grid_approx
 ```{r grid_approx, cache=TRUE}
 for (ii in 1:nrow(grid_approx)) {
   grid_approx[ii, "log_lik"] <- 
-    sum(log(dnorm(Males$WnMass,
-                  mean = grid_approx$mu[ii],
-                  sd = grid_approx$sigma[ii])))
+    log_lik(c(grid_approx$mu[ii], grid_approx$sigma[ii]),
+            Males$WnMass)
 }
 ```
 
@@ -393,7 +392,7 @@ plot3d(grid_approx$mu[which.max(grid_approx$log_lik)],
 MLE <- optim(c(13, 1), # Start at mu = 13, sigma = 1
              log_lik,
              Y = Males$WnMass,
-             control = list(fnscale = -1,
+             control = list(fnscale = -1,   # Find maximum
                             reltol = 10^-100))
 ```
 
@@ -436,7 +435,8 @@ tibble(resampled_mean) %>%
   ggplot(aes(resampled_mean)) +
   geom_histogram(bins = 20) +
   labs(x = "Resampled Mean", y = "Count") +
-  geom_vline(xintercept = mean(resampled_mean), color = "red",
+  geom_vline(xintercept = mean(resampled_mean),
+             color = "red",
              size = 1.5)
 ```
 
