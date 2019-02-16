@@ -1,0 +1,357 @@
+---
+title: "MCMC Demo"
+author: Karthik Panchanathan, Department of Anthropology
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## INTRODUCTION
+
+This file (hopefully) helps you learn how MCMC works and why we need it. Along the way, you will learn a bit about conjugate pairs, the beta distribution, and how to model batting averages in baseball as a Bayesian. The other purpose of this is as a review of what we've covered so far. Now that we are about half way through the book, it's easy to get lost in all that we've covered. This will review some of the major themes we've discussed, using a common estimation problem to show how each of the different techniques work.
+
+This weaves together a few different sources. The references are given below.
+
+## THE BETA DISTRIBUTION
+
+For this exercise, we'll start with a discussion of the beta distribution. It's commonly used in Bayesian statistics as a "conjugate prior" for the binomial likelihood model. It's also used in population genetics to model the frequency of certain alleles in a two-allele system. It has other uses, too. 
+
+An intuitive way of thinking about the beta distribution is that it represents a probability distribution of probabilities. This sounds confusing, but the idea is pretty simple. Suppose we are trying to estimate some probability (in the example below, it will be the batting average for baseball players). A probability is some number between 0 and 1 (with some additional properties). Now, being Bayesians, we won't be satisfied with just one number to characterize a player (i.e., the maximum a posteriori value). Instead, we want to quantify our uncertainty. This means that we have different degrees of belief for different parameter values. Here, our parameter value is the batting average, which is a probability. The beta is a good probability distribution for this purpose. It takes on continuous values between 0 and 1. So, if we observe a player get a hit in 3 of 10 at-bats, assuming a flat prior, the maximum a posteriori value for his "true" batting average (e.g. our prediction for his end-of-season average) will be 0.300. But, 10 at-bats is a small sample size. We are not convinced that in 100 at-bats, he will record exactly 30 hits. Like with a coin flipping process, we are prepared to believe that his true batting average is best represented as a probability distribution of batting averages (centered around 0.300 if we use a flat prior). That is, we want to represent our beliefs about his batting average using a probability distribution of probabilities.
+
+When modeling batting averages, we use the beta distribution for our prior and the binomial for the likelihood (i.e., like the coin flipping process, we have a series of successes and failures). The prior, in this case, represents what we roughly expect a player's batting average will be before we see him swing.
+
+To get started, let's play with the beta distribution in R. As with other probability distributions, we'll use the "d" and "r" functions to generate probability densities and draw random numbers. For the beta, we'll use `dbeta` and `rbeta`. Let's first generate a distribution using some made up numbers (we're sticking with the batting average example).
+
+```{r}
+plot(
+  x = seq(0, 1, 0.001),
+  y = dbeta(x = seq(0, 1, 0.001), shape1 = 81, shape2 = 219), 
+  type = "l",
+  ylab = "Density",
+  xlab = "True/predicted batting average"
+)
+```
+
+The beta distribution is a 2-parameter probability distribution, like the normal. With the normal distribution, you are used to thinking about the mean (a measure of central location) and the standard deviation (a measure of dispersion). With the beta, the two parameters are labeled alpha and beta. These are so-called "shape" parameters; varying these give rise to many different kinds of shapes, including J-shapes, uniform distribution-like, normal distribution-like, and U-shaped. It's a very flexible distribution. There is another way to "parameterize" the beta distribution, in which one parameter corresponds to the mean and the other corresponds to the dispersion. In this parameterization, the mean is given by alpha / (alpha + beta). In the example above, with alpha (shape1) set to 81 and beta (shape2) set to 219, the mean would be 0.270. That's what you see in the figure, too. To convince yourself of that, execute the code below.
+
+```{r}
+mean(rbeta(n = 100, shape1 = 81, shape2 = 219))
+```
+
+With 100 data points, I got a mean close to 0.270. If you increase n, you'll obviously get a closer value.
+
+## ANALYTICAL SOLUTION TO THE POSTERIOR
+
+Returning to the baseball example, the x-axis ranges from 0 to 1. This represents the possible values for the player's true/predicted batting average.
+
+Here's where the beta becomes a very useful probability distribution for modeling our beliefs about a process with a series of successes and failures. Suppose we observe the player over a series at-bats. We need to update our beliefs. The new beta distribution, after a certain number of hits and misses, is given by: Beta(alpha_0 + hits, beta_0 + misses).
+
+How can we do this? Why don't we need to turn to simulation, as we've been doing in class? In this case, using a beta as our prior and a binomial as our likelihood, the posterior is a new beta with the values presented above. You need to do some math to prove this (see the link below on the Conjugate prior). This is an example of using a CONJUGATE PRIOR. When you choose the prior and likelihoods so that they conjugate, the resulting posterior can be had without doing any simulation; you can solve the Bayesian problem of inverse probability by mathematics.
+
+Returning to our example above, suppose the player recored 15 hits and 23 misses in his first 38 at-bats during the season (an observed batting average of 0.394). That's a real hot streak he's on. If we see that, surely we don't believe he will maintain that pace for the season. Being good Bayesians, we integrate our prior beliefs (here, we are NOT using a uniform prior) and the observations to formulate our posterior beliefs. I'll plot the prior (in black) and the posterior (in blue) below. In addition, I'll draw in the posterior if we had a uniform prior (in red; set `shape1 = 0` and `shape2 = 0` in the beta).
+
+```{r}
+plot(
+  x = seq(0, 1, 0.001),
+  y = dbeta(x = seq(0,1,0.001), shape1 = 81, shape2 = 219), 
+  type ="l",
+  ylab = "Density",
+  xlab = "True/predicted batting average"
+)
+
+points(
+  x = seq(0, 1, 0.001),
+  y = dbeta(x = seq(0,1,0.001), shape1 = 81 + 15, shape2 = 219 + 23), 
+  type ="l",
+  col = "blue"
+)
+
+points(
+  x = seq(0, 1, 0.001),
+  y = dbeta(x = seq(0,1,0.001), shape1 = 0 + 15, shape2 = 0 + 23), 
+  type ="l",
+  col = "red"
+)
+```
+
+Our INFORMATIVE prior is in black. This is the distribution of final batting averages we expected at the beginning of the season. The blue line is our updated posterior. It has gotten a little narrower and has shifted to the right. It's no where near the observed batting average of 0.394. That's because the posterior is represents a combination of our prior beliefs and our observations. As with the REGULARIZING priors we've been using in class, our INFORMATIVE prior here has prevented our golem from getting too excited about the data. (There is no hard-and-fast distinction between a regularizing and informative prior. A regularizing prior is used when we explicitly want to reign in the over-excitement of the likelihood, whether or not we know something about the phenomena before observation. An informative prior is used when we have some explicit knowledge before observation and want to put it into our model.) The red line represents our posterior if we started with a naive, uniform prior (i.e. our golem was initially prepared to believe a batting average of 0.000 or 1.000 were as likely as a batting average of 0.270).
+
+With priors and likelihoods that are conjugate, like the beta and binomial, life is pretty easy. No need for fancy simulation. You have exact answers for the posteriors. We haven't covered this analytic approach to Bayesian inference in the textbook. The reasons are several. First, to get conjugacy, you have to choose specific pairs prior and likelihood combinations. What if, for example, the process you are modeling is not well described by a requisite likelihood model? Too bad. If you want conjugacy, you have a limited menu of choices. If you are willing to give up some accuracy in your prediction (i.e. choosing an inappropriate probability distribution may "work", but it will result in shapes that poorly predict). Second, models with any complexity (e.g. many generalized linear models, multi-level models) cannot be solved mathematically; you have to turn to simulation. Richard chose to avoid the analytic approach entirely, and had us learn three techniques for finding posteriors: grid approximation, quadratic approximation, and MCMC.
+
+## GRID APPROXIMATION
+
+Let's turn to grid approximation to solve the problem above. We first need to define our grid. Since we're modeling batting averages, the grid will be bounded between 0.000 and 1.000. 
+
+```{r}
+# define the grid
+p_grid <- seq(from = 0, to = 1, length.out = 1001)
+```
+
+We next need to define our prior. We could use a uniform prior, but that seems silly. Surely a player is more likely to end the season with a batting average of 0.300 compared to 0.500! In the example above, we used the beta distribution to model the prior. Suppose we didn't know that distribution. We know the normal. Let's try that. One thing that's a little weird is that the normal has no bounds. So, our prior beliefs include the possibility (however improbable) of a batting average below 0 or above 1. This shouldn't make too much of a difference. Let's assume a mean of 0.270 as above (i.e. the MAP estimate of our prior is a final average of 0.270) and a standard deviation of 0.026. (I chose this standard deviation by simulating 1000 draws from a beta with shape1 = 81 and shape2 = 219 and taking the standard deviation. If you draw a plot of our beta prior above and the normal prior below, they will be very close.)
+
+```{r}
+# define the prior
+prior <- dnorm(x = p_grid, mean = 0.270, sd = 0.026)
+```
+
+Next, we need to compute the likelihood at each value in the grid. Our likelihood is going to be a binomial with 15 hits in 38 at-bats (from the example above). This is similar to our globe-tossing example from Chapter 2.
+
+```{r}
+# compute the likelihood 
+likelihood <- dbinom(15, size = 38, prob = p_grid)
+```
+
+Now we multiply the likelihood and prior to get our "unstandardized posterior."
+
+```{r}
+unstd.posterior <- likelihood * prior
+```
+
+Finally, we standardize the posterior so that it sums to 1 (i.e. it's a well-behaved probability distribution).
+
+```{r}
+posterior <- unstd.posterior / sum(unstd.posterior)
+```
+
+Why does this work? Remember, Bayes Theorem:
+
+$$Posterior = \frac{Likelihood \times Prior}{Average~Likelihood}$$
+
+The problem with applying this formula is that the Average Likelihood is very hard to compute (often impossible analytically). With conjugate priors and likelihood, this can be computed and everything is hunky dory. Without them, we have to turn to simulation techniques. With the grid approximation, we don't bother calculating the Average Likelihood. Since the Average Likelihood is a constant (given some model and some data), each unique likelihood x prior in our grid approximation is divided by the same number. As such, if we don't bother with the denominator (Average Likelihood), the numerator (Likelihood x Prior) is proportional to the Posterior. It'll just be off by some constant (the Average Likelihood). Since we want the posterior to be a probability distribution (i.e., it sums to 1), we can just divide the numerator (which is a vector of values proportional to posterior probabilities) by the sum of the numerator. This will turn the numerator into a vector which will equal the posterior as it turns the numerator into a proper probability distribution. By doing this, we "invert" the probability, getting out the posterior distribution. This trick using the grid approximation only works for the simplest of Bayesian problems. As our problems get more complex, we need to turn to more efficient and powerful techniques, like quadratic approximation and MCMC.
+
+Let's plot the prior in black and the posterior in blue with our grid approximation as we did before. I'm going to actually make a 2x2 panel plot. The left column will be the analytic model (top = prior, bottom = posterior). The right column will be the grid approximation.
+
+```{r}
+# prepare the plot
+par(mfrow = c(2, 2), new = TRUE)
+
+# plot prior from the analytic model
+plot(
+  x = p_grid,
+  y = dbeta(x = p_grid, shape1 = 81, shape2 = 219) / 
+    sum(dbeta(x = p_grid, shape1 = 81, shape2 = 219)), 
+  type ="l",
+  ylab = "Probability",
+  xlab = "True/predicted batting average",
+  main = "Prior, analytical"
+)
+
+# plot posterior from analytic model
+plot(
+  x = p_grid,
+  y = dbeta(x = p_grid, shape1 = 81 + 15, shape2 = 219 + 23) / 
+    sum(dbeta(x = p_grid, shape1 = 81 + 15, shape2 = 219 + 23)), 
+  type ="l",
+  ylab = "Probability",
+  xlab = "True/predicted batting average",
+  main = "Posterior, analytical"
+)
+
+# plot prior from the grid approximation
+plot(
+  x = p_grid,  
+  y = prior / sum(prior),
+  type ="l",
+  ylab = "Probability",
+  xlab = "True/predicted batting average",
+  main = "Prior, grid"
+)
+
+# plot posterior from grid approximation
+plot(
+  x = p_grid,  
+  y = posterior,
+  type ="l",
+  ylab = "Probability",
+  xlab = "True/predicted batting average",
+  main = "Posterior, grid"
+)
+```
+
+As you can see, they are nearly identical. If you look at the code for the y-values on the first three plots, I've divided the density vectors by the sum. This is to turn the densities into probabilities (ranging from 0 to 1). The posterior from the grid approximation, since we "standardized" it, already has that feature. The book discusses the distinction between a density and a probability in one of the end notes.
+
+## QUADRATIC APPROXIMATION
+
+The next technique we learned is the quadratic approximation. This makes the assumption that the posterior is normally distributed. In our analytic models from above, we saw that the "correct" posterior will have a beta distribution. However, as we saw before, our grid approximation was very close to the analytical posterior. In fact, when the number of "successes" and "failures" in a beta distribution get large, the beta takes on a shape that is well approximated by a normal distribution.
+
+Just to review, we are modeling batting averages. We have some prior belief about a player and then we observe some at-bats. We want to integrate our prior knowledge with our observations. Because we modeled our prior beliefs with a beta distribution and our likelihood with a binomial distribution, we can exploit the conjugacy property of these two distributions and compute our posterior analytically. We've done that first. We also say how to get the same answer through simulation using grid approximation. (We didn't need to do this, but went through the approach as an exercise to review what we started the course with.) Here, we are going to get the same answer using quadratic approximation. In real-world problems, you would turn to quadratic approximation when the model is too complex or inappropriate to use conjugacy, when you are okay assuming that the posterior is normally distributed, and when the model isn't too complicated (in which case you would turn to MCMC).
+
+```{r}
+# load the rethinking library
+library(rethinking)
+```
+
+Let's fit the model with quadratic approximation. Our outcome measures hits (h) using a binomial probability distribution for the likelihood.
+
+```{r}
+m_quad <- 
+  map(
+    alist(
+      h ~ dbinom(size = 38, prob = p),
+      p ~ dnorm(mean = 0.270, sd = 0.026)
+    ),
+    data = list(h = 15)
+  )
+```
+
+Let's look at the summary of the model
+
+```{r}
+precis(m_quad)
+```
+
+How does this compare to the analytical results? Remember, the posterior from that mode was given by beta(81 + 15, 219 + 23). Let's sample from this and look at summary statistics.
+
+```{r}
+precis(rbeta(1e4, 96, 242))
+```
+
+The quadratic approximation yields the same results as our analytic methods.
+
+## MARKOV CHAIN MONTE CARLO (MCMC)
+
+Finally, we turn to MCMC approaches. When and why do we turn to this? When we are building complicated models (e.g., multi-level models), quadratic approximation is too inefficient. We need some other technique to find posterior distributions. We will see many of these kinds of models as the book proceeds. For now, we'll continue with our batting average problem. I realize that we don't need MCMC for this, but it's nice to use so that we can see exactly how MCMC works. (Technically, MCMC is a generally class of techniques. We are going to use the Metropolis algorithm that was discussed in the book. It's an early algorithm and quite easy to understand. It's not very efficient. As the book discussed, we'll mostly be using HMC. Gibbs sampling is another MCMC algorithm that is commonly used.)
+
+Let's once again look at Bayes formula, using both a word formula and a symbolic one.
+
+$$Posterior = \frac{Likelihood \times Prior}{Average~Likelihood}$$
+
+$$P(model|data) = \frac{P(data|model) \times P(model)}{P(data)}$$
+
+The denominator is the pesky problem with Bayesian statistics. What do we mean by $P(data)$? What is the probability of having observed this data? It's what we called the Average Likelihood. That means that for each possible hypothesis we are entertaining (e.g., each batting average from 0 to 1 in our baseball example), we calculate the likelihood of obtaining the data. We weight each of these likelihoods by the probability associated with that particular hypothesis drawn from our prior. To illustrate simply, suppose that we are entertaining two hypotheses: the player we observe has a true batting average of 0.250 or the player's true average is 0.350. Let's assign equal weight to these two hypotheses. (This is like a uniform prior, except that we are only considering two possibilities). With 15 hits in 38 at-bats, we can compute the likelihood given some prior probability. We use the `dbinom` function for this.
+
+```{r}
+(likelihood_250 = dbinom(x = 15, size = 38, prob = 0.250))
+
+(likelihood_350 = dbinom(x = 15, size = 38, prob = 0.350))
+
+# Now let's compute the average likelihood of the data, given two hypotheses.
+((0.5 * likelihood_250) + (0.5 * likelihood_350))
+```
+
+This value has no meaning to us. But it's needed to turn the numerator (Likelihood x Prior) into a well-behaved probability distribution. Without it, our result would be proportional to the posterior, but wouldn't be a probability distribution (i.e. wouldn't sum to 1). 
+
+For even slightly complicated models, we can't compute Pr(data) analytically. For relatively simple models (that are too complex for analytics), we turn to one of the approximations discussed above. For the more complex, we can't even approximate the posterior. We need to turn to MCMC. The logic of what is going on is complicated. The technical idea is that we construct a Markov chain that has an equilibrium distribution which matches the posterior distribution. That, of course, offers NO HELP in understanding what is going on. We'll set up an Metropolis algorithm that does this for us. What you'll see seems rather spooky. We have a situation in which we can't compute the posterior and we can't approximate it so we can't sample from it. But, by constructing a Markov chain, we slowly build up the posterior distribution by clever sampling.
+
+We saw this in the book with the King Markov example and the final two practice problems. While those covered a basic MCMC, it felt incomplete because we ended up sampling from the posterior in the final practice problem. If we already had the posterior, what's the whole point of the MCMC! Here, let's assume we don't have the posterior. (Of course, in our baseball case, we do have it. We can get it directly through maths, we can get through the grid approximation, and we can get it through quadratic approximation. With truly complex problems, which the book will cover shortly, we won't have posteriors by these other means. I'm using this as we already understand what's going on.)
+
+If you recall the King Markov example, the king travels probabilistically from island to island using the Metropolis algorithm to make his move decisions. The islands form a ring. The kind flips a coin to decide which direction he might move. He then compares the population of the proposed island to the population of the current island. If the proposed island is bigger, he always goes. If it's smaller, then goes with probability pop_proposal / pop_current. 
+
+To see the analogy between this and a Bayesian inference problem, we need to think of each island as a possible hypothesis. In our baseball example, each island corresponds to a possible predicted batting average for our players. Since probabilities are continuous, there are an infinite number of possible batting averages. For simplicity, let's discretize this. We'll call the vector of possible AVERAGES and only consider each percentage point.
+
+```{r}
+averages <- seq(0, 1, by = 0.01)
+```
+
+The analogue of the population of each island is the posterior. From each island, the king flips a coin. If heads, he looks at the island in one direction and moves based on the population of the proposed island and the population of the current island. If tails, he does the same, but with the island in the other direction. Here, our Bayesian golem sits on some particular paramater value (i.e., a batting average). It then flips a coin. If heads, it looks at the next highest batting average. Comparing the posterior of that batting average to the posterior of the current batting average, it probabilistically moves. 
+
+I've been beating around the bush for a while. We don't have the posteriors associated with each parameter value. If we had that, we'd be done, we wouldn't need MCMC. What do we have? For a particular parameter value (e.g., batting average = 0.250), we have a prior probability which we started with and we also can compute a likelihood. As we discussed before, this is the numerator to Bayes formula. This is the easy part. The hard part is the denominator, the average likelihood. While we can't compute the average likelihood, it turns out we don't need it. That's because we always consider two options at once: the posterior of the current parameter value and the posterior of the proposed parameter value.
+
+Let's look at Bayes theorem once more.
+
+$$P(model|data) = \frac{P(data|model) \times P(model)}{P(data)}$$
+
+
+Remember, the model is a whole big thing which includes the prior, the likelihood function, specific values for each parameter, etc. Let's call the model with current parameter value $m_{current}$ and the model with the proposed parameter value $m_{proposed}$. Then we can write:
+
+$$P(m_{current}|data) = \frac{P(data|m_{current}) \times P(m_{current})}{P(data)}$$
+
+$$P(m_{proposed}|data) = \frac{P(data|m_{proposed}) \times P(m_{proposed})}{P(data)}$$
+
+This may feel weird. What does this mean. If you recall the simplification from above, let's call the current model the one in which we assume the true batting average to be 0.250. The proposed model is with the batting average of 0.350. We might then re-write the above as:
+
+$$P(p=0.250|data = \frac{ P(data|p = 0.250) \times P(p = 0.250)}{P(data)}$$
+
+$$P(p=0.350|data = \frac{ P(data|p = 0.350) \times P(p = 0.350)}{P(data)}$$
+
+As we saw above, with this kind of model (i.e., beta prior, binomial likelihood), we can calculate everything, including $P(data)$, which we did above. Again, we're assuming we can't do this. So what to do? 
+
+Remember our Metropolis algorithm needs the posterior associated with the proposed location and the posterior associated with the current location. It uses the ratio of these posteriors to decide whether or not it moves. Let's look at those ratios (using the $m_{current}$ and $m_{proposal} notation).
+
+$$P(m_{current}|data) = \frac{P(data|m_{current}) \times P(m_{current})}{P(data)}$$
+
+$$P(m_{proposed}|data) = \frac{P(data|m_{proposed}) \times P(m_{proposed})}{P(data)}$$
+
+$$\frac{P(m_{current}|data) = \frac{P(data|m_{current}) \times P(m_{current})}{P(data)}}{P(m_{proposed}|data) = \frac{P(data|m_{proposed}) \times P(m_{proposed})}{P(data)}}$$
+
+So far, no magic. We just took the equations and divided one by the other. But notice something about the right-hand side. There is a $P(data)$ in both the numerator and the denominator. This is the average likelihood. The pesky thing we usually can't solve for. Since it's in both the numerator and denominator, it cancels out! That leaves us with:
+
+$$\frac{P(m_{current}|data) = P(data|m_{current}) \times P(m_{current})}{P(m_{proposed}|data) = P(data|m_{proposed}) \times P(m_{proposed})}$$
+
+Writing this in our word formula, we have   
+
+$$\frac{Posterior~of~m1 = Likelihood~of~m1 \times Prior~of~m1}{Posterior~of~m2 = Likelihood~of~m1 \times Prior~of~m1}$$
+
+King Markov doesn't need the average likelihood to figure out whether he should stay or go. He only needs to compute the likelihood associated with the proposed and current parameter values, multiply these by the associated priors, and then divide the products. This gives him his shift probability. 
+
+This is the magic of MCMC: *we never explicitly calculate posterior probabilities*. We calculate quantities that are proportional to them (likelihood x prior). We then take ratios of our current location in parameter space and a proposed location to compute shift probabilities. This algorithm will crawl through the parameter space, spending more time at locations with higher posterior probabilities and less time at locations with lower posterior probabilities. This random walk through parameter space slowly builds up a picture of the posterior distribution.
+
+Let's write an MCMC using the Metropolis algorithm that's similar to the King Markov example from the book. We'll apply it to our baseball estimation problem and get back a posterior that is similar to the ones we computed with other methods.
+
+```{r}
+# number of samples to take from the posterior
+num_samples <- 1e5
+
+# possible parameter values (e.g. batting averages we'll consider)
+step_size <- 0.01
+averages <- seq(0, 1, by = step_size)
+
+# assign prior to each of these possible batting averages
+prior <- dnorm(x = averages, mean = 0.270, sd = 0.026)
+
+# record locations visited
+positions <- rep(0, num_samples)
+
+# starting location (we'll start at a batting average of 0.500)
+current <- 0.5
+for (i in 1:num_samples) {
+  # record current position
+  positions[i] <- current
+
+  # flip coin to generate proposal
+  proposal <- current + sample(step_size * c(-1, 1), size = 1)
+  
+  # ensure our golem around the averages (e.g. a step down from 0 leads to 1)
+  if (proposal < 0) proposal <- 1
+  if (proposal > 1) proposal <- 0
+  
+  # posterior-proportional quantity associated with current and proposed
+  # location; in the prior part, we multiply proposal or current by 100 to
+  # turn the parameter value (a batting average) into the appropriate index
+  
+  p_current <- dbinom(15, 38, prob = current) * prior[current * 100]
+  p_proposal <- dbinom(15, 38, prob = proposal) * prior[proposal * 100]
+  
+  # move to proposed parameter value?
+  prob_move <- p_proposal / p_current
+  current <- ifelse(runif(1) < prob_move, proposal, current)
+}
+```
+
+```{r}
+# The vector positions represent 100,000 samples from the posterior. Let's plot this.
+dens(positions)
+```
+
+```{r}
+# Let's look at the summary statistics
+precis(positions)
+```
+
+For comparison, let's look at the summary statistics from the analytical calculation.
+
+```{r}
+precis(rbeta(1e4, 96, 242))
+```
+
+They're close, though not as close as our other approximations. I'm not particularly knowledgeable about MCMC procedures. There's probably stuff I could have done to the Markov Chain that would have made the approximation better. I'm sure Richard will guide us through this kind of stuff. I just wanted to use this to demystify the MCMC. If you've made it this far, I hope you have a much deeper intuition about how MCMC works: sampling from the posterior without every calculating the posterior!
+
+## REFERENCES
+
+For a more thorough description of the beta distribution, see the following blogpost. I previously sent out a series of posts on Bayesian statistics and modeling batting averages. This is the first in that series. http://varianceexplained.org/statistics/beta_distribution_and_baseball/
+
+For more on conjugate priors: https://en.wikipedia.org/wiki/Conjugate_prior#Example
+
+Explains MCMC in some detail, providing intuitions: http://twiecki.github.io/blog/2015/11/10/mcmc-sampling/
