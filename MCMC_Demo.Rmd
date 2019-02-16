@@ -282,7 +282,7 @@ $$\frac{P(m_{current}|data) = P(data|m_{current}) \times P(m_{current})}{P(m_{pr
 
 Writing this in our word formula, we have   
 
-$$\frac{Posterior~of~m1 = Likelihood~of~m1 \times Prior~of~m1}{Posterior~of~m2 = Likelihood~of~m1 \times Prior~of~m1}$$
+$$\frac{Posterior~of~m1 = Likelihood~of~m1 \times Prior~of~m1}{Posterior~of~m2 = Likelihood~of~m2 \times Prior~of~m2}$$
 
 King Markov doesn't need the average likelihood to figure out whether he should stay or go. He only needs to compute the likelihood associated with the proposed and current parameter values, multiply these by the associated priors, and then divide the products. This gives him his shift probability. 
 
