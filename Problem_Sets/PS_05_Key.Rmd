@@ -22,14 +22,14 @@ library(cowplot)
 Stalk-eyed flies are a clade of flies whose eyes are at the ends of long projections (stalks) on either side of their head. Shortly after emerging from a pupae, these flies ingest air through their mouth in order to pump it into these stalks to elongate them (watch this craziness here: https://www.youtube.com/watch?v=bGX7zZk0Eo4). Females prefer males with wider eye spans. Photo below:
 
 <div style="width:350px">
-![](https://i1.wp.com/invorma.com/wp-content/uploads/2015/06/The-Stalk-Eyed-Fly.jpg)
+![](https://i.imgur.com/7KxZKQF.jpg)
 </div>
 
 The `Stalkies.csv` data file contains data for an experiment in which male stalk-eyed flies were reared on different food sources (corn and cotton). The hypothesis is that food type affects eye span. In the next few exercises, you will try to answer this question using different approaches.
 
 ### Activity 1
 
-Load the Stalkies.csv file.
+Load the `Stalkies.csv` file.
 
 ```{r}
 # FIXME
@@ -59,7 +59,7 @@ Describe the distributions within each group and between groups. What do these p
 
 We will first use the analytical method to determine if the group means are significantly different. In this case, a *t*-test is most appropriate.
 
-By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE` if you decide that is appropriate here.
+By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*.
 
 ### Activity 2
 
@@ -92,19 +92,19 @@ summary(fm)
 
 Compare the results of the linear model with the results of the *t*-test above. Do you recognize any of the estimates?
 
-> The `(Intercept)` term from `lm()` is equal to the mean for the Corn group. The `food_sourceCotton` estimate is the difference between the means for the Corn and Cotton groups.
+> The `(Intercept)` term from `lm()` is equal to the mean for the Corn group. The `food_sourceCotton` estimate is the *difference* between the means for the Corn and Cotton group means.
 
 ### Activity 4
 
-In lecture, we gave the equations for calculating the Bayes Factor (likelihood ratio) to compare two models. This type of comparison is applicable in situations when you have the model likelihoods and gives you an estimate of the relative support of one model to another. In the future, we will use variations of this test to compare models.
+In lecture, we gave the equations for calculating the Bayes Factor (likelihood ratio) to compare two models. This type of comparison is applicable in situations when you have model likelihoods available and gives you an estimate of the relative support of one model compared to the another. In the future, we will use variations of this test to compare models.
 
 For now, we will give you most of the steps along the way. Study carefully, so that you understand what every block of code is doing.
 
 ```{r}
-# Function for sum of squares
+# Function to calculate sum of squares of a vector
 SS <- function(x, x_bar = NULL) {
   # If x_bar is not provided, use the mean of x
-  if (is.null(x_bar)) x_bar <- mean(x)
+  if (is.null(x_bar)) x_bar <- mean(x, na.rm = TRUE)
 
   # Return sum of squares
   return(sum((x - x_bar) ^ 2))
@@ -171,7 +171,7 @@ What do you conclude based on the Bayes Factor comparison?
 
 We have actually violated one of the assumptions of the likelihood calculations that we did. What is it?
 
-> The variances are likely not equal.
+> The variances are likely *not* equal.
 
 ## Confidence intervals
 
@@ -179,7 +179,7 @@ We will use the same data to explore confidence intervals.
 
 ### Activity
 
-Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture mu +/- 2 * SEM.
+Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture $\mu$ +/- 2 * SEM.
 
 ```{r}
 # FIXME
@@ -269,14 +269,14 @@ What do you conclude based on this simulation?
 
 Is it correct to say that there is a 95% probability that the true mean is within a 95% confidence interval? Why or why not? Think about what you just showed with your simulation.
 
-> No, it is not correct. CIs tell us about a range of values that we have some confidence in for future samples.
+> No, it is not correct. CIs tell us about a range of values that we have some confidence in for *future* samples. This is a nuanced but very important point about confidence intervals.
 
 ## OLS Regression
 
 The file `Earwigs.csv` contains data for the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. An earwig with forceps is shown below.
 
 <div style="width:350px">
-![](http://1.bp.blogspot.com/-n4ViM3mLJA4/Tps-JoQ4gJI/AAAAAAAACbw/aRFxy7vAM9o/s1600/IMG_0346.jpg)
+![](https://i.imgur.com/YJ0NnSb.jpg)
 </div>
 
 The hypothesis is that earwigs living at higher densities will be more likely to have forceps, so that samples living at higher densities will have a higher proportion with forceps.
@@ -296,7 +296,8 @@ Make a scatterplot of the proportion of earwigs with forceps vs. density.
 # FIXME
 EW %>%
   ggplot(aes(Density, Proportion_Forceps)) +
-  geom_point()
+  geom_point() +
+  labs(x = "Population Density", y = "Proportion with Forceps")
 ```
 
 Use the following code to add an OLS regression line through the points to your plot: `+ geom_smooth(method = "lm")`. Just add that code after `geom_point()` in your call to ggplot.
@@ -306,7 +307,8 @@ Use the following code to add an OLS regression line through the points to your 
 EW %>%
   ggplot(aes(Density, Proportion_Forceps)) +
   geom_point() +
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm") +
+  labs(x = "Population Density", y = "Proportion with Forceps")
 ```
 
 Use `lm()` to fit a linear model in which the proportion of earwigs with forceps is modeled by the density of earwigs. Assign the linear model to an object, and then pass that object to `summary()` as you did above.

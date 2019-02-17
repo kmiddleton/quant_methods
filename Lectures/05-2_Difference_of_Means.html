@@ -3213,7 +3213,7 @@ mu.horn &lt;- 24   # mean
 sd.horn &lt;- 3    # standard deviation
 n.iter &lt;- 10000 # number of iterations
 n.samp &lt;- 50    # number in each sample
-sim.diff &lt;- tibble(dd = numeric(length = n.iter)) # vector for output  
+sim.diff &lt;- tibble(dd = numeric(length = n.iter)) # to hold for output  
 
 for (zz in 1:n.iter) {
   s1 &lt;- rnorm(n.samp, mu.horn, sd.horn) # sample 1
@@ -3350,9 +3350,9 @@ diffs &lt;- numeric(length = reps)
 diffs[1] &lt;- mean(HL$horn_length[HL$group == &quot;alive&quot;]) -
   mean(HL$horn_length[HL$group == &quot;dead&quot;])
 
-for (i in 2:reps) {
+for (ii in 2:reps) {
   shuffle &lt;- sample(HL$horn_length)
-  diffs[i] &lt;- mean(shuffle[HL$group == &quot;alive&quot;]) -
+  diffs[ii] &lt;- mean(shuffle[HL$group == &quot;alive&quot;]) -
     mean(shuffle[HL$group == &quot;dead&quot;])
 }</pre>
 

@@ -3280,9 +3280,9 @@ head(SumSq)</pre>
 </article></slide><slide class=""><hgroup><h2>Minimizing Sums of Squares</h2></hgroup><article  id="minimizing-sums-of-squares-9">
 
 <pre class = 'prettyprint lang-r'># Iterate through slopes
-for (i in 1:nrow(SumSq)) {
-  theta_1 &lt;- SumSq$theta_1[i]
-  SumSq$SS[i] &lt;- ssPlot(X, Y, theta_1, do.plot = FALSE)
+for (ii in 1:nrow(SumSq)) {
+  theta_1 &lt;- SumSq$theta_1[ii]
+  SumSq$SS[ii] &lt;- ssPlot(X, Y, theta_1, do.plot = FALSE)
 }
 
 # Location of minimum SS
@@ -3432,8 +3432,8 @@ logLik(fm)</pre>
 
 <pre class = 'prettyprint lang-r'>b &lt;- seq(-10, 10, by = 0.01)
 lls &lt;- numeric(length(b))
-for (i in 1:length(b)) {
-  lls[i] &lt;- log_lik(b[i], X, Y)
+for (ii in 1:length(b)) {
+  lls[ii] &lt;- log_lik(b[ii], X, Y)
 }
 
 # Location of maximum log-likelihood

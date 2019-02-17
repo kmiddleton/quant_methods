@@ -210,9 +210,9 @@ head(SumSq)
 
 ```{r}
 # Iterate through slopes
-for (i in 1:nrow(SumSq)) {
-  theta_1 <- SumSq$theta_1[i]
-  SumSq$SS[i] <- ssPlot(X, Y, theta_1, do.plot = FALSE)
+for (ii in 1:nrow(SumSq)) {
+  theta_1 <- SumSq$theta_1[ii]
+  SumSq$SS[ii] <- ssPlot(X, Y, theta_1, do.plot = FALSE)
 }
 
 # Location of minimum SS
@@ -366,8 +366,8 @@ For a range of $b$ from -10 to 10 in increments of 0.01, calculate the log-likel
 ```{r}
 b <- seq(-10, 10, by = 0.01)
 lls <- numeric(length(b))
-for (i in 1:length(b)) {
-  lls[i] <- log_lik(b[i], X, Y)
+for (ii in 1:length(b)) {
+  lls[ii] <- log_lik(b[ii], X, Y)
 }
 
 # Location of maximum log-likelihood
