@@ -142,7 +142,7 @@ For each of the following, generate a set of values and plot a histogram. You ma
 
 ```
 
-Create a density plot for #3 and #6 above on the same plot. First create a single data frame with both sets and a column identifying each group.
+Now create a new plot consisting of a density plot for #3 and #6 above on a single plot. First create a single data frame with both sets and a column identifying each group.
 
 ```{r}
 
