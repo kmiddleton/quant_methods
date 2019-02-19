@@ -2,7 +2,6 @@
 title: "Hypothesis Testing"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -46,7 +45,7 @@ source("Shade_Distributions.R")
 ## Analytical
 
 - Calculate test statistic
-- Determine P - value (area under tail(s))
+- Determine *P*-value (area under tail(s))
 
 <div class="columns-2">
 
@@ -79,7 +78,7 @@ Data will always be on one side of H~0~ or the other.
 ## Analytical
 
 - Calculate test statistic
-- Determine P - value (area under tail(s))
+- Determine *P*-value (area under tail(s))
 
 <div class="columns-2">
 
@@ -315,7 +314,7 @@ Philosophical and practical problems have been raised since the 1960's.
 
 - In 1986, the *American Journal of Public Health* told all researchers wanting to publish in the journal that he would no longer accept results based on *P*-values (and then backed down 2 years later)
 - *Basic and Applied Social Psychology* banned *P*-values in 2015
-- In 2016, the American Statistical Association published a "Statement on p-Values: Context, Process, and Purpose" which critiqued the (mis)use of *P*-values.
+- In 2016, the American Statistical Association published a "Statement on *P*-Values: Context, Process, and Purpose" which critiqued the (mis)use of *P*-values.
 
 ## History
 
