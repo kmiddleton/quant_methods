@@ -29,7 +29,7 @@ library(cowplot)
 ## Problem
 
 <center>
-<img src="images/reddeer.png" width="90%" />
+<img src="https://i.imgur.com/GsL12KL.jpg" width="90%" />
 </center>
 
 ## Prediction
@@ -38,7 +38,7 @@ library(cowplot)
 > Predictor: Birth Date
 
 <center>
-<img src="images/deersurv.png" width="75%" />
+<img src="https://i.imgur.com/iUhj5fp.png" width="75%" />
 </center>
 
 ## Prediction
@@ -72,7 +72,7 @@ Possible predictors:
 > Outcome: Juvenile Survival
 
 <center>
-<img src="images/deerpath.png" width="80%" />
+<img src="https://i.imgur.com/QfNggMP.png" width="80%" />
 </center>
 
 
@@ -99,7 +99,7 @@ Possible predictors:
 ## What we want to avoid
 
 <center>
-<img src="images/Decision_Tree.png" width="80%" />
+<img src="https://i.imgur.com/tVpUUwY.png" width="80%" />
 </center>
 
 ## What we want to encourage
@@ -110,7 +110,7 @@ Possible predictors:
 - Make inferences
 
 <center>
-<img src="images/GLM_Flowchart.png" width="100%" />
+<img src="https://i.imgur.com/mLP3Qj3.png" width="100%" />
 </center>
 
 ## *Generalized* linear models
@@ -151,7 +151,7 @@ $Y$ follows some distribution (e.g., normal or binomial)
 ## Hierarchy of GLMs
 
 <center>
-<img src="images/GeneralizedLinearModels.png" width="100%" />
+<img src="https://i.imgur.com/sdx4fMz.png" width="100%" />
 </center>
 
 ## No quiz for this lecture
@@ -159,4 +159,3 @@ $Y$ follows some distribution (e.g., normal or binomial)
 Watch Lecture 07-2
 
 ## References {.references}
-
