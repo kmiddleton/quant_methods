@@ -2,7 +2,6 @@
 title: "Linear Models: Multiple Categories"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -21,13 +20,13 @@ source("Shade_Distributions.R")
 ## Hierarchy of GLMs
 
 <center>
-<img src="images/GeneralizedLinearModels.png" width="100%" />
+<img src="https://i.imgur.com/sdx4fMz.png" width="100%" />
 </center>
 
 ## Problem
 
 <center>
-<img src="images/reddeer.png" width="90%" />
+<img src="https://i.imgur.com/GsL12KL.jpg" width="90%" />
 </center>
 
 ## Prediction
@@ -73,13 +72,12 @@ Now predict with three or more groups
 <div class="columns-2">
 
 <center>
-<img src="https://s-media-cache-ak0.pinimg.com/736x/ec/0c/7a/ec0c7a667bd469ca26ca42aedeb36446.jpg" width="100%" />
+<img src="https://i.imgur.com/X8kUEJq.jpg" width="100%" />
 <br />
 <br />
 <br />
 
 </center>
-
 
 - 3 groups
     - No light (control)
@@ -126,13 +124,12 @@ $F$-statistic is the ratio of the two.
 <div class="columns-2">
 
 <center>
-<img src="https://s-media-cache-ak0.pinimg.com/736x/ec/0c/7a/ec0c7a667bd469ca26ca42aedeb36446.jpg" width="100%" />
+<img src="https://i.imgur.com/X8kUEJq.jpg" width="100%" />
 <br />
 <br />
 <br />
 
 </center>
-
 
 - 3 groups
     - No light (control)

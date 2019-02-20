@@ -2,7 +2,6 @@
 title: "Linear Models: In Class"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -141,7 +140,7 @@ coef(fm)
 <br />
 <br />
 <br />
-<img src="images/semi1.png" width="75%" />
+<img src="https://i.imgur.com/6nLlp1w.png" width="75%" />
 <br />
 <br />
 <br />
@@ -173,7 +172,7 @@ $$\frac{Variation~in~Y~explained~by~X1}{Total~Variation~in~Y}$$
 What regression does:
 
 <center>
-<img src="images/semi2.png" width="50%" />
+<img src="https://i.imgur.com/knphmqx.png" width="50%" />
 </center>
 
 <br />
@@ -243,7 +242,7 @@ $$\frac{Variation~in~Y~explained~by~X1}{Variation~not~explained~by~X2}$$
 Another method:
 
 <center>
-<img src="images/semi3.png" width="50%" />
+<img src="https://i.imgur.com/K6yCJcW.png" width="50%" />
 </center>
 
 <br />
