@@ -142,6 +142,6 @@ Each line contains a hypothesis test of estimate = 0.
 
 ## Quiz 06-1
 
-Complete Quiz 06-1 (a littler longer than usual)
+Complete Quiz 06-1 (a little longer than usual)
 
 Watch Lecture 06-2

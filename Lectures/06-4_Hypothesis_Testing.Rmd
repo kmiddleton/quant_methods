@@ -27,7 +27,7 @@ source("Shade_Distributions.R")
 - Curran-Everett and Benos [-@Curran-Everett2007-nk]: Guidelines for reporting statistics in journals published by the *American Physiological Society*: the sequel
 - Gelman and Stern [-@Gelman2006-xj]: The difference between "significant" and "not significant" is not itself statistically significant
 - Ioannidis [-@Ioannidis2005-od]: Why most published research findings are false
-- Jager and Leek [-@Jager2013-lw]: An estimate of the science-wise false discovery rate and application to the top medical literature
+- Jager and Leek [-@Jager2014-lw]: An estimate of the science-wise false discovery rate and application to the top medical literature
 - Kruschke [-@Kruschke2010-xg]: What to believe: Bayesian methods for data analysis
 - Leek and Peng [-@Leek2015-xj]: *P* values are just the tip of the iceberg
 - Young et al. [-@Young2008-gy]: Why current publication practices may distort science

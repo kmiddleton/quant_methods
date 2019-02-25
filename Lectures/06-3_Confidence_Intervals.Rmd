@@ -79,7 +79,7 @@ ggplot() +
   geom_line(data = norm, aes(x, y)) +
   scale_color_manual(values = pal, name = "Degrees of\nFreedom") +
   labs(x = "x", y = "Relative Likelihood") +
-  theme(legend.position = c(0.9, 0.75))
+  theme(legend.position = c(0.85, 0.75))
 ```
 
 ## Calculating exact confidence intervals

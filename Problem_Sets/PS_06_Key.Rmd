@@ -139,8 +139,8 @@ Because you have data on individual-level survival of salmon, you might be tempt
 
 ```{r echo=FALSE}
 M <- tibble(Survival = c("Survived", "Did not survive"),
-                `Trout absent` = c(946, 3470),
-                `Trout present` = c(919, 3876))
+            `Trout absent` = c(946, 3470),
+            `Trout present` = c(919, 3876))
 knitr::kable(M)
 ```
 
