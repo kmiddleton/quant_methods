@@ -1,7 +1,7 @@
 library(tidyverse)
 
 set.seed(993255)
-SSD<-data_frame(
+SSD<-tibble(
   Species=c(rep("Pardosa_ramulosa",100),rep("Nephila_clavipes",100)),
   Sex = c(rep(c('M','F'),each=50,times=2)),
   BodyLength = c(rnorm(50,5),rnorm(50,6),rnorm(50,20,3),rnorm(50,50,10)),

@@ -7,7 +7,7 @@ mu2 <- 5.2
 sd1 <- 2
 sd2 <- 2
 
-M <- data_frame(y = c(rnorm(n, mu1, sd1),
+M <- tibble(y = c(rnorm(n, mu1, sd1),
                       rnorm(n, mu2, sd2)),
                 grp = factor(rep(c("A", "B"), each = n)))
 

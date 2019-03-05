@@ -7,7 +7,7 @@ set.seed(4872364)
 
 n <- 20
 
-M <- data_frame(
+M <- tibble(
   Area = c(rnorm(n, 8, 2), rnorm(n, 16, 2)),
   Treatment = fct_inorder(rep(c("Antibacterial", "Control"), each = n))
 )
