@@ -15,7 +15,6 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
-library(forcats)
 
 library(knitr)
 ```
@@ -28,8 +27,8 @@ Before we try the simulation, we will learn apply. `apply()` is part of a family
 
 ```{r}
 ap.test <- tibble(x1 = seq(1, 10),
-                      x2 = rep(5, 10),
-                      x3 = seq(20, 65, length = 10))
+                  x2 = rep(5, 10),
+                  x3 = seq(20, 65, length.out = 10))
 
 # Built in R funtions
 (max.ap.row <- apply(ap.test, 1, max))
@@ -56,9 +55,9 @@ Now let's try our simulation. We will simulate two groups that have different me
     - Set up the function to return the F-value
     - Test out your function to see that it works.
 
-2) Set up a `data.frame()` with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).
+2) Set up a `data.frame()` or `tibble()` with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).
 
-3) Use apply to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful about the order you pass the values to your function and the order your function is expecting them to be in.
+3) Use `apply()` to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful about the order you pass the values to your function and the order your function is expecting them to be in.
 
 4) Plot the F-value vs. the standard deviation. Add a horizontal line at the critical value for an $\alpha$ of 0.05.
 
@@ -132,7 +131,7 @@ Think of all the variables in this simulation. Which should be altered to change
 
 What do you think is the lower limit of F (i.e., if you increased the standard deviation difference to a very large number)?
 
-> F assymtotes at 0.
+> F asymptotes at 0.
 
 ## Predicting height from limb lengths
 
@@ -153,13 +152,13 @@ We should be able to predict someone's height from the lengths of their limbs. T
 
 ### Activity
 
-Load the data for limb lengths. Use `summarize_each()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
+Load the data for limb lengths. Use `summarize_all()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
 
 ```{r}
 # FIXME
 M <- read_csv("../data/Limb_Lengths.csv")
 M %>% head()
-M %>% summarize_each(funs = c("mean", "sd"))
+M %>% summarize_all(.funs = c("mean", "sd"))
 ```
 
 Make two plots, one for left limb length vs. height and one for right limb length vs. height. Use `plot_grid()` to put them side by side.
@@ -222,9 +221,7 @@ str(M)
 
 Notice that `Mismatch_Degree` is currently a character vector. To use it in a linear model, we need to convert it to a factor. We could do this with R's built-in function `factor()`. The drawback is that, by default, `factor()` will order the factors in alphabetical order. For these data, the alphabetical order will put the `High` mismatch first, which is not ideal. We want to have `Low` come first.
 
-[`forcats`](https://blog.rstudio.org/2016/08/31/forcats-0-1-0/) is a package that greatly simplifies working with factors in R. It has functions to create factors in the order that they appear in the data.frame, in the order of frequency, and in any arbitrary order.
-
-Add `library(forcats)` to the setup chunk at the beginning of this file. You might have to install the `forcats` package as well.
+[`forcats`](https://forcats.tidyverse.org/) is a package that greatly simplifies working with factors in R. It has functions to create factors in the order that they appear in the data.frame, in the order of frequency, and in any arbitrary order. `forcats` is built into the tidyverse, so you do not need to load it separately.
 
 Because the data or organized so that the `Low` group is first, we can use `fct_inorder()` to make the factor in the sequence that we want.
 
@@ -294,7 +291,9 @@ What does removing the intercept term from an ANOVA linear model do?
 
 ## Bird abundance
 
-The file `Birds.xlsx` contains data from Vuilleumier, F. (1970) Insular Biogeography in Continental Regions. I. The Northern Andes of South America. *American Naturalist* 104:373-388. This paper explores the numbers of bird species in isolated "islands" of paramo vegetation in the Andes. The Missouri Botanical Garden can explain it better than me (http://bit.ly/1PNWfsq):
+The file `Birds.xlsx` contains data from Vuilleumier, F. (1970) Insular Biogeography in Continental Regions. I. The Northern Andes of South America. *American Naturalist* 104:373-388.
+
+This paper explores the numbers of bird species in isolated "islands" of paramo vegetation in the Andes. The Missouri Botanical Garden can explain it better than we can (http://bit.ly/1PNWfsq):
 
 > Within the tropical regions of Mexico, Central and South America, Africa, Malesia including New Guinea, and Hawaii, there is a vegetation type that occurs between the upper limit of continuous, closed-canopy forest (i.e., forest line or timberline) and the upper limit of plant life (i.e., snow line) that is characterized by tussock grasses, large rosette plants, shrubs with evergreen, coriaceous and sclerophyllous leaves, and cushion plants.  This vegetation type is scattered along the crests of the highest mountain ranges or on isolated mountaintops between about 3000 meters (m) and 5000 m, like islands in a sea of forest.
 
@@ -344,7 +343,8 @@ Fit a linear model wherein species abundance is predicted by the other four vari
 
 ```{r}
 # FIXME
-fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador, data = M)
+fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
+         data = M)
 ```
 
 Use `summary()` to get information about the model fit.
