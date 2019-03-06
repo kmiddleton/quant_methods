@@ -23,6 +23,31 @@ knit_hooks$set(webgl = hook_webgl)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
+## Plotting skills
+
+<div class="columns-2">
+
+<center>
+<br />
+<br />
+<img src="https://press.princeton.edu/sites/default/files/styles/large/public/covers/9780691181622_0.png" width="75%" />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+</center>
+
+*Data Visualization: A practical introduction*
+
+- Kieran Healy
+- http://socviz.co/
+
+Edward Tufte: https://www.edwardtufte.com/
+
+</div>
+
 ## Multiple regression
 
 ```{r, fig.height = 4, echo=FALSE}
@@ -30,7 +55,7 @@ milk <- read_excel("../data/Milk.xlsx", na = "NA")
 M <- milk %>% select(species, kcal.per.g, perc.fat, perc.lactose) %>%
   drop_na()
 names(M) <- c("Species", "Milk_Energy", "Fat", "Lactose")
-ggscatmat(as.data.frame(M), columns = 2:4)
+ggscatmat(M, columns = 2:4)
 ```
 
 ## Multiple regression {.smaller}

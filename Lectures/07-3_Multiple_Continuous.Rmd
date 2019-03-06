@@ -37,7 +37,7 @@ library(wesanderson)
 
 Possible predictors:
 
-- Birth date  
+- Birth date
 - Birth mass
 - Year
 - Sex
@@ -96,7 +96,7 @@ M <- data.frame(X, Y)
 fm <- lm(Y ~ X, M)
 M$fit <- fm$fitted.values
 
-p1 <- M %>% 
+p1 <- M %>%
   ggplot(aes(X, Y)) +
   geom_smooth(method = "lm", se = FALSE) +
   geom_point()
@@ -117,7 +117,7 @@ M <- data.frame(X, Y)
 fm <- lm(Y ~ X, M)
 M$fit <- fm$fitted.values
 
-p1 <- M %>% 
+p1 <- M %>%
   ggplot(aes(X, Y)) +
   geom_smooth(method = "lm", se = FALSE) +
   geom_segment(aes(x = X, xend = X, y = Y, yend = fit),
@@ -126,7 +126,7 @@ p1 <- M %>%
 
 res <- fm$residuals
 
-p2 <- tibble(res) %>% 
+p2 <- tibble(res) %>%
   ggplot(aes(res)) +
   geom_dotplot() +
   labs(x = "Residual", y = "Relative Count")
@@ -184,7 +184,7 @@ plot3d(M$Fat, M$Lactose, M$Milk_Energy,
 
 ```{r, fig.height = 4}
 library(GGally)
-ggscatmat(as.data.frame(M), columns = 2:4)
+ggscatmat(M, columns = 2:4)
 ```
 
 ## Multiple regression {.smaller}
@@ -306,7 +306,7 @@ plot_grid(milk_res_lact, milk_res_fat, ncol = 2)
 High correlation between predictors leaves little residual variation to be used for explaining the outcome variable.
 
 ```{r echo=FALSE}
-ggscatmat(as.data.frame(M), columns = 2:4)
+ggscatmat(M, columns = 2:4)
 ```
 
 ## Masking
@@ -348,7 +348,7 @@ plot_grid(p2, p1, ncol = 2)
 ## Visualizing
 
 ```{r, echo=FALSE}
-ggscatmat(as.data.frame(M), columns = c(2, 4, 5))
+ggscatmat(M, columns = c(2, 4, 5))
 ```
 
 ## Bivariate model of Neocortex {.smaller}

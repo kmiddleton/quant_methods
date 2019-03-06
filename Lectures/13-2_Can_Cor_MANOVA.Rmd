@@ -83,7 +83,7 @@ MVnorm <- function(n, rho, mu, lab, sigma = 1) {
                     rho * sigma ^ 2, sigma ^ 2), 2)
   x <- MASS::mvrnorm(n, mu, Sigma, empirical = TRUE)
   colnames(x) <- paste0(lab, 1:2)
-  return(x)  
+  return(x)
 }
 ```
 
@@ -195,7 +195,7 @@ plot_grid(p1, p2, ncol = 2)
 ## Head measurements
 
 ```{r}
-ggscatmat(as.data.frame(M))
+ggscatmat(M)
 ```
 
 ## Head measurements
@@ -261,7 +261,7 @@ Directional:
 3. MANCOVA: *p* Continuous ~ *q* Categorical + *r* Continuous
 4. (Multiple) correspondence analysis: *p* Categorical ~ *q* Categorical
 
-MANOVA creates a composite variable from the set of outcome variables and asks whether the groups differ. 
+MANOVA creates a composite variable from the set of outcome variables and asks whether the groups differ.
 
 ## General approach
 
@@ -308,7 +308,7 @@ str(M)
 ## Drug testing
 
 ```{r warning=FALSE}
-ggscatmat(as.data.frame(M), 1:3, color = "Treatment")
+ggscatmat(M, 1:3, color = "Treatment")
 ```
 
 ## Drug testing
@@ -355,7 +355,7 @@ M <- M %>% mutate(Origin = factor(Origin))
 ## Tibetan skulls
 
 ```{r echo=FALSE}
-ggscatmat(as.data.frame(M), 1:5, color = "Origin") +
+ggscatmat(M, 1:5, color = "Origin") +
   theme(text = element_text(size = 9),
         axis.text = element_text(size = 6),
         axis.text.x = element_text(angle = -90, vjust = 0.5))

@@ -34,7 +34,7 @@ Load the Excel file, and convert hormone and sex to factors. The levels of `Trea
 
 ```{r, message = FALSE}
 # FIXME
-M <- read_excel("../data/Bird_Plasma.xlsx") %>% 
+M <- read_excel("../data/Bird_Plasma.xlsx") %>%
   mutate(Treatment = factor(Treatment),
          Sex = factor(Sex),
          Treatment = fct_relevel(Treatment, "None"))
@@ -101,7 +101,7 @@ Read in the data and convert both Treatment and Block into factors. It is especi
 
 ```{r, message = FALSE}
 # FIXME
-M <- read_csv("../data/Zooplankton.csv") %>% 
+M <- read_csv("../data/Zooplankton.csv") %>%
   mutate(Treatment = factor(Treatment),
          Block = factor(Block))
 ```
@@ -110,10 +110,10 @@ Make two plots, one in which Treatment is on the x axis and Block is encoded by 
 
 ```{r}
 # FIXME
-M %>% 
+M %>%
   ggplot(aes(x = Treatment, y = Zooplankton, color = Block)) +
   geom_point()
-M %>% 
+M %>%
   ggplot(aes(x = Block, y = Zooplankton, color = Treatment)) +
   geom_point()
 ```
@@ -123,7 +123,7 @@ We want to test for significant differences in Treatment while accounting for th
 1. `lm()` and `anova()` with an additive model including Treatment and Block
 2. `lme()` from the `nlme` package with Block as a random effect
 
-Fit both of these models 
+Fit both of these models
 
 ```{r}
 fm_lm <- lm(Zooplankton ~ Treatment + Block, M)
@@ -146,7 +146,7 @@ We will fit this model in two ways: using `anova(lm())` and using `lme()`. There
 
 ### Activity
 
-Load the data in `G44_Morphometrics.xlsx` and plot the two measurements for head height (`HeadHt`) against one another. 
+Load the data in `G44_Morphometrics.xlsx` and plot the two measurements for head height (`HeadHt`) against one another.
 
 ```{r echo=FALSE}
 M <- read_excel("../data/G44_Morphometrics.xlsx")
@@ -160,7 +160,7 @@ ggplot(M, aes(HeadHt1, HeadHt2)) +
 Based on your plot, do you expect repeatability to be high or low? Give an estimate?
 
 > The points are very close to the line, so repeatability should be large (> 0.9).
- 
+
 Follow the example from lecture to calculate repeatability of the head height (`HeadHt`) measurement using `anova(lm())`.
 
 ```{r}
@@ -174,7 +174,7 @@ var_a <- (fm$'Mean Sq'[1] - fm$'Mean Sq'[2]) / 2
 var_a / (var_a + fm$'Mean Sq'[2])
 ```
 
-Calculate repeatability of the head height (HeadHt) measurement using `lme()` with MouseID treated as a random effect. 
+Calculate repeatability of the head height (HeadHt) measurement using `lme()` with MouseID treated as a random effect.
 
 1) Fit a linear model using `lme()` with MouseID treated as a random effect.
 
@@ -187,13 +187,13 @@ fm_lme <- lme(HeadHt ~ 1,
 ```
 
 2) Extract the coefficients of your model. Compare these with the means for each MouseID. Hint: `group_by()` and `summarize()` will help here. What is the relationship between the intercept estimates and the means calculated for each MouseID??
- 
+
 > The numbers are very similar.
 
 ```{r}
 head(coef(fm_lme))
 
-MouseMeans <- Heads %>% group_by(MouseID) %>% summarize(mean(HeadHt)) 
+MouseMeans <- Heads %>% group_by(MouseID) %>% summarize(mean(HeadHt))
 head(MouseMeans)
 ```
 
@@ -214,7 +214,7 @@ print(var.among, digits = 4)
 4) Using the same procedure that you used to calculate the per-mouse means, also calculate the per-mouse variances. What is the relationship between the mean of the variances per MouseID and the variances from `VarCorr()`?
 
 ```{r}
-MouseVars <- Heads %>% group_by(MouseID) %>% summarize(var(HeadHt)) 
+MouseVars <- Heads %>% group_by(MouseID) %>% summarize(var(HeadHt))
 MouseVars <- as.data.frame(MouseVars)
 
 print(mean(as.numeric(MouseVars[, 2])), digits = 4)
@@ -229,19 +229,19 @@ We will use data on the effects of a drug on fever, blood pressure, and pain. Th
 
 ### Activity
 
-First read in the data (`Drug_test.xlsx`) and make `Treatment` a factor. You will need to make "Placebo" as the base level of the factor.     
+First read in the data (`Drug_test.xlsx`) and make `Treatment` a factor. You will need to make "Placebo" as the base level of the factor.
 
 ```{r}
-M <- read_excel("../data/Drug_test.xlsx") %>% 
+M <- read_excel("../data/Drug_test.xlsx") %>%
   mutate(Treatment = factor(Treatment),
          Treatment = fct_relevel(Treatment, "Placebo"))
 str(M)
 ```
 
-Use `ggscatmat()` to visualize the relationships between our predictors: `Fever`, `BP`, and `Pain`. Color your points by treatment. 
+Use `ggscatmat()` to visualize the relationships between our predictors: `Fever`, `BP`, and `Pain`. Color your points by treatment.
 
 ```{r}
-ggscatmat(as.data.frame(M), 1:3, color = "Treatment")
+ggscatmat(M, 1:3, color = "Treatment")
 ```
 
 Are there any concerning patterns in the data?
@@ -275,7 +275,7 @@ The authors were interested in determining whether the odds of cancer differed i
 Read in the data, and convert all the variables to factors. Look at the help for `mutate_each()` for a shortcut.
 
 ```{r message = FALSE}
-M <- read_csv("../data/Aspirin.csv") %>% 
+M <- read_csv("../data/Aspirin.csv") %>%
   mutate_each("factor")
 str(M)
 ```

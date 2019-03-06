@@ -142,7 +142,7 @@ Fitting in R:
 ```{r}
 set.seed(4)
 rainfall <- c(runif(20, 100, 160),
-              runif(20, 160, 210)) 
+              runif(20, 160, 210))
 presence <- c(rbinom(20, 1, 0.15),
               rbinom(20, 1, 0.95))
 LogReg <- data.frame(Rainfall = rainfall,
@@ -177,11 +177,11 @@ logistic.display(fm)
 
 ```{r log_plot, eval=FALSE}
 ggplot(LogReg, aes(x = Rainfall,
-                   y = as.numeric(Presence) - 1)) + 
+                   y = as.numeric(Presence) - 1)) +
   geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
   geom_smooth(method = "glm",
               method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
+              se = FALSE, size = 2) +
   geom_point(size = 3) +
   ylab("Probability of Presence") +
   xlab("Rainfall (cm/y)") +
@@ -237,11 +237,11 @@ logistic.display(fm)
 
 ```{r echo=FALSE}
 ggplot(M, aes(x = salinity,
-              y = as.numeric(Solea_solea) - 1)) + 
+              y = as.numeric(Solea_solea) - 1)) +
   geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
   geom_smooth(method = "glm",
               method.args = list(family = "binomial"),
-              se = FALSE, size = 2) + 
+              se = FALSE, size = 2) +
   geom_point(size = 3) +
   ylab("Probability of Presence") +
   xlab("Salinity") +
@@ -259,7 +259,7 @@ M <- M %>% mutate(Origin = factor(Origin))
 ## Tibetan skulls
 
 ```{r echo=FALSE}
-ggscatmat(as.data.frame(M), 1:5, color = "Origin") +
+ggscatmat(M, 1:5, color = "Origin") +
   theme(text = element_text(size = 9),
         axis.text = element_text(size = 6),
         axis.text.x = element_text(angle = -90, vjust = 0.5))

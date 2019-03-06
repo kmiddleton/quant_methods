@@ -46,7 +46,7 @@ M <- M %>% mutate(Origin = factor(Origin))
 ## Tibetan skulls
 
 ```{r echo=FALSE}
-ggscatmat(as.data.frame(M), 1:5, color = "Origin") +
+ggscatmat(M, 1:5, color = "Origin") +
   theme(text = element_text(size = 9),
         axis.text = element_text(size = 6),
         axis.text.x = element_text(angle = -90, vjust = 0.5))
@@ -105,7 +105,7 @@ glimpse(iris)
 Anderson, E. 1935. The irises of the Gaspe Peninsula. *Bulletin of the American Iris Society* 59: 2–5.
 
 ```{r echo=FALSE}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
   geom_point()
 ```
 
@@ -167,7 +167,7 @@ new_iris <- data.frame(Sepal.Length = c(6.11),
 ## Predicting a new observation
 
 ```{r echo=FALSE, fig.height = 2.5}
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
   geom_point() +
   geom_point(data = new_iris, color = "red", size = 3)
 ```
@@ -183,7 +183,7 @@ new_iris <- data.frame(Sepal.Length = c(6.11),
                        Sepal.Width = c(3.55),
                        Petal.Length = c(5.05),
                        Petal.Width = c(1.66))
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
   geom_point() +
   geom_point(data = new_iris, color = "red", size = 3)
 ```
@@ -195,7 +195,7 @@ predict(iris.lda, new_iris)
 ## Tibetan skulls
 
 ```{r}
-M <- read_excel("../data/Tibetan_Skulls.xlsx") %>% 
+M <- read_excel("../data/Tibetan_Skulls.xlsx") %>%
   mutate(Origin = factor(Origin)) %>%
   as.data.frame()
 str(M)
@@ -228,8 +228,8 @@ Skull measurements of oreodonts
 ## Oreodonts
 
 ```{r}
-M <- read_excel("../data/Oreodont.xlsx") %>% 
-  mutate(Sex = factor(Sex)) %>% 
+M <- read_excel("../data/Oreodont.xlsx") %>%
+  mutate(Sex = factor(Sex)) %>%
   as.data.frame()
 ```
 
