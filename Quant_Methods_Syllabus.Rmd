@@ -126,19 +126,18 @@ _#_  | _Date_  | _Topic_                          |
 00   | F 1/18  | Pre-workshop. Installing R, etc. |
 01   | F 1/25  | Reproducible research, programming with data |
 02   | F 2/01  | Data cleaning, organization, visualization |
-03   | F 2/08  | Basic probability |
-04   | F 2/15  | Likelihood, Bayesian concepts, frequentist framework |
-05   | F 2/22  | Applications of three inference frameworks |
+03   | F 2/08  | Probability and distributions |
+04   | F 2/15  | Likelihood, Bayesian, and frequentist frameworks |
+05   | F 2/22  | Central tendency, differences of means, linear regression |
 06   | F 3/01  | Parameter estimation, significance testing |
-07   | F 3/08  | Randomization, multiple testing |
-08   | F 3/15  | Generalized linear models |
-09   | F 3/22  | Generalized linear models |
-10   | F 4/05  | Model comparison, model based inference |
+07   | F 3/08  | Multiple predictors |
+08   | F 3/15  | Partitioning variance, interctions, multilevel models |
+09   | F 3/22  | Model comparison, model based inference, cross-validation |
+10   | F 4/05  | Distribution free methods, permutation tests |
 11   | F 4/12  | Kinship and phylogenetic methods |
 12   | F 4/19  | Multiple comparisons procedures |
-13   | F 4/26  | Composite variables |
-14   | F 5/03  | Composite variables |
-15   | F 5/10  | Experimental design |
+13   | F 4/26  | Composite variables, classification |
+14   | F 5/03  | Experimental design, power analysis |
 
 Other key dates:
 
