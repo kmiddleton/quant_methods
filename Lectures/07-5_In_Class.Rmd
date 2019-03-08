@@ -16,11 +16,9 @@ library(ggrepel)
 library(cowplot)
 library(readxl)
 library(knitr)
-# library(rgl)
 library(GGally)
 library(knitr)
 library(ggforce)
-# knit_hooks$set(webgl = hook_webgl)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -107,29 +105,32 @@ head(M)
 ```{r echo=FALSE}
 desc <- 'Large negative residual'
 
-ggplot(M, aes(Lactose, Fat, label = Species)) +
+F_v_L <- ggplot(M, aes(Lactose, Fat, label = Species)) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") +
   geom_point() +
-  labs(x = "Percent Lactose", y = "Percent Fat") +
-  geom_mark_ellipse(aes(filter = Species == "Callimico goeldii",
-                        description = desc),
-                    label.buffer = unit(50, "mm")) +
-  geom_text_repel(size = 3, force = 15)
+  labs(x = "Percent Lactose", y = "Percent Fat")
+print(F_v_L +
+        geom_text_repel(size = 3, force = 15) +
+        geom_mark_ellipse(aes(filter = Species == "Callimico goeldii",
+                              description = desc),
+                          label.buffer = unit(50, "mm")))
 ```
 
 ## Estimate `Fat` coefficient
 
 ```{r echo=FALSE}
-ggplot(M, aes(resid_Lact, Milk_Energy,
-                               label = Species)) +
+milk_res_lact <- ggplot(M, aes(resid_Lact, Milk_Energy, label = Species)) +
   geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf), fill = "gray80") +
   geom_vline(xintercept = 0, color = "blue") +
   geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
   geom_point() +
-  labs(x = "Residual Fat Percent", y = "Milk Energy") +
-  annotate(geom = "label", x = -5.4, y = 0.97, label = "Less fat than predicted",
-           color = "red", size = 5) +
-  geom_text_repel(size = 3, force = 15)
+  labs(x = "Residual Fat Percent", y = "Milk Energy")
+print(milk_res_lact +
+        annotate(geom = "label", x = -5.4, y = 0.97, label = "Less fat than predicted",
+                 color = "red", size = 5) +
+        geom_text_repel(size = 3, force = 15) +
+        geom_mark_ellipse(aes(filter = Species == "Callimico goeldii"),
+                          label.fontsize = 8))
 ```
 
 ## Estimate `Fat` coefficient
@@ -152,26 +153,27 @@ M$resid_Fat <- residuals(fm_Fat)
 ## Estimate `Lactose` coefficient
 
 ```{r echo=FALSE}
-ggplot(M, aes(Fat, Lactose, label = Species)) +
+L_v_F <- ggplot(M, aes(Fat, Lactose, label = Species)) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") +
   geom_point() +
-  labs(y = "Percent Lactose", x = "Percent Fat") +
-  geom_text_repel(size = 3, force = 15)
+  labs(y = "Percent Lactose", x = "Percent Fat")
+print(L_v_F +
+        geom_text_repel(size = 3, force = 15))
 ```
 
 ## Estimate `Lactose` coefficient
 
 ```{r echo=FALSE}
-ggplot(M, aes(resid_Fat, Milk_Energy,
-                              label = Species)) +
+milk_res_fat <- ggplot(M, aes(resid_Fat, Milk_Energy, label = Species)) +
   geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf), fill = "gray80") +
   geom_vline(xintercept = 0, color = "blue") +
   geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
   geom_point() +
-  labs(x = "Residual Lactose Percent", y = "Milk Energy") +
-  annotate(geom = "label", x = -4.4, y = 0.97, label = "Less lactose than predicted",
-           color = "red", size = 5) +
-  geom_text_repel(size = 3, force = 15)
+  labs(x = "Residual Lactose Percent", y = "Milk Energy")
+print(milk_res_fat +
+        annotate(geom = "label", x = -4.4, y = 0.97, label = "Less lactose than predicted",
+                 color = "red", size = 5) +
+        geom_text_repel(size = 3, force = 15))
 ```
 
 ## Estimate `Lactose` coefficient
