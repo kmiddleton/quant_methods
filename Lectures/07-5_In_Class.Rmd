@@ -16,11 +16,11 @@ library(ggrepel)
 library(cowplot)
 library(readxl)
 library(knitr)
-library(rgl)
+# library(rgl)
 library(GGally)
 library(knitr)
 library(ggforce)
-knit_hooks$set(webgl = hook_webgl)
+# knit_hooks$set(webgl = hook_webgl)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -66,6 +66,31 @@ fm <- lm(Milk_Energy ~ Fat + Lactose, data = M)
 summary(fm)
 ```
 
+## Relationshps between variables
+
+<div class="columns-2">
+
+<center>
+<br />
+<br />
+<br />
+<img src="https://i.imgur.com/6nLlp1w.png" width="75%" />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+</center>
+
+What is the independent contribution of X1 to Y?
+
+How much variation does X1 alone explain in Y?
+
+</div>
+
 ## Estimate `Fat` coefficient
 
 1. Use `Lactose` to predict `Fat`, which will take the effect of `Lactose` out of the model when we predict `Milk_Energy`
@@ -102,7 +127,7 @@ ggplot(M, aes(resid_Lact, Milk_Energy,
   geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
   geom_point() +
   labs(x = "Residual Fat Percent", y = "Milk Energy") +
-  annotate(geom = "label", x = -5.4, y = 0.97, label = "Less energy than predicted",
+  annotate(geom = "label", x = -5.4, y = 0.97, label = "Less fat than predicted",
            color = "red", size = 5) +
   geom_text_repel(size = 3, force = 15)
 ```
@@ -144,7 +169,7 @@ ggplot(M, aes(resid_Fat, Milk_Energy,
   geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
   geom_point() +
   labs(x = "Residual Lactose Percent", y = "Milk Energy") +
-  annotate(geom = "label", x = -4.4, y = 0.97, label = "Less energy than predicted",
+  annotate(geom = "label", x = -4.4, y = 0.97, label = "Less lactose than predicted",
            color = "red", size = 5) +
   geom_text_repel(size = 3, force = 15)
 ```
@@ -288,13 +313,13 @@ Another method:
 
 1) Perform:
 
-- Y ~ X2
+    - Y ~ X2
 
 2) Get residuals
 
 3) Perform:
 
-- Residuals ~ X1
+    - Residuals ~ X1
 
 </div>
 
