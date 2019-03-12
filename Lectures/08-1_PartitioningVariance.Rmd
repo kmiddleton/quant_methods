@@ -2,7 +2,6 @@
 title: "General(ized) Linear Models: Partitioning Variance"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -28,7 +27,7 @@ knitr::opts_chunk$set(cache = TRUE)
 > How much of the variation in the outcome variable is explained by the predictor variables?
 
 <center>
-<img src="images/GeneralizedLinearModels.png" width="80%" />
+<img src="https://i.imgur.com/E2Gu7ke.png" width="80%" />
 </center>
 
 ## Multiple Regression Makes a Composite Variable
@@ -98,7 +97,7 @@ $F$-statistic is the ratio of the two.
 ## Visualizing ANOVA
 
 <center>
-<img src="images/JetLag_Means.png" width="100%" />
+<img src="https://i.imgur.com/dNF4ph0.png" width="100%" />
 </center>
 
 $$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
@@ -148,7 +147,7 @@ $$\mbox{Measurement} \sim \mbox{Specimen ID}$$
 ## Repeatability of caliper measurements
 
 <center>
-<img src="images/Mouse_Bones.png" width="40%" />
+<img src="https://i.imgur.com/FRd1Apz.png" width="40%" />
 </center>
 
 ## Calculation of ICC {.smaller}
@@ -203,7 +202,7 @@ ICC is 0.999 for these measurements.
 - Repeatability
 
 <center>
-<img src="images/Learning_ind.png" width="60%" />
+<img src="https://i.imgur.com/PIcJusE.png" width="60%" />
 </center>
 
 ## Quiz 08-1

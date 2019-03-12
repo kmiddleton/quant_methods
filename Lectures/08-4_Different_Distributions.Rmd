@@ -196,7 +196,7 @@ ggplot(LogReg, aes(x = Rainfall,
 ## Presence of sole
 
 <center>
-<img src="images/solea.jpg" width="100%" />
+<img src="https://i.imgur.com/tippc8A.jpg" width="100%" />
 </center>
 
 ## Presence of sole

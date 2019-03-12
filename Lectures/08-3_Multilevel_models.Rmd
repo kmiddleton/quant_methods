@@ -2,7 +2,6 @@
 title: "General(ized) Linear Models: Multilevel Models"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -20,6 +19,7 @@ library(cowplot)
 library(dplyr)
 library(tidyr)
 library(wesanderson)
+library(car)
 ```
 
 ## Notes
@@ -138,39 +138,39 @@ Where $\mbox{Random}$ can be:
 ## Turning flight in hummingbirds
 
 <center>
-<img src="images/WCB/WCB_img.004.png" width="100%" />
+<img src="https://i.imgur.com/Sacnb48.png" width="100%" />
 </center>
 
 ## Turning flight in hummingbirds
 
 <center>
-<img src="images/WCB/WCB_img.005.png" width="80%" />
+<img src="https://i.imgur.com/Z144W14.png" width="80%" />
 </center>
 
 ## Turning flight in hummingbirds
 
 <center>
-<img src="images/WCB/WCB_img.008.png" width="80%" />
+<img src="https://i.imgur.com/iFspGbe.png" width="80%" />
 </center>
 
 ## Turning flight in hummingbirds
 
 <center>
-<img src="images/WCB/WCB_img.010.png" width="80%" />
-</center>
-
-
-## Turning flight in hummingbirds
-
-<center>
-<img src="images/Bird_5.png" width="55%" />
+<img src="https://i.imgur.com/gWAgxud.png" width="80%" />
 </center>
 
 
 ## Turning flight in hummingbirds
 
 <center>
-<img src="images/Bird_6.png" width="80%" />
+<img src="https://i.imgur.com/7tQutuc.png" width="55%" />
+</center>
+
+
+## Turning flight in hummingbirds
+
+<center>
+<img src="https://i.imgur.com/D0o9y6J.png" width="80%" />
 </center>
 
 ## Hierarchical structure
@@ -221,7 +221,7 @@ Among the options for R packages:
 ## *Loligo forbesii*
 
 <center>
-<img src="images/loligo.jpg" width="80%" />
+<img src="https://i.imgur.com/0pAgSaC.jpg" width="80%" />
 </center>
 
 Seasonal patterns in testis mass in the squid *Loligo*. Testis mass predicted by dorsal mantle length, month, and DML X month.
@@ -322,9 +322,22 @@ plot(fm2)
 
 ## Summary {.smaller}
 
-```{r}
+```{r eval=FALSE}
 library(car)
 Anova(fm2, type = "III")
+```
+
+```
+## Analysis of Deviance Table (Type III tests)
+## 
+## Response: Testis_Mass
+##             Df   Chisq Pr(>Chisq)    
+## (Intercept)  1  12.830  0.0003411 ***
+## DML          1  97.686  < 2.2e-16 ***
+## Month       11 131.398  < 2.2e-16 ***
+## DML:Month   11 263.769  < 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ## Visualization of the model
@@ -373,7 +386,7 @@ We could just take a means of each block and use those data for ANOVA.
 Collected by National Institute for Coastal and Marine Management (RIKZ)
 
 <center>
-<img src="images/intertidal.jpg" width="100%" />
+<img src="https://i.imgur.com/4YGDggA.jpg" width="100%" />
 </center>
 
 ## Intertidal data
@@ -398,7 +411,7 @@ RIKZ <- RIKZ %>% mutate(Beach = factor(Beach))
 ## Sampling structure
 
 <center>
-<img src="images/RIKZ.jpg" width="100%" />
+<img src="https://i.imgur.com/HY6P6GF.jpg" width="100%" />
 </center>
 
 Sites are the level of the observation.
@@ -546,7 +559,7 @@ Sequential measurements of the same individual / plot / organism, etc. will resu
 Distance from the sella turcica to the pterygomaxillary fissure in growing children.
 
 <center>
-<img src="images/ortho.jpg" width="60%" />
+<img src="https://i.imgur.com/N9e47BR.jpg" width="60%" />
 </center>
 
 ## Orthodonics data
