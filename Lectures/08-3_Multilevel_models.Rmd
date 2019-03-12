@@ -229,18 +229,18 @@ Seasonal patterns in testis mass in the squid *Loligo*. Testis mass predicted by
 ## `Squid` data
 
 ```{r}
-S <- read_excel("../data/Squid.xlsx")
-S <- S %>% mutate(Month = factor(Month))
-str(S)
+Sq <- read_excel("../data/Squid.xlsx")
+Sq <- Sq %>% mutate(Month = factor(Month))
+str(Sq)
 
 # Check for missing data
-sum(!complete.cases(S))
+sum(!complete.cases(Sq))
 ```
 
 ## Visualizing
 
 ```{r echo=FALSE}
-ggplot(S, aes(DML, Testis_Mass)) +
+ggplot(Sq, aes(DML, Testis_Mass)) +
   geom_point() +
   labs(x = "Dorsal Mantle Length (mm)", y = "Testis Mass (g)")
 ```
@@ -248,7 +248,7 @@ ggplot(S, aes(DML, Testis_Mass)) +
 ## Visualizing
 
 ```{r echo=FALSE}
-ggplot(S, aes(DML, Testis_Mass)) +
+ggplot(Sq, aes(DML, Testis_Mass)) +
   geom_point() +
   facet_wrap("Month", nrow = 3) +
   labs(x = "Dorsal Mantle Length (mm)", y = "Testis Mass (g)")
@@ -259,20 +259,20 @@ ggplot(S, aes(DML, Testis_Mass)) +
 Testis mass modeled by `DML`, `Month`, and the `DML` X `Month` interaction:
 
 ```{r}
-fm1 <- lm(Testis_Mass ~ DML + Month + DML:Month, data = S)
+fm1 <- lm(Testis_Mass ~ DML + Month + DML:Month, data = Sq)
 ```
 
 Extract the residuals and fitted values:
 
 ```{r}
-S$Res1 <- residuals(fm1)
-S$Fitted <- fitted.values(fm1)
+Sq$Res1 <- residuals(fm1)
+Sq$Fitted <- fitted.values(fm1)
 ```
 
 ## Residuals vs. Fitted Values
 
 ```{r echo=FALSE}
-ggplot(S, aes(Fitted, Res1)) +
+ggplot(Sq, aes(Fitted, Res1)) +
   geom_point() +
   labs(x = "Fitted Values", y = "Residuals")
 ```
@@ -280,7 +280,7 @@ ggplot(S, aes(Fitted, Res1)) +
 ## Residuals vs. Month
 
 ```{r echo=FALSE}
-ggplot(S, aes(Month, Res1)) +
+ggplot(Sq, aes(Month, Res1)) +
   geom_boxplot() +
   labs(x = "Month", y = "Residuals")
 ```
@@ -310,7 +310,7 @@ variance_struct <- varPower(form = ~ DML | Month)
     - Other variance structures available
 
 ```{r gls_fit}
-fm2 <- gls(Testis_Mass ~ DML * Month, data = S,
+fm2 <- gls(Testis_Mass ~ DML * Month, data = Sq,
            weights = variance_struct)
 ```
 
@@ -327,27 +327,14 @@ library(car)
 Anova(fm2, type = "III")
 ```
 
-```
-## Analysis of Deviance Table (Type III tests)
-## 
-## Response: Testis_Mass
-##             Df   Chisq Pr(>Chisq)    
-## (Intercept)  1  12.830  0.0003411 ***
-## DML          1  97.686  < 2.2e-16 ***
-## Month       11 131.398  < 2.2e-16 ***
-## DML:Month   11 263.769  < 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
 ## Visualization of the model
 
 ```{r}
-S$Res2 <- residuals(fm2, type = "normalized")
+Sq$Res2 <- residuals(fm2, type = "normalized")
 ```
 
 ```{r echo=FALSE}
-ggplot(S, aes(DML, Res2)) +
+ggplot(Sq, aes(DML, Res2)) +
   geom_point() +
   facet_wrap("Month") +
   labs(x = "Dorsal Mantle Length",
@@ -357,7 +344,7 @@ ggplot(S, aes(DML, Res2)) +
 ## Visualization of the model
 
 ```{r echo=FALSE}
-ggplot(S, aes(Month, Res2)) +
+ggplot(Sq, aes(Month, Res2)) +
   geom_boxplot() +
   ylim(c(-10, 10)) +
   labs(x = "Month",
