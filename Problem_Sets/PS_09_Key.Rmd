@@ -236,7 +236,7 @@ Make a scatterplot of brain size vs. body mass, with points colored by species. 
 M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
   geom_point(size = 2) +
   scale_color_d3() +
-  theme(legend.position = c(0.9, 0.12),
+  theme(legend.position = c(0.75, 0.12),
         legend.background = element_rect(size = 0.5,
                                          color = "black",
                                          linetype = "solid")) +
