@@ -2,7 +2,6 @@
 title: "Non-independence: Introduction"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -25,7 +24,7 @@ library(readxl)
 - In biological situations, independence assumption is often violated
 
 <center>
-<img src="https://www.researchgate.net/profile/David_Reznick/publication/223968369/figure/fig2/AS:289284385984548@1445982180555/Figure-1-Map-of-the-Northern-Range-Mountains-of-Trinidad-showing-the-north-and-south.png" width="60%" />
+<img src="https://i.imgur.com/2NrNYHZ.png" width="60%" />
 </center>
 
 ## When is independence assumption violated?
@@ -67,19 +66,19 @@ ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin, color = Clade)) +
 **Pseudoreplication**: artificially inflated sample size lead to unfounded confidence
 
 <center>
-<img src="images/PCM_2.png" width="90%" />
+<img src="https://i.imgur.com/2AzYFXF.png" width="90%" />
 </center>
 
 ## Conventional statistics assume
 
 <center>
-<img src="images/PCM_3.png" width="90%" />
+<img src="https://i.imgur.com/FeMvrT7.png" width="90%" />
 </center>
 
 ## Best case for this example
 
 <center>
-<img src="images/PCM_4.png" width="90%" />
+<img src="https://i.imgur.com/kAf09JX.png" width="90%" />
 </center>
 
 ## Genotype-Phenotype Relationships

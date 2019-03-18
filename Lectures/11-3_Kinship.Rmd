@@ -2,7 +2,6 @@
 title: "Non-independence: Kinship"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -39,7 +38,7 @@ When modeled correctly, non-independence between samples can be very useful:
 ## Heritability and genetic correlation
 
 <center>
-<img src="https://s-media-cache-ak0.pinimg.com/originals/b0/09/d6/b009d6cbadcf86f97609886a6e52cac7.jpg" width="65%" />
+<img src="https://i.imgur.com/AquXKrw.jpg" width="65%" />
 </center>
 
 ## Load pedigree
@@ -223,13 +222,13 @@ Kinship matrix can be
 ## Mice on Meth
 
 <center>
-<img src="images/F1.large.jpg" width="85%" />
+<img src="https://i.imgur.com/kaeCImN.jpg" width="85%" />
 </center>
 
 ## Mice on Meth
 
 <center>
-<img src="images/F3.large.jpg" width="90%" />
+<img src="https://i.imgur.com/Rst1DwD.jpg" width="90%" />
 </center>
 
 ## Quiz 11-3

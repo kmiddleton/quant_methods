@@ -22,8 +22,8 @@ library(ape)
 library(phytools)
 # source("https://bioconductor.org/biocLite.R")
 # biocLite("ggtree")
-# install_github("GuangchuangYu/treeio")
-# install_github("GuangchuangYu/ggtree")
+# devtools::install_github("GuangchuangYu/treeio")
+# devtools::install_github("GuangchuangYu/ggtree")
 library(ggtree)
 library(foreach)
 library(reshape2)
@@ -143,7 +143,7 @@ ggtree(tree, ladderize = FALSE) +
 ## Home range vs. body mass
 
 ```{r echo=FALSE}
-tree2 <- groupClade(tree, node = 51)
+tree2 <- groupClade(tree, .node = 51)
 ggtree(tree2, aes(color = group), ladderize = FALSE) +
   geom_tiplab(size = 3) +
   geom_treescale() +
@@ -417,25 +417,25 @@ Rather than simulating data, estimate the values for $\alpha$ and $\theta$.
 Evolution toward two local optima:
 
 <center>
-<img src="images/Butler_King_2.png" width="50%" />
+<img src="https://i.imgur.com/8Iwp6A4.png" width="50%" />
 </center>
 
 ## Estimating an OU model
 
 <center>
-<img src="images/Butler_King.png" width="100%" />
+<img src="https://i.imgur.com/qfuAvQ5.png" width="100%" />
 </center>
 
 ## Estimating an OU model
 
 <center>
-<img src="images/Butler_King_Table.png" width="100%" />
+<img src="https://i.imgur.com/vUwTJ2Z.png" width="100%" />
 </center>
 
 ## Estimating an OU model
 
 <center>
-<img src="images/Butler_King_Table_2.png" width="75%" />
+<img src="https://i.imgur.com/OFcpiST.png" width="75%" />
 </center>
 
 $\theta_{small} = `r round(exp(-1.4), 2)`$ mm head length.
@@ -507,7 +507,7 @@ tree$tip.label <- gsub("\\:", "", tree$tip.label)
 ```
 
 ```{r echo=FALSE}
-tree2 <- groupClade(tree, node = 51)
+tree2 <- groupClade(tree, .node = 51)
 ggtree(tree2, aes(color = group), ladderize = FALSE) +
   geom_tiplab(size = 3) +
   geom_treescale() +
