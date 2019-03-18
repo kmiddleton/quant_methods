@@ -205,7 +205,7 @@ mean(F_stats >= F_stats[1])
 
 We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors.
 
-There are four predictors, you will have 5 tests:
+There are four predictors, and you will have 5 tests:
 
 1. The overall multple regression (F-test)
 2. Area: "Island" size (thousands of square km)
