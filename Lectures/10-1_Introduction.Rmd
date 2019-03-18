@@ -2,7 +2,6 @@
 title: "Distribution Free Methods: Introduction"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -30,7 +29,7 @@ North BV, Curtis D, Sham PC. [-@North2002-nu]. A note on the calculation of empi
 
 ## Distribution Free Methods
 
-Distribution free methods do not assume the data are drawn from any specific probability distribution. *Important: distribution-free, not assumption-free (e.g. IID).*
+Distribution free methods do not assume the data are drawn from any specific probability distribution. *Important: distribution-free, not assumption-free (e.g., IID).*
 
   - Randomization 
       - Shuffle data set in some way

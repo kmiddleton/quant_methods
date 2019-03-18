@@ -2,7 +2,6 @@
 title: "Model Comparison: In Class"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -20,9 +19,9 @@ knitr::opts_chunk$set(cache = TRUE)
 
 ## Review Project 
 
-- Approval Due 04.07
+- Approval Due 04/19
     - Note: *Approval*, not proposal (don't wait until the last minute)
-- Project Due 05.12
+- Project Due 05/17
 
 ## Review Project
 
@@ -38,5 +37,3 @@ knitr::opts_chunk$set(cache = TRUE)
 - Follow the [Proc B Guidelines for Reviewers](http://rspb.royalsocietypublishing.org/for-reviewers)
     - Focus on the statistical guidelines.  
 - You may consider the scope of the journal in which the article is published instead of Proc B
-- Example reviews will be posted on Canvas
-  
