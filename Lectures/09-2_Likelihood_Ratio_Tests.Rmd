@@ -2,7 +2,6 @@
 title: "Likelihood Ratio Tests"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -42,7 +41,7 @@ shade_chisq(0.05, 1)
 ## Energy expenditure in naked mole rats
 
 <center>
-<img src="images/NMR.jpg" width="80%" />
+<img src="https://i.imgur.com/FMMAjpa.jpg" width="80%" />
 </center>
 
 ## Energy expenditure in naked mole rats
@@ -56,7 +55,7 @@ names(M) <- c("Caste", "Mass", "Energy")
 
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
-  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
   theme(legend.justification = c(0, 1),
         legend.position = c(0, 1)) +
   labs(x = "ln Body Mass (g)",
@@ -82,8 +81,8 @@ M <- M %>% mutate(pred1 = predict(fm1))
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   geom_line(aes(x = Mass, y = pred1), lwd = 2,
-            color = wes_palette("Cavalcanti")[5]) +
-  scale_color_manual(values = wes_palette("Cavalcanti")) +
+            color = wes_palette("Cavalcanti1")[5]) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
   theme(legend.justification = c(0, 1),
         legend.position = c(0, 1)) +
   labs(x = "ln Body Mass (g)",
@@ -101,7 +100,7 @@ M <- M %>% mutate(pred2 = predict(fm2))
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   geom_line(aes(x = Mass, y = pred2, color = Caste), lwd = 2) +
-  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
   theme(legend.justification = c(0, 1),
         legend.position = c(0, 1)) +
   labs(x = "ln Body Mass (g)",
@@ -119,8 +118,8 @@ M <- M %>% mutate(pred3 = predict(fm3))
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   geom_line(aes(x = Mass, y = pred3, group = 1), lwd = 2,
-            color = wes_palette("Cavalcanti")[5]) +
-  scale_color_manual(values = wes_palette("Cavalcanti")) +
+            color = wes_palette("Cavalcanti1")[5]) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
   theme(legend.justification = c(0, 1),
         legend.position = c(0, 1)) +
   labs(x = "ln Body Mass (g)",
@@ -138,7 +137,7 @@ M <- M %>% mutate(pred4 = predict(fm4))
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   geom_line(aes(x = Mass, y = pred4, color = Caste), lwd = 2) +
-  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
   theme(legend.justification = c(0, 1),
         legend.position = c(0, 1)) +
   labs(x = "ln Body Mass (g)",
@@ -156,7 +155,7 @@ M <- M %>% mutate(pred5 = predict(fm5))
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   geom_line(aes(x = Mass, y = pred5, color = Caste), lwd = 2) +
-  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
   theme(legend.justification = c(0, 1),
         legend.position = c(0, 1)) +
   labs(x = "ln Body Mass (g)",
@@ -274,7 +273,7 @@ save(fm1, fm2, fm3, fm4, fm5, fm6, file = "lrtmodels.Rda")
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   geom_line(aes(x = Mass, y = pred4, color = Caste), lwd = 2) +
-  scale_color_manual(values = wes_palette("Cavalcanti")) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
   theme(legend.justification = c(0, 1),
         legend.position = c(0, 1)) +
   labs(x = "ln Body Mass (g)",
