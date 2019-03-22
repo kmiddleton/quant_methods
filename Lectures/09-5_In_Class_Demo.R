@@ -25,11 +25,12 @@ M <- tibble(
 str(M)
 
 ggplot(M, aes(x = x, y = y)) +
-  geom_point(size = 3)
+  geom_point(size = 3, color = "blue")
 
-ggplot(M, aes(x = x, y = y, color = grp)) +
-  geom_point(size = 3) +
-  # scale_color_brewer(palette = "Set1") +
+ggplot(M, aes(x = x, y = y, shape = grp)) +
+  geom_point(size = 5) +
+  scale_shape_manual(values = c(13, 20, 4), name = "Shapes")
+  # scale_color_brewer(palette = "Set2") +
   # scale_color_aaas() +
   # scale_color_d3() +
   # scale_color_futurama() +
@@ -37,11 +38,11 @@ ggplot(M, aes(x = x, y = y, color = grp)) +
   # scale_color_nejm() +
   # scale_color_startrek() +
   # scale_color_manual(values = wes_palette("Royal1")) +
-  scale_color_manual(values = wes_palette("GrandBudapest1")) +
+  # scale_color_manual(values = wes_palette("GrandBudapest1")) +
   NULL
 
-ggplot(M, aes(x = x, y = y, color = y)) +
-  geom_point(size = 3) +
+ggplot(M, aes(x = x, y = y, size = y)) +
+  geom_point() +
   # scale_color_gradient(low = "blue", high = "orange") +
   # scale_color_viridis()
   NULL
