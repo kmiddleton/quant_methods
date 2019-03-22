@@ -21,9 +21,9 @@ library(knitr)
 
 ## Variation Within and Between Groups
 
-In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`.
+In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`, as well as some `apply` relatives in the `tidyverse` that take some of the difficulty from apply functions across R structures.
 
-Before we try the simulation, we will learn apply. `apply()` is part of a family of functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions. We'll show you the syntax here. Run the following and make sure you understand what is happening.
+Let's start with `apply()`. `apply()` is part of a family of base-R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
 
 ```{r}
 ap.test <- tibble(x1 = seq(1, 10),
@@ -43,6 +43,46 @@ ap.test <- tibble(x1 = seq(1, 10),
 (ss <- apply(ap.test, 1, function(x) (x[1] * x[2]) / x[3]))
 ```
 
+The `tidyverse` has a family of `map` and `pmap` functions that alleviate some of the difficulty in programming with apply, especially when you are trying to pass multiple values to a function (as in the last example above with `x[1]`, `x[2]`, and `x[3]`). `map()` and relatives (e.g., `map_dbl()` which converts the returned values to a numeric vector [whereas `map()` by default returns a list]) are not as useful to us right now. We will instead focus on the `map2` functions that operate across `data.frame`s or `tibble`s.
+
+`pmap()` (for "parallel" `map`) passes the entire row of a `data.frame` to a function. By default, it returns a list. However, `pmap_dbl()` expects a numeric vector to be returned from the function, and `pmap_dfr()` expects a `data.frame`.
+
+We will use our example `ap.test` from above.
+
+```{r}
+# Convert anonymous function into a standalone function 
+myfun <- function(x1, x2, x3) (x1 * x2) / x3
+
+pmap_dbl(ap.test, myfun) # Note that this is the same as above
+```
+
+One nice thing about `pmap` is that it will figure out the correct order for passing variables to the function. If we reorder the columns, they are still correctly interpreted by the function. Doing the same would give the wrong answer for `apply()`.
+
+```{r}
+ap.test.reorder <- ap.test[, c(3, 2, 1)]
+pmap_dbl(ap.test.reorder, myfun) # Note that this is the same as above
+```
+
+Another nice feature of `pmap()` is that it offers some protection from passing the wrong column names to the function. The following code would fail, because the function expects "x1", "x2", and "x3".
+
+```{r, eval=FALSE}
+names(ap.test.rename) <- c("y1", "y2", "y3")
+pmap_dbl(ap.test.rename, myfun) # Fails with an error
+```
+
+`pmap()` will work with anonymous functions, just like `apply`. This can be handy if your function is quick and/or you want to just append the calculated value onto the existing object.
+
+```{r}
+pmap_dbl(ap.test, function(x1, x2, x3) (x1 * x2) / x3)
+
+# Note the . below in pmap_dbl, to indicate ap.test should be passed to
+# the function
+ap.test <- ap.test %>% 
+  mutate(x4 = pmap_dbl(., function(x1, x2, x3) (x1 * x2) / x3))
+
+ap.test
+```
+
 ### Activity
 
 Now let's try our simulation. We will simulate two groups that have different means (the true means are different) but change the variance and see how F is affected. Here is the pseudocode:
@@ -55,18 +95,11 @@ Now let's try our simulation. We will simulate two groups that have different me
     - Set up the function to return the F-value
     - Test out your function to see that it works.
 
-2) Set up a `data.frame()` or `tibble()` with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).
-
-3) Use `apply()` to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful about the order you pass the values to your function and the order your function is expecting them to be in.
-
-4) Plot the F-value vs. the standard deviation. Add a horizontal line at the critical value for an $\alpha$ of 0.05.
-
-5) There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Return to your function and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value.
-
 ```{r}
 # FIXME
 set.seed(2351222)
 
+# Step 1
 getF <- function(mu1, mu2, sd_both, nobs) {
   x <- factor(rep(c(1, 2), each = nobs))
   y1 <- rnorm(nobs, mu1, sd_both)
@@ -78,7 +111,12 @@ getF <- function(mu1, mu2, sd_both, nobs) {
   return(F_val)
 }
 getF(mu1 = 0, mu2 = 1, sd_both = 1, nobs = 100)
+```
 
+2) Set up a `data.frame()` or `tibble()` with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).
+
+```{r}
+# Step 2
 sds <- seq(1, 5, by = 0.25)
 sims <- data.frame(
   sd_both = sds,
@@ -86,15 +124,31 @@ sims <- data.frame(
   mu2 = rep(1, length = length(sds)),
   nobs = rep(100, length = length(sds))
 )
+```
 
-Fs <- apply(sims, 1, function(x) {getF(x[2], x[3], x[1], x[4])})
+3) Use `pmap_dbl()` to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful not to have any extra column names other than the ones that `getF()` is expecting.
+
+```{r}
+# Step 3
+Fs <- pmap_dbl(sims, getF)
 sims$Fs <- Fs
+```
 
+4) Plot the $F$-statistic vs. the standard deviation. Add a horizontal line at the critical value for an $\alpha$ of 0.05.
+
+```{r}
+# Step 4
 fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
 
 ggplot(sims, aes(x = sds, y = Fs)) +
   geom_point() +
   geom_hline(yintercept = fcrit, color = 'coral')
+```
+
+5) There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Make a copy of your function (call it `getF2`) and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value. Then plot as above.
+
+```{r}
+# Step 5
 
 getF2 <- function(mu1, mu2, sd_both, nobs) {
   niter <- 100
@@ -111,8 +165,16 @@ getF2 <- function(mu1, mu2, sd_both, nobs) {
   return(mean(Fs))
 }
 
-Fs <- apply(sims, 1, function(x) {getF2(x[2], x[3], x[1], x[4])})
-sims$Fs <- Fs
+# Start over with a new copy of sims
+sims <- data.frame(
+  sd_both = sds,
+  mu1 = rep(0, length = length(sds)),
+  mu2 = rep(1, length = length(sds)),
+  nobs = rep(100, length = length(sds))
+)
+
+sims <- sims %>% 
+  mutate(Fs = pmap_dbl(sims, getF2))
 
 fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
 
@@ -123,15 +185,15 @@ ggplot(sims, aes(x = sds, y = Fs)) +
 
 What do you observe in the plot?
 
-> As the standard deviation increases, the F-value decreases.
+> As the standard deviation increases, the $F$-statistic decreases.
 
 Think of all the variables in this simulation. Which should be altered to change the within-group variance, and which to change the between-group variance?
 
 > Within-group variance == standard deviation (what we have done here). Between-group variance == mean value for each group.
 
-What do you think is the lower limit of F (i.e., if you increased the standard deviation difference to a very large number)?
+What do you think is the lower limit of $F$ (i.e., if you increased the standard deviation difference to a very large number)?
 
-> F asymptotes at 0.
+> $F$ asymptotes at 0.
 
 ## Predicting height from limb lengths
 

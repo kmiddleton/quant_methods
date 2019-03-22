@@ -1344,9 +1344,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -1377,8 +1375,6 @@ summary {
 </style>
 
 
-
-<div class="container-fluid main-container">
 
 <!-- tabsets -->
 
@@ -1537,6 +1533,16 @@ div.tocify {
 
 </style>
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
 <div class="col-xs-12 col-sm-4 col-md-3">
@@ -1554,8 +1560,8 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Problem Set 07</h1>
-<h4 class="author"><em>Your Name Here: Group X</em></h4>
-<h4 class="date"><em>Last updated: 2019-03-05</em></h4>
+<h4 class="author">Your Name Here: Group X</h4>
+<h4 class="date">Last updated: 2019-03-22</h4>
 
 </div>
 
@@ -1563,8 +1569,8 @@ div.tocify {
 <pre class="r"><code>library(tidyverse)</code></pre>
 <div id="variation-within-and-between-groups" class="section level2">
 <h2>Variation Within and Between Groups</h2>
-<p>In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, <code>apply()</code>.</p>
-<p>Before we try the simulation, we will learn apply. <code>apply()</code> is part of a family of functions that all “apply”<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is <code>lapply()</code>). <code>apply()</code> takes three arguments: the <code>data.frame</code> or <code>matrix</code>, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called “anonymous” functions. We’ll show you the syntax here. Run the following and make sure you understand what is happening.</p>
+<p>In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, <code>apply()</code>, as well as some <code>apply</code> relatives in the <code>tidyverse</code> that take some of the difficulty from apply functions across R structures.</p>
+<p>Let’s start with <code>apply()</code>. <code>apply()</code> is part of a family of base-R functions that all “apply”<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is <code>lapply()</code>). <code>apply()</code> takes three arguments: the <code>data.frame</code> or <code>matrix</code>, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called “anonymous” functions). We’ll show you the syntax here. Run the following and make sure you understand what is happening.</p>
 <pre class="r"><code>ap.test &lt;- tibble(x1 = seq(1, 10),
                   x2 = rep(5, 10),
                   x3 = seq(20, 65, length.out = 10))
@@ -1585,6 +1591,46 @@ div.tocify {
 (ss &lt;- apply(ap.test, 1, function(x) (x[1] * x[2]) / x[3]))</code></pre>
 <pre><code>##  [1] 0.2500000 0.4000000 0.5000000 0.5714286 0.6250000 0.6666667 0.7000000
 ##  [8] 0.7272727 0.7500000 0.7692308</code></pre>
+<p>The <code>tidyverse</code> has a family of <code>map</code> and <code>pmap</code> functions that alleviate some of the difficulty in programming with apply, especially when you are trying to pass multiple values to a function (as in the last example above with <code>x[1]</code>, <code>x[2]</code>, and <code>x[3]</code>). <code>map()</code> and relatives (e.g., <code>map_dbl()</code> which converts the returned values to a numeric vector [whereas <code>map()</code> by default returns a list]) are not as useful to us right now. We will instead focus on the <code>map2</code> functions that operate across <code>data.frame</code>s or <code>tibble</code>s.</p>
+<p><code>pmap()</code> (for “parallel” <code>map</code>) passes the entire row of a <code>data.frame</code> to a function. By default, it returns a list. However, <code>pmap_dbl()</code> expects a numeric vector to be returned from the function, and <code>pmap_dfr()</code> expects a <code>data.frame</code>.</p>
+<p>We will use our example <code>ap.test</code> from above.</p>
+<pre class="r"><code># Convert anonymous function into a standalone function 
+myfun &lt;- function(x1, x2, x3) (x1 * x2) / x3
+
+pmap_dbl(ap.test, myfun) # Note that this is the same as above</code></pre>
+<pre><code>##  [1] 0.2500000 0.4000000 0.5000000 0.5714286 0.6250000 0.6666667 0.7000000
+##  [8] 0.7272727 0.7500000 0.7692308</code></pre>
+<p>One nice thing about <code>pmap</code> is that it will figure out the correct order for passing variables to the function. If we reorder the columns, they are still correctly interpreted by the function. Doing the same would give the wrong answer for <code>apply()</code>.</p>
+<pre class="r"><code>ap.test.reorder &lt;- ap.test[, c(3, 2, 1)]
+pmap_dbl(ap.test.reorder, myfun) # Note that this is the same as above</code></pre>
+<pre><code>##  [1] 0.2500000 0.4000000 0.5000000 0.5714286 0.6250000 0.6666667 0.7000000
+##  [8] 0.7272727 0.7500000 0.7692308</code></pre>
+<p>Another nice feature of <code>pmap()</code> is that it offers some protection from passing the wrong column names to the function. The following code would fail, because the function expects “x1”, “x2”, and “x3”.</p>
+<pre class="r"><code>names(ap.test.rename) &lt;- c(&quot;y1&quot;, &quot;y2&quot;, &quot;y3&quot;)
+pmap_dbl(ap.test.rename, myfun) # Fails with an error</code></pre>
+<p><code>pmap()</code> will work with anonymous functions, just like <code>apply</code>. This can be handy if your function is quick and/or you want to just append the calculated value onto the existing object.</p>
+<pre class="r"><code>pmap_dbl(ap.test, function(x1, x2, x3) (x1 * x2) / x3)</code></pre>
+<pre><code>##  [1] 0.2500000 0.4000000 0.5000000 0.5714286 0.6250000 0.6666667 0.7000000
+##  [8] 0.7272727 0.7500000 0.7692308</code></pre>
+<pre class="r"><code># Note the . below in pmap_dbl, to indicate ap.test should be passed to
+# the function
+ap.test &lt;- ap.test %&gt;% 
+  mutate(x4 = pmap_dbl(., function(x1, x2, x3) (x1 * x2) / x3))
+
+ap.test</code></pre>
+<pre><code>## # A tibble: 10 x 4
+##       x1    x2    x3    x4
+##    &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1     1     5    20 0.25 
+##  2     2     5    25 0.4  
+##  3     3     5    30 0.5  
+##  4     4     5    35 0.571
+##  5     5     5    40 0.625
+##  6     6     5    45 0.667
+##  7     7     5    50 0.7  
+##  8     8     5    55 0.727
+##  9     9     5    60 0.75 
+## 10    10     5    65 0.769</code></pre>
 <div id="activity" class="section level3">
 <h3>Activity</h3>
 <p>Now let’s try our simulation. We will simulate two groups that have different means (the true means are different) but change the variance and see how F is affected. Here is the pseudocode:</p>
@@ -1597,11 +1643,24 @@ div.tocify {
 <li>Set up the function to return the F-value</li>
 <li>Test out your function to see that it works.</li>
 </ul></li>
-<li><p>Set up a <code>data.frame()</code> or <code>tibble()</code> with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).</p></li>
-<li><p>Use <code>apply()</code> to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your <code>data.frame</code>. Be careful about the order you pass the values to your function and the order your function is expecting them to be in.</p></li>
-<li><p>Plot the F-value vs. the standard deviation. Add a horizontal line at the critical value for an <span class="math inline">\(\alpha\)</span> of 0.05.</p></li>
-<li><p>There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Return to your function and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value.</p></li>
 </ol>
+<pre class="r"><code># Step 1</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Set up a <code>data.frame()</code> or <code>tibble()</code> with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).</li>
+</ol>
+<pre class="r"><code># Step 2</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Use <code>pmap_dbl()</code> to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your <code>data.frame</code>. Be careful not to have any extra column names other than the ones that <code>getF()</code> is expecting.</li>
+</ol>
+<pre class="r"><code># Step 3</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>Plot the <span class="math inline">\(F\)</span>-statistic vs. the standard deviation. Add a horizontal line at the critical value for an <span class="math inline">\(\alpha\)</span> of 0.05.</li>
+</ol>
+<pre class="r"><code># Step 4</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Make a copy of your function (call it <code>getF2</code>) and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value. Then plot as above.</li>
+</ol>
+<pre class="r"><code># Step 5</code></pre>
 <p>What do you observe in the plot?</p>
 <blockquote>
 
@@ -1610,7 +1669,7 @@ div.tocify {
 <blockquote>
 
 </blockquote>
-<p>What do you think is the lower limit of F (i.e., if you increased the standard deviation difference to a very large number)?</p>
+<p>What do you think is the lower limit of <span class="math inline">\(F\)</span> (i.e., if you increased the standard deviation difference to a very large number)?</p>
 <blockquote>
 
 </blockquote>
