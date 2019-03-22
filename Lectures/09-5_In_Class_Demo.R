@@ -1,6 +1,7 @@
 # Week 9 demo
 
 # http://jfly.iam.u-tokyo.ac.jp/color/
+# https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/colorPaletteCheatsheet.pdf
 
 library(tidyverse)
 library(cowplot)
