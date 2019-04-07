@@ -16,7 +16,6 @@ library(cowplot)
 library(readxl)
 ```
 
-
 ## IID is often violated
 
 - Events are independent if the occurence of one does not influence the occurence of the other
@@ -58,7 +57,7 @@ Does higher altitude drive the evolution of higher levels of hemoglobin?
 ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin, color = Clade)) +
   geom_point(size = 6) +
   scale_color_manual(values = c("blue", "red")) +
-  theme(legend.position = c(0.92, 0.17))
+  theme(legend.position = c(0.82, 0.17))
 ```
 
 ## Why is non-independence a problem?
