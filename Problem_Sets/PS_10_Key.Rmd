@@ -205,7 +205,7 @@ mean(F_stats >= F_stats[1])
 
 We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors.
 
-There are four predictors, and you will have 5 tests:
+There are four predictors, and you will have 5 randomization tests, though you will fit a single model with multiple predictors to obtain the test statistics for each:
 
 1. The overall multple regression (F-test)
 2. Area: "Island" size (thousands of square km)
@@ -224,14 +224,17 @@ obs <- summary(fm)
 set.seed(2876)
 nreps <- 1e4
 
-t_stats <- matrix(NA, nrow = nreps, ncol = 4)
-colnames(t_stats) <- rownames(obs$coefficients)[2:5]
-t_stats[1, ] <- obs$coefficients[2:5, 3]
+t_stats <- matrix(NA, nrow = nreps, ncol = 5)
+colnames(t_stats) <- c(rownames(obs$coefficients)[2:5], "Fstat")
+t_stats[1, 1:4] <- obs$coefficients[2:5, 3]
+t_stats[1, 5] <- obs$fstatistic[1]
 
 for (ii in 2:nreps) {
   fm_rand <- lm(sample(N_Species) ~ Dist_to_Island + Elevation +
                   Area + Dist_to_Ecuador, data = M)
-  t_stats[ii, ] <- summary(fm_rand)$coefficients[2:5, 3]
+  t_stats[ii, 1:4] <- summary(fm_rand)$coefficients[2:5, 3]
+  t_stats[ii, 5] <- summary(fm_rand)$fstatistic[1]
+  
 }
 
 # Dist_to_Island
@@ -273,6 +276,16 @@ tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
   labs(x = "t statistics", y = "Count")
 
 2 * mean(t_stats[, "Dist_to_Ecuador"] <= t_stats[1, "Dist_to_Ecuador"])
+
+tibble(Fstat = t_stats[, "Fstat"]) %>%
+  ggplot(aes(Fstat)) +
+  geom_histogram() +
+  geom_vline(xintercept = t_stats[1, "Fstat"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+mean(t_stats[, "Fstat"] >= t_stats[1, "Fstat"])
+
 ```
 
 ## Aspirin and cancer (PS 08)
