@@ -67,7 +67,7 @@ for (ii in 2:nreps) {
 
 tibble(t_stats) %>%
   ggplot(aes(t_stats)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1], color = "red") +
   labs(x = "t statistics", y = "Count")
 
@@ -119,7 +119,7 @@ The same number of iterations but using 2 processors takes 93 seconds.
 # Iterations per second, 1 processor
 (p1 <- 124.7 / nreps)
 
-# Iterations per second, 6 processors
+# Iterations per second, 2 processors
 (p6 <- 93 / nreps)
 
 p1 / p6
@@ -154,7 +154,7 @@ for (ii in 2:nreps) {
 
 tibble(t_stats) %>%
   ggplot(aes(t_stats)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1], color = "red") +
   labs(x = "t statistics", y = "Count")
 
@@ -194,7 +194,7 @@ for (ii in 2:nreps) {
 
 tibble(F_stats) %>%
   ggplot(aes(F_stats)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = F_stats[1], color = "red") +
   labs(x = "F statistics", y = "Count")
 
@@ -240,7 +240,7 @@ for (ii in 2:nreps) {
 # Dist_to_Island
 tibble(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
   ggplot(aes(Dist_to_Island)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1, "Dist_to_Island"],
              color = "red") +
   labs(x = "t statistics", y = "Count")
@@ -250,7 +250,7 @@ tibble(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
 # Elevation
 tibble(Elevation = t_stats[, "Elevation"]) %>%
   ggplot(aes(Elevation)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1, "Elevation"],
              color = "red") +
   labs(x = "t statistics", y = "Count")
@@ -260,17 +260,17 @@ tibble(Elevation = t_stats[, "Elevation"]) %>%
 # Area
 tibble(Area = t_stats[, "Area"]) %>%
   ggplot(aes(Area)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1, "Area"],
              color = "red") +
   labs(x = "t statistics", y = "Count")
 
 2 * mean(t_stats[, "Area"] >= t_stats[1, "Area"])
 
-# Elevation
+# Dist_to_Ecuador
 tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
   ggplot(aes(Dist_to_Ecuador)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1, "Dist_to_Ecuador"],
              color = "red") +
   labs(x = "t statistics", y = "Count")
@@ -279,23 +279,24 @@ tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
 
 tibble(Fstat = t_stats[, "Fstat"]) %>%
   ggplot(aes(Fstat)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1, "Fstat"],
              color = "red") +
   labs(x = "t statistics", y = "Count")
 
 mean(t_stats[, "Fstat"] >= t_stats[1, "Fstat"])
-
 ```
 
 ## Aspirin and cancer (PS 08)
 
-In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use.
+In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
 
 ```{r aspirin1}
 M <- read_csv("../data/Aspirin.csv") %>%
   mutate_each("factor")
 fm <- glm(Cancer ~ Treatment, M, family = "binomial")
+
+# We will use the deviance first.
 
 set.seed(8736)
 nreps <- 1e3
@@ -311,12 +312,39 @@ system.time({
 
 tibble(devs) %>%
   ggplot(aes(devs)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = devs[1], color = "red") +
   labs(x = "Deviance", y = "Count")
 
 mean(devs <= devs[1])
 ```
+
+We can also use the Z-score for `TreatmentPlacebo`. This runs more slowly, because you have to generate the summary for each model.
+
+```{r}
+set.seed(8736)
+nreps <- 1e3
+Zs <- numeric(nreps)
+Zs[1] <- summary(fm)$coefficients[2, 3]
+
+system.time({
+  for (ii in 2:nreps) {
+    fm_rand <- glm(sample(Cancer) ~ Treatment, M,
+                    family = "binomial")
+    Zs[ii] <- summary(fm_rand)$coefficients[2, 3]
+  }
+})
+
+tibble(Zs) %>%
+  ggplot(aes(Zs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = Zs[1], color = "red") +
+  labs(x = "Z-score", y = "Count")
+
+mean(Zs <= Zs[1]) * 2
+```
+
+We can also do something similar with a standard $\chi^2$ test:
 
 ```{r aspirin2}
 obs <- chisq.test(xtabs(~ Treatment + Cancer, M),
@@ -336,7 +364,7 @@ system.time({
 
 tibble(chisqs) %>%
   ggplot(aes(chisqs)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = chisqs[1], color = "red") +
   labs(x = "Chi-squared Statistic", y = "Count")
 
@@ -362,7 +390,7 @@ for (ii in 2:nreps) {
 
 tibble(corrs) %>%
   ggplot(aes(corrs)) +
-  geom_histogram() +
+  geom_histogram(bins = 30) +
   geom_vline(xintercept = corrs[1], color = "red") +
   labs(x = "Correlation", y = "Count")
 

@@ -64,7 +64,7 @@ You should do the randomization and collect the output test statistics using jus
 
 ## Aspirin and cancer (PS 08)
 
-In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use.
+In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
 
 ## Correlation
 
