@@ -38,7 +38,7 @@ for(ii in 1:niter) {
 }
 
 ggplot(ps, aes(x = p1)) +
-  geom_histogram() +
+  geom_histogram(bins = 20) +
   labs(x = "P value")
 ```
 
@@ -77,20 +77,22 @@ p2 <- p1 - 0.1
 F1 <- qf(p = p1, df1, df2, lower.tail = FALSE)
 F2 <- qf(p = p2, df1, df2, lower.tail = FALSE)
 
-#tibble(p1, p2, F1, F2)
 x_max <- max(F1) * 2
 M <- tibble(x = seq(0.001, x_max, length = 20000),
                y = df(x, df1, df2))
 p <- ggplot(M, aes(x, y)) +
  geom_line() +
  ylim(c(0, 1.1 * max(M$y))) +
- labs(x = TeX("$F_{3, 10$"), y = "Relative Likelihood")
-ccs <- c("steelblue","coral","steelblue","coral","steelblue","coral","steelblue","coral","steelblue","coral")
+ labs(x = TeX("$F_{3, 10$"),
+      y = "Relative Likelihood")
+ccs <- c("steelblue", "coral", "steelblue", "coral",
+         "steelblue", "coral", "steelblue", "coral",
+         "steelblue", "coral")
 for (ii in 1:length(p1)) {
  p <- p +
    geom_ribbon(data = subset(M, x > F1[ii] & x < F2[ii]),
                aes(ymax = y), ymin = 0,
-               fill = ccs[ii])#rainbow(10)[ii])
+               fill = ccs[ii])
 }
 p
 ```

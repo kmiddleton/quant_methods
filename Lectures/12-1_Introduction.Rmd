@@ -2,7 +2,6 @@
 title: "Multiple Testing: Introduction"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King and Kevin Middleton'
-date: 'Last updated: `r Sys.Date()`'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -60,8 +59,8 @@ set.seed(93)
 nn <- 10
 group1.mean <- 5
 group2.mean <- 6
-yy <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-gg <- c(rep('a',nn), rep('b',nn))
+yy <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
+gg <- c(rep('a', nn), rep('b', nn))
 summary(lm(yy ~ gg))$coefficients
 ```
 
@@ -99,42 +98,43 @@ nn <- 10
 group1.mean <- 6
 group2.mean <- 6
 niter <- 1000
-ps<-data.frame('p1'=numeric(length=niter),
-               'p2'=numeric(length=niter))
+ps<-data.frame('p1' = numeric(length = niter),
+               'p2' = numeric(length = niter))
 
-for(ii in 1:niter)
-{
-yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-gg <- c(rep('a',nn), rep('b',nn))
-ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
-ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
-
+for(ii in 1:niter) {
+  yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+  yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+  gg <- c(rep('a',nn), rep('b',nn))
+  ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
+  ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
 }
 ```
 
 ## Problems of Multiplicity
 
 What is the probability of a false positive for yy1?
+
 ```{r}
-cbind(ps[c(8,12),],c("FP","x"))
-mean(ps[,'p1']<0.05)
+cbind(ps[c(8, 12), ], c("FP", "x"))
+mean(ps[, 'p1'] < 0.05)
 ```
 
 ## Problems of Multiplicity
 
 What is the probability of a false positive for yy2?
+
 ```{r}
-cbind(ps[c(8,12),],c("x","FP"))
-mean(ps[,'p2']<0.05)
+cbind(ps[c(8, 12),], c("x", "FP"))
+mean(ps[, 'p2'] < 0.05)
 ```
 
 ## Problems of Multiplicity
 
 What is the probability of a false positive for yy1 or yy2?
+
 ```{r}
-cbind(ps[c(8,12,13),],c("FP","FP","x"))
-length(which(ps[,'p1']<0.05 | ps[,'p2']<0.05))/niter
+cbind(ps[c(8, 12, 13), ], c("FP", "FP", "x"))
+length(which(ps[, 'p1'] < 0.05 | ps[, 'p2'] < 0.05)) / niter
 ```
 
 The overall error rate = the family-wise error rate (FWER).
@@ -257,7 +257,7 @@ alpha <- 0.05
 
 ```{r FWER_table, echo=FALSE}
 calcFWER <- function(k, alpha){
-  round(1 - (1 - alpha) ^ k, 3)
+  return(round(1 - (1 - alpha) ^ k, 3))
 }
 k <- c(1, 2, 3, 5, 10, 20, 50, 100)
 FWER <- calcFWER(k, 0.05)
@@ -273,16 +273,11 @@ pander(error_rates)
 
 ```{r FWER_figure, echo=FALSE, fig.width=8}
 k <- seq(1, 200, by = 1)
-alphas <- c(0.05, 0.01, 0.001)
-out <- matrix(NA, ncol = length(alphas))
-for (i in alphas) {
-  FWER <- calcFWER(k, i)
-  alpha <- rep(i, times = length(k))
-  tmp <- cbind(alpha, k, FWER)
-  out <- rbind(out, tmp)
-}
-FWERs <- as.data.frame(out)
-FWERs$alpha <- as.factor(FWERs$alpha)
+alpha <- c(0.05, 0.01, 0.001)
+FWERs <- crossing(k, alpha) %>%
+  mutate(FWER = pmap_dbl(.l = ., .f = calcFWER),
+         alpha = factor(alpha))
+
 ggplot(FWERs, aes(x = k, y = FWER, color = alpha)) +
   geom_hline(yintercept = 1, lty = "dotted") +
   geom_path(lwd = 2) +
