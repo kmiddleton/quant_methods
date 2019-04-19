@@ -1,0 +1,77 @@
+---
+title: "In class discussion"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+```
+
+## Review project
+
+- Due tonight
+- No reanalysis of data
+
+## Independence
+
+- What are independent observations?
+
+## Familywise Error Rate
+
+For a family of $k$ tests, where $\alpha$ is the error rate for a single test:
+
+$$\mbox{FWER} = 1-(1-\alpha)^k$$
+
+- For some arbitrary $\alpha$ and $k$ number of tests.
+
+## Distribution of *P* values 
+
+```{r cache=TRUE}
+set.seed(3210)
+nn <- 10
+group1.mean <- 6
+group2.mean <- 6
+niter <- 100000
+ps <- numeric(length = niter)
+
+for(ii in 1:niter) {
+  y <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
+  gg <- rep(c('a','b'), each = nn)
+  ps[ii] <- t.test(y ~ gg, var.equal = TRUE)$p.value
+}
+```
+
+## Distribution of *P* values 
+
+```{r echo=FALSE}
+ggplot(tibble(ps), aes(x = ps)) +
+  geom_histogram(bins = 100) +
+  labs(x = "P value")
+```
+
+## Observed vs. Expected *P* values 
+
+```{r}
+log_10_p <- sort(-log10(ps))
+log_10_unif <- sort(-log10(runif(niter, 0, 1)))
+```
+
+## Observed vs. Expected *P* values 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+tibble(log_10_p, log_10_unif) %>% 
+  ggplot(aes(x = log_10_unif, y = log_10_p)) + 
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  xlim(c(0, 5)) +
+  ylab("Observed P values") +
+  xlab("Expected P values")
+```

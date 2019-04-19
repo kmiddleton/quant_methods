@@ -26,8 +26,8 @@ nn <- 10
 group1.mean <- 6
 group2.mean <- 6
 niter <- 10000
-ps<-data.frame('p1' = numeric(length = niter),
-               'p2' = numeric(length = niter))
+ps <- data.frame('p1' = numeric(length = niter),
+                 'p2' = numeric(length = niter))
 
 for(ii in 1:niter) {
   yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
