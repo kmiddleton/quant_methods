@@ -222,7 +222,7 @@ table(Original = M$Origin, Predicted = skulls_classify)
 Skull measurements of oreodonts
 
 <center>
-<img src="images/oreodont.jpg" width="80%" />
+<img src="https://i.imgur.com/OOqkgmx.jpg" width="80%" />
 </center>
 
 ## Oreodonts
