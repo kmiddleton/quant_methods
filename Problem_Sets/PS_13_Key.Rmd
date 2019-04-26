@@ -117,6 +117,24 @@ summary(fm2)
 
 > PC is basically as axis of sand (large, medium, fine) with values in negative PC1 scores to mud in positive PC1 scores. Gravel doesn't load appreciably on PC1. Logistic regression shows that as PC1 score increases, sole are less likely to be present (negative coefficient estimate). So sole are less likely to be present as the substrate gets more muddy. They are more likely to be present as the substrate gets more sandy.
 
+```{r}
+M$PC1 <- z$x[, 1]
+
+ggplot(M, aes(x = PC1,
+              y = as.numeric(Solea_solea) - 1)) +
+  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_smooth(method = "glm",
+              method.args = list(family = "binomial"),
+              se = FALSE, size = 2) +
+  geom_point(size = 3) +
+  ylab("Probability of Presence") +
+  xlab("PC1") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
+  annotate("text", x = -3, y = -0.2, label = "Sandy") +
+  annotate("text", x = 3, y = -0.2, label = "Muddy")
+```
+
+
 ## Egyptian skulls
 
 The file `Egyptian_Skulls.xlsx` contains 4 measurements of 150 skulls from 5 time periods of Egypt from Thompson and Randall-Maciver (1905). Here is an image of the measurements that we found online (with typos):
