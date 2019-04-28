@@ -1,7 +1,6 @@
 ---
 title: "Experimental Design: Power I"
-author: 'Special Topics: Multivariate Statistics'
-date: 'Last updated: `r Sys.Date()`'
+subtitle: "Quantitative Methods in Life Sciences"
 output:
   ioslides_presentation:
     fig_width: 7
@@ -99,7 +98,7 @@ M$Sex <- factor(M$Sex)
 M_subs <- M %>% select(Sex, WnMass)
 M_subs <- M_subs %>% filter(complete.cases(.))
 ggplot(M_subs, aes(x = WnMass)) +
-  geom_histogram() +
+  geom_histogram(bins=30) +
   facet_grid(Sex ~ .)
 ```
 
@@ -210,4 +209,4 @@ pwr.t.test(power = 0.80, sig.level = 0.05, n = 1227,
 
 Lecture 14-3
 
-## References {.references}
+## References

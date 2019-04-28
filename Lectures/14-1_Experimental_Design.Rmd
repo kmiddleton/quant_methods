@@ -1,7 +1,6 @@
 ---
 title: "Experimental Design: Introduction"
-author: 'Special Topics: Multivariate Statistics'
-date: 'Last updated: `r Sys.Date()`'
+subtitle: "Quantitative Methods in Life Sciences"
 output:
   ioslides_presentation:
     fig_width: 7
@@ -91,7 +90,7 @@ Reviewer #3:
 "Normalization" methods can correct for batch effects statistically, *unless they are confounded with variables of interest!*
 
 <center>
-<img src="images/IIS_PCA.png" width="80%" />
+<img src="https://i.imgur.com/Y3ft8Fm.png" width="80%" />
 </center>
 
 ## Replication and pseudoreplication
@@ -133,7 +132,7 @@ Measured by Cohen's $\kappa$. See Fleiss [-@Fleiss1971-pa] for details.
 ## Scoring archosaur suture morphology
 
 <center>
-<img src="images/Gator.png" width="80%" />
+<img src="https://i.imgur.com/y9SByTR.png" width="80%" />
 </center>
 
 From Bailleul et al. [-@Bailleul2016-tk]
@@ -158,16 +157,16 @@ Obs2 <- M %>% select(-Specimen) %>% filter(Observer == 2) %>%
 
 ## Calculating IRR with `CohenKappa()`
 
-```{r}
+```{r warning=FALSE}
 library(DescTools)
 CohenKappa(Obs1, Obs2, conf.level = 0.95)
 ```
 
 Arbitrary discriptions:
 
-- > 0.75 = excellent
-- < 0.75 but > 0.4 = good to fair
-- < 0.4 = poor
+- Over 0.75 = excellent
+- Between 0.75 and 0.4 = good to fair
+- Less than 0.4 = poor
 
 ## Additional diagnostics
 
@@ -193,7 +192,7 @@ $$\mbox{Measurement} \sim \mbox{Specimen ID}$$
 ## Repeatability of caliper measurements
 
 <center>
-<img src="images/Mouse_Bones.png" width="40%" />
+<img src="https://i.imgur.com/FRd1Apz.png" width="40%" />
 </center>
 
 ## Calculation of ICC {.smaller}
