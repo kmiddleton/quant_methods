@@ -95,7 +95,7 @@ How do you interpret the minimum effect size that the researchers could detect a
 
 A more appropriate way to analyze the bird plasma data is to use a factorial ANOVA (both main effects and their interaction term). Imagine that you are planning just such an experiment:
 
-- Two treatment groups which each have two levels (a 2X2 design)
+- Two treatment groups which each have two levels (a 2 X 2 design)
 - n = 5 in each group
 - Your alpha will be 0.05
 - You are interested in detecting main effects and interactions (full factorial model)
@@ -127,7 +127,9 @@ pwr_sim <- pwr_sim %>%
          sex_tx = logical(length = nrow(pwr_sim)))
 ```
 
-b. Let's start by considering a single parameter combination: the first row of your `tibble` from above. First we will calculate the means for the four groups defined by sex and treatment (you might call these - s0t0, s1t0, s0t1, s1t1). Assign s0t0 to have a mean of zero. Because we are focusing only on treatment, we will not simulate a main effect of sex so assign s1t0 to also have a mean of zero. For the effect of treatment, because we are also simulating an interaction, we need to consider both when assigning the means. That is what an interaction is, the effect of one term is dependent on the state of the other. We will add the effect of the main effect and the interaction effect which will be conditional on sex. So, for s0t1, add the effect for treatment to 0.5 multiplied by the effect of the interaction. And for s1t1, add the effect for treatment to -0.5 multiplied by the effect of the interaction. This will create a set of means in which there is an overall main effect for treatment, no main effect for sex, and an interaction effect. Confirm this by looking at the values for your means.  
+b. Let's start by considering a single parameter combination: the first row of your `tibble` from above. First we will calculate the means for the four groups defined by sex and treatment (you might call these `s0t0`, `s1t0`, `s0t1`, `s1t1`). Assign `s0t0` to have a mean of zero. Because we are focusing only on treatment, we will not simulate a main effect of sex so assign `s1t0` to also have a mean of zero. For the effect of treatment, because we are also simulating an interaction, we need to consider both when assigning the means. That is what an interaction is, the effect of one term is dependent on the state of the other. We will add the effect of the main effect and the interaction effect which will be conditional on sex. So, for `s0t1`, add the effect for treatment to 0.5 multiplied by the effect of the interaction. And for `s1t1`, add the effect for treatment to -0.5 multiplied by the effect of the interaction. This will create a set of means in which there is an overall main effect for treatment, no main effect for sex, and an interaction effect.
+
+Confirm this by calculating the values for your means.  
 
 ```{r}
 # FIXME
@@ -139,7 +141,7 @@ s1t1 <- as.numeric(pwr_sim[1, 1] + -0.5 * pwr_sim[1, 2])
 print(c(s0t0, s1t0, s0t1, s1t1))
 ```
 
-c. Now that you have code to assign the means for each group, we can move on to simulating one iteration for this parameter combination. We want to generate data for each group from a random normal distribution. All have the same standard deviation (4). Use the sample sizes for the groups defined above. Set up a `data.frame` with these data and labels for the groups (think about how `lm()` will need the data to be formatted). Then we will fit the ANOVA using `anova(lm())` and assign a TRUE/FALSE for the treatment term and interaction term that will tell us whether it is significant or not at our alpha level. Begin with your code from b.  
+c. Now that you have code to assign the means for each group, we can move on to simulating one iteration for this parameter combination. We want to generate data for each group from a random normal distribution. All have the same standard deviation (4). Use the sample sizes for the groups defined above. Set up a `data.frame` with these data and labels for the groups (think about how `lm()` will need the data to be formatted). Then we will fit the ANOVA using `anova(lm())` and assign a TRUE/FALSE for the treatment term and interaction term that will tell us whether it is significant or not at our alpha level.  
 
 ```{r warning=FALSE}
 # FIXME
