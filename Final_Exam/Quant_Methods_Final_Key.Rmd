@@ -109,7 +109,7 @@ summary(glht(fm_log_B,
 
 d. Interpret the results of the two linear models, including the post hoc tests. What can you say about female mating preference for each of red and blue morphs of female strawberry poison frogs relative to the three male colors?
 
-> Both colors of frogs spend significantly more time associating with frogs of the same color (the differences in the posthoc tests show more time with sam color frogs than with non-same colors frogs; the signs of the differences are the same). The other comparison isn't really of much interest: the difference between the time th female spends with the two non-same color frogs. Regardless, it's not different for blue frogs but very slightly different for red frogs, which spend more time with intermediate color males than blue males.
+> Both colors of frogs spend significantly more time associating with frogs of the same color (the differences in the posthoc tests show more time with same color frogs than with non-same colors frogs; the signs of the differences are the same). The other comparison isn't really of much interest: the difference between the time the female spends with the two non-same color frogs. Regardless, it's not different for blue frogs but very slightly different for red frogs, which spend more time with intermediate color males than blue males.
 
 e. Return to the original (untransformed) association time data. Fit the same models as above, but this time assess overall significance via a randomization procedure. Again use type III sums of squares. You *do not* need to perform post hoc comparisons. Be sure to visualize the randomized test statistics.
 
@@ -211,7 +211,7 @@ den$fence_dist <- log(den$fence_dist)
 ggscatmat(den[ , c("viewshed","vrm","slope","fence_dist")])
 ```
 
-> The raw data are pretty skewed, so we did a log transformation. `viewshed` needed +1 to allow logging. After that, there aren't any obvious pathological relationships amongbetween variables.
+> The raw data are pretty skewed, so we did a log transformation. `viewshed` needed +1 to allow logging. After that, there aren't any obvious pathological relationships between variables.
 
 b. Perform a logistic regression predicting den occupancy from all four measured variables. Fit all possible models that include both `viewshed` and `vrm`. Do not consider any interaction terms here. You will have four models. Use AICc to compare these models and summarize your conclusions. 
 
@@ -320,7 +320,7 @@ Interpret the results of the model in the context of the loadings on the princip
 
 f. Which approach (part b & c vs. part d & e) do you think is most appropriate and informative for this dataset? Explain your answer and discuss what aspects of the dataset would make each approach more appropriate.
 
-> You could argue this either way. The PCA doesn't really do much for reducing the complexity of the data, so on one hand the original logitic regressions have the same information in a format that is easier to digest. On the other hand, PCA does give us a sense for the direction in which variables are covarying, which gives a little more nuanced understanding in the logsitic regression based on PCs.
+> You could argue this either way. The PCA doesn't really do much for reducing the complexity of the data, so on one hand the original logistic regressions have the same information in a format that is easier to digest. On the other hand, PCA does give us a sense for the direction in which variables are covarying, which gives a little more nuanced understanding in the logistic regression based on PCs.
 
 ## *Drosophila* Longevity
 
@@ -389,11 +389,11 @@ Interpret the results of the experiment in the context of the power you calculat
 
 You are reading a paper on growth of *Arabidopsis* in two different treatments: control (water only) and an organic fertilizer dissolved in water. The results section contains the following:
 
-> We measured aboveground biomass of plants after six weeks of growth in each of two treatment groups (n = 1000 per group). The means were 10.31 g (SEM = 0.001) for the control group and 10.42 (SEM = 0.002) for the fertilizer treatment group. A paired t-test showed highly significant difference of treatment ($t_{1998}$ = 52.4, P << 0.0001).
+> We measured above ground biomass of plants after six weeks of growth in each of two treatment groups (n = 1000 per group). The means were 10.31 g (SEM = 0.001) for the control group and 10.42 (SEM = 0.002) for the fertilizer treatment group. A paired t-test showed highly significant difference of treatment ($t_{1998}$ = 52.4, P << 0.0001).
 
 What is your interpretation of these results? Do you think that the fertilizer has an important biological effect? Why or why not?
 
-> The result is certinaly significant, and the experiment appears to have been carried out correctly. The issue is that the effect size is very small. The difference in means is only ~0.1 g, which is a small fraction of the overall. Yes, this difference is detectable with a large sample, but it is unlikely to be biologically meaningful.
+> The result is certainly significant, and the experiment appears to have been carried out correctly. The issue is that the effect size is very small. The difference in means is only ~0.1 g, which is a small fraction of the overall. Yes, this difference is detectable with a large sample, but it is unlikely to be biologically meaningful.
 
 ## t-test assumption
 
