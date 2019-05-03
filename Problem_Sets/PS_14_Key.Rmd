@@ -102,7 +102,7 @@ A more appropriate way to analyze the bird plasma data is to use a factorial ANO
 
 We will simulate data where the main effect of one term varies and the interaction effect varies, figure out the power across a range of different means, and make the assumption that within-group standard deviations are equal at 4 and the main effect of the other variable does not change (for now). We will build up this simulation in steps, first considering one parameter combination and one iteration before setting up the entire simulation.
 
-a. Generate two vectors, which will represent the range of differences in treatment and the range of differences for the interaction. For now, test from -10 to 10, with 10 steps in between.
+a. Generate two vectors, which will represent the range of differences in treatment and the range of differences for the interaction. For now, test the sequence from -10 to 10, with a length of 10 (`length.out = 10`).
 
 The `tidyr` package, which is loaded with `tidyverse` has a handy function `crossing()`, which will expand vectors with all pairwise combinations into a `tibble`. Use this function to cross the vectors. You should have a 100 X 2 `tibble`.
 
@@ -112,8 +112,8 @@ low <- -10
 high <- 10
 length.out <- 10
 
-diffs_tx <- seq(low, high, length = length.out)
-diffs_int <- seq(low, high, length = length.out)
+diffs_tx <- seq(low, high, length.out = length.out)
+diffs_int <- seq(low, high, length.out = length.out)
 
 pwr_sim <- crossing(diffs_tx, diffs_int)
 ```
@@ -123,8 +123,8 @@ Use `mutate()` at add two additional `numeric()` columns, one each for the power
 ```{r}
 # FIXME
 pwr_sim <- pwr_sim %>% 
-  mutate(tx = logical(length = nrow(pwr_sim)),
-         sex_tx = logical(length = nrow(pwr_sim)))
+  mutate(tx = numeric(length = nrow(pwr_sim)),
+         sex_tx = numeric(length = nrow(pwr_sim)))
 ```
 
 b. Let's start by considering a single parameter combination: the first row of your `tibble` from above. First we will calculate the means for the four groups defined by sex and treatment (you might call these `s0t0`, `s1t0`, `s0t1`, `s1t1`). Assign `s0t0` to have a mean of zero. Because we are focusing only on treatment, we will not simulate a main effect of sex so assign `s1t0` to also have a mean of zero. For the effect of treatment, because we are also simulating an interaction, we need to consider both when assigning the means. That is what an interaction is, the effect of one term is dependent on the state of the other. We will add the effect of the main effect and the interaction effect which will be conditional on sex. So, for `s0t1`, add the effect for treatment to 0.5 multiplied by the effect of the interaction. And for `s1t1`, add the effect for treatment to -0.5 multiplied by the effect of the interaction. This will create a set of means in which there is an overall main effect for treatment, no main effect for sex, and an interaction effect.
@@ -176,7 +176,7 @@ Use `Sys.time()` to get a sense for how long your program will run when you scal
 
 ```{r}
 set.seed(2238746)
-niter <- 1000
+niter <- 100
 alpha <- 0.05
 nn <- 5
 stdev <- 4

@@ -88,18 +88,22 @@ A more appropriate way to analyze the bird plasma data is to use a factorial ANO
 
 We will simulate data where the main effect of one term varies and the interaction effect varies, figure out the power across a range of different means, and make the assumption that within-group standard deviations are equal at 4 and the main effect of the other variable does not change (for now). We will build up this simulation in steps, first considering one parameter combination and one iteration before setting up the entire simulation.
 
-a. Generate two vectors, which will represent the range of differences in treatment and the range of differences for the interaction. For now, test from -10 to 10, with 10 steps in between.
+a. Generate two vectors, which will represent the range of differences in treatment and the range of differences for the interaction. For now, test the sequence from -10 to 10, with a length of 10 (`length.out = 10`).
 
 The `tidyr` package, which is loaded with `tidyverse` has a handy function `crossing()`, which will expand vectors with all pairwise combinations into a `tibble`. Use this function to cross the vectors. You should have a 100 X 2 `tibble`.
 
 ```{r}
-
+d_tx <- seq(-10, 10, length.out = 10)
+d_int <- seq(-10, 10, length.out = 10)
+ds <- crossing(d_tx, d_int)
 ```
 
 Use `mutate()` at add two additional `numeric()` columns, one each for the power to detect a treatment effect and the sex X treatment interaction.
 
 ```{r}
-
+ds <- ds %>% 
+  mutate(pwr_tx = NA,
+         pwr_int = NA)
 ```
 
 b. Let's start by considering a single parameter combination: the first row of your `tibble` from above. First we will calculate the means for the four groups defined by sex and treatment (you might call these `s0t0`, `s1t0`, `s0t1`, `s1t1`). Assign `s0t0` to have a mean of zero. Because we are focusing only on treatment, we will not simulate a main effect of sex so assign `s1t0` to also have a mean of zero. For the effect of treatment, because we are also simulating an interaction, we need to consider both when assigning the means. That is what an interaction is, the effect of one term is dependent on the state of the other. We will add the effect of the main effect and the interaction effect which will be conditional on sex. So, for `s0t1`, add the effect for treatment to 0.5 multiplied by the effect of the interaction. And for `s1t1`, add the effect for treatment to -0.5 multiplied by the effect of the interaction. This will create a set of means in which there is an overall main effect for treatment, no main effect for sex, and an interaction effect.
@@ -107,14 +111,29 @@ b. Let's start by considering a single parameter combination: the first row of y
 Confirm this by calculating the values for your means.  
 
 ```{r}
-
+s0t0 <- 0
+s1t0 <- 0
+s0t1 <- as.numeric(ds[1, "d_tx"]) + 0.5 * as.numeric(ds[1, "d_int"])
+s1t1 <- as.numeric(ds[1, "d_tx"]) + -0.5 * as.numeric(ds[1, "d_int"]) 
+c(s0t0, s1t0, s0t1, s1t1)
 ```
 
 
 c. Now that you have code to assign the means for each group, we can move on to simulating one iteration for this parameter combination. We want to generate data for each group from a random normal distribution. All have the same standard deviation (4). Use the sample sizes for the groups defined above. Set up a `data.frame` with these data and labels for the groups (think about how `lm()` will need the data to be formatted). Then we will fit the ANOVA using `anova(lm())` and assign a TRUE/FALSE for the treatment term and interaction term that will tell us whether it is significant or not at our alpha level.  
 
 ```{r}
+n <- 5
+sdd <- 4
+y_s0t0 <- rnorm(n, s0t0, sdd)
+y_s1t0 <- rnorm(n, s1t0, sdd)
+y_s0t1 <- rnorm(n, s0t1, sdd)
+y_s1t1 <- rnorm(n, s1t1, sdd)
 
+d <- data.frame(
+  Ca = c(y_s0t0, y_s1t0, y_s0t1, y_s1t1),
+  Sex = factor(c(rep(0:1, each = 5), rep(0:1, each = 5))),
+  Tx = factor(rep(0:1, each = 10))
+)
 ```
 
 d. You now have all of the code you need to do the simulation. You just need to set it up with two loops. You want to loop through each of your parameter combinations. Then, for each combination, you want to loop through several iterations. First set this up with a small number of iterations. Then scale up to 1000.
@@ -122,7 +141,7 @@ d. You now have all of the code you need to do the simulation. You just need to 
 Use `Sys.time()` to get a sense for how long your program will run when you scale up. Start by assigning the output of `Sys.time()` to a variable before you loop starts (`t_start <- Sys.time()`). After your loop, subtract that from `Sys.time()` (e.g., `Sys.time() - t_start`).
 
 ```{r}
-
+fm <- lm(Ca ~ Sex * Tx, data = d)
 ```
 
 
