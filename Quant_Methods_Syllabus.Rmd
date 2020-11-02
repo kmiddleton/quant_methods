@@ -3,19 +3,18 @@ title: "Quantitative Methods in Life Sciences"
 author: "Elizabeth King and Kevin Middleton"
 date: "Spring 2019"
 output:
-  html_document:
-    smart: no
-    theme: flatly
   pdf_document:
     fig_caption: yes
     fig_height: 3
     fig_width: 6.5
     latex_engine: xelatex
     number_sections: no
+  html_document:
+    smart: no
+    theme: flatly
 geometry: margin=1in
-mainfont: Helvetica
-mathfont: Helvetica
-monofont: Andale Mono
+mainfont: Arial
+mathfont: Arial
 fontsize: 12pt
 subtitle: BIO_SC 8002 / PTH_AS 8285
 csl: evolution.csl
