@@ -1,22 +1,22 @@
 ---
 title: "Quantitative Methods in Life Sciences"
 author: "Elizabeth King and Kevin Middleton"
-date: "Spring 2019"
+date: "Spring 2021"
 output:
+  html_document:
+    smart: no
+    theme: flatly
   pdf_document:
     fig_caption: yes
     fig_height: 3
     fig_width: 6.5
     latex_engine: xelatex
     number_sections: no
-  html_document:
-    smart: no
-    theme: flatly
 geometry: margin=1in
 mainfont: Arial
 mathfont: Arial
 fontsize: 12pt
-subtitle: BIO_SC 8002 / PTH_AS 8285
+subtitle: BIO_SC 8640 / PTH_AS 8640
 csl: evolution.csl
 ---
 
@@ -24,7 +24,7 @@ csl: evolution.csl
 
 This is a graduate-level course in statistical analysis designed with the specific needs of students in life sciences, focusing on statistical literacy: performing, interpreting, and writing about biological data analysis. As such, we will assume a basic understanding of some topics and zero understanding of other topics. We will cover most topics broadly and occasionally in great depth, highlighting the perils and pitfalls of different methods, while providing guidelines for a wide array of statistical approaches to data analysis. We will seek to find the balance between really understanding all the math involved and learning to be a competent practitioner and consumer of analysis. We will emphasize the practical over the theoretical, with additional emphasis on the communication of data (plotting, graphs, figures) and of results.
 
-### Main ideas
+### Guiding idea
 
 > "Science is a way to teach how something gets known, what is not known, to what extent things are known (for nothing is known absolutely), how to handle doubt and uncertainty, what the rules of evidence are, how to think about things so that judgments can be made, how to distinguish truth from fraud, from show..." (Feynman, 1953)
 
@@ -34,7 +34,7 @@ By the end of this course, you will have a foundation in the quantitative method
 
 **If you have never used R before**, you must attend the pre-course workshop (01/18) to install R on your laptop and work through some Swirl tutorials (http://swirlstats.com/) prior to the first course meeting (01/25).
 
-We will start with the assumption of some previous exposure to the following topics:
+We will start with the assumption of some very minimal previous exposure to the following topics:
 
 - Basic probability rules
 - Kinds of variables (continuous, categorical)
@@ -67,19 +67,19 @@ Kevin Middleton
 
 ### Meeting times and place
 
-The course will meet Fridays from 1:00-3:00 Tucker 322.
+The course will meet Fridays from 1:00-2:50 online via zoom.
 
 ### Expectations
 
-You will get as much or as little from this class as you put into it.
+You will get as much or as little from this class as you put into it. Assignments are graded only for completion. You should go through your own answers along with the provided answer key to check.
 
-This course will require you to watch lecture videos outside of class and answer questions related to those videos through Canvas. Treat these as you would a normal lecture. You should be taking notes. Pause the videos if you need to. You may need to rewatch and/or search the internet for additional information.
+This course will require you to watch lecture videos outside of class and answer questions related to those videos through Canvas. Treat these online lectures as you would a regular, in-person lecture. You should be taking notes. You should pause the videos if you need to. You may need to re-watch and/or search the internet or the provided resources for additional information.
 
 We expect you to be an active participant in class. If you do not understand something, it is your responsibility to ask. Being a silent attendee will not benefit you, and your instructors will not know if you do not understand until it is too late.
 
 - You must try, be willing to fail, and keep trying.
-- You must learn from your mistakes so that you will avoid making them again.
-- Exhaust your own means before asking for help.^[How would you solve the problem if you were an independent researcher?] Then ask for help.
+- You must try to learn from your mistakes, so that you will avoid making them again.
+- Exhaust your own means and those of your group before asking for help.^[Ask yourself, how would I solve this problem if you were an independent researcher?] Then ask for help.
 - Do any readings that are assigned. Be prepared for discussion.
 - No mystery numbers are allowed. It should be clear where every number comes from.
 - Plot the data. The answer you get from your statistical test should be apparent from thoughtful plots of your data.
