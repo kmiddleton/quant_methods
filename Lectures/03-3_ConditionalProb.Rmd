@@ -1,7 +1,7 @@
 ---
 title: "Conditional Probability"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -14,6 +14,7 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(readxl)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
 
 ## Notes
@@ -66,7 +67,6 @@ Suppose that you wake up one day with spots all over your face. The doctor tells
 </center>
 
 ## Bayes' Rule
-[Imgur]()
 <center>
 <img src="https://i.imgur.com/VCRHJoG.jpg" width="80%" />
 </center>
@@ -100,15 +100,15 @@ Choose a random person off the street and test them for HIV. The test is positiv
 
 ## Bayes' Rule
 
-If you *have* HIV, the probability that the test is positive is 99.9% (sensitivity)
+If a person *has* HIV, the probability that the test is positive is 99.9% (sensitivity)
 
   - $Pr[T|H] = 0.999$
 
-If you *don't have* HIV, the probability that the test is negative is 99.99% (specificity)
+If a person *does not have* HIV, the probability that the test is negative is 99.99% (specificity)
 
   - $Pr[T'|H'] = 0.9999$
 
-Only about 13/100000 people have HIV.
+Only about 13/100000 people are positive for HIV.
 
   - $P[H] = 13/100000 = 1.3 \times 10^{-4}$
 
@@ -148,7 +148,7 @@ Pr[H|T] &= \frac{Pr[T|H] \times Pr[H]}{Pr[T]} \\
 
 ## Bayes' Rule
 
-Take 100000 people:
+For 100000 hypothetical people:
 
 - 13 have HIV
 - 100000 – 13 = 99987 do not
@@ -178,11 +178,5 @@ Or just $12.987 / (12.987 + 9.9987)$ because the 100000s cancel out, which is th
 ## Uncertainty
 
 > "In scientific research, measurements are replete with randomness. Extraneous influences contaminate the measurements despite tremendous efforts to limit their intrusion." [@Kruschke2015-rp]
-
-## Quiz 03-3
-
-On Canvas, complete quiz 03-3.
-
-Move on to lecture 03-4.
 
 ## References

@@ -1,7 +1,7 @@
 ---
 title: "Distributions"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 7
@@ -16,6 +16,7 @@ library(readxl)
 library(cowplot)
 library(forcats)
 library(latex2exp)
+theme_set(theme_cowplot())
 ```
 
 ## Distributions
@@ -33,7 +34,6 @@ flip6 <- tibble(
 
 flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
  geom_bar(stat = "Identity")
-
 ```
 
 ## Distributions
@@ -118,8 +118,7 @@ sum(dbinom(0:6, 6, 0.5))
 set.seed(5)
 
 # Random numbers with a mean of 0 and standard deviation of 1
-x <- rnorm(200)
-M <- tibble(x)  # Make a tibble for ggplot
+M <- tibble(x = rnorm(n = 200, mean = 0, sd = 1))
 ```
 
 ## Frequency distributions: Continuous data
@@ -258,11 +257,5 @@ ggplot(M, aes(Successes, Probability)) +
 <center>
 <img src="https://i.imgur.com/Mks8NPD.png" width="80%" />
 </center>
-
-## Quiz 03-4
-
-On Canvas, complete quiz 03-4.
-
-No more lectures this week.
 
 ## References

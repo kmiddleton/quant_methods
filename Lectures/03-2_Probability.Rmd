@@ -1,7 +1,7 @@
 ---
 title: "Probability"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -14,17 +14,18 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(readxl)
 library(cowplot)
-library(forcats)
+theme_set(theme_cowplot())
 ```
 
 ## Notes
 
 [Khan Academy probability videos and exercises](https://www.khanacademy.org/math/statistics-probability/probability-library)
 
-
 ## Uncertainty & Science
 
 > Scientific knowledge is a body of statements of varying degrees of certainty—some most unsure, some nearly sure, none absolutely certain (Feynman)
+
+Probability is a way to quantify uncertainty.
 
 ## Why learn probability?
 
@@ -242,10 +243,3 @@ flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
  geom_bar(stat = "Identity")
 
 ```
-
-
-## Quiz 03-2
-
-On Canvas, complete quiz 03-2.
-
-Move on to lecture 03-3.

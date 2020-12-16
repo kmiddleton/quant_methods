@@ -1,10 +1,10 @@
 ---
 title: "Key Concepts"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, Lauren Sullivan'
 output:
   ioslides_presentation:
-    fig_width: 7
+    fig_width: 8
     css: styles.css
 csl: evolution.csl
 bibliography: Multivariate.bib
@@ -16,13 +16,10 @@ library(readxl)
 library(cowplot)
 ```
 
-## Readings
-
-- Curran-Everett [-@Curran-Everett2000-ng]: The process of scientific discovery: How certain can we be?
-
 ## Assumptions of Science as a Way of Knowing
-- all ways of knowing make a set of assumptions
-- our knowledge is conditional on these assumptions being met
+
+- All ways of knowing involve a set of assumptions
+- Our knowledge is conditional on these assumptions being met
 
 ## Definitions of statistics
 
@@ -147,11 +144,5 @@ Randomly select 20 trees (left) or randomly select 20 square quadrats with 0 or 
 </center>
 
 How realistic is this?
-
-## Quiz 03-1
-
-On Canvas, complete quiz 03-1.
-
-Move on to lecture 03-2.
 
 ## References
