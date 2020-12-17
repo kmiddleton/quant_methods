@@ -47,6 +47,7 @@ Fun reading:
 - [stringsAsFactors = sigh](http://notstatschat.tumblr.com/post/124987394001/stringsasfactors-sigh)
 - [stringsAsFactors: An unauthorized biography](http://simplystatistics.org/2015/07/24/stringsasfactors-an-unauthorized-biography/)
 
+
 ## Reading Excel files into R
 
 Preferred package: [readxl](https://cran.r-project.org/web/packages/readxl/index.html)
@@ -61,6 +62,8 @@ M <- read_excel("MyFile.xlsx")
 
 ## Load data
 
+To load data into R, you can either use the direct path to the file with any of the read functions.
+
 ```{r message=FALSE, warning=FALSE}
 M <- read_excel("../data/Mouse_Weaning_Data.xlsx",
                 na = "NA")
@@ -71,10 +74,31 @@ Read file and assign to an object `M`.
 - Look for it in the `data` directory, which is one level up from the working directory (`../`)
 - Explicitly define "NA" is `NA`
 
+
+## Load data
+
+Or you can use `setwd()` to set your working directory folder, and then use any read function to read in any file by its name (not path name) that is in that folder. 
+
+
+```{r message=FALSE, warning=FALSE}
+setwd("../data/")
+M <- read_excel("Mouse_Weaning_Data.xlsx",
+                na = "NA")
+```
+
+
+
+
+## Important Coding Tips
+
+<span style="color:pink">SHOULD THIS GO IN A SEPARATE CODING TIPS?</span>
+
 Use `<-` for assign.
 
 - Don't use `=` (even though you can).
 - "Assign the object on the right to the object on the left."
+
+
 
 ## Use `str()` to get information
 
@@ -181,6 +205,15 @@ _Note_:
 M_agr <- aggregate(M, by = list(M$DamID), FUN = "mean")
 M_agr
 ```
+
+
+
+##SPLIT HERE
+
+
+<span style="color:pink">I WOULD LIKE TO SPLIT THIS HERE AND MAKE A NEW ONE FOR DATA CLEANING WITH ALL THE TIDY STUFF.</span>
+
+
 
 ## New tools: Selecting, filtering, aggregating
 
