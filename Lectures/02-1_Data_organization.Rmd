@@ -1,7 +1,7 @@
 ---
 title: "Data Organization"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 7
@@ -13,73 +13,110 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE}
 library(tidyverse)
 library(readxl)
+library(cowplot)
+theme_set(theme_cowplot())
 ```
 
-## Notes
 
-## Readings
-
-Required:
-
-Broman and Woo (2018) [*Data Organization in Spreadsheets. The American Statistician, 72:1, 2-10.*](https://doi.org/10.1080/00031305.2017.1375989)
-
-Suggested:
-
-- Ted Garland [*How to Structure and Name Data Files*](http://biology.ucr.edu/people/faculty/Garland/How_to_Structure_and_Name_Data_Files_1.pdf)
-- Karl Broman's guide to data organization: http://kbroman.org/dataorg/
-- Jeff Leek research group's guide to sharing data: https://github.com/jtleek/datasharing
-- Hadley Wickham (2013): [Tidy Data](http://vita.had.co.nz/papers/tidy-data.pdf)
-- White et al. (2013): [Nine Simple Ways to Make It Easier to (Re)use Your Data](http://ojs.library.queensu.ca/index.php/IEE/article/view/4608)
 
 ## Goal for this week
 
 **Take Care of Your Data**:
 
+- Organizing
 - Storing
 - Loading
+- Cleaning
 - Visualizing
 - Validating
 
-## Guidelines for data files
 
-- Think about how to store your data _before_ you have data to store
-    - Get it right the first time rather than to deal with bad decisions forever
+
+## Data Organizing - File Structure
+
+For each R project/manuscript, you will want to have a set of folders. Here is a suggestion, but there are many options.
+
+\bigskip
+
+- Main Project Folder
+  - Data
+  - Data Wrangling
+  - Analysis
+  - Graphics
+  - Documents
+  - ReadMe
+
+## Data Organizing - File Structure
+
+<font size="4">
+
+  - Data
+    - raw data (read-only, pristine backup, not to be touched)
+    - tidy data (intermediate and final R datasets)
+  - Data Wrangling
+    - DataAcquisition.R - script for compiling all data files into a single, usable dataset.
+  - Analysis
+  - Graphics
+  - Documents
+    - Manuscript folder
+    - Literature folder
+  - ReadMe
+    - metadata
+    - write down the driving questions and purposes of the project and other notes.
+
+</font>
+
+*Note: Your code will stay cleaner if you use many smaller scripts, e.g. one for all analyses, one for all figures **OR** one for each analysis and the associated figures*
+
+
+## Data Storing - General Tips 
+
+- Think about how to store your data _before_ you start
+    - Get it right the first time or deal with bad decisions forever
 - Keep everything.
     - Disk space is cheap.
     - Dropbox / Box / Google Drive / Sync, etc.
     - Iterate file names (or -- better -- use version control)
+- Create a data dictionary in your metadata folder (explanations of what your columns represent)
+    - "Body mass in grams, measured to nearest 0.1 g."
 - Be consistent
     - File names, variable names, file formats, etc.
-    - No spaces in data file names
 
-## Guidelines for data files
+## Data Storing - Guidelines for data files {.smaller}
 
-- Store data in rectangular format
+
+1. Store data in rectangular format
     - **No empty cells**, repeat values if necessary
-- Use only one header row
+1. Use only one header row
     - Curse software that outputs more than one header row
-- Use `NA` for missing data
-- Use wide format
+1. R is case sensitive so keep column headers in a case structure  (e.g. snake_case, dot.case)
+    - No spaces or units in column names. E.g. `body_mass` or `BodyMass` but not "Body Mass" or "Body Mass (g)"
+1. Use `NA` for missing data
+    - The difference between “0” and “NA” and a blank cell all tells you something
+1. Use wide format
     - Each unique observation unit is a row
-
-## Guidelines for data files
-
-- No spaces or units in column names
-    - `body_mass` or `BodyMass` but not "Body Mass" or "Body Mass (g)"
-- Store dates as three separate columns (`Year`, `Month`, `Day`)
+1. Store dates as three separate columns (`Year`, `Month`, `Day`)
     - Excel does weird things with dates
-    - With concatentation, it is easy to make date columns if you need them
-    - We might be in the minority here.
 
-## Guidelines for data files
+  
 
-- Create a data dictionary (explanations of what your columns represent)
-    - Cell comments, a separate Excel sheet, or separate file
-        - *Not in the column names*
-    - "Body mass in grams, measured to nearest 0.1 g."
-- Keep file sizes manageable
-    - Do you need 384 columns in that Excel file?
+## Data Storing - Relational Data
+
+
+-  Strive for relational data to keep your file size small 
+    - store data as smaller units (hierarchical and by type) and link through code. 
     - Use shared numeric IDs so that you can match and merge data across files
+    -  For example: store site level data in one file, and plot level data in another. Then link these datasets through code.
+        - This helps avoid confusion and repetition
+        -  Great for large, interconnected datasets, especially those that can change
+    - Data management systems play well with data in this format (e.g. Tidy, SQL)
+
+
+## Data Storing - Relational Data
+
+<span style="color:pink">INCLUDE RELATIONAL DATA IMAGE</span>
+
+
 
 ## Examples, bad and good
 
@@ -87,11 +124,18 @@ Suggested:
 <img src="https://i.imgur.com/4kNywhX.png" />
 </center>
 
+
+<span style="color:pink">FIX</span>
+
+
 ## Examples, bad and good
 
 <center>
 <img src="https://i.imgur.com/2MFXD0C.png" />
 </center>
+
+<span style="color:pink">FIX</span>
+
 
 ## It would be nice to store data in csv files and edit in Excel, but...
 
@@ -99,11 +143,17 @@ Suggested:
 <img src="https://i.imgur.com/AiwZwdq.png" />
 </center>
 
+<span style="color:pink">FIX</span>
+
+
 ## and
+
+<span style="color:pink">FIX</span>
+
 
 <center>
 <img src="https://i.imgur.com/YlwLXJN.png" />
-</center>
+</center>    
 
 Working with csv files in Excel _not_ a viable (i.e., non-aggravating) option.
 

@@ -4,7 +4,6 @@
   <title>Data Organization</title>
 
   <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <meta name="generator" content="pandoc" />
 
@@ -31,7 +30,7 @@
       // Author information
       presenters: [
             {
-        name:  'Elizabeth King and Kevin Middleton' ,
+        name:  'Elizabeth King, Kevin Middleton and Lauren Sullivan' ,
         company: '',
         gplus: '',
         twitter: '',
@@ -259,7 +258,6 @@ background: black;
 }
 
 slides > slide {
-display: none;
 font-family: 'Open Sans', Arial, sans-serif;
 font-size: 26px;
 color: #797979;
@@ -280,17 +278,19 @@ transition: all 0.6s ease-in-out;
 }
 
 slides > slide.far-past {
-display: none;
 }
 
 slides > slide.past {
-display: block;
 opacity: 0;
 }
 
 slides > slide.current {
 display: block;
 opacity: 1;
+z-index: 1;
+}
+slides > slide:not(.current) {
+z-index: 0;
 }
 
 slides > slide.current .auto-fadein {
@@ -305,13 +305,11 @@ background-size: 100% 100%;
 }
 
 slides > slide.next {
-display: block;
 opacity: 0;
 pointer-events: none;
 }
 
 slides > slide.far-next {
-display: none;
 }
 
 slides > slide.dark {
@@ -383,8 +381,6 @@ width: 1100px;
 
 slides.layout-widescreen > slide.far-past,
 slides.layout-faux-widescreen > slide.far-past {
-display: block;
-display: none;
 -webkit-transform: translate(-2260px);
 -moz-transform: translate(-2260px);
 -ms-transform: translate(-2260px);
@@ -418,8 +414,6 @@ pointer-events: none;
 
 slides.layout-widescreen > slide.far-next,
 slides.layout-faux-widescreen > slide.far-next {
-display: block;
-display: none;
 -webkit-transform: translate(2260px);
 -moz-transform: translate(2260px);
 -ms-transform: translate(2260px);
@@ -1351,7 +1345,19 @@ opacity: 1;
 .overview .slide-area {
 display: none;
 }
+slides > slide {
+background: linear-gradient(#ffffff, #ffffff 85%, #e6e6e6);
+background-color: white;
+}
+slides > slide {
+opacity: 0;
+}
 @media print {
+
+@page {
+size: landscape;
+margin: 0;
+}
 
 slides slide {
 display: block !important;
@@ -3095,6 +3101,10 @@ if (document.readyState !== "loading" &&
       transition: opacity 0.6s ease-in 0.4s;
       opacity: 0;
     }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
 
   </style>
 
@@ -3115,42 +3125,81 @@ if (document.readyState !== "loading" &&
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2>Notes</h2></hgroup><article  id="notes">
-
-</article></slide><slide class=""><hgroup><h2>Readings</h2></hgroup><article  id="readings">
-
-<p>Required:</p>
-
-<p>Broman and Woo (2018) <a href='https://doi.org/10.1080/00031305.2017.1375989' title=''><em>Data Organization in Spreadsheets. The American Statistician, 72:1, 2-10.</em></a></p>
-
-<p>Suggested:</p>
-
-<ul>
-<li>Ted Garland <a href='http://biology.ucr.edu/people/faculty/Garland/How_to_Structure_and_Name_Data_Files_1.pdf' title=''><em>How to Structure and Name Data Files</em></a></li>
-<li>Karl Broman’s guide to data organization: <a href='http://kbroman.org/dataorg/' title=''>http://kbroman.org/dataorg/</a></li>
-<li>Jeff Leek research group’s guide to sharing data: <a href='https://github.com/jtleek/datasharing' title=''>https://github.com/jtleek/datasharing</a></li>
-<li>Hadley Wickham (2013): <a href='http://vita.had.co.nz/papers/tidy-data.pdf' title=''>Tidy Data</a></li>
-<li>White et al. (2013): <a href='http://ojs.library.queensu.ca/index.php/IEE/article/view/4608' title=''>Nine Simple Ways to Make It Easier to (Re)use Your Data</a></li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2>Goal for this week</h2></hgroup><article  id="goal-for-this-week">
+<slide class=""><hgroup><h2>Goal for this week</h2></hgroup><article  id="goal-for-this-week">
 
 <p><strong>Take Care of Your Data</strong>:</p>
 
 <ul>
+<li>Organizing</li>
 <li>Storing</li>
 <li>Loading</li>
+<li>Cleaning</li>
 <li>Visualizing</li>
 <li>Validating</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Guidelines for data files</h2></hgroup><article  id="guidelines-for-data-files">
+</article></slide><slide class=""><hgroup><h2>Data Organizing - File Structure</h2></hgroup><article  id="data-organizing---file-structure">
+
+<p>For each R project/manuscript, you will want to have a set of folders. Here is a suggestion, but there are many options.</p>
+
+
 
 <ul>
-<li>Think about how to store your data <em>before</em> you have data to store
+<li>Main Project Folder
 
 <ul>
-<li>Get it right the first time rather than to deal with bad decisions forever</li>
+<li>Data</li>
+<li>Data Wrangling</li>
+<li>Analysis</li>
+<li>Graphics</li>
+<li>Documents</li>
+<li>ReadMe</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Data Organizing - File Structure</h2></hgroup><article  id="data-organizing---file-structure-1">
+
+<p><font size="4"></p>
+
+<ul>
+<li>Data
+
+<ul>
+<li>raw data (read-only, pristine backup, not to be touched)</li>
+<li>tidy data (intermediate and final R datasets)</li>
+</ul></li>
+<li>Data Wrangling
+
+<ul>
+<li>DataAcquisition.R - script for compiling all data files into a single, usable dataset.</li>
+</ul></li>
+<li>Analysis</li>
+<li>Graphics</li>
+<li>Documents
+
+<ul>
+<li>Manuscript folder</li>
+<li>Literature folder</li>
+</ul></li>
+<li>ReadMe
+
+<ul>
+<li>metadata</li>
+<li>write down the driving questions and purposes of the project and other notes.</li>
+</ul></li>
+</ul>
+
+<p></font></p>
+
+<p><em>Note: Your code will stay cleaner if you use many smaller scripts, e.g. one for all analyses, one for all figures <strong>OR</strong> one for each analysis and the associated figures</em></p>
+
+</article></slide><slide class=""><hgroup><h2>Data Storing - General Tips</h2></hgroup><article  id="data-storing---general-tips">
+
+<ul>
+<li>Think about how to store your data <em>before</em> you start
+
+<ul>
+<li>Get it right the first time or deal with bad decisions forever</li>
 </ul></li>
 <li>Keep everything.
 
@@ -3159,17 +3208,21 @@ if (document.readyState !== "loading" &&
 <li>Dropbox / Box / Google Drive / Sync, etc.</li>
 <li>Iterate file names (or – better – use version control)</li>
 </ul></li>
+<li>Create a data dictionary in your metadata folder (explanations of what your columns represent)
+
+<ul>
+<li>&ldquo;Body mass in grams, measured to nearest 0.1 g.&rdquo;</li>
+</ul></li>
 <li>Be consistent
 
 <ul>
 <li>File names, variable names, file formats, etc.</li>
-<li>No spaces in data file names</li>
 </ul></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Guidelines for data files</h2></hgroup><article  id="guidelines-for-data-files-1">
+</article></slide><slide class=""><hgroup><h2>Data Storing - Guidelines for data files</h2></hgroup><article  class="smaller" id="data-storing---guidelines-for-data-files">
 
-<ul>
+<ol>
 <li>Store data in rectangular format
 
 <ul>
@@ -3180,51 +3233,50 @@ if (document.readyState !== "loading" &&
 <ul>
 <li>Curse software that outputs more than one header row</li>
 </ul></li>
-<li>Use <code>NA</code> for missing data</li>
+<li>R is case sensitive so keep column headers in a case structure (e.g. snake_case, dot.case)
+
+<ul>
+<li>No spaces or units in column names. E.g. <code>body_mass</code> or <code>BodyMass</code> but not &ldquo;Body Mass&rdquo; or &ldquo;Body Mass (g)&rdquo;</li>
+</ul></li>
+<li>Use <code>NA</code> for missing data
+
+<ul>
+<li>The difference between &ldquo;0&rdquo; and &ldquo;NA&rdquo; and a blank cell all tells you something</li>
+</ul></li>
 <li>Use wide format
 
 <ul>
 <li>Each unique observation unit is a row</li>
 </ul></li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2>Guidelines for data files</h2></hgroup><article  id="guidelines-for-data-files-2">
-
-<ul>
-<li>No spaces or units in column names
-
-<ul>
-<li><code>body_mass</code> or <code>BodyMass</code> but not &ldquo;Body Mass&rdquo; or &ldquo;Body Mass (g)&rdquo;</li>
-</ul></li>
 <li>Store dates as three separate columns (<code>Year</code>, <code>Month</code>, <code>Day</code>)
 
 <ul>
 <li>Excel does weird things with dates</li>
-<li>With concatentation, it is easy to make date columns if you need them</li>
-<li>We might be in the minority here.</li>
 </ul></li>
-</ul>
+</ol>
 
-</article></slide><slide class=""><hgroup><h2>Guidelines for data files</h2></hgroup><article  id="guidelines-for-data-files-3">
-
-<ul>
-<li>Create a data dictionary (explanations of what your columns represent)
+</article></slide><slide class=""><hgroup><h2>Data Storing - Relational Data</h2></hgroup><article  id="data-storing---relational-data">
 
 <ul>
-<li>Cell comments, a separate Excel sheet, or separate file
+<li>Strive for relational data to keep your file size small
 
 <ul>
-<li><em>Not in the column names</em></li>
-</ul></li>
-<li>&ldquo;Body mass in grams, measured to nearest 0.1 g.&rdquo;</li>
-</ul></li>
-<li>Keep file sizes manageable
-
-<ul>
-<li>Do you need 384 columns in that Excel file?</li>
+<li>store data as smaller units (hierarchical and by type) and link through code.</li>
 <li>Use shared numeric IDs so that you can match and merge data across files</li>
+<li>For example: store site level data in one file, and plot level data in another. Then link these datasets through code.
+
+<ul>
+<li>This helps avoid confusion and repetition</li>
+<li>Great for large, interconnected datasets, especially those that can change</li>
+</ul></li>
+<li>Data management systems play well with data in this format (e.g. Tidy, SQL)</li>
 </ul></li>
 </ul>
+
+</article></slide><slide class=""><hgroup><h2>Data Storing - Relational Data</h2></hgroup><article  id="data-storing---relational-data-1">
+
+<p><span style="color:pink">
+INCLUDE RELATIONAL DATA IMAGE</span></p>
 
 </article></slide><slide class=""><hgroup><h2>Examples, bad and good</h2></hgroup><article  id="examples-bad-and-good">
 
@@ -3234,6 +3286,9 @@ if (document.readyState !== "loading" &&
 
 </center>
 
+<p><span style="color:pink">
+FIX</span></p>
+
 </article></slide><slide class=""><hgroup><h2>Examples, bad and good</h2></hgroup><article  id="examples-bad-and-good-1">
 
 <center>
@@ -3241,6 +3296,9 @@ if (document.readyState !== "loading" &&
 <img src="https://i.imgur.com/2MFXD0C.png" />
 
 </center>
+
+<p><span style="color:pink">
+FIX</span></p>
 
 </article></slide><slide class=""><hgroup><h2>It would be nice to store data in csv files and edit in Excel, but…</h2></hgroup><article  id="it-would-be-nice-to-store-data-in-csv-files-and-edit-in-excel-but">
 
@@ -3250,7 +3308,13 @@ if (document.readyState !== "loading" &&
 
 </center>
 
+<p><span style="color:pink">
+FIX</span></p>
+
 </article></slide><slide class=""><hgroup><h2>and</h2></hgroup><article  id="and">
+
+<p><span style="color:pink">
+FIX</span></p>
 
 <center>
 
