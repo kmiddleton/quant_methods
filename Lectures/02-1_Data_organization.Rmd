@@ -19,17 +19,6 @@ theme_set(theme_cowplot())
 
 
 
-## Goal for this week
-
-**Take Care of Your Data**:
-
-- Organizing
-- Storing
-- Loading
-- Cleaning
-- Visualizing
-- Validating
-
 
 
 ## Data Organizing - File Structure
@@ -46,9 +35,7 @@ For each R project/manuscript, you will want to have a set of folders. Here is a
   - Documents
   - ReadMe
 
-## Data Organizing - File Structure
-
-<font size="4">
+## Data Organizing - File Structure {.smaller}
 
   - Data
     - raw data (read-only, pristine backup, not to be touched)
@@ -62,9 +49,8 @@ For each R project/manuscript, you will want to have a set of folders. Here is a
     - Literature folder
   - ReadMe
     - metadata
-    - write down the driving questions and purposes of the project and other notes.
+    - list the driving questions and purposes of the project and other notes.
 
-</font>
 
 *Note: Your code will stay cleaner if you use many smaller scripts, e.g. one for all analyses, one for all figures **OR** one for each analysis and the associated figures*
 
@@ -82,7 +68,7 @@ For each R project/manuscript, you will want to have a set of folders. Here is a
 - Be consistent
     - File names, variable names, file formats, etc.
 
-## Data Storing - Guidelines for data files {.smaller}
+## Data Storing - Guidelines for Data Files {.smaller}
 
 
 1. Store data in rectangular format
@@ -114,9 +100,9 @@ For each R project/manuscript, you will want to have a set of folders. Here is a
 
 ## Data Storing - Relational Data
 
-<span style="color:pink">INCLUDE RELATIONAL DATA IMAGE</span>
-
-
+<center>
+<img src="https://imgur.com/tYmH2yK.png" style="width: 100%"/>
+</center>
 
 ## Examples, bad and good
 
@@ -125,8 +111,6 @@ For each R project/manuscript, you will want to have a set of folders. Here is a
 </center>
 
 
-<span style="color:pink">FIX</span>
-
 
 ## Examples, bad and good
 
@@ -134,7 +118,6 @@ For each R project/manuscript, you will want to have a set of folders. Here is a
 <img src="https://i.imgur.com/2MFXD0C.png" />
 </center>
 
-<span style="color:pink">FIX</span>
 
 
 ## It would be nice to store data in csv files and edit in Excel, but...
@@ -143,12 +126,10 @@ For each R project/manuscript, you will want to have a set of folders. Here is a
 <img src="https://i.imgur.com/AiwZwdq.png" />
 </center>
 
-<span style="color:pink">FIX</span>
 
 
 ## and
 
-<span style="color:pink">FIX</span>
 
 
 <center>
@@ -160,17 +141,3 @@ Working with csv files in Excel _not_ a viable (i.e., non-aggravating) option.
 - If you are entering data, use .xls or .xlsx and trust that translators will be available for as long as you are a scientist
 - If you are outputting data from another program, use csv or tab-delimits (if your data has commas).
 
-## Some hope: Comma Chameleon
-
-- Simple, cross-platform csv editing.
-- http://comma-chameleon.io/
-
-<center><img src="http://comma-chameleon.io/img/icon.jpg" /></center>
-
-MacOS specific: https://github.com/jakob/TableTool
-
-## Quiz 02-1
-
-On Canvas, complete quiz 02-1.
-
-Move on to lecture 02-2.
