@@ -1,7 +1,7 @@
 ---
 title: "Reproducible Research"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 7
@@ -13,16 +13,16 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE}
 ```
 
-## Notes
+## Four Foundational Principles of Data Management
 
-None for this lecture
+1. **F**indability
+2. **A**ccessibility
+3. **I**nteroperability
+4. **R**eusability (Reproducibility)
 
-## Readings
+\bigskip If we care about long term data useability, sharing and stewardship, then we need to think about how and when to make our data FAIR. This is especially important if we want our work to be accessed by multiple stakeholders (i.e. industry, public, education, policy, *computers?*)
 
-Recommended:
-
-- Buffalo (2015) Chapter 1: "How to Learn Bioinformatics"
-    - Note: although the focus of this chapter is bioinformatics the rationale applies to any field of life sciences.
+\bigskip These ideas will come in handy when writing future "data management plans" required for many grants.
 
 ## What is reproducible research?
 
@@ -75,7 +75,7 @@ Treat raw data like an endangered species. Don't mess with it! In data science s
 1. Markdown
 1. Version control
     - Ok = sequential numbers (never use "final"!)
-    - Better = Git (Interested? See [Git for Humans](https://speakerdeck.com/alicebartlett/git-for-humans))
+    - Better = Git (Interested? See Git & Github resources)
 
 ## Why R for reproducible research?
 
@@ -143,8 +143,3 @@ Be kind to your future self.
 
 > Your closest collaborator is you six months ago, but you don't reply to emails.
 
-## Quiz 01-2
-
-Go complete quiz 01-2 on Canvas now.
-
-Then move on to lecture 01-3.

@@ -4,7 +4,6 @@
   <title>Programming with Data</title>
 
   <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <meta name="generator" content="pandoc" />
 
@@ -31,7 +30,7 @@
       // Author information
       presenters: [
             {
-        name:  'Elizabeth King and Kevin Middleton' ,
+        name:  'Elizabeth King, Kevin Middleton, and Lauren Sullivan' ,
         company: '',
         gplus: '',
         twitter: '',
@@ -259,7 +258,6 @@ background: black;
 }
 
 slides > slide {
-display: none;
 font-family: 'Open Sans', Arial, sans-serif;
 font-size: 26px;
 color: #797979;
@@ -280,17 +278,19 @@ transition: all 0.6s ease-in-out;
 }
 
 slides > slide.far-past {
-display: none;
 }
 
 slides > slide.past {
-display: block;
 opacity: 0;
 }
 
 slides > slide.current {
 display: block;
 opacity: 1;
+z-index: 1;
+}
+slides > slide:not(.current) {
+z-index: 0;
 }
 
 slides > slide.current .auto-fadein {
@@ -305,13 +305,11 @@ background-size: 100% 100%;
 }
 
 slides > slide.next {
-display: block;
 opacity: 0;
 pointer-events: none;
 }
 
 slides > slide.far-next {
-display: none;
 }
 
 slides > slide.dark {
@@ -383,8 +381,6 @@ width: 1100px;
 
 slides.layout-widescreen > slide.far-past,
 slides.layout-faux-widescreen > slide.far-past {
-display: block;
-display: none;
 -webkit-transform: translate(-2260px);
 -moz-transform: translate(-2260px);
 -ms-transform: translate(-2260px);
@@ -418,8 +414,6 @@ pointer-events: none;
 
 slides.layout-widescreen > slide.far-next,
 slides.layout-faux-widescreen > slide.far-next {
-display: block;
-display: none;
 -webkit-transform: translate(2260px);
 -moz-transform: translate(2260px);
 -ms-transform: translate(2260px);
@@ -1351,7 +1345,19 @@ opacity: 1;
 .overview .slide-area {
 display: none;
 }
+slides > slide {
+background: linear-gradient(#ffffff, #ffffff 85%, #e6e6e6);
+background-color: white;
+}
+slides > slide {
+opacity: 0;
+}
 @media print {
+
+@page {
+size: landscape;
+margin: 0;
+}
 
 slides slide {
 display: block !important;
@@ -3095,7 +3101,81 @@ if (document.readyState !== "loading" &&
       transition: opacity 0.6s ease-in 0.4s;
       opacity: 0;
     }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
 
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+            code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode { white-space: pre; position: relative; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    code.sourceCode { white-space: pre-wrap; }
+    code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+        
   </style>
 
   <link href="data:text/css;charset=utf-8,%23bluefont%20%7B%0Acolor%3A%20blue%3B%0A%7D%0A%2Ereferences%20%7B%0Afont%2Dsize%3A%2060%25%3B%0Apadding%2Dleft%3A%2022px%20%3B%0Atext%2Dindent%3A%20%2D22px%20%3B%0A%7D%0A%2Ecenter%20%7B%0Adisplay%3A%20block%3B%0Amargin%2Dleft%3A%20auto%3B%0Amargin%2Dright%3A%20auto%3B%0A%7D%0Ablockquote%20%7B%0Abackground%3A%20%23f9f9f9%3B%0Aborder%2Dleft%3A%2010px%20solid%20%23ccc%3B%0Amargin%3A%201%2E5em%2010px%3B%0Apadding%3A%200%2E5em%2010px%3B%0Aquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%0A%7D%0Ap%20ul%20ol%20%7B%0Atext%2Dalign%3A%20left%3B%0Afont%2Dsize%3A%2080%25%3B%0A%7D%0Ablockquote%20p%20%7B%0Afont%2Dsize%3A%2080%25%3B%0Adisplay%3A%20inline%3B%0Atext%2Dalign%3A%20left%3B%0A%7D%0A%3Cstyle%3E%0A%2Ecol2%20%7B%0A%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%0A%2Dmoz%2Dcolumns%3A%202%20300px%3B%20%0Acolumns%3A%202%20300px%3B%20%0A%7D%0A%2Ecol3%20%7B%0A%2Dwebkit%2Dcolumns%3A%203%20100px%3B%0A%2Dmoz%2Dcolumns%3A%203%20100px%3B%0Acolumns%3A%203%20100px%3B%0A%7D%0A%3C%2Fstyle%3E%0A" rel="stylesheet" type="text/css" />
@@ -3115,15 +3195,7 @@ if (document.readyState !== "loading" &&
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2>Notes</h2></hgroup><article  id="notes">
-
-<p>None for this lecture.</p>
-
-</article></slide><slide class=""><hgroup><h2>Readings</h2></hgroup><article  id="readings">
-
-<p>None for this lecture.</p>
-
-</article></slide><slide class=""><hgroup><h2></h2></hgroup><article >
+<slide class=""><hgroup><h2></h2></hgroup><article >
 
 <blockquote>
 <p>&quot;For example, last month I was working on a problem of logistic regression that I suspected had mislabeled outcomes (some zeroes turned to ones, and vice versa), and read up on some robust logistic regression methods, implemented in the robust package. But I wasn’t sure they would be effective on my data, so I did some random simulation of mislabeled outcomes and applied the method. The method didn’t work as well as I needed it to, which saved me from applying it to my data and thinking I’d solved the problem.</p>
@@ -3221,7 +3293,7 @@ if (document.readyState !== "loading" &&
 
 <center>
 
-<img src="https://arttodaymagazine.objects.frb.io/assets/uploads/2016/06/03152001/The-Madonna-Child-by-Sinorelli.jpg" />
+<img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Leonardo_Design_for_a_Flying_Machine%2C_c._1488.jpg" width="50%" />
 
 </center>
 
@@ -3236,6 +3308,77 @@ library(tidyverse)</pre>
 <li>We will start using these tools next week.</li>
 <li>Read <a href='https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html' title=''>The Tidy Tools Manifesto</a></li>
 </ul>
+
+</article></slide><slide class=""><hgroup><h2>A few tips for clean code</h2></hgroup><article  id="a-few-tips-for-clean-code">
+
+<ul>
+<li>In order to make sure your code is reproducible, you want to make sure it is understandable by others (and your future self). To achieve this, your code should be clean, readable, and well annotated. So how do we do that?</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Whitespace is your friend</h2></hgroup><article  class="smaller" id="whitespace-is-your-friend">
+
+<ul>
+<li>Separate elements and processes with spaces and line breaks</li>
+<li>Limit line length</li>
+<li>Use indenting to group code</li>
+</ul>
+
+<p>Hard to read:</p>
+
+<pre class = 'prettyprint lang-r'>tvtest&lt;-lmer(sqrt(tv)~Region*log(DD5_TOT)+(1|Population/Sample_ID)+
+(1|Year),data=tvdat,REML=FALSE)
+summary(tvtest)
+ggplot(tvdat,aes(x=log(DD5_TOT),y=sqrt(tv),col=Region))+
+geom_point(shape=1,size=3,alpha=1/3)+ geom_smooth(aes(col=Region),method=&#39;lm&#39;)+
+xlab(bquote(&#39;log(Degree Days above&#39; ~5^o~C*&#39;)&#39;))+ylab(&#39;sqrt(Terminal Velocity (m/s))&#39;)</pre>
+
+</article></slide><slide class=""><hgroup><h2>Whitespace is your friend</h2></hgroup><article  class="smaller" id="whitespace-is-your-friend-1">
+
+<ul>
+<li>Separate elements and processes with spaces and line breaks</li>
+<li>Limit line length</li>
+<li>Use indenting to group code</li>
+</ul>
+
+<p>Easier to read:</p>
+
+<pre class = 'prettyprint lang-r'>tvtest &lt;- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
+                 (1|Population/Sample_ID) + 
+                 (1|Year), data = tvdat, 
+               REML = FALSE)
+
+summary(tvtest)
+
+ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
+  geom_point(shape = 1, size = 3, alpha = 1/3) +
+  geom_smooth(aes(col = Region), method = &#39;lm&#39;) + 
+  xlab(bquote(&#39;log(Degree Days above&#39; ~5^o~C*&#39;)&#39;)) +
+  ylab(&#39;sqrt(Terminal Velocity (m/s))&#39;)</pre>
+
+</article></slide><slide class=""><hgroup><h2>Annotations are messages to your future self (and others)</h2></hgroup><article  class="smaller" id="annotations-are-messages-to-your-future-self-and-others">
+
+<ul>
+<li>Explain the reason &amp; functionality of the code (important when you are a beginner!)</li>
+<li>Any useful messages</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'># Linear mixed model
+# Random effects: Sample nested in Population and Year
+tvtest &lt;- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
+                 (1|Population/Sample_ID) + 
+                 (1|Year), data = tvdat, 
+               REML = FALSE)
+
+# Summary output of the model
+summary(tvtest)
+
+# Plot tv vs. dd5_tot colored by Region
+# alpha = transparancy, smaller is more transparent
+ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
+  geom_point(shape = 1, size = 3, alpha = 1/3) +
+  geom_smooth(aes(col = Region), method = &#39;lm&#39;) + 
+  xlab(bquote(&#39;log(Degree Days above&#39; ~5^o~C*&#39;)&#39;)) +
+  ylab(&#39;sqrt(Terminal Velocity (m/s))&#39;)</pre>
 
 </article></slide><slide class=""><hgroup><h2>Kinds of data in R</h2></hgroup><article  id="kinds-of-data-in-r">
 
@@ -3304,9 +3447,9 @@ y1[1:3]</pre>
 
 <pre class = 'prettyprint lang-r'>sqrt(y2)</pre>
 
-<pre >##  [1] 1.000000 1.213954 1.395481 1.555973 1.701393 1.835326 1.960129
-##  [8] 2.077448 2.188487 2.294157 2.395171 2.492093 2.585384 2.675424
-## [15] 2.762531 2.846974 2.928984 3.008759 3.086473 3.162278</pre>
+<pre >##  [1] 1.000000 1.213954 1.395481 1.555973 1.701393 1.835326 1.960129 2.077448
+##  [9] 2.188487 2.294157 2.395171 2.492093 2.585384 2.675424 2.762531 2.846974
+## [17] 2.928984 3.008759 3.086473 3.162278</pre>
 
 <pre class = 'prettyprint lang-r'>y2_mean &lt;- mean(y2)
 y2_sd &lt;- sd(y2)
@@ -3390,8 +3533,7 @@ M</pre>
 
 <pre class = 'prettyprint lang-r'>M$A</pre>
 
-<pre >## [1] a b c
-## Levels: a b c</pre>
+<pre >## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;</pre>
 
 <pre class = 'prettyprint lang-r'>M[, &quot;y&quot;]</pre>
 
@@ -3432,7 +3574,7 @@ M</pre>
 
 <p>Get help from the R command line with ?: <code>?sqrt</code> or <code>?log10</code>. Also try <code>help.search(&quot;mean&quot;)</code>, etc.</p>
 
-</article></slide><slide class=""><hgroup><h2>Analysis workflow</h2></hgroup><article  id="analysis-workflow" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Analysis workflow</h2></hgroup><article  class="smaller" id="analysis-workflow">
 
 <ol>
 <li>Enter data (e.g., Excel)</li>
@@ -3456,7 +3598,15 @@ M</pre>
 <li>More analysis</li>
 </ul></li>
 <li>Make tables and figures for publication</li>
-</ol></article></slide>
+</ol>
+
+</article></slide><slide class=""><hgroup><h2>Analysis workflow</h2></hgroup><article  id="analysis-workflow-1">
+
+<center>
+
+<img src="https://i.imgur.com/fDpfRDA.png" width="85%" />
+
+</center></article></slide>
 
 
   <slide class="backdrop"></slide>

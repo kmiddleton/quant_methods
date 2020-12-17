@@ -1,7 +1,7 @@
 ---
 title: "Introduction"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 7
@@ -12,14 +12,6 @@ bibliography: Multivariate.bib
 
 ```{r setup, echo=FALSE}
 ```
-
-## Notes
-
-None for this lecture.
-
-## Readings
-
-None for this lecture.
 
 ## Goals for this course
 
@@ -76,6 +68,7 @@ Programming
 
 - Participate
     - In class and in your groups
+    - Ask questions
 - Do the readings when applicable
 - Do the problem sets conscientiously
 - Persistence
@@ -90,8 +83,7 @@ Programming
 1. Data organization and visualization
 1. Probability, methods of inference, hypothesis testing
 1. Generalized linear models, model comparison
-1. Composite variables
-1. Experimental design
+1. Robust experimental design & planning
 
 ## Resources
 
@@ -101,8 +93,3 @@ Canvas $\rightarrow$ Modules $\rightarrow$ Pre-course Workshop
 - Learning R
 - Statistics resources
 
-## Quiz 01-1
-
-Go complete quiz 01-1 on Canvas now.
-
-Then move on to lecture 01-2.

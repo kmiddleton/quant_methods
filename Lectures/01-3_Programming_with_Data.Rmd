@@ -1,7 +1,7 @@
 ---
 title: "Programming with Data"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 7
@@ -16,13 +16,6 @@ library(readxl)
 library(cowplot)
 ```
 
-## Notes
-
-None for this lecture.
-
-## Readings
-
-None for this lecture.
 
 ---
 
@@ -83,7 +76,7 @@ Should you learn the base R way or the new tools?
 
   - Both, eventually.
 
-<center><img src="https://arttodaymagazine.objects.frb.io/assets/uploads/2016/06/03152001/The-Madonna-Child-by-Sinorelli.jpg" /></center>
+<center><img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Leonardo_Design_for_a_Flying_Machine%2C_c._1488.jpg" width="50%" /></center>
 
 ## The tidyverse
 
@@ -96,6 +89,76 @@ library(tidyverse)
 
 - We will start using these tools next week.
 - Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)
+
+## A few tips for clean code
+
+- In order to make sure your code is reproducible, you want to make sure it is understandable by others (and your future self). To achieve this, your code should be clean, readable, and well annotated. So how do we do that?
+
+## Whitespace is your friend {.smaller}
+
+- Separate elements and processes with spaces and line breaks
+- Limit line length
+- Use indenting to group code
+
+Hard to read:
+```{r eval=FALSE}
+tvtest<-lmer(sqrt(tv)~Region*log(DD5_TOT)+(1|Population/Sample_ID)+
+(1|Year),data=tvdat,REML=FALSE)
+summary(tvtest)
+ggplot(tvdat,aes(x=log(DD5_TOT),y=sqrt(tv),col=Region))+
+geom_point(shape=1,size=3,alpha=1/3)+ geom_smooth(aes(col=Region),method='lm')+
+xlab(bquote('log(Degree Days above' ~5^o~C*')'))+ylab('sqrt(Terminal Velocity (m/s))')
+```
+
+## Whitespace is your friend {.smaller}
+
+- Separate elements and processes with spaces and line breaks
+- Limit line length
+- Use indenting to group code
+
+Easier to read:
+```{r eval=FALSE}
+tvtest <- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
+                 (1|Population/Sample_ID) + 
+                 (1|Year), data = tvdat, 
+               REML = FALSE)
+
+summary(tvtest)
+
+ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
+  geom_point(shape = 1, size = 3, alpha = 1/3) +
+  geom_smooth(aes(col = Region), method = 'lm') + 
+  xlab(bquote('log(Degree Days above' ~5^o~C*')')) +
+  ylab('sqrt(Terminal Velocity (m/s))')
+
+```
+
+## Annotations are messages to your future self (and others) {.smaller}
+
+- Explain the reason & functionality of the code (important when you are a beginner!)
+- Any useful messages
+
+```{r eval=FALSE}
+# Linear mixed model
+# Random effects: Sample nested in Population and Year
+tvtest <- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
+                 (1|Population/Sample_ID) + 
+                 (1|Year), data = tvdat, 
+               REML = FALSE)
+
+# Summary output of the model
+summary(tvtest)
+
+# Plot tv vs. dd5_tot colored by Region
+# alpha = transparancy, smaller is more transparent
+ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
+  geom_point(shape = 1, size = 3, alpha = 1/3) +
+  geom_smooth(aes(col = Region), method = 'lm') + 
+  xlab(bquote('log(Degree Days above' ~5^o~C*')')) +
+  ylab('sqrt(Terminal Velocity (m/s))')
+
+```
+
 
 ## Kinds of data in R
 
@@ -241,3 +304,7 @@ Get help from the R command line with ?: `?sqrt` or `?log10`. Also try `help.sea
 1. Interpretation
     * More analysis
 1. Make tables and figures for publication
+
+## Analysis workflow
+
+<center><img src="https://i.imgur.com/fDpfRDA.png" width="85%" /></center>

@@ -4,7 +4,6 @@
   <title>Reproducible Research</title>
 
   <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <meta name="generator" content="pandoc" />
 
@@ -31,7 +30,7 @@
       // Author information
       presenters: [
             {
-        name:  'Elizabeth King and Kevin Middleton' ,
+        name:  'Elizabeth King, Kevin Middleton, and Lauren Sullivan' ,
         company: '',
         gplus: '',
         twitter: '',
@@ -259,7 +258,6 @@ background: black;
 }
 
 slides > slide {
-display: none;
 font-family: 'Open Sans', Arial, sans-serif;
 font-size: 26px;
 color: #797979;
@@ -280,17 +278,19 @@ transition: all 0.6s ease-in-out;
 }
 
 slides > slide.far-past {
-display: none;
 }
 
 slides > slide.past {
-display: block;
 opacity: 0;
 }
 
 slides > slide.current {
 display: block;
 opacity: 1;
+z-index: 1;
+}
+slides > slide:not(.current) {
+z-index: 0;
 }
 
 slides > slide.current .auto-fadein {
@@ -305,13 +305,11 @@ background-size: 100% 100%;
 }
 
 slides > slide.next {
-display: block;
 opacity: 0;
 pointer-events: none;
 }
 
 slides > slide.far-next {
-display: none;
 }
 
 slides > slide.dark {
@@ -383,8 +381,6 @@ width: 1100px;
 
 slides.layout-widescreen > slide.far-past,
 slides.layout-faux-widescreen > slide.far-past {
-display: block;
-display: none;
 -webkit-transform: translate(-2260px);
 -moz-transform: translate(-2260px);
 -ms-transform: translate(-2260px);
@@ -418,8 +414,6 @@ pointer-events: none;
 
 slides.layout-widescreen > slide.far-next,
 slides.layout-faux-widescreen > slide.far-next {
-display: block;
-display: none;
 -webkit-transform: translate(2260px);
 -moz-transform: translate(2260px);
 -ms-transform: translate(2260px);
@@ -1351,7 +1345,19 @@ opacity: 1;
 .overview .slide-area {
 display: none;
 }
+slides > slide {
+background: linear-gradient(#ffffff, #ffffff 85%, #e6e6e6);
+background-color: white;
+}
+slides > slide {
+opacity: 0;
+}
 @media print {
+
+@page {
+size: landscape;
+margin: 0;
+}
 
 slides slide {
 display: block !important;
@@ -3095,7 +3101,18 @@ if (document.readyState !== "loading" &&
       transition: opacity 0.6s ease-in 0.4s;
       opacity: 0;
     }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
 
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+            
   </style>
 
   <link href="data:text/css;charset=utf-8,%23bluefont%20%7B%0Acolor%3A%20blue%3B%0A%7D%0A%2Ereferences%20%7B%0Afont%2Dsize%3A%2060%25%3B%0Apadding%2Dleft%3A%2022px%20%3B%0Atext%2Dindent%3A%20%2D22px%20%3B%0A%7D%0A%2Ecenter%20%7B%0Adisplay%3A%20block%3B%0Amargin%2Dleft%3A%20auto%3B%0Amargin%2Dright%3A%20auto%3B%0A%7D%0Ablockquote%20%7B%0Abackground%3A%20%23f9f9f9%3B%0Aborder%2Dleft%3A%2010px%20solid%20%23ccc%3B%0Amargin%3A%201%2E5em%2010px%3B%0Apadding%3A%200%2E5em%2010px%3B%0Aquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%0A%7D%0Ap%20ul%20ol%20%7B%0Atext%2Dalign%3A%20left%3B%0Afont%2Dsize%3A%2080%25%3B%0A%7D%0Ablockquote%20p%20%7B%0Afont%2Dsize%3A%2080%25%3B%0Adisplay%3A%20inline%3B%0Atext%2Dalign%3A%20left%3B%0A%7D%0A%3Cstyle%3E%0A%2Ecol2%20%7B%0A%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%0A%2Dmoz%2Dcolumns%3A%202%20300px%3B%20%0Acolumns%3A%202%20300px%3B%20%0A%7D%0A%2Ecol3%20%7B%0A%2Dwebkit%2Dcolumns%3A%203%20100px%3B%0A%2Dmoz%2Dcolumns%3A%203%20100px%3B%0Acolumns%3A%203%20100px%3B%0A%7D%0A%3C%2Fstyle%3E%0A" rel="stylesheet" type="text/css" />
@@ -3115,21 +3132,18 @@ if (document.readyState !== "loading" &&
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2>Notes</h2></hgroup><article  id="notes">
+<slide class=""><hgroup><h2>Four Foundational Principles of Data Management</h2></hgroup><article  id="four-foundational-principles-of-data-management">
 
-<p>None for this lecture</p>
+<ol>
+<li><strong>F</strong>indability</li>
+<li><strong>A</strong>ccessibility</li>
+<li><strong>I</strong>nteroperability</li>
+<li><strong>R</strong>eusability (Reproducibility)</li>
+</ol>
 
-</article></slide><slide class=""><hgroup><h2>Readings</h2></hgroup><article  id="readings">
+<p>If we care about long term data useability, sharing and stewardship, then we need to think about how and when to make our data FAIR. This is especially important if we want our work to be accessed by multiple stakeholders (i.e. industry, public, education, policy, <em>computers?</em>)</p>
 
-<p>Recommended:</p>
-
-<ul>
-<li>Buffalo (2015) Chapter 1: &ldquo;How to Learn Bioinformatics&rdquo;
-
-<ul>
-<li>Note: although the focus of this chapter is bioinformatics the rationale applies to any field of life sciences.</li>
-</ul></li>
-</ul>
+<p>These ideas will come in handy when writing future &ldquo;data management plans&rdquo; required for many grants.</p>
 
 </article></slide><slide class=""><hgroup><h2>What is reproducible research?</h2></hgroup><article  id="what-is-reproducible-research">
 
@@ -3202,7 +3216,7 @@ if (document.readyState !== "loading" &&
 
 <ul>
 <li>Ok = sequential numbers (never use &ldquo;final&rdquo;!)</li>
-<li>Better = Git (Interested? See <a href='https://speakerdeck.com/alicebartlett/git-for-humans' title=''>Git for Humans</a>)</li>
+<li>Better = Git (Interested? See Git &amp; Github resources)</li>
 </ul></li>
 </ol>
 
@@ -3301,13 +3315,7 @@ if (document.readyState !== "loading" &&
 
 <blockquote>
 <p>Your closest collaborator is you six months ago, but you don’t reply to emails.</p>
-</blockquote>
-
-</article></slide><slide class=""><hgroup><h2>Quiz 01-2</h2></hgroup><article  id="quiz-01-2">
-
-<p>Go complete quiz 01-2 on Canvas now.</p>
-
-<p>Then move on to lecture 01-3.</p></article></slide>
+</blockquote></article></slide>
 
 
   <slide class="backdrop"></slide>
