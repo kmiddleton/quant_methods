@@ -82,7 +82,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
 
 ```{r eval=FALSE}
 library("tidyverse")
-library("cowplot")  # Our preferred ggplot theme
+library("cowplot")  # *Some* of our preferred ggplot theme
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
   geom_point() 
 ```
@@ -262,6 +262,7 @@ ggplot(iris, aes(x = Petal.Length)) +
 - `geom_smooth()`
 - `geom_line()`
 - `geom_histogram()`
+- `geom_density()`
 - `geom_boxplot()`
 - `geom_dotplot()`
 - More at http://docs.ggplot2.org/current/
