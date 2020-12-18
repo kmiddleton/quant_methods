@@ -16,7 +16,7 @@ library(readxl)
 library(cowplot)
 ```
 
-## Assumptions of Science as a Way of Knowing
+## Assumptions of science as a way of knowing
 
 - All ways of knowing involve a set of assumptions
 - Our knowledge is conditional on these assumptions being met

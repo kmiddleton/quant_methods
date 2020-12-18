@@ -14,6 +14,7 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(readxl)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
 
 
@@ -87,8 +88,9 @@ install.packages("tidyverse") # Once
 library(tidyverse)
 ```
 
-- We will start using these tools next week.
-- Read [The Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)
+- Tidyverse Resources 
+  - The Tidy Tools Manifesto
+  - Guides & Tutorials 
 
 ## A few tips for clean code
 
@@ -243,7 +245,7 @@ Mixed data types per column
   - Factor (categorical)
   - Logical (`TRUE` and `FALSE`)
 
-`read_excel()` produces `tbl_df`s, which print a little prettier but are otherwise equivalent and completely compatible.
+`read_excel()` produces `tibble`s, which print a little prettier but are otherwise equivalent and completely compatible.
 
 ## Making data.frames
 

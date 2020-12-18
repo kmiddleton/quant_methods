@@ -77,19 +77,14 @@ Programming
     - Exhaust your own options first (work with your group)
     - "What will I do when I'm on my own?" (Can Google help me?)
 
-## Course outline | Major topics
-
-1. Working with R for reproducible research
-1. Data organization and visualization
-1. Probability, methods of inference, hypothesis testing
-1. Generalized linear models, model comparison
-1. Robust experimental design & planning
 
 ## Resources
 
-Canvas $\rightarrow$ Modules $\rightarrow$ Pre-course Workshop
+Canvas $\rightarrow$ Modules $\rightarrow$ Resources
 
 - Installing R and RStudio
 - Learning R
 - Statistics resources
+- Programming resources
+- Etc.
 
