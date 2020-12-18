@@ -30,7 +30,7 @@
       // Author information
       presenters: [
             {
-        name:  'Elizabeth King and Kevin Middleton' ,
+        name:  'Elizabeth King, Kevin Middleton and Lauren Sullivan' ,
         company: '',
         gplus: '',
         twitter: '',
@@ -3125,11 +3125,7 @@ slide:not(.current) .plotly.html-widget{
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2>Notes</h2></hgroup><article  id="notes">
-
-</article></slide><slide class=""><hgroup><h2>Readings</h2></hgroup><article  id="readings">
-
-</article></slide><slide class=""><hgroup><h2>Reading delimited files into R</h2></hgroup><article  id="reading-delimited-files-into-r">
+<slide class=""><hgroup><h2>Reading delimited files into R</h2></hgroup><article  id="reading-delimited-files-into-r">
 
 <ul>
 <li>csv: <code>read.csv()</code></li>
@@ -3141,6 +3137,7 @@ slide:not(.current) .plotly.html-widget{
 <li><code>read_csv()</code></li>
 <li>Like their base R counterparts but with more logical default arguments &amp; behavior</li>
 </ul></li>
+<li>check out the fun readings on &ldquo;strings as factors&rdquo; in the resources tab.</li>
 </ul>
 
 </article></slide><slide class=""><hgroup><h2>Beware of <code>stringsAsFactors</code> &ldquo;feature&rdquo;</h2></hgroup><article  id="beware-of-stringsasfactors-feature">
@@ -3161,23 +3158,15 @@ slide:not(.current) .plotly.html-widget{
 <li>Use <code>tidyverse</code> functions <code>read_delim()</code> and <code>read_csv()</code>.</li>
 </ul>
 
-<p>Fun reading:</p>
-
-<ul>
-<li><a href='http://notstatschat.tumblr.com/post/124987394001/stringsasfactors-sigh' title=''>stringsAsFactors = sigh</a></li>
-<li><a href='http://simplystatistics.org/2015/07/24/stringsasfactors-an-unauthorized-biography/' title=''>stringsAsFactors: An unauthorized biography</a></li>
-</ul>
-
 </article></slide><slide class=""><hgroup><h2>Reading Excel files into R</h2></hgroup><article  id="reading-excel-files-into-r">
 
 <p>Preferred package: <a href='https://cran.r-project.org/web/packages/readxl/index.html' title=''>readxl</a></p>
 
 <ul>
-<li><em>Not</em> automatically loaded with <code>tidyverse</code></li>
+<li>Note: <strong>NOT</strong> a part of <code>tidyverse</code>! You must load it separately.</li>
 </ul>
 
-<pre class = 'prettyprint lang-r'>library(&quot;readxl&quot;)
-
+<pre class = 'prettyprint lang-r'>library(readxl)
 M &lt;- read_excel(&quot;MyFile.xlsx&quot;)</pre>
 
 </article></slide><slide class=""><hgroup><h2>Load data</h2></hgroup><article  id="load-data">
@@ -4213,294 +4202,20 @@ M_agr</pre>
 ## 280 2011.000  4.000000 11.00000      NA   NA     NA
 ## 281 2011.000  4.000000 11.00000      NA   NA     NA</pre>
 
-</article></slide><slide class=""><hgroup><h2>SHOULD WE WRITE A FILE?</h2></hgroup><article  id="should-we-write-a-file">
-
-<p><span style="color:pink">
-WRITE A FILE?</span></p>
-
-<p>##SPLIT HERE</p>
-
-<p><span style="color:pink">
-I WOULD LIKE TO SPLIT THIS HERE AND MAKE A NEW ONE FOR DATA CLEANING WITH ALL THE TIDY STUFF. I WOULD BASICALLY JUST ADD ON ALL THIS TO THE DATA CLEANING ONE THAT I THINK SHOULD GO NEXT (new 02-3)</span></p>
-
-</article></slide><slide class=""><hgroup><h2>New tools: Selecting, filtering, aggregating</h2></hgroup><article  id="new-tools-selecting-filtering-aggregating">
+</article></slide><slide class=""><hgroup><h2>Writing Files</h2></hgroup><article  id="writing-files">
 
 <ul>
-<li><a href='https://cran.r-project.org/web/packages/tidyr/index.html' title=''>tidyr</a></li>
-<li><a href='https://cran.r-project.org/web/packages/dplyr/index.html' title=''>dplyr</a></li>
-<li>Both load with <code>tidyverse</code></li>
-</ul>
-
-<p>Tutorials:</p>
+<li><p>When you have a file you want to save, use <code>write.csv()</code>, or <code>write_csv()</code>, or <code>write.txt()</code>, or <code>write_txt()</code>.</p>
 
 <ul>
-<li><a href='http://seananderson.ca/2014/09/13/dplyr-intro.html' title=''>http://seananderson.ca/2014/09/13/dplyr-intro.html</a></li>
-<li><a href='https://rpubs.com/bradleyboehmke/data_wrangling' title=''>https://rpubs.com/bradleyboehmke/data_wrangling</a></li>
-</ul>
-
-<pre class = 'prettyprint lang-r'>library(&quot;tidyverse&quot;)</pre>
-
-</article></slide><slide class=""><hgroup><h2>tidyr</h2></hgroup><article  id="tidyr">
-
-<p>tidyr is most useful for moving data between &ldquo;wide&rdquo; and &ldquo;long&rdquo; formats:</p>
-
-<ul>
-<li><code>gather()</code>: wide to long</li>
-<li><code>spread()</code>: long to wide</li>
-</ul>
-
-<p>Utility functions for existing variables:</p>
-
-<ul>
-<li><code>separate()</code>: splitting variables (1 column to &gt;1)</li>
-<li><code>unite()</code>: joining variables (&gt;1 columns to 1)</li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2>Wide data</h2></hgroup><article  id="wide-data">
-
-<pre class = 'prettyprint lang-r'>LS</pre>
-
-<pre >## # A tibble: 4 x 4
-##    Line Diet  Lifespan Fecundity
-##   &lt;int&gt; &lt;chr&gt;    &lt;int&gt;     &lt;int&gt;
-## 1     1 C           30        93
-## 2     1 H           31       101
-## 3     2 C           35        91
-## 4     2 H           45       101</pre>
-
-</article></slide><slide class=""><hgroup><h2>Long data</h2></hgroup><article  id="long-data">
-
-<pre class = 'prettyprint lang-r'>LS %&gt;% gather(variable, value, -Line, -Diet)</pre>
-
-<pre >## # A tibble: 8 x 4
-##    Line Diet  variable  value
-##   &lt;int&gt; &lt;chr&gt; &lt;chr&gt;     &lt;int&gt;
-## 1     1 C     Lifespan     30
-## 2     1 H     Lifespan     31
-## 3     2 C     Lifespan     35
-## 4     2 H     Lifespan     45
-## 5     1 C     Fecundity    93
-## 6     1 H     Fecundity   101
-## 7     2 C     Fecundity    91
-## 8     2 H     Fecundity   101</pre>
-
-</article></slide><slide class=""><hgroup><h2>Combine existing variables: tidyr</h2></hgroup><article  id="combine-existing-variables-tidyr">
-
-<pre class = 'prettyprint lang-r'>LS &lt;- LS %&gt;% unite(col = &quot;ID&quot;, Diet, Line,
-                 sep = &quot;_&quot;, remove = FALSE)
-LS</pre>
-
-<pre >## # A tibble: 4 x 5
-##   ID     Line Diet  Lifespan Fecundity
-##   &lt;chr&gt; &lt;int&gt; &lt;chr&gt;    &lt;int&gt;     &lt;int&gt;
-## 1 C_1       1 C           30        93
-## 2 H_1       1 H           31       101
-## 3 C_2       2 C           35        91
-## 4 H_2       2 H           45       101</pre>
-
-<p><code>remove = FALSE</code> means that the pre-existing variables are not removed.</p>
-
-</article></slide><slide class=""><hgroup><h2>Main functions in dplyr</h2></hgroup><article  id="main-functions-in-dplyr">
-
-<ul>
-<li><code>mutate()</code>: create new columns</li>
-<li><code>glimpse()</code>: like <code>str()</code></li>
-<li><code>select()</code>: like <code>[ , ]</code> for columns</li>
-<li><code>filter()</code>: like <code>subset()</code> or <code>[ , ]</code> with conditions</li>
-<li><code>summarize()</code> with <code>group_by()</code>: like <code>aggregate()</code></li>
-<li><code>arrange()</code>: sorting</li>
-<li><code>join()</code>: merging <code>data.frames</code></li>
-</ul>
-
-<p>Functions can (should) be chained together with <code>%&gt;%</code></p>
-
-<ul>
-<li>&ldquo;Pipe&rdquo; the result of the lefthand expression to the righthand expression.</li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2><code>glimpse()</code> is like <code>str()</code></h2></hgroup><article  id="glimpse-is-like-str">
-
-<pre class = 'prettyprint lang-r'>glimpse(M)</pre>
-
-<pre >## Rows: 2,457
-## Columns: 22
-## $ WnBatch  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
-## $ WnOrder  &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1…
-## $ MouseID  &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -9, -9, 11, 12, -9, -9, -9, -…
-## $ Sex      &lt;dbl&gt; 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ WnMass   &lt;dbl&gt; 15.26, 12.47, 17.37, 16.63, 16.76, 12.53, 10.89, 13.60, 14.1…
-## $ DamID    &lt;chr&gt; &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;229x&quot;, &quot;205x&quot;, &quot;205x&quot;, &quot;205…
-## $ DamMass  &lt;dbl&gt; 30.69, 30.69, 30.69, 30.69, 30.69, 36.85, 36.85, 36.85, 36.8…
-## $ SireID   &lt;chr&gt; &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;231x&quot;, &quot;207x&quot;, &quot;207x&quot;, &quot;207…
-## $ SireMass &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-## $ Lineage  &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-## $ WnYear   &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, …
-## $ WnMonth  &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, …
-## $ WnDay    &lt;dbl&gt; 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, …
-## $ BYear    &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, …
-## $ BMonth   &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, …
-## $ BDay     &lt;dbl&gt; 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, …
-## $ SepYear  &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, …
-## $ SepMonth &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, …
-## $ SepDay   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
-## $ Breeder  &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-## $ Fate     &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
-## $ Observ   &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</pre>
-
-</article></slide><slide class=""><hgroup><h2>Calculate new variables: dplyr</h2></hgroup><article  id="calculate-new-variables-dplyr">
-
-<pre class = 'prettyprint lang-r'>M &lt;- M %&gt;%
-  mutate(log10_DamMass = log10(DamMass))</pre>
-
-<ul>
-<li>Assigning <code>M</code> back to itself just adds the column <code>log10DamMass</code> to the end of the <code>data.frame</code>.</li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2><code>mutate()</code> or not?</h2></hgroup><article  id="mutate-or-not">
-
-<p><code>mutate()</code> lets you add many new variables at once.</p>
-
-<pre class = 'prettyprint lang-r'>M$log10_WnMass &lt;- log10(M$WnMass)
-M$log10_DamMass &lt;- log10(M$DamMass)</pre>
-
-<p>vs.</p>
-
-<pre class = 'prettyprint lang-r'>M &lt;- M %&gt;%
-  mutate(log10_WnMass = log10(WnMass),
-         log10_DamMass = log10(DamMass))</pre>
-
-</article></slide><slide class=""><hgroup><h2>Selecting columns: dplyr</h2></hgroup><article  id="selecting-columns-dplyr">
-
-<pre class = 'prettyprint lang-r'>M %&gt;% select(Sex, WnMass, DamID)</pre>
-
-<pre >## # A tibble: 2,457 x 3
-##      Sex WnMass DamID
-##    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;
-##  1     0   15.3 229x 
-##  2     1   12.5 229x 
-##  3     1   17.4 229x 
-##  4     1   16.6 229x 
-##  5     1   16.8 229x 
-##  6     0   12.5 205x 
-##  7     0   10.9 205x 
-##  8     1   13.6 205x 
-##  9     1   14.2 205x 
-## 10     1   13.4 205x 
-## # … with 2,447 more rows</pre>
-
-</article></slide><slide class=""><hgroup><h2>Chaining operations</h2></hgroup><article  id="chaining-operations">
-
-<pre class = 'prettyprint lang-r'>M %&gt;% select(starts_with(&quot;wn&quot;)) %&gt;% glimpse()</pre>
-
-<pre >## Rows: 2,457
-## Columns: 6
-## $ WnBatch &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
-## $ WnOrder &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18…
-## $ WnMass  &lt;dbl&gt; 15.26, 12.47, 17.37, 16.63, 16.76, 12.53, 10.89, 13.60, 14.17…
-## $ WnYear  &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2…
-## $ WnMonth &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1…
-## $ WnDay   &lt;dbl&gt; 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 2…</pre>
-
-<p>For more information and examples: <code>?select</code></p>
-
-<p><code>starts_with()</code>, <code>ends_with()</code>, <code>contains()</code>, <code>matches()</code>, <code>num_range()</code>, <code>one_of()</code>, <code>everything()</code></p>
-
-</article></slide><slide class=""><hgroup><h2>Benefits of chaining operations</h2></hgroup><article  id="benefits-of-chaining-operations">
-
-<ol>
-<li>Cleaner code, reads like a sentence
-
-<ul>
-<li>Be wary of long, opaque, chains (comment, comment, comment)</li>
+<li>With the Base R writing functions, you want to add &ldquo;row.names = FALSE&rdquo; to avoid an extra column for row names.</li>
 </ul></li>
-<li>(Often) avoid saving intermediate objects.
+<li><p>It will save to your working directory.</p></li>
+</ul>
 
-<ul>
-<li>Select, filter, and plot in one step</li>
-</ul></li>
-</ol>
+<pre class = 'prettyprint lang-r'>write_csv(M_agr, &quot;M_aggregate.csv&quot;)</pre>
 
-</article></slide><slide class=""><hgroup><h2>Filtering: dplyr</h2></hgroup><article  id="filtering-dplyr">
-
-<pre class = 'prettyprint lang-r'>M %&gt;% filter((WnMass &lt; 6 | WnMass &gt; 19) &amp; Sex == 0)</pre>
-
-<pre >## # A tibble: 14 x 24
-##    WnBatch WnOrder MouseID   Sex WnMass DamID DamMass SireID SireMass Lineage
-##      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;lgl&gt;  
-##  1       1      11      -9     0   5.69 205x     36.8 207x         NA NA     
-##  2       5      53     336     0  19.9  234      35.6 238          NA NA     
-##  3       6      58     338     0  19.9  236      34.0 238          NA NA     
-##  4       6      64      -9     0  19.5  236      34.0 238          NA NA     
-##  5       2      14     407     0   4.76 351      28.5 354          NA NA     
-##  6       4      90      -9     0  19.0  302      32.2 306          NA NA     
-##  7       5      29      -9     0  19.4  453      33.4 457          NA NA     
-##  8       5      32      -9     0  19.4  453      33.4 457          NA NA     
-##  9       5      33      -9     0  19.2  453      33.4 457          NA NA     
-## 10       5      46     534     0  19.2  446      35.8 449          NA NA     
-## 11       8      90      -9     0   4.88 519      34.0 522          NA NA     
-## 12       2      63      -9     0  19.5  1327     38.5 1328         NA NA     
-## 13       4      71      -9     0   4.91 1932     31.3 1939         NA NA     
-## 14       4      72      -9     0   3.77 1932     31.3 1939         NA NA     
-## # … with 14 more variables: WnYear &lt;dbl&gt;, WnMonth &lt;dbl&gt;, WnDay &lt;dbl&gt;,
-## #   BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;, SepYear &lt;dbl&gt;, SepMonth &lt;dbl&gt;,
-## #   SepDay &lt;dbl&gt;, Breeder &lt;chr&gt;, Fate &lt;chr&gt;, Observ &lt;chr&gt;, log10_WnMass &lt;dbl&gt;,
-## #   log10_DamMass &lt;dbl&gt;</pre>
-
-</article></slide><slide class=""><hgroup><h2>Sorting: dplyr</h2></hgroup><article  id="sorting-dplyr">
-
-<pre class = 'prettyprint lang-r'>M %&gt;% filter((WnMass &lt; 6 | WnMass &gt; 19) &amp; Sex == 0) %&gt;%
-  arrange(WnMass)</pre>
-
-<pre >## # A tibble: 14 x 24
-##    WnBatch WnOrder MouseID   Sex WnMass DamID DamMass SireID SireMass Lineage
-##      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;lgl&gt;  
-##  1       4      72      -9     0   3.77 1932     31.3 1939         NA NA     
-##  2       2      14     407     0   4.76 351      28.5 354          NA NA     
-##  3       8      90      -9     0   4.88 519      34.0 522          NA NA     
-##  4       4      71      -9     0   4.91 1932     31.3 1939         NA NA     
-##  5       1      11      -9     0   5.69 205x     36.8 207x         NA NA     
-##  6       4      90      -9     0  19.0  302      32.2 306          NA NA     
-##  7       5      33      -9     0  19.2  453      33.4 457          NA NA     
-##  8       5      46     534     0  19.2  446      35.8 449          NA NA     
-##  9       5      29      -9     0  19.4  453      33.4 457          NA NA     
-## 10       5      32      -9     0  19.4  453      33.4 457          NA NA     
-## 11       6      64      -9     0  19.5  236      34.0 238          NA NA     
-## 12       2      63      -9     0  19.5  1327     38.5 1328         NA NA     
-## 13       6      58     338     0  19.9  236      34.0 238          NA NA     
-## 14       5      53     336     0  19.9  234      35.6 238          NA NA     
-## # … with 14 more variables: WnYear &lt;dbl&gt;, WnMonth &lt;dbl&gt;, WnDay &lt;dbl&gt;,
-## #   BYear &lt;dbl&gt;, BMonth &lt;dbl&gt;, BDay &lt;dbl&gt;, SepYear &lt;dbl&gt;, SepMonth &lt;dbl&gt;,
-## #   SepDay &lt;dbl&gt;, Breeder &lt;chr&gt;, Fate &lt;chr&gt;, Observ &lt;chr&gt;, log10_WnMass &lt;dbl&gt;,
-## #   log10_DamMass &lt;dbl&gt;</pre>
-
-</article></slide><slide class=""><hgroup><h2>Selecting and filtering</h2></hgroup><article  id="selecting-and-filtering-1">
-
-<pre class = 'prettyprint lang-r'>M %&gt;% filter((WnMass &lt; 6 | WnMass &gt; 19) &amp; Sex == 0) %&gt;% 
-  select(MouseID, DamID, WnMass)</pre>
-
-<pre >## # A tibble: 14 x 3
-##    MouseID DamID WnMass
-##      &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
-##  1      -9 205x    5.69
-##  2     336 234    19.9 
-##  3     338 236    19.9 
-##  4      -9 236    19.5 
-##  5     407 351     4.76
-##  6      -9 302    19.0 
-##  7      -9 453    19.4 
-##  8      -9 453    19.4 
-##  9      -9 453    19.2 
-## 10     534 446    19.2 
-## 11      -9 519     4.88
-## 12      -9 1327   19.5 
-## 13      -9 1932    4.91
-## 14      -9 1932    3.77</pre>
-
-</article></slide><slide class=""><hgroup><h2>Quiz 02-2</h2></hgroup><article  id="quiz-02-2">
-
-<p>On Canvas, complete quiz 02-2.</p>
-
-<p>Move on to lecture 02-3.</p></article></slide>
+<p><em>Note</em> it will always rewrite your old file if you re-run your code.</p></article></slide>
 
 
   <slide class="backdrop"></slide>
