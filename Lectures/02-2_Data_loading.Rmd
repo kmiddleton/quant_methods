@@ -28,30 +28,11 @@ theme_set(theme_cowplot())
     - Like their base R counterparts but with more logical default arguments & behavior
 
 
-- check out the fun readings on "strings as factors" in the resources tab.
-
-## Beware of `stringsAsFactors` "feature"
-
-Base R file readers (`read.csv()` and `read.table()`) automatically convert strings into factors (`stringsAsFactors = TRUE`).
-
-- *Could* be what you want, but it very often will cause problems.
-- You likely don't want your "Notes" column as a factor
-
-
-## Beware of `stringsAsFactors` "feature"
-
-Options:
-
-- Pass `stringsAsFactors = FALSE` as an argument to `read.csv()`, `read.table()`, or `data.frame()`
-- Use `tidyverse` functions `read_delim()` and `read_csv()`.
-
-
-
 ## Reading Excel files into R
 
 Preferred package: [readxl](https://cran.r-project.org/web/packages/readxl/index.html)
 
-- Note: **NOT** a part of `tidyverse`! You must load it separately.
+- Note: **NOT** loaded with `tidyverse`! You must load it separately.
 
 
 ```{r eval=FALSE}
