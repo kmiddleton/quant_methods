@@ -1,7 +1,7 @@
 ---
 title: "Data Visualization"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 7
@@ -14,11 +14,8 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(readxl)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
-
-## Notes
-
-## Readings
 
 ## R plotting systems
 
@@ -32,22 +29,15 @@ Lattice (`library(lattice)`)
 - Largely overlappying functionality with `ggplot`
 - Much less friendly interface (really)
 
-## ggplot2 resources {.smaller}
 
-- `ggplot2` documentation reference: http://docs.ggplot2.org/current/
-- R Graphics Cookbook: http://www.cookbook-r.com/Graphs/
-- Quick-R: http://www.statmethods.net/advgraphs/ggplot2.html
-- Quick Introduction to ggplot: http://blog.echen.me/2012/01/17/quick-introduction-to-ggplot2/
-- ggplot Cheatsheet: http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/
-- Tutorial: http://www.ceb-institute.org/bbs/wp-content/uploads/2011/09/handout_ggplot2.pdf
-- https://github.com/jennybc/ggplot2-tutorial
-- https://speakerdeck.com/jennybc/ggplot2-tutorial
-- http://inundata.org/2013/04/10/a-quick-introduction-to-ggplot2/
-- Advanced: http://rpubs.com/hadley/97970
 
 ## Basics of ggplot
 
-Anderson, E. 1935. The irises of the Gaspe Peninsula. *Bulletin of the American Iris Society* 59: 2–5.
+ggplot graphics
+
+- [ggplot2](https://cran.r-project.org/web/packages/ggplot2/index.html), loaded with `tidyverse`
+
+- Anderson, E. 1935. The irises of the Gaspe Peninsula. *Bulletin of the American Iris Society* 59: 2–5.
 
 ```{r}
 glimpse(iris)
@@ -61,7 +51,6 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
   geom_point() 
 ```
 
-- Load the `tidyverse` package, which includes `ggplot2`
 - `ggplot()` sets up the plot using `iris` data.frame.
 - `aes()` sets `x` and `y` variables
 - `geom_point()` adds `(x, y)` points corresponding to `Petal.Length` and `Petal.Width`
@@ -82,7 +71,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
 
 ```{r eval=FALSE}
 library("tidyverse")
-library("cowplot")  # *Some* of our preferred ggplot theme
+library("cowplot")  # Our preferred ggplot theme
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
   geom_point() 
 ```
@@ -169,6 +158,25 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 
 ```{r plot_colors, echo=FALSE}
 ```
+
+
+## Building plots
+
+```{r plot_colors_colorblind, echo=TRUE, eval=FALSE}
+library("viridis")
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
+                 color = Species)) + 
+  geom_point(size = 3) + 
+  scale_color_viridis(discrete = TRUE, option = "viridis")
+```
+
+- `library(viridis)` works for colorblind and grayscale friendly images.
+
+
+## Building plots
+```{r plot_colors_colorblind, echo=FALSE, message = FALSE}
+```
+
 
 ## Building plots
 
@@ -265,10 +273,5 @@ ggplot(iris, aes(x = Petal.Length)) +
 - `geom_density()`
 - `geom_boxplot()`
 - `geom_dotplot()`
-- More at http://docs.ggplot2.org/current/
 
-## Quiz 02-3
 
-On Canvas, complete quiz 02-3.
-
-Move on to lecture 02-4.
