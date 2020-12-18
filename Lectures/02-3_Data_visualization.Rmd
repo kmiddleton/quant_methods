@@ -19,16 +19,12 @@ theme_set(theme_cowplot())
 
 ## R plotting systems
 
-Base R graphics (e.g., `plot()`, `hist()`)
-
-- Easy to do easy things (bivariate scatterplot, histogram)
-- Difficult to do complex plots
-
-Lattice (`library(lattice)`)
-
-- Largely overlappying functionality with `ggplot`
-- Much less friendly interface (really)
-
+1. Base R graphics (e.g., `plot()`, `hist()`)
+    - Easy to do easy things (bivariate scatterplot, histogram)
+    - Difficult to do complex plots
+2. ggplot
+    - Harder to learn, easier to make complex plots
+    - Much better graphics and logic
 
 
 ## Basics of ggplot
