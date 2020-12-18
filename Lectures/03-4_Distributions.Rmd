@@ -252,7 +252,7 @@ ggplot(M, aes(Successes, Probability)) +
   ggtitle(TeX("$\\lambda = 5$"))
 ```
 
-## Miscellaneous distributions
+## A miscellanea of distributions
 
 <center>
 <img src="https://i.imgur.com/Mks8NPD.png" width="80%" />

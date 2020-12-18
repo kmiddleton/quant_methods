@@ -17,10 +17,6 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
-## Notes
-
-An Introduction to Bayes' Rule: http://bit.ly/1nfNZ9p
-
 ## Conditional probability
 
 The **conditional probability** of a dependent event is the probability of that event occurring given that another condition or conditions is met.
@@ -70,7 +66,6 @@ Suppose that you wake up one day with spots all over your face. The doctor tells
 <center>
 <img src="https://i.imgur.com/VCRHJoG.jpg" width="80%" />
 </center>
-
 
 ## Bayes' Rule
 
