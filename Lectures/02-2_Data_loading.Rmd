@@ -91,8 +91,6 @@ M <- read_excel("Mouse_Weaning_Data.xlsx",
 
 ## Important Coding Tips
 
-<span style="color:pink">SHOULD THIS GO IN A SEPARATE CODING TIPS?</span>
-
 Use `<-` for assign.
 
 - Don't use `=` (even though you can).
@@ -206,12 +204,15 @@ M_agr <- aggregate(M, by = list(M$DamID), FUN = "mean")
 M_agr
 ```
 
+## SHOULD WE WRITE A FILE?
+
+<span style="color:pink">WRITE A FILE?</span>
 
 
 ##SPLIT HERE
 
 
-<span style="color:pink">I WOULD LIKE TO SPLIT THIS HERE AND MAKE A NEW ONE FOR DATA CLEANING WITH ALL THE TIDY STUFF.</span>
+<span style="color:pink">I WOULD LIKE TO SPLIT THIS HERE AND MAKE A NEW ONE FOR DATA CLEANING WITH ALL THE TIDY STUFF.  I WOULD BASICALLY JUST ADD ON ALL THIS TO THE DATA CLEANING ONE THAT I THINK SHOULD GO NEXT (new 02-3)</span>
 
 
 
