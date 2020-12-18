@@ -121,19 +121,17 @@ Treat raw data like an endangered species. Don't mess with it! In data science s
 - RStudio is one of the most important things to ever happen to R
 - These slides were written in R, using RStudio and R Markdown.
 
-## R Markdown {.smaller}
+## R Markdown
 
 - Text-based markup language (i.e., HTML)
-- Variant of markdown (https://daringfireball.net/projects/markdown/)
+- Variant of markdown
 - Render to different formats (PDF, HTML, docx)
 - Inline R code
     - Your text and analysis coexist together in one file
 - Resources
-    - http://rmarkdown.rstudio.com/
-    - R Markdown Reference Guide: https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
-    - http://inundata.org/2012/12/04/how-to-ditch-word/
-    - http://moderndata.plot.ly/r-markdown-and-knitr-tutorial-part-1/
-    - http://moderndata.plot.ly/r-markdown-and-knitr-tutorial-part-2/
+    - Markdown information
+    - Guides and Tutorials
+    
 
 ## Reproducibility is an investment for your future self
 
