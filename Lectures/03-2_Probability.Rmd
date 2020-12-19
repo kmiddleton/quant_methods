@@ -99,7 +99,7 @@ If events are *independent*, then their individual probabilities do not influenc
 - Successive die rolls
 - Successive roulette wheel spins
 - Weekly lottery drawings
-- Child sex (in the absence of bad genes)
+- Offspring sex
 
 ## Multiplication rule | Independent events
 
