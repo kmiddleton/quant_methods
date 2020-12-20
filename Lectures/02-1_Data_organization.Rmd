@@ -141,3 +141,6 @@ Working with csv files in Excel _not_ a viable (i.e., non-aggravating) option.
 - If you are entering data, use .xls or .xlsx and trust that translators will be available for as long as you are a scientist
 - If you are outputting data from another program, use csv or tab-delimits (if your data has commas).
 
+
+
+## References
