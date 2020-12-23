@@ -122,23 +122,26 @@ Note that this is a general outline. The schedule of topics is subject to change
 
 _#_  | _Date_  | _Topic_                          |
 -----|---------|----------------------------------|
-00   | F 1/18  | Pre-workshop. Installing R, etc. |
-01   | F 1/25  | Reproducible research, programming with data |
-02   | F 2/01  | Data cleaning, organization, visualization |
-03   | F 2/08  | Probability and distributions |
-04   | F 2/15  | Likelihood, Bayesian, and frequentist frameworks |
-05   | F 2/22  | Central tendency, differences of means, linear regression |
-06   | F 3/01  | Parameter estimation, significance testing |
-07   | F 3/08  | Multiple predictors |
-08   | F 3/15  | Partitioning variance, interctions, multilevel models |
-09   | F 3/22  | Model comparison, model based inference, cross-validation |
-10   | F 4/05  | Distribution free methods, permutation tests |
-11   | F 4/12  | Kinship and phylogenetic methods |
-12   | F 4/19  | Multiple comparisons procedures |
-13   | F 4/26  | Composite variables, classification |
-14   | F 5/03  | Experimental design, power analysis |
+00   | F 1/15  | Pre-workshop. Installing R, etc. |
+01   | F 1/22  | Reproducible research, programming with data |
+02   | F 1/29  | Data loading, organization, visualization |
+03   | F 2/05  | Data cleaning |
+04   | F 2/12  | Probability and distributions |
+     | F 2/19  | Topic Review 1-4
+05   | F 2/26  | Likelihood, Bayesian, and frequentist frameworks |
+06   | F 3/05  | Central tendency, differences of means, linear regression |
+07   | F 3/12  | Parameter estimation |
+08   | F 3/19  | Multiple predictors |
+     | F 3/26  | Topic Review 5-8
+09   | F 4/09  | Partitioning variance, interactions, multilevel models |
+10   | F 4/16  | Model comparison, model based inference, cross-validation |
+11   | F 4/23  | Distribution free methods, permutation tests |
+12   | F 4/30  | Multiple comparisons procedures, Experimental design, power analysis |
+     | F 5/07  | Topic Review 9-12
 
 Other key dates:
+
+*FIXME*
 
 - 4/19 (Friday): Review project paper approval required
 - 5/15 (Wednesday): Final exam due
