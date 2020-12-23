@@ -32,7 +32,7 @@ By the end of this course, you will have a foundation in the quantitative method
 
 ### Background knowledge
 
-**If you have never used R before**, you must attend the pre-course workshop (01/18) to install R on your laptop and work through some Swirl tutorials (http://swirlstats.com/) prior to the first course meeting (01/25).
+**If you have never used R before**, you must attend the pre-course workshop (01/15) to install R on your laptop and work through some Swirl tutorials (http://swirlstats.com/) prior to the first course meeting (01/22).
 
 We will start with the assumption of some very minimal previous exposure to the following topics:
 
