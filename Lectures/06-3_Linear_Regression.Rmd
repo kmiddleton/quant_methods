@@ -437,7 +437,7 @@ fm <- ulam(
 ## Bayesian sampling
 
 ```{r, echo=FALSE}
-plot(fm)
+traceplot(fm)
 ```
 
 ## Bayesian posteriors

@@ -357,7 +357,7 @@ fm2 <- ulam(
 ## Bayesian
 
 ```{r echo=FALSE}
-plot(fm2, depth = 2)
+traceplot(fm2)
 ```
 
 ## Bayesian posterior distributions
