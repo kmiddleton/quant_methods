@@ -421,18 +421,17 @@ plot_grid(p1, p2, ncol = 2)
 ## Bayesian
 
 ```{r Bayes_regression, cache=TRUE, message=FALSE}
-fm <- map2stan(
+fm <- ulam(
   alist(
-    Y ~ dnorm(mu, sigma),
+    Y ~ normal(mu, sigma),
     mu <- theta_0 + theta_1 * X,
-    theta_0 ~ dnorm(0, 10),
-    theta_1 ~ dnorm(0, 10),
-    sigma ~ dcauchy(0, 2)
+    theta_0 ~ normal(0, 10),
+    theta_1 ~ normal(0, 5),
+    sigma ~ exponential(0.5)
   ),
   data = M,
-  WAIC = FALSE,
-  iter = 10^4,
-  warmup = 1000)
+  iter = 1e4,
+  chains = 4)
 ```
 
 ## Bayesian sampling
@@ -450,7 +449,7 @@ post %>%
   gather(variable, value) %>% 
   ggplot(aes(value)) +
   geom_line(stat = "density") +
-  facet_grid(. ~ variable)
+  facet_grid(. ~ variable, scales = "free_x")
 ```
 
 ## Bayesian summary
@@ -475,7 +474,7 @@ ggplot() +
 
 - Analytical solutions are fast, hand-calculable
     - Unavailable for complex models (e.g., hierarchical models)
-- Analytical and ML estimates will converge given enough precision
+- Analytical and maximum likelihood estimates will converge given enough precision
 - Bayesian estimates can include prior knowledge
 - Bayesian estimates will converge on ML estimates for sufficiently flat priors and/or sufficient data
 
@@ -488,4 +487,3 @@ Comparison of means between groups:
 Linear relationships
 
 - Continuous predictor variables
-

@@ -17,6 +17,8 @@ theme_set(theme_cowplot())
 library(rethinking)
 library(latex2exp)
 library(wesanderson)
+
+# remotes::install_github("rmcelreath/rethinking")
 ```
 
 ## Horned lizard predation
@@ -310,12 +312,12 @@ Prepare data:
 ```{r message=FALSE}
 HL <- read_csv("../data/HornedLizards.csv") %>% 
   drop_na() %>% 
-  mutate(group = coerce_index(group)) %>% 
+  mutate(group = as.integer(factor(group))) %>% 
   as.data.frame()
 str(HL)
 ```
 
-`coerce_index(group)` converts factors into integers.
+`group` is converted to integers: 1 == alive, 2 == dead.
 
 ## Bayesian
 
@@ -323,14 +325,14 @@ str(HL)
 mean(HL$horn_length)
 ```
 
-Prior for group means (alive, dead) ~  $\mathcal{N}(\mu = 23.9, \sigma = 5)$
+Prior for group means (alive, dead) ~  $\mathcal{N}(\mu = 25, \sigma = 5)$
 
-- ~95% of probability lies between 13.9 and 33.9
+- ~95% of probability lies between 15 and 35
 - Estimate posterior distribution of each group simultaneously
 
 ```{r echo=FALSE, fig.height = 2}
 tibble(x = seq(10, 38, length = 100),
-           y = dnorm(x, 23.9, 5)) %>% 
+           y = dnorm(x, 25, 5)) %>% 
   ggplot(aes(x, y)) +
   geom_line() +
   labs(x = "Prior for Horn Length (mm)")
@@ -340,21 +342,22 @@ tibble(x = seq(10, 38, length = 100),
 ## Bayesian
 
 ```{r bayes_mean_2, cache=TRUE}
-fm2 <- map2stan(
+fm2 <- ulam(
   alist(
-    horn_length ~ dnorm(mu, sigma),
+    horn_length ~ normal(mu, sigma),
     mu <- a[group],
-    a[group] ~ dnorm(23.9, 5),
-    sigma ~ dcauchy(0, 2)
+    a[group] ~ normal(25, 5),
+    sigma ~ exponential(0.5)
   ),
   data = HL,
-  iter = 1e5, warmup = 1e3)
+  chains = 4,
+  iter = 1e4)
 ```
 
 ## Bayesian
 
 ```{r echo=FALSE}
-plot(fm2)
+plot(fm2, depth = 2)
 ```
 
 ## Bayesian posterior distributions
@@ -382,14 +385,14 @@ HL %>% group_by(group) %>%
 
 ## Bayesian credible interval
 
-95% credible interval of difference:
+95% credible interval of difference between alive and dead:
 
 ```{r echo=FALSE, fig.height = 2}
-diff <- alive - dead
-hdint <- HPDI(diff)
+d <- alive - dead
+hdint <- HPDI(d)
 
-tibble(diff) %>% 
-  ggplot(aes(diff)) +
+tibble(d) %>% 
+  ggplot(aes(d)) +
   geom_line(stat = "density", size = 1.5) +
   geom_vline(xintercept = hdint[1], color = "lightblue", size = 1.5) +
   geom_vline(xintercept = hdint[2], color = "lightblue", size = 1.5) +
@@ -397,6 +400,5 @@ tibble(diff) %>%
 ```
 
 ```{r}
-HPDI(diff, prob = 0.95)
+HPDI(d, prob = 0.95)
 ```
-
