@@ -1,7 +1,7 @@
 ---
 title: "Applications of Inference Frameworks: Linear Regression"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,6 +13,7 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(RcppEigen)
 library(plot3D)
 library(rethinking)
@@ -488,6 +489,3 @@ Linear relationships
 
 - Continuous predictor variables
 
-## That's all for this week.
-
-No quiz.

@@ -1,7 +1,7 @@
 ---
 title: "Applications of Inference Frameworks: More Basics"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,12 +13,8 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
-
-
-## Readings
-
-- Curran-Everett [-@Curran-Everett2009-zz]: Explorations in statistics: confidence intervals. *AJP: Advances in Physiology Education* 2: 87-90.
 
 ## Models
 
@@ -340,11 +336,5 @@ CV
 ```
 
 The coefficient of variation of undulation rate was `r round(CV, 1)`%.
-
-## Quiz 05-1
-
-Complete quiz 05-1.
-
-Watch lecture 05-2 on Canvas.
 
 ## References

@@ -1,7 +1,7 @@
 ---
 title: "Applications of Inference Frameworks: Difference of Means"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,6 +13,7 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(rethinking)
 library(latex2exp)
 library(wesanderson)
@@ -399,8 +400,3 @@ tibble(diff) %>%
 HPDI(diff, prob = 0.95)
 ```
 
-## Quiz 05-2
-
-Complete quiz 05-2.
-
-Watch lecture 05-3 on Canvas.
