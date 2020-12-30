@@ -18,7 +18,7 @@ library(rethinking)
 library(latex2exp)
 library(wesanderson)
 
-# remotes::install_github("rmcelreath/rethinking")
+ remotes::install_github("rmcelreath/rethinking")
 ```
 
 ## Horned lizard predation
