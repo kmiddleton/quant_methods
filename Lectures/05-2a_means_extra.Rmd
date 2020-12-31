@@ -1,0 +1,103 @@
+---
+title: "Applications of Inference Frameworks: More Basics"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+theme_set(theme_cowplot())
+```
+
+## Measures of central tendency (location)
+
+The value around which the distribution is centered
+
+1. Mean 
+1. Median
+1. Mode (most common value)
+
+## Mean
+
+Sample (arithmetic) mean:
+
+$$\bar{Y} = \frac{\sum^n_{i=1}Y_i}{n}$$
+
+The term "mean" is preferred to "average". The arithmetic mean is one kind of average, but there are others (as there are other types of means).
+
+- One argument: "Average" is a statistic determined by an arithmetic procedure. "Mean" is a parameter.
+
+## Median
+
+The median is the central measurement of a sample (the 50th percentile and the 0.50 quantile). If $n$ is even, then the median is the mean of the two middle observations.
+
+```{r}
+undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
+median(undulation_rate)
+```
+
+## Mean vs. Median
+
+Number of lateral plates (plates) in threespine sticklebacks (*Gasterosteus aculeatus*) with three different *Ectodysplasin* genotypes (mm, Mm, and MM).
+
+<center>
+<img src="https://i.imgur.com/Xr68AKa.jpg" width="75%" />
+</center>
+
+## Mean vs. Median
+
+```{r echo=FALSE, message=FALSE}
+SticklebackPlates <- read_csv("../data/Stickleback_Plates.csv")
+```
+
+```{r}
+glimpse(SticklebackPlates)
+```
+
+## Mean vs. Median
+
+```{r echo=FALSE, message=FALSE}
+ggplot(SticklebackPlates, aes(x = plates)) +
+  geom_histogram(bins = 30) +
+  facet_grid(genotype ~ .) +
+  xlab("Number of Lateral Body Plates") +
+  ylab("Count")
+```
+
+## Mean vs. Median
+
+```{r}
+SticklebackPlates %>% group_by(genotype) %>% 
+  summarize(mean_plate = mean(plates),
+            median_plate = median(plates))
+```
+
+## Mean is sensitive to extreme values
+
+```{r echo=FALSE, message=FALSE}
+M <- SticklebackPlates %>% group_by(genotype) %>% 
+  summarize(Mean = mean(plates),
+            Median = median(plates)) %>% 
+  gather(Value, x, -genotype)
+
+ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
+  geom_histogram(bins = 30) +
+  geom_vline(data = M, aes(xintercept = x, color = Value),
+             size = 2) +
+  scale_color_manual(values = c("red", "blue")) +
+  facet_grid(genotype ~ .) +
+  xlab("Number of Lateral Body Plates") +
+  ylab("Count")
+```
+
+## When might you substitute the median for the mean? | (As a measure of central tendency)
+
+## Why don't we always use the median?
+
