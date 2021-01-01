@@ -1,7 +1,7 @@
 ---
 title: "Key Concepts"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King, Kevin Middleton, Lauren Sullivan'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
