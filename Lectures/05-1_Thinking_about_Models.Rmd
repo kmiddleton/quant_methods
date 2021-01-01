@@ -1,0 +1,173 @@
+---
+title: "Frameworks for Inference"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+```
+
+## Remember the Goal of Statistics
+
+> "a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@Amabile1989-pf]
+
+Success depends on evaluating the relative support for different *models*
+
+## Example: Wing Dimorphic Crickets
+
+> Do long-winged crickets have a higher resting metabolic rate than short-winged crickets?
+
+<div class="columns-2">
+
+<center>
+<img src="https://i.imgur.com/kgPmw0b.jpg" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+Controlling for body mass,
+
+- Metabolic rates do not differ
+- Average metabolic rate of long-wings is higher
+- Average  metabolic rate of long-wings is lower
+
+</div>
+
+## Example: Genetics of Corn Oil Content
+
+> Which set of loci best predicts oil content in corn kernels?
+
+<div class="columns-2">
+
+<center>
+<br />
+<img src="https://i.imgur.com/w6z5m2e.jpg" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+- Heritability of corn oil content is 0
+- Different possible combinations of SNPs
+- All additive
+- Dominance
+- Epistasis
+- Structural variants
+
+</div>
+
+## Example: Canid relationships
+
+> What are the phylogenetic relationships between dog breeds & other canids?
+
+<div class="columns-2">
+
+<center>
+<img src="https://i.imgur.com/spdaSkP.jpg" width="100%" />
+<br />
+<br />
+
+</center>
+
+- Star phylogeny
+- Single origin of dogs
+- Ancient breeds are monophyletic
+- Every possible tree....
+  
+</div>
+
+## Example: Predict the species of a fossil
+
+> Is this bone more like a chimpanzee, australopith, Neandertal, or modern human?
+
+<div class="columns-2">
+
+<center>
+<br />
+<img src="https://i.imgur.com/cQ1Kl1v.png" width="90%" />
+<br />
+<br />
+<br />
+</center>
+
+- Relative probabilities of new fossil being in one of four groups
+- What is the percent correct classification of known fossils?
+
+</div>
+
+## Example: Alligator growth
+
+> Do alligators exhibit determinate or indeterminate growth and does growth depend of atmospheric oxygen levels?
+
+<div class="columns-2">
+
+<center>
+<br />
+<img src="https://i.imgur.com/yvphu7u.png" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+Determinate:
+
+- von Bertalanffy
+- Logistic
+
+Indeterminate:
+
+- Polynomial
+
+</div>
+
+## Example: Alligator growth
+
+von Bertalanffy:
+
+$$Femoral~Length\left(Age\right) = \theta_1 \left(1 - e^{-\theta_2 \left(Age - \theta_3\right)}\right)$$
+
+Logistic:
+
+$$Femoral~Length\left(Age\right) = \frac{\theta_1}{1 + e^{\frac{\theta_2 - Age}{\theta_3}}}$$
+
+Polynomial:
+
+$$Femoral~Length\left(Age\right) = a + b \cdot Age + c \cdot Age^2$$
+
+## Example: Alligator growth
+
+<center>
+<img src="https://i.imgur.com/scZSjNE.png" width="100%" />
+</center>
+
+## Example: Your Research
+
+> Your Question Here
+
+<div class="columns-2">
+
+<center>
+<img src="https://i.imgur.com/ETBeDVR.jpg" width="100%" />
+<br />
+<br />
+<br />
+</center>
+
+
+- Model 1
+- Model 2
+- Model 3
+- ...
+
+</div>
+
+## References
