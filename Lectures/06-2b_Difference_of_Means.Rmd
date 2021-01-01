@@ -203,7 +203,7 @@ fm2 <- ulam(
 ## Bayesian 
 
 ```{r echo=FALSE, message = FALSE}
-traceplot(fm2)
+trankplot(fm2)
 ```
 
 ## Bayesian posterior distributions
