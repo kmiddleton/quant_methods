@@ -224,7 +224,7 @@ t.test(horn_length ~ group, data = HL, var.equal = TRUE)
 
 ## Frameworks for inference
 
-1. Analytical
+1. ~~Analytical~~
 2. Maximum likelihood
 3. Resampling
 4. Bayesian

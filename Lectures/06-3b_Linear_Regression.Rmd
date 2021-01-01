@@ -64,15 +64,12 @@ $$Y = \theta_1 + \theta_2 X$$
 
 ## Frameworks for inference
 
-1. ~~Analytical~~ 
+1. ~~Analytical~~
 2. Maximum likelihood
+    - Minimizing the residual sum of squares is numerically equal to *maximizing* the model likelihood.
 3. Resampling
 4. Bayesian
 
-
-## Minimizing the SS == Maximizing the Likelihood
-
-Minimizing the residual sum of squares (Analytical Solution) is numerically equal to *maximizing* the model likelihood.
 
 ## Errors are normally distributed around the regression line
 
