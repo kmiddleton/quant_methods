@@ -18,148 +18,23 @@ library(rethinking)
 library(latex2exp)
 library(wesanderson)
 
- remotes::install_github("rmcelreath/rethinking")
+#remotes::install_github("rmcelreath/rethinking")
 ```
 
 ## Horned lizard predation
 
-<center>
-<img src="https://i.imgur.com/6GSiaAy.jpg" width="100%" />
-</center>
+<div class="columns-2">
 
-## Horned lizard predation
+```{r message=FALSE, echo = FALSE, fig.width = 3.5}
 
-```{r message=FALSE}
 HL <- read_csv("../data/HornedLizards.csv")
-glimpse(HL)
-HL %>% group_by(group) %>% tally()
-```
-
-## Horned lizard predation
-
-```{r echo=FALSE, warning=FALSE}
-HL %>% 
-  ggplot(aes(horn_length)) +
-  geom_histogram(bins = 30) +
-  facet_grid(group ~ .) +
-  labs(x = "Horn Length (mm)", y = "Count")
-```
-
-## Summarize
-
-```{r}
-HL %>% group_by(group) %>% 
-  summarize(horn_mean = mean(horn_length),
-            horn_sd = sd(horn_length))
-sum(!complete.cases(HL))
-```
-
-## Summarize
-
-Drop rows with any `NA`s:
-
-```{r}
 HL <- HL %>% drop_na()
-```
-
-Summarize:
-
-```{r}
-HL %>% group_by(group) %>% 
-  summarize(horn_mean = mean(horn_length),
-            horn_sd = sd(horn_length))
-```
-
-## Are the means different?
-
-Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "alive"]), 2)` mm
-
-Horn length in dead horned lizards: `r round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
-
-Imagine you collected 100 live horned lizards and randomly assigned 50 to each of two groups. Do you think they would have the same mean horn length? How different do you think the means would be? Think about how the variability among individual horn length measurements would affect your intuition here.
-
-> The first principle is that you must not fool yourself – and you are the easiest person to fool. -Feynman
-
-## How large of a difference do we expect to see from sampling error?
-
-<div class="columns-2">
-<center>
-<img src="https://i.imgur.com/EIfjPa0.jpg" width="100%" />
-<br />
-<br />
-<br />
-</center>
-
-- Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 3)
-- Randomly catch two groups of $n = 50$ from this population
-- How different are the groups?
-</div>
-
-## How large of a difference do we expect to see from sampling error?
-
-```{r}
-set.seed(883231)
-mu.horn <- 24   # mean
-sd.horn <- 3    # standard deviation
-n.iter <- 10000 # number of iterations
-n.samp <- 50    # number in each sample
-sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold for output  
-
-for (zz in 1:n.iter) {
-  s1 <- rnorm(n.samp, mu.horn, sd.horn) # sample 1
-  s2 <- rnorm(n.samp, mu.horn, sd.horn) # sample 2
-  sim.diff[zz, 'dd'] <- mean(s1) - mean(s2) # difference in means
-}
-```
-
-## How large of a difference do we expect to see from sampling error?
-
-<div class="columns-2">
-
-```{r message=FALSE, fig.width=3.5, fig.height=3.5, echo=FALSE}
-ggplot(sim.diff, aes(x = dd)) +
-  geom_histogram(bins = 30) +
-  labs(x = "Difference of Means", y = "Count")
-```
-
-- Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 3)
-- Randomly catch two groups of $n = 50$ from this population
-- How different are they?
-</div>
-
-## How large of a difference do we expect to see from sampling error?
-
-<div class="columns-2">
-
-```{r message=FALSE, fig.width=3.5, fig.height=3.5, echo=FALSE}
-HL %>% 
-  ggplot(aes(horn_length)) +
-  geom_histogram(bins = 30) +
-  facet_grid(group ~ .) +
-  labs(x = "Horn Length (mm)", y = "Count")
-```
-
-Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "alive"]), 2)` mm
-
-Horn length in dead horned lizards: `r round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
-
-Difference: `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(HL$horn_length[HL$group == "dead"]), 2)`
-
-Are the means different?
-</div>
-
-## How large of a difference do we expect to see from sampling error?
-
-```{r message=FALSE, fig.height=3.5, echo=FALSE}
-p1 <- ggplot(sim.diff, aes(x = dd)) +
-  geom_histogram(bins = 30) +
-  labs(x = "Difference of Means", y = "Count")
 
 HL_mean <- HL %>% group_by(group) %>% 
   summarize(Mean = mean(horn_length)) %>% 
   gather(Value, x, -group)
 
-p2 <- HL %>% 
+HL %>% 
   ggplot(aes(horn_length)) +
   geom_histogram(bins = 30) +
   geom_vline(data = HL_mean, aes(xintercept = x, color = Value),
@@ -168,59 +43,30 @@ p2 <- HL %>%
   labs(x = "Horn Length (mm)", y = "Count") +
   theme(legend.position = "none")
 
-plot_grid(p2, p1, ncol = 2)
 ```
+
+
+Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "alive"]), 2)` mm
+
+Horn length in dead horned lizards: `r round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
+
+Difference: `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(HL$horn_length[HL$group == "dead"]), 2)`
+
+Are the means different?
 
 <center>
-Difference = `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
+<img src="https://i.imgur.com/6GSiaAy.jpg" width="100%" />
 </center>
-
-## Frameworks for inference
-
-1. Analytical
-2. Maximum likelihood
-3. Resampling
-4. Bayesian
-
-## Analytical: *t*-test
-
-```{r t_plot, message=FALSE, fig.height=2.5, echo=FALSE, warning=FALSE}
-x <- seq(-3, 3, by = 0.001)
-
-sim <- tibble(df = c(2, 10, 50)) %>%
-  group_by(df) %>%
-  do(tibble(x = x, y = dt(x, .$df))) %>%
-  mutate(Parameters = paste0("df = ", df)) %>%
-  ungroup() %>%
-  mutate(Parameters = factor(Parameters, levels = unique(Parameters)))
-
-norm <- tibble(
-  x = x,
-  y = dnorm(x, 0, 1)
-)
-
-pal <- wes_palette("Moonrise3", 3, type = "discrete")
-
-ggplot() +
-  geom_line(data = sim, aes(x, y, color = Parameters), size = 1.5) +
-  geom_line(data = norm, aes(x, y)) +
-  scale_color_manual(values = pal, name = "Degrees of\nFreedom") +
-  labs(x = "x", y = "Relative Likelihood") +
-  theme(legend.position = c(0.9, 0.75))
-```
-
-- Test statistic based on means, standard deviations, and sample size 
-- Follows a *t* distribution
-- Like a normal distribution that accounts for sample size
-- We won't derive the *t* distribution
 
 </div>
 
-## *t*-test
 
-```{r}
-t.test(horn_length ~ group, data = HL, var.equal = TRUE)
-```
+## Frameworks for inference
+
+1. ~~Analytical~~
+2. Maximum likelihood
+3. Resampling
+4. Bayesian
 
 ## ML Comparison
 
@@ -268,7 +114,7 @@ Compare the models with a likelihood ratio (Bayes Factor):
 
 $$BF = \frac{\mathcal{L}[Model~2]}{\mathcal{L}[Model~1]} = \frac{\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right)}{\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|y\right)} = \left(\frac{\hat{\sigma}^2_2}{\hat{\sigma}^2_1}\right)^{-\frac{n_1 + n_2}{2}}$$
 
-More in Problem Set 5.
+
 
 ## Resampled difference of means
 
@@ -305,7 +151,7 @@ sprintf("%.5f", p)
 sprintf("%.5f", 3 / 50000)
 ```
 
-## Bayesian
+## Bayesian {.smaller}
 
 Prepare data:
 
@@ -339,7 +185,7 @@ tibble(x = seq(10, 38, length = 100),
 ```
 
 
-## Bayesian
+## Bayesian {.smaller}
 
 ```{r bayes_mean_2, cache=TRUE}
 fm2 <- ulam(
@@ -354,9 +200,9 @@ fm2 <- ulam(
   iter = 1e4)
 ```
 
-## Bayesian
+## Bayesian 
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE}
 traceplot(fm2)
 ```
 
@@ -376,7 +222,7 @@ tibble(alive, dead) %>%
 
 ## Bayesian summary
 
-```{r}
+```{r message = FALSE}
 precis(fm2, depth = 2, digits = 4)
 HL %>% group_by(group) %>% 
   summarize(horn_mean = mean(horn_length),
