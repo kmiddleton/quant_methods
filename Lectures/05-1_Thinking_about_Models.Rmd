@@ -1,7 +1,7 @@
 ---
-title: "Frameworks for Inference"
+title: "Thinking about Models"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -19,7 +19,8 @@ library(cowplot)
 
 > "a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@Amabile1989-pf]
 
-Success depends on evaluating the relative support for different *models*
+- The statistical analyses that you carry out are *models*.
+- Inference depends on evaluating the relative support for different models.
 
 ## Example: Wing Dimorphic Crickets
 
