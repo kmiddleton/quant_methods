@@ -100,7 +100,7 @@ Controlling for body mass,
 <br />
 </center>
 
-- What is the relative probabilities of new fossil being in one of four taxonomic groups?
+- What are the relative probabilities of new fossil being in one of four taxonomic groups?
 - What is the percent correct classification of known fossils?
 
 </div>
