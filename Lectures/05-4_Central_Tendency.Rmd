@@ -1,5 +1,5 @@
 ---
-title: "Applications of Inference Frameworks: More Basics"
+title: "Measures of Central Tendency"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:

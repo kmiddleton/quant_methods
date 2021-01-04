@@ -1,7 +1,7 @@
 ---
-title: "Applications of Inference Frameworks"
+title: "Estimating Means"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -19,12 +19,6 @@ library(latex2exp)
 library(htmltools)
 library(vembedr)
 ```
-
-## Readings
-
-Optional:
-
-- Quick Bayesian introduction: http://andrewgelman.com/2016/12/13/bayesian-statistics-whats/
 
 ## Frameworks for inference
 
@@ -469,9 +463,3 @@ print(fm_priors, digits = 3)
 ```
 
 Lower mean than the analytical or ML estimate (`r round(mean(undulation_rate), 3)`) because the prior places more probability on lower values.
-
-## Quiz 04-3
-
-Complete quiz 04-3.
-
-This is the final lecture for this week.

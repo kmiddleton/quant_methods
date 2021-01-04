@@ -1,7 +1,7 @@
 ---
 title: "From Probability to Likelihood"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -243,9 +243,3 @@ log_liks %>%
              color = "red", size = 3) +
   labs(x = TeX("$\\theta$"), y = "log-Likelihood")
 ```
-
-## Quiz 04-2
-
-Complete quiz 04-2.
-
-Move on to Lecture 04-3.
