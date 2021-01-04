@@ -11,13 +11,19 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+# Need dev version of plotly:
+# devtools::install_github("ropensci/plotly")
+
 library(tidyverse)
 library(rstan)
 library(cowplot)
-library(plot3D)
+library(plotly)
 library(latex2exp)
 library(htmltools)
 library(vembedr)
+library(bayesplot)
+
+theme_set(theme_cowplot())
 ```
 
 ## Frameworks for inference
@@ -96,7 +102,7 @@ dnorm(0, mean = 0, sd = 1)
 
 ```{r normal_plot, echo=FALSE, fig.height=4}
 M <- tibble(x = seq(-3, 3, length = 100),
-                y = dnorm(x))
+            y = dnorm(x))
 ggplot(M, aes(x, y)) + geom_line() +
   labs(x = "Y", y = "Relative Likelihood")
 ```
@@ -142,7 +148,7 @@ ggplot(M, aes(x, y)) + geom_line() +
                    xend = undulation_rate[1],
                    y = 0,
                    yend = dnorm(undulation_rate[1],
-                                 mean = 0, sd = 1)),
+                                mean = 0, sd = 1)),
                color = "red")
 ```
 
@@ -201,17 +207,16 @@ Ranges of possible values:
 
 ## Grid approximation
 
-For combinations of $\mu$ and $\sigma$, calculate the model likelihood. Pick the largest log-likelihood as the maximum likelihood estimates.
+For combinations of $\mu$ and $\sigma$, calculate the model likelihood. Pick the largest log-likelihood as the parameter estimates.
 
 Set up the grid:
 
 ```{r}
-n <- 100 # How fine is the grid
-mu <- seq(0.1, 5, length = n) # Vector of mu
-sigma <- seq(0.1, 2, length = n) # Vector of sigma
+n <- 100                           # How fine is the grid?
+mu <- seq(0.1, 3, length = n)      # Vector of mu
+sigma <- seq(0.1, 0.5, length = n) # Vector of sigma
 
-grid_approx <- crossing(mu, sigma) %>% 
-  mutate(log_lik = NA)
+grid_approx <- crossing(mu, sigma)
 ```
 
 ---
@@ -223,12 +228,16 @@ grid_approx
 ## Grid approximation
 
 ```{r grid_approx, cache=TRUE}
+log_lik <- numeric(length = nrow(grid_approx))
+
 for (ii in 1:nrow(grid_approx)) {
-  grid_approx[ii, "log_lik"] <- 
-    sum(log(dnorm(undulation_rate,
-                  mean = grid_approx$mu[ii],
-                  sd = grid_approx$sigma[ii])))
+  log_lik[ii] <- 
+    sum(dnorm(undulation_rate,
+              mean = grid_approx$mu[ii],
+              sd = grid_approx$sigma[ii],
+              log = TRUE))
 }
+grid_approx$log_lik <- log_lik
 ```
 
 - Iterate through the rows ($ii$) of `grid_approx`
@@ -237,45 +246,63 @@ for (ii in 1:nrow(grid_approx)) {
 ---
 
 ```{r}
-head(grid_approx)
+grid_approx
 ```
-
-This approach is coarse, time consuming, and not feasible for fine grids or many parameters.
 
 - For a 100 X 100 grid, there are 10,000 calculations.
 - If there were 3 parameters, there would be 1,000,000.
 
-## Grid approximation
+## Visualizing likelihood surface
 
 ```{r echo=FALSE}
 grid_approx <- do.call(data.frame,
                        lapply(grid_approx,
                               function(x) replace(x, is.infinite(x), NA)))
-scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
-          labels = c("mu", "sigma", "log-likelihood"))
+
+fig <- plot_ly() %>%
+  add_markers(data = grid_approx,
+              x = ~ mu,
+              y = ~ sigma,
+              z = ~ log_lik,
+              color = ~ log_lik,
+              size = 1,
+              showlegend = FALSE) %>%
+  add_markers(data = grid_approx[which.max(grid_approx$log_lik), ],
+              x = ~ mu,
+              y = ~ sigma,
+              z = ~ log_lik,
+              size = 2,
+              showlegend = FALSE) %>% 
+  hide_colorbar() %>%
+  layout(scene = list(xaxis = list(title = 'Mu'),
+                      yaxis = list(title = 'Sigma'),
+                      zaxis = list(title = 'log-Likelihood')))
+
+fig
 ```
+
 
 ## Grid approximation
 
-On this grid, the maximum likelihood estimate of $\mu$ is:
+On this grid, the maximum likelihood estimates of $\mu$ and $\sigma$ are:
 
 ```{r}
 grid_approx[which.max(grid_approx$log_lik), ]
 ```
 
-The analytical estimate is:
+The analytical estimates are:
 
 ```{r}
 mean(undulation_rate)
+sd(undulation_rate)
 ```
 
 ## Maximum likelihood via optimization
 
-Search for the most likely values of $\mu$ and $\sigma$.
+*Search* for the most likely values of $\mu$ and $\sigma$ across all possible values.
 
 ```{r echo=FALSE}
-scatter3D(grid_approx$mu, grid_approx$sigma, grid_approx$log_lik, pch = 16,
-          labels = c("mu", "sigma", "log-likelihood"), colkey = FALSE)
+fig
 ```
 
 ## Maximum likelihood via optimization
@@ -284,8 +311,8 @@ Define a function that takes a vector of values to optimize `x` ($\mu$ and $\sig
 
 ```{r}
 log_lik <- function(x, Y){
-  liks <- dnorm(Y, mean = x[1], sd = x[2])
-  return(sum(log(liks)))
+  liks <- dnorm(Y, mean = x[1], sd = x[2], log = TRUE)
+  return(sum(liks))
 }
 ```
 
@@ -346,7 +373,7 @@ mean(undulation_rate)
 mean(resampled_mean)
 ```
 
-**Given enough iterations, the resampled mean equals the analytical mean (and equals the ML mean).**
+**Given enough iterations, the resampled mean equals the analytical mean (and equals the maximum likelihood mean).**
 
 ## Bayesian vs. ML inference
 
@@ -384,12 +411,12 @@ Can we do better? Yes, Bayesian priors.
 
 ## Prior for the mean
 
-Cauchy distribution (location = 0, scale = 5)
+Cauchy distribution (location = 0, scale = 3)
 
 ```{r, echo=FALSE, message=FALSE}
 tibble(
   x = seq(0, 10, length = 100),
-  y = dcauchy(x, scale = 5)) %>% 
+  y = dcauchy(x, scale = 3)) %>% 
   ggplot(aes(x, y)) + geom_line() +
   labs(y = "Relative Likelihood", x = "value")
 ```
@@ -409,8 +436,8 @@ model <- "
     real<lower=0> sigma;
   }
   model{
-    sigma ~ cauchy(0, 5);
-    mu ~ cauchy(0, 5);
+    mu ~ cauchy(0, 3);
+    sigma ~ exponential(1);
     undulation_rate ~ normal(mu, sigma);
   }
 "
@@ -418,42 +445,27 @@ model <- "
 
 ## Sample the Bayesian model
 
-```{r stan_fit, cache=TRUE}
+```{r stan_fit, message=FALSE, warning=FALSE, results="hide"}
 fm_priors <- stan(
   model_code = model,
   data = list(undulation_rate = undulation_rate,
               N = length(undulation_rate)),
-  iter = 10^4,
-  warmup = 10^3)
+  iter = 1e5,
+  chains = 4)
 ```
 
 ## Inspecting the samples
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-samp <- fm_priors@sim$samples
-mu <- tibble(Iteration = 1:length(samp[[1]]$mu),
-                 Chain_1 = samp[[1]]$mu,
-                 Chain_2 = samp[[2]]$mu,
-                 Chain_3 = samp[[3]]$mu,
-                 Chain_4 = samp[[4]]$mu)
-mu %>% 
-  gather(Chain, value, -Iteration) %>% 
-  ggplot(aes(x = Iteration, y = value, color = Chain)) +
-  geom_line() +
-  xlim(c(2000, 10000)) +
-  labs(x = "Iteration", y = "mu")
+post <- as.array(fm_priors)
+mcmc_trace(post, pars = c("mu", "sigma"))
 ```
 
 ## Summarizing the results
 
 ```{r, echo=FALSE}
-post <- extract(fm_priors) %>% 
-  as_tibble() %>% 
-  select(mu)
-post %>%
-  ggplot(aes(mu)) +
-  geom_line(stat = "density") +
-  labs(x = TeX("$\\mu$"), y = "Density")
+mcmc_dens(as.data.frame(fm_priors),
+          pars = c("mu", "sigma"))
 ```
 
 ## Summarizing the results
@@ -462,4 +474,4 @@ post %>%
 print(fm_priors, digits = 3)
 ```
 
-Lower mean than the analytical or ML estimate (`r round(mean(undulation_rate), 3)`) because the prior places more probability on lower values.
+Lower mean than the analytical or ML estimate (`r round(mean(undulation_rate), 3)`) because the prior places less probability on high values.

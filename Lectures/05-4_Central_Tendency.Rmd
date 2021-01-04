@@ -39,8 +39,9 @@ The term "mean" is preferred to "average". The arithmetic mean is one kind of av
 The median is the central measurement of a sample (the 50th percentile and the 0.50 quantile). If $n$ is even, then the median is the mean of the two middle observations.
 
 ```{r}
-undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
-median(undulation_rate)
+1:10
+median(1:10)
+quantile(1:10, prob = 0.5)
 ```
 
 ## Mean vs. Median
@@ -76,15 +77,18 @@ ggplot(SticklebackPlates, aes(x = plates)) +
 ```{r}
 SticklebackPlates %>% group_by(genotype) %>% 
   summarize(mean_plate = mean(plates),
-            median_plate = median(plates))
+            median_plate = median(plates),
+            .groups = "drop")
 ```
 
 ## Mean is sensitive to extreme values
 
 ```{r echo=FALSE, message=FALSE}
-M <- SticklebackPlates %>% group_by(genotype) %>% 
+M <- SticklebackPlates %>% 
+  group_by(genotype) %>% 
   summarize(Mean = mean(plates),
-            Median = median(plates)) %>% 
+            Median = median(plates),
+            .groups = "drop") %>% 
   gather(Value, x, -genotype)
 
 ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
