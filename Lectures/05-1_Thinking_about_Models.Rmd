@@ -105,6 +105,31 @@ Controlling for body mass,
 
 </div>
 
+
+## Example: Species Richness in Lakes
+
+> Does the number of phytoplankton species change with agricultural intensity around lakes?
+
+
+<div class="columns-2">
+
+<center>
+<br />
+<img src="https://imgur.com/GoOM9bb.png" width="90%" />
+<br />
+</center>
+
+- There is no relationship between species richness and agricultural intensity
+- There is a positive relationship
+- There is a negative relationship
+
+</div>
+
+
+
+
+
+
 ## Example: Alligator growth
 
 > Do alligators exhibit determinate or indeterminate growth and does growth depend of atmospheric oxygen levels?
