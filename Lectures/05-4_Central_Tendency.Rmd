@@ -11,8 +11,15 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+# Need dev version of plotly:
+# devtools::install_github("ropensci/plotly")
+
 library(tidyverse)
 library(cowplot)
+library(plotly)
+library(vembedr)
+library(htmltools)
+
 theme_set(theme_cowplot())
 ```
 
@@ -105,3 +112,318 @@ ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
 
 ## Why don't we always use the median?
 
+## Frameworks for inference
+
+1. Analytical
+2. Maximum likelihood
+3. Resampling
+4. Bayesian
+
+## [Flying snake](https://www.youtube.com/playlist?list=PL1qTT-Q9lkEaw8eiGJOKOQjcYPIYYfvkL)
+
+```{r echo=FALSE}
+div(
+  align = "center",
+  embed_youtube("kwMWzlKnyiE?rel=0")
+)
+```
+
+## [Flying snake](https://www.youtube.com/playlist?list=PL1qTT-Q9lkEaw8eiGJOKOQjcYPIYYfvkL)
+
+```{r echo=FALSE}
+div(
+  align = "center",
+  embed_youtube("sYiHbQvJZi4?rel=0")
+)
+```
+
+## Inferring a mean
+
+Mean undulation rate for $n = 8$ [gliding snakes](http://www.flyingsnake.org/):
+
+```{r}
+undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
+```
+
+<center>
+<img src="http://www.lazerhorse.org/wp-content/uploads/2015/01/Flying-Snake-Chrysopelea.jpg" width="60%" />
+</center>
+
+What is the mean undulation rate for this sample of flying snakes?
+
+## Undulation rate
+
+```{r undulation_plot, message=FALSE, echo=FALSE}
+ggplot(tibble(undulation_rate), aes(undulation_rate)) +
+  geom_histogram() +
+  labs(x = "Undulation Rate (Hz)", y = "Count")
+```
+
+## Analytical inference of mean
+
+Arithmetic mean:
+
+$$\hat{Y} = \frac{\sum_{i=1}^{n}Y_i}{n}$$
+
+$$mean~undulation~rate = \frac{\sum_{i=1}^{n}undulation~rate_i}{n}$$
+
+## Analytical inference of mean
+
+```{r}
+sum(undulation_rate) / length(undulation_rate)
+mean(undulation_rate)
+```
+
+## Maximum likelihood inference of mean
+
+Use `dnorm()` to calculate the relative likelihood of an observed value $Y_i$ drawn from a normal distribution given a mean ($\mu$) and standard deviation ($\sigma$).
+
+$$f\left(Y_i; \mu, \sigma\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$
+
+## Standard normal distribution
+
+```{r}
+dnorm(0, mean = 0, sd = 1)
+```
+
+```{r normal_plot, echo=FALSE, fig.height=4}
+M <- tibble(x = seq(-3, 3, length = 100),
+            y = dnorm(x))
+ggplot(M, aes(x, y)) + geom_line() +
+  labs(x = "Y", y = "Relative Likelihood")
+```
+
+## Calculating a likelihood
+
+*Hypothesizing that the population mean is 0 and the standard deviation is 1*, what is the likelihood of the observed values?
+
+1. This is a model.
+2. Calculate the relative likelihood of each observation
+3. Model likelihood is the product of the individual likelihoods
+4. log-likelihood is more tractable, so calculate that
+
+## Model Likelihood ($\mathcal{L}$)
+
+For a set of observations ($Y_i$) and hypothesized parameters ($\Theta$; i.e., mean and standard deviation) the model likelihood is the product of the observations' individual likelihoods:
+
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$
+
+$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(\phi\left(Y_{i};\Theta\right)\right)$$
+
+## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
+
+*Hypothesizing that the population mean is 0 and the standard deviation is 1*, what is the likelihood of the observed values?
+
+Likelihood for the first observation (`undulation_rate[1]`):
+
+```{r}
+undulation_rate[1]
+dnorm(undulation_rate[1], mean = 0, sd = 1)
+```
+
+## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
+
+```{r, echo=FALSE, fig.height=3.5}
+ggplot(M, aes(x, y)) + geom_line() +
+  labs(x = "Y", y = "Relative Likelihood") +
+  geom_point(aes(x = undulation_rate[1],
+                 y = dnorm(undulation_rate[1], mean = 0, sd = 1)),
+             color = "red",
+             size = 3) +
+  geom_segment(aes(x = undulation_rate[1],
+                   xend = undulation_rate[1],
+                   y = 0,
+                   yend = dnorm(undulation_rate[1],
+                                mean = 0, sd = 1)),
+               color = "red")
+```
+
+This is only the likelihood for *one* observation. We need the likelihoods for all `r length(undulation_rate)` undulation rates to get a model likelihood.
+
+## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
+
+Vector of likelihoods for all values in `undulation_rate` given `mu = 0` and `sigma = 1`:
+
+```{r}
+(rel_liks <- dnorm(undulation_rate, mean = 0, sd = 1))
+```
+
+## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
+
+Model likelihood is the product of those likelihoods:
+
+```{r}
+(lik <- prod(rel_liks))
+```
+
+## Likelihood to log-likelihood
+
+```{r}
+log(lik)
+```
+
+Rather than logging the product, we can sum the log-likelihoods:
+
+```{r}
+sum(log(rel_liks))
+```
+
+For a model in which the mean is 0 and  standard deviation is 1, the model log-likelihood is `r round(log(lik), 2)`.
+
+## Higher likelihood
+
+Is there another combination of $\mu$ and $\sigma$ that gives a higher likelihood (= larger log-likelihood)?
+
+Try $\mu = 1$ and $\sigma = 1$:
+
+```{r}
+sum(log(dnorm(undulation_rate, mean = 1, sd = 1)))
+```
+
+This is an improvement over $\mu = 0$ and $\sigma = 1$.
+
+## Calculating the log-likelihood for a _range_ of $\mu$ and $\sigma$
+
+Find the combination of $\mu$ and $\sigma$ that maximizes the log-likelihood of the model for the mean and standard deviation of undulation rates.
+
+Ranges of possible values:
+
+1. Mean ($\mu$): $-\infty < \mu < \infty$
+2. Standard deviation ($\sigma$): $0 < \sigma < \infty$
+
+## Grid approximation
+
+For combinations of $\mu$ and $\sigma$, calculate the model likelihood. Pick the largest log-likelihood as the parameter estimates.
+
+Set up the grid:
+
+```{r}
+n <- 100                           # How fine is the grid?
+mu <- seq(0.1, 3, length = n)      # Vector of mu
+sigma <- seq(0.1, 0.5, length = n) # Vector of sigma
+
+grid_approx <- crossing(mu, sigma)
+```
+
+---
+
+```{r}
+grid_approx
+```
+
+## Grid approximation
+
+```{r grid_approx, cache=TRUE}
+log_lik <- numeric(length = nrow(grid_approx))
+
+for (ii in 1:nrow(grid_approx)) {
+  log_lik[ii] <- 
+    sum(dnorm(undulation_rate,
+              mean = grid_approx$mu[ii],
+              sd = grid_approx$sigma[ii],
+              log = TRUE))
+}
+grid_approx$log_lik <- log_lik
+```
+
+- Iterate through the rows ($ii$) of `grid_approx`
+- For each row, assign the model log-likelihood calculated for that `mu` and `sigma` to `log_lik`
+
+---
+
+```{r}
+grid_approx
+```
+
+- For a 100 X 100 grid, there are 10,000 calculations.
+- If there were 3 parameters, there would be 1,000,000.
+
+## Visualizing the likelihood surface
+
+```{r echo=FALSE}
+grid_approx <- do.call(data.frame,
+                       lapply(grid_approx,
+                              function(x) replace(x, is.infinite(x), NA)))
+
+fig <- plot_ly() %>%
+  add_markers(data = grid_approx,
+              x = ~ mu,
+              y = ~ sigma,
+              z = ~ log_lik,
+              color = ~ log_lik,
+              size = 1,
+              showlegend = FALSE) %>%
+  add_markers(data = grid_approx[which.max(grid_approx$log_lik), ],
+              x = ~ mu,
+              y = ~ sigma,
+              z = ~ log_lik,
+              size = 2,
+              showlegend = FALSE) %>% 
+  hide_colorbar() %>%
+  layout(scene = list(xaxis = list(title = 'Mu'),
+                      yaxis = list(title = 'Sigma'),
+                      zaxis = list(title = 'log-Likelihood')))
+
+fig
+```
+
+
+## Grid approximation
+
+On this grid, the maximum likelihood estimates of $\mu$ and $\sigma$ are:
+
+```{r}
+grid_approx[which.max(grid_approx$log_lik), ]
+```
+
+The analytical estimates are:
+
+```{r}
+mean(undulation_rate)
+sd(undulation_rate)
+```
+
+## Maximum likelihood via optimization
+
+*Search* for the most likely values of $\mu$ and $\sigma$ across all possible values.
+
+```{r echo=FALSE}
+fig
+```
+
+## Maximum likelihood via optimization
+
+Define a function that takes a vector of values to optimize `x` ($\mu$ and $\sigma$) as well as a set of data `Y` and returns the log-likelihood:
+
+```{r}
+log_lik <- function(x, Y){
+  liks <- dnorm(Y, mean = x[1], sd = x[2], log = TRUE)
+  return(sum(liks))
+}
+```
+
+We can now simultaneously optimize $\mu$ and $\sigma$, maximizing the log-likelihood.
+
+## Maximum likelihood via optimization
+
+`reltol` says to stop when the improvement is $<10^{-100}$.
+
+```{r ML_optim, cache = TRUE}
+optim(c(0.1, 0.1), # Start at 0.1, 0.1
+      log_lik,
+      Y = undulation_rate,
+      control = list(fnscale = -1,
+                     reltol = 10^-100))
+```
+
+## Maximum likelihood via optimization
+
+`glm()` fits generalized linear modules via optimization:
+
+```{r ML_glm}
+fm <- glm(undulation_rate ~ 1) # Estimate a mean only
+coef(fm)
+logLik(fm)
+```
+
+**For a small enough tolerance, the maximum likelihood estimate equals the analytical estimate.**

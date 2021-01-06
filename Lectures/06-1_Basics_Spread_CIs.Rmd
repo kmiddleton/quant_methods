@@ -134,6 +134,26 @@ $$
 
 - When sample size is not low, the sample variance ($s^2$) is an *unbiased estimator* of the population variance ($\sigma^2$), though the calculation is a little different (divide by $n$ rather than $n − 1$) See [explanation of $n$ vs. $n-1$](http://stats.stackexchange.com/q/3931/597) 
 
+## Coefficient of variation
+
+Coefficient of variation represents the standard deviation as a percentage of the mean. Elephant mass has an inherently higher standard deviation than mouse mass.
+
+$$
+CV = 100\% \times \frac{s}{\bar{Y}}
+$$
+
+- Can be used as a general indicator of the amount of variability in a sample.
+- Can also be used to (cautiously) compare variables that are not measured in the same units (e.g., basal metabolic rate to ear area).
+
+## Coefficient of variation
+
+```{r}
+CV <- 100 * sd(undulation_rate) / mean(undulation_rate)
+CV
+```
+
+The coefficient of variation of undulation rate was `r round(CV, 1)`%.
+
 
 ## Standard error of the sample mean
 
@@ -185,6 +205,7 @@ The 95% confidence interval for a mean can be estimated by the sample mean ± 2 
 
 ## Confidence intervals
 
+
 ```{r}
 y_bar <- mean(undulation_rate)
 se_y <- sd(undulation_rate) / sqrt(length(undulation_rate))
@@ -192,28 +213,16 @@ lower <- y_bar - 2 * se_y
 upper <- y_bar + 2 * se_y
 ```
 
-We are 95% confident that the true mean lies between `r round(lower, 2)` and `r round(upper, 2)`.
+<div class="columns-2">
+
+```{r echo = FALSE, message = FALSE, fig.height = 3.5, fig.width = 3.5, fig.align = "center"}
+ggplot(tibble(undulation_rate), aes(undulation_rate)) +
+  geom_histogram() +
+  labs(x = "Undulation Rate (Hz)", y = "Count")
+```
 
 Mean undulation rate was `r round(y_bar, 2)` Hz ($n$ = `r length(undulation_rate)`; 95% CI = `r round(lower, 2)` - `r round(upper, 2)` Hz).
 
-## Coefficient of variation
-
-Coefficient of variation represents the standard deviation as a percentage of the mean. Elephant mass has an inherently higher standard deviation than mouse mass.
-
-$$
-CV = 100\% \times \frac{s}{\bar{Y}}
-$$
-
-- Can be used as a general indicator of the amount of variability in a sample.
-- Can also be used to (cautiously) compare variables that are not measured in the same units (e.g., basal metabolic rate to ear area).
-
-## Coefficient of variation
-
-```{r}
-CV <- 100 * sd(undulation_rate) / mean(undulation_rate)
-CV
-```
-
-The coefficient of variation of undulation rate was `r round(CV, 1)`%.
+</div>
 
 ## References
