@@ -128,10 +128,6 @@ Controlling for body mass,
 </div>
 
 
-
-
-
-
 ## Example: Alligator growth
 
 > Do alligators exhibit determinate or indeterminate growth and does growth depend of atmospheric oxygen levels?
@@ -157,6 +153,7 @@ Indeterminate:
 
 </div>
 
+
 ## Example: Alligator growth
 
 von Bertalanffy:
@@ -169,7 +166,7 @@ $$Femoral~Length\left(Age\right) = \frac{\theta_1}{1 + e^{\frac{\theta_2 - Age}{
 
 Polynomial:
 
-$$Femoral~Length\left(Age\right) = a + b \cdot Age + c \cdot Age^2$$
+$$Femoral~Length\left(Age\right) = \theta_1 + \theta_2 \cdot Age + \theta_3 \cdot Age^2$$
 
 ## Example: Alligator growth
 
