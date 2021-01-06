@@ -18,4 +18,74 @@ theme_set(theme_cowplot())
 ```
 
 
-## Test
+## Data Manipulation Goals
+
+- Perform all manipulation in R
+  - Preserves data integrity
+  - This will take a lot of time at first but is worth the effort
+  - Remember Google is your friend!
+  
+  
+## The Tidyverse
+
+<center><img src="https://i.imgur.com/fHQecxu.png" width="85%" />
+<br />
+<br />
+</center>  
+
+- Core Tidyverse packages: ggplot2, dplyr, tidyr, readr, purr, tibble, stringr, forcats. 
+- `install.packages("tidyverse")`  
+  
+
+## The Tidyverse
+
+You may notice when you load the tidyverse you get a message that says that some libraries overwrite functions in base R. 
+  
+- For example, dplyr overwrites `filter()` and `lag()`.
+    - To use the base functions, you will need to use their full names: `stats::filter()` and `stats::lag()`.
+
+ 
+## Analysis workflow - Tidy Data
+
+
+<center>
+<br />
+<br />
+<img src="https://i.imgur.com/fDpfRDA.png" width="85%" />
+</center>  
+  
+  
+## Tibbles  {.smaller}
+
+The tidyverse (via `read_csv()`) reads in files as tibbles instead of data.frames.
+<br />
+<br />
+
+```{r echo=TRUE, message=FALSE}
+dat <- read_csv("composition_data.csv")
+dat
+```
+    
+
+## Tibbles 
+
+Tibbles and data frames are essentially the same thing, but a tibble is more modern and works better with the data structure of the tidyverse.  For more detailed info see `vignette("tibble")`.
+    
+- You can coerce a data.frame into a tibble with `as.tibble(data.frame)`
+- Tibbles never change the type of an input (e.g. no conversion of strings to factors), it never changes the name of a variable, and it never creates row names.
+- You can transpose a tibble with `tribble()`
+
+    
+## Tibbles
+
+Some differences between tibbles and data.frames
+  
+  1. Tibbles only print 10 rows, and columns display their type (e.g. "chr", "int"), whereas data frames will print the whole thing, and you have to use `str()` to see data types.
+    
+    -   You can specify what parts of the tibble you want printed with `print(tibble, n=x, width=x)` where `n` is the number of rows, and `width` is the width to display.
+    -   You can look at the start of a tibble with `head(<tibble_name>)`, or the end of a tibble with `tail(<tibble_name>)`.
+
+  2. Subsetting is done by name with `$`, or by name or position with `[[]]`.
+
+    
+    
