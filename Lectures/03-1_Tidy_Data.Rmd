@@ -87,5 +87,7 @@ Some differences between tibbles and data.frames
 
   2. Subsetting is done by name with `$`, or by name or position with `[[]]`.
 
-    
+
+
+## NEXT
     
