@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Programming with Data</title>
+  <title>Tidy Data</title>
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -19,7 +19,7 @@
     var SLIDE_CONFIG = {
       // Slide settings
       settings: {
-                title: 'Programming with Data',
+                title: 'Tidy Data',
                         subtitle: 'Quantitative Methods in Life Sciences',
                 useBuilds: true,
         usePrettify: true,
@@ -30,7 +30,7 @@
       // Author information
       presenters: [
             {
-        name:  'Elizabeth King, Kevin Middleton, and Lauren Sullivan' ,
+        name:  'Elizabeth King, Kevin Middleton and Lauren Sullivan' ,
         company: '',
         gplus: '',
         twitter: '',
@@ -3195,422 +3195,98 @@ slide:not(.current) .plotly.html-widget{
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2></h2></hgroup><article >
-
-<blockquote>
-<p>&quot;For example, last month I was working on a problem of logistic regression that I suspected had mislabeled outcomes (some zeroes turned to ones, and vice versa), and read up on some robust logistic regression methods, implemented in the robust package. But I wasn’t sure they would be effective on my data, so I did some random simulation of mislabeled outcomes and applied the method. The method didn’t work as well as I needed it to, which saved me from applying it to my data and thinking I’d solved the problem.</p>
-</blockquote>
-
-<blockquote>
-<p>For this reason, no matter how much math and proofs there are that show a method is [reliable], I really only feel comfortable with a method once I’ve worked with it simulated data. It’s also a great way to teach myself about the statistical method.&quot; <a href='http://varianceexplained.org/r/simulation-bayes-baseball/' title=''>David Robinson</a></p>
-</blockquote>
-
-</article></slide><slide class=""><hgroup><h2>Learning a programming language</h2></hgroup><article  id="learning-a-programming-language">
-
-<p>Like learning a foreign language.</p>
+<slide class=""><hgroup><h2>Data Manipulation Goals</h2></hgroup><article  id="data-manipulation-goals">
 
 <ul>
-<li>Practice</li>
-<li>Struggle</li>
-<li>Gradual proficiency</li>
-<li>Lectures, talks, and bootcamps won’t help you as much as hands-on practice.</li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2>What do you mean programming?</h2></hgroup><article  id="what-do-you-mean-programming">
-
-<p>Modern Scientist == Programmer</p>
+<li>Perform all manipulation in R
 
 <ul>
-<li>95% of your analysis time is spent <em>not</em> doing statistics.
-
-<ul>
-<li>Wrangling data</li>
-</ul></li>
-<li>Invest time now in learning the logic of programming. Save time later.</li>
-<li>Reproducibility. You always know what you did.
-
-<ul>
-<li>Code with comments reads as a step-by-step of your analysis</li>
-</ul></li>
-<li>This is a process. It takes time to learn and be comfortable.</li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2>Why program?</h2></hgroup><article  id="why-program">
-
-<blockquote>
-<p>&ldquo;If you had done something twice, you are likely to do it again.&rdquo; – Brian Kernighan and Bob Pike</p>
-</blockquote>
-
-</article></slide><slide class=""><hgroup><h2>Good things about programming with data</h2></hgroup><article  id="good-things-about-programming-with-data">
-
-<ul>
-<li>Forces you to be explicit.
-
-<ul>
-<li>R won’t give unless you ask.</li>
-</ul></li>
-<li>Forces you to have a record of your analysis.
-
-<ul>
-<li>Add to/modify your data and rerun</li>
-<li>No point and click hell</li>
-</ul></li>
-<li>Allows you to keep versions of your analysis
-
-<ul>
-<li>Revert to an older version</li>
+<li>Preserves data integrity</li>
+<li>This will take a lot of time at first but is worth the effort</li>
+<li>Remember Google is your friend!</li>
 </ul></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>R and RStudio</h2></hgroup><article  id="r-and-rstudio">
-
-<p>You are living in a good time.</p>
-
-<ul>
-<li>The R Renaissance (2012-present)</li>
-<li>The DaRk Ages (1993-2011)</li>
-</ul>
+</article></slide><slide class=""><hgroup><h2>The Tidyverse</h2></hgroup><article  id="the-tidyverse">
 
 <center>
 
-<img src="http://s3.crackedcdn.com/phpimages/article/0/2/5/208025_v1.jpg" />
+<img src="https://i.imgur.com/fHQecxu.png" width="85%" /> <br /> <br />
 
 </center>
 
-</article></slide><slide class=""><hgroup><h2>Base R vs. new tools</h2></hgroup><article  id="base-r-vs.-new-tools">
-
-<p>People have extened the basic R functionality</p>
-
 <ul>
-<li>Reading, writing, and working with data (selecting, filtering, aggregating, plotting)</li>
+<li>Core Tidyverse packages: ggplot2, dplyr, tidyr, readr, purr, tibble, stringr, forcats.</li>
+<li><code>install.packages(&quot;tidyverse&quot;)</code></li>
 </ul>
 
-<p>Should you learn the base R way or the new tools?</p>
+</article></slide><slide class=""><hgroup><h2>The Tidyverse</h2></hgroup><article  id="the-tidyverse-1">
+
+<p>You may notice when you load the tidyverse you get a message that says that some libraries overwrite functions in base R.</p>
 
 <ul>
-<li>Both, eventually.</li>
-</ul>
-
-<center>
-
-<img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Leonardo_Design_for_a_Flying_Machine%2C_c._1488.jpg" width="50%" />
-
-</center>
-
-</article></slide><slide class=""><hgroup><h2>The tidyverse</h2></hgroup><article  id="the-tidyverse">
-
-<p>A set of packages to load, clean, filter, plot, and generally deal with data in a &ldquo;tidy&rdquo; way. Largely the work of <a href='http://hadley.nz/' title=''>Hadley Wickham</a>.</p>
-
-<pre class = 'prettyprint lang-r'>install.packages(&quot;tidyverse&quot;) # Once
-library(tidyverse)</pre>
+<li>For example, dplyr overwrites <code>filter()</code> and <code>lag()</code>.
 
 <ul>
-<li>Tidyverse Resources
-
-<ul>
-<li>The Tidy Tools Manifesto</li>
-<li>Guides &amp; Tutorials</li>
+<li>To use the base functions, you will need to use their full names: <code>stats::filter()</code> and <code>stats::lag()</code>.</li>
 </ul></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>A few tips for clean code</h2></hgroup><article  id="a-few-tips-for-clean-code">
+</article></slide><slide class=""><hgroup><h2>Analysis workflow - Tidy Data</h2></hgroup><article  id="analysis-workflow---tidy-data">
+
+<center>
+
+<br /> <br /> <img src="https://i.imgur.com/fDpfRDA.png" width="85%" />
+
+</center>
+
+</article></slide><slide class=""><hgroup><h2>Tibbles</h2></hgroup><article  id="tibbles" class="smaller">
+
+<p>The tidyverse (via <code>read_csv()</code>) reads in files as tibbles instead of data.frames. <br /> <br /></p>
+
+<pre class = 'prettyprint lang-r'>dat &lt;- read_csv(&quot;composition_data.csv&quot;)
+dat</pre>
+
+<pre >## # A tibble: 1,343 x 4
+##    plot_no subplot species notes   
+##      &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   
+##  1       1       6 poapra  &lt;NA&gt;    
+##  2       1       6 solcan  &lt;NA&gt;    
+##  3       1       6 sornut  seedling
+##  4       1       6 solspe  &lt;NA&gt;    
+##  5       1       6 schsco  &lt;NA&gt;    
+##  6       1       6 andger  &lt;NA&gt;    
+##  7       1       6 monfis  seedling
+##  8       1       7 solcan  &lt;NA&gt;    
+##  9       1       7 poapra  &lt;NA&gt;    
+## 10       1       7 sornut  &lt;NA&gt;    
+## # … with 1,333 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2>Tibbles</h2></hgroup><article  id="tibbles-1">
+
+<p>Tibbles and data frames are essentially the same thing, but a tibble is more modern and works better with the data structure of the tidyverse. For more detailed info see <code>vignette(&quot;tibble&quot;)</code>.</p>
 
 <ul>
-<li>In order to make sure your code is reproducible, you want to make sure it is understandable by others (and your future self). To achieve this, your code should be clean, readable, and well annotated. So how do we do that?</li>
+<li>You can coerce a data.frame into a tibble with <code>as.tibble(data.frame)</code></li>
+<li>Tibbles never change the type of an input (e.g. no conversion of strings to factors), it never changes the name of a variable, and it never creates row names.</li>
+<li>You can transpose a tibble with <code>tribble()</code></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Whitespace is your friend</h2></hgroup><article  id="whitespace-is-your-friend" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Tibbles vs Data Frames</h2></hgroup><article  id="tibbles-vs-data-frames">
 
-<ul>
-<li>Separate elements and processes with spaces and line breaks</li>
-<li>Limit line length</li>
-<li>Use indenting to group code</li>
-</ul>
-
-<p>Hard to read:</p>
-
-<pre class = 'prettyprint lang-r'>tvtest&lt;-lmer(sqrt(tv)~Region*log(DD5_TOT)+(1|Population/Sample_ID)+
-(1|Year),data=tvdat,REML=FALSE)
-summary(tvtest)
-ggplot(tvdat,aes(x=log(DD5_TOT),y=sqrt(tv),col=Region))+
-geom_point(shape=1,size=3,alpha=1/3)+ geom_smooth(aes(col=Region),method=&#39;lm&#39;)+
-xlab(bquote(&#39;log(Degree Days above&#39; ~5^o~C*&#39;)&#39;))+ylab(&#39;sqrt(Terminal Velocity (m/s))&#39;)</pre>
-
-</article></slide><slide class=""><hgroup><h2>Whitespace is your friend</h2></hgroup><article  id="whitespace-is-your-friend-1" class="smaller">
-
-<ul>
-<li>Separate elements and processes with spaces and line breaks</li>
-<li>Limit line length</li>
-<li>Use indenting to group code</li>
-</ul>
-
-<p>Easier to read:</p>
-
-<pre class = 'prettyprint lang-r'>tvtest &lt;- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
-                 (1|Population/Sample_ID) + 
-                 (1|Year), data = tvdat, 
-               REML = FALSE)
-
-summary(tvtest)
-
-ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
-  geom_point(shape = 1, size = 3, alpha = 1/3) +
-  geom_smooth(aes(col = Region), method = &#39;lm&#39;) + 
-  xlab(bquote(&#39;log(Degree Days above&#39; ~5^o~C*&#39;)&#39;)) +
-  ylab(&#39;sqrt(Terminal Velocity (m/s))&#39;)</pre>
-
-</article></slide><slide class=""><hgroup><h2>Annotations are messages to your future self (and others)</h2></hgroup><article  id="annotations-are-messages-to-your-future-self-and-others" class="smaller">
-
-<ul>
-<li>Explain the reason &amp; functionality of the code (important when you are a beginner!)</li>
-<li>Any useful messages</li>
-</ul>
-
-<pre class = 'prettyprint lang-r'># Linear mixed model
-# Random effects: Sample nested in Population and Year
-tvtest &lt;- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
-                 (1|Population/Sample_ID) + 
-                 (1|Year), data = tvdat, 
-               REML = FALSE)
-
-# Summary output of the model
-summary(tvtest)
-
-# Plot tv vs. dd5_tot colored by Region
-# alpha = transparancy, smaller is more transparent
-ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
-  geom_point(shape = 1, size = 3, alpha = 1/3) +
-  geom_smooth(aes(col = Region), method = &#39;lm&#39;) + 
-  xlab(bquote(&#39;log(Degree Days above&#39; ~5^o~C*&#39;)&#39;)) +
-  ylab(&#39;sqrt(Terminal Velocity (m/s))&#39;)</pre>
-
-</article></slide><slide class=""><hgroup><h2>Kinds of data in R</h2></hgroup><article  id="kinds-of-data-in-r">
-
-<ul>
-<li>Character (&ldquo;a&rdquo;, &ldquo;Female&rdquo;, &ldquo;The quick brown fox&rdquo;)</li>
-<li>Numeric (1.25, 1e6) or integer (1)</li>
-<li>Logical (<code>TRUE</code> or <code>FALSE</code>)</li>
-<li>Factor (categorical)</li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2>Common R objects</h2></hgroup><article  id="common-r-objects">
+<p>Two big differences between tibbles and data.frames</p>
 
 <ol>
-<li>Vectors</li>
-<li>Matrices</li>
-<li>data.frames</li>
-<li>Functions</li>
+<li>Tibbles only print 10 rows, so you can work with large datsets easily, and columns display their type (e.g. &ldquo;chr&rdquo;, &ldquo;int&rdquo;).</li>
 </ol>
 
-</article></slide><slide class=""><hgroup><h2>Vectors</h2></hgroup><article  id="vectors">
-
-<pre class = 'prettyprint lang-r'>x &lt;- c(112, 2.2, 7, 14.1)
-x</pre>
-
-<pre >## [1] 112.0   2.2   7.0  14.1</pre>
-
-<pre class = 'prettyprint lang-r'>x[2]</pre>
-
-<pre >## [1] 2.2</pre>
-
-<pre class = 'prettyprint lang-r'>sort(x)</pre>
-
-<pre >## [1]   2.2   7.0  14.1 112.0</pre>
-
-</article></slide><slide class=""><hgroup><h2>Vectors</h2></hgroup><article  id="vectors-1">
-
-<pre class = 'prettyprint lang-r'>y1 &lt;- 1:10
-y2 &lt;- seq(1, 10, length = 20)
-y1[1:3]</pre>
-
-<pre >## [1] 1 2 3</pre>
-
-<pre class = 'prettyprint lang-r'>y2[1:3]</pre>
-
-<pre >## [1] 1.000000 1.473684 1.947368</pre>
-
-</article></slide><slide class=""><hgroup><h2>Vectors</h2></hgroup><article  id="vectors-2">
-
-<pre class = 'prettyprint lang-r'>x + 10</pre>
-
-<pre >## [1] 122.0  12.2  17.0  24.1</pre>
-
-<pre class = 'prettyprint lang-r'>y1^2</pre>
-
-<pre >##  [1]   1   4   9  16  25  36  49  64  81 100</pre>
-
-<pre class = 'prettyprint lang-r'>min(x)</pre>
-
-<pre >## [1] 2.2</pre>
-
-<pre class = 'prettyprint lang-r'>max(x)</pre>
-
-<pre >## [1] 112</pre>
-
-</article></slide><slide class=""><hgroup><h2>Vectors</h2></hgroup><article  id="vectors-3">
-
-<pre class = 'prettyprint lang-r'>sqrt(y2)</pre>
-
-<pre >##  [1] 1.000000 1.213954 1.395481 1.555973 1.701393 1.835326 1.960129 2.077448
-##  [9] 2.188487 2.294157 2.395171 2.492093 2.585384 2.675424 2.762531 2.846974
-## [17] 2.928984 3.008759 3.086473 3.162278</pre>
-
-<pre class = 'prettyprint lang-r'>y2_mean &lt;- mean(y2)
-y2_sd &lt;- sd(y2)
-y2_mean</pre>
-
-<pre >## [1] 5.5</pre>
-
-<pre class = 'prettyprint lang-r'>y2_sd</pre>
-
-<pre >## [1] 2.802354</pre>
-
-</article></slide><slide class=""><hgroup><h2>Matrices</h2></hgroup><article  id="matrices">
-
-<p>Square object of one data type</p>
-
-<ul>
-<li>Indexed by [Rows, Columns] (think &ldquo;RC Cola&rdquo;)</li>
-<li>Default is to fill by column (<code>byrow = TRUE</code> for rowwise)</li>
-</ul>
-
-<pre class = 'prettyprint lang-r'>M &lt;- matrix(1:9, nrow = 3, ncol = 3)
-M</pre>
-
-<pre >##      [,1] [,2] [,3]
-## [1,]    1    4    7
-## [2,]    2    5    8
-## [3,]    3    6    9</pre>
-
-<pre class = 'prettyprint lang-r'>M[2, 2]</pre>
-
-<pre >## [1] 5</pre>
-
-</article></slide><slide class=""><hgroup><h2>Matrices</h2></hgroup><article  id="matrices-1">
-
-<pre class = 'prettyprint lang-r'>M[1, ]</pre>
-
-<pre >## [1] 1 4 7</pre>
-
-<pre class = 'prettyprint lang-r'>M[, 1]</pre>
-
-<pre >## [1] 1 2 3</pre>
-
-<center>
-
-<img src="https://i.imgur.com/1yKQBJZ.png" height="200px" />
-
-</center>
-
-</article></slide><slide class=""><hgroup><h2><code>data.frame()</code>: a basic unit of storage</h2></hgroup><article  id="data.frame-a-basic-unit-of-storage">
-
-<p>Mixed data types per column</p>
-
-<ul>
-<li>Numeric</li>
-<li>Character</li>
-<li>Factor (categorical)</li>
-<li>Logical (<code>TRUE</code> and <code>FALSE</code>)</li>
-</ul>
-
-<p><code>read_excel()</code> produces <code>tibble</code>s, which print a little prettier but are otherwise equivalent and completely compatible.</p>
-
-</article></slide><slide class=""><hgroup><h2>Making data.frames</h2></hgroup><article  id="making-data.frames">
-
-<pre class = 'prettyprint lang-r'>M &lt;- data.frame(x = 1:3,
-                y = c(10, 17, 21),
-                A = c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
-M</pre>
-
-<pre >##   x  y A
-## 1 1 10 a
-## 2 2 17 b
-## 3 3 21 c</pre>
-
-</article></slide><slide class=""><hgroup><h2>Extracting from data.frames</h2></hgroup><article  id="extracting-from-data.frames">
-
-<p>Either <code>$</code> or <code>[, ]</code> notation (with quoted column names).</p>
-
-<pre class = 'prettyprint lang-r'>M$x</pre>
-
-<pre >## [1] 1 2 3</pre>
-
-<pre class = 'prettyprint lang-r'>M$A</pre>
-
-<pre >## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;</pre>
-
-<pre class = 'prettyprint lang-r'>M[, &quot;y&quot;]</pre>
-
-<pre >## [1] 10 17 21</pre>
-
-</article></slide><slide class=""><hgroup><h2>Extracting from data.frames</h2></hgroup><article  id="extracting-from-data.frames-1">
-
-<pre class = 'prettyprint lang-r'>M[2, ]</pre>
-
-<pre >##   x  y A
-## 2 2 17 b</pre>
-
-<pre class = 'prettyprint lang-r'>M[, 2]</pre>
-
-<pre >## [1] 10 17 21</pre>
-
-</article></slide><slide class=""><hgroup><h2>Functions</h2></hgroup><article  id="functions">
-
-<p>We will get to writing our own functions later, for now: <code>functionName()</code>, where parameters go inside ().</p>
-
-<pre class = 'prettyprint lang-r'>c(1)</pre>
-
-<pre >## [1] 1</pre>
-
-<pre class = 'prettyprint lang-r'>sqrt(256)</pre>
-
-<pre >## [1] 16</pre>
-
-</article></slide><slide class=""><hgroup><h2>Functions</h2></hgroup><article  id="functions-1">
-
-<pre class = 'prettyprint lang-r'>log(2.718)</pre>
-
-<pre >## [1] 0.9998963</pre>
-
-<pre class = 'prettyprint lang-r'>exp(1)</pre>
-
-<pre >## [1] 2.718282</pre>
-
-<p>Get help from the R command line with ?: <code>?sqrt</code> or <code>?log10</code>. Also try <code>help.search(&quot;mean&quot;)</code>, etc.</p>
-
-</article></slide><slide class=""><hgroup><h2>Analysis workflow</h2></hgroup><article  id="analysis-workflow" class="smaller">
+<pre >-   You can specify what parts of the tibble you want printed with `print(tibble, n=x, width=x)` where `n` is the number of rows, and `width` is the width to display.
+-   You can look at the start of a tibble with `head(&lt;tibble_name&gt;)`, or the end of a tibble with `tail(&lt;tibble_name&gt;)`.
+-   See a full scrollable version of the data with `View()`.</pre>
 
 <ol>
-<li>Enter data (e.g., Excel)</li>
-<li>Load raw data and perform manipulations
-
-<ul>
-<li>Recode variables</li>
-<li>Create categorical variables where applicable</li>
-<li>Combine and transform variables if necessary</li>
-</ul></li>
-<li>Plot the raw data to look for mistakes, outliers, etc.
-
-<ul>
-<li>Go back and fix errors</li>
-<li>Explore your data</li>
-</ul></li>
-<li>Statistical analysis</li>
-<li>Interpretation
-
-<ul>
-<li>More analysis</li>
-</ul></li>
-<li>Make tables and figures for publication</li>
-</ol>
-
-</article></slide><slide class=""><hgroup><h2>Analysis workflow</h2></hgroup><article  id="analysis-workflow-1">
-
-<center>
-
-<img src="https://i.imgur.com/fDpfRDA.png" width="85%" />
-
-</center></article></slide>
+<li>Subsetting is done by name with <code>$</code>, or by name or position with <code>[[]]</code>.</li>
+</ol></article></slide>
 
 
   <slide class="backdrop"></slide>
