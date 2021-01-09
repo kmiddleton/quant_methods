@@ -1,7 +1,7 @@
 ---
 title: "Hypothesis Testing"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,24 +13,9 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 source("Shade_Distributions.R")
-
 ```
-
-## Readings
-
-- Gelman and Loken [-@Gelman2014-ng]: The statistical crisis in science
-- Nuzzo [-@Nuzzo2014-ey]: Statistical errors
-
-## Additional (not required) resources (see Canvas) {.smaller}
-
-- Curran-Everett and Benos [-@Curran-Everett2007-nk]: Guidelines for reporting statistics in journals published by the *American Physiological Society*: the sequel
-- Gelman and Stern [-@Gelman2006-xj]: The difference between "significant" and "not significant" is not itself statistically significant
-- Ioannidis [-@Ioannidis2005-od]: Why most published research findings are false
-- Jager and Leek [-@Jager2014-lw]: An estimate of the science-wise false discovery rate and application to the top medical literature
-- Kruschke [-@Kruschke2010-xg]: What to believe: Bayesian methods for data analysis
-- Leek and Peng [-@Leek2015-xj]: *P* values are just the tip of the iceberg
-- Young et al. [-@Young2008-gy]: Why current publication practices may distort science
 
 ## Hypotheses
 
@@ -41,6 +26,7 @@ source("Shade_Distributions.R")
 - Many statistical analyses have the goal of performing a hypothesis test.
 
 **Three Frameworks** : Analytical, Maximum Likelihood, Bayesian
+
 
 ## Analytical
 
@@ -59,6 +45,7 @@ shade_t(0.05, 10,tail = "upper")
 
 </center>
 
+
 ## One sided or two-sided tests
 
 Data will always be on one side of H~0~ or the other.
@@ -74,6 +61,7 @@ Data will always be on one side of H~0~ or the other.
 - *Appropriate at all other times.*
 - Multiply the one-sided *P* by 2.
     - Don't forget to do this.
+
 
 ## Analytical
 
@@ -96,16 +84,16 @@ shade_t(0.005, 10,tail = "both") +
 </center>
 
 
-
 ## Maximum Likelihood
 
 - Does a given model explain significantly more variation than a model with fewer parameters?
 
 - Likelihood ratios
     - Likelihood of Model 2 (more parameters)/Likelihood of Model 1 (fewer parameters)
-    - Follow a $\chi^2$ Distribution (df = difference in number of estimated parameters)
+    - Follow a $\chi^2$ Distribution (*df* = difference in number of estimated parameters)
 
 *Stay Tuned for Model Comparisons*
+
 
 ## Bayesian Inference
 
@@ -122,6 +110,7 @@ is a general equation that can be used to test any null hypothesized parameter e
 
 - $b$ is the parameter estimate, $\beta_0$ is the null hypothesized value (often and by default $\beta_0 = 0$)
 - Analyses of allometry: the study of scaling relationships
+
 
 ## PanTHERIA: Database of mammal life history data
 
@@ -151,11 +140,13 @@ names(mammals) <- c("Order", "Species", "Mass", "Forearm")
 
 *AdultForearmLen_mm*: Total length from elbow to wrist of adult (or age unspecified) live, freshly-killed, or museum specimens using captive, wild, provisioned, or unspecified populations; male, female, or sex unspecified individuals; primary, secondary, or extrapolated sources; all measures of central tendency; in all localities.
 
+
 ## Examine the data
 
 ```{r}
 glimpse(mammals)
 ```
+
 
 ## Preliminary plotting
 
@@ -165,6 +156,7 @@ ggplot(mammals, aes(x = Mass, y = Forearm, color = Order)) +
   xlab("Adult Body Mass (g)") +
   ylab("Adult Forearm Length (mm)")
 ```
+
 
 ## Drop the really large mammals
 
@@ -179,6 +171,7 @@ Observations:
 mammals <- mammals %>% filter(Mass <= 5000)
 ```
 
+
 ## Replot
 
 ```{r echo=FALSE}
@@ -187,6 +180,7 @@ ggplot(mammals, aes(x = Mass, y = Forearm)) +
   xlab("Adult Body Mass (g)") +
   ylab("Adult Forearm Length (mm)")
 ```
+
 
 ## Scaling relationships
 
@@ -204,15 +198,17 @@ Volume (mass) is proportional to a length cubed:
 
 $$V \propto L^3$$
 
+
 ## Log transformation
 
 The power law relationship:
 
-$$Y = a \centerdot M^b$$
+$$Y = a~M^b$$
 
 Can be linearized by logging (natural or otherwise) both sides of the equation:
 
 $$\log{Y} = \log{a} + b \log{M}$$
+
 
 ## Plotting on log-log scale
 
@@ -225,16 +221,19 @@ ggplot(mammals, aes(x = Mass, y = Forearm)) +
   scale_y_log10()
 ```
 
+
 ## Plotting on log-log scale
 
 ```{r ref.label="mammals_log_plot", echo=FALSE}
 ```
+
 
 ## Caution about working in log space
 
 In this case log~10~:
 
 > "It is probably difficult, for example, to appreciate that points quite close together, such as with log values of 4.90 and 4.60, are the difference on a linear scale between about 79,000 and 40,000." Smith [-@Smith1984-gp]
+
 
 ## Log-transformation
 
@@ -245,12 +244,14 @@ mammals <- mammals %>%
 glimpse(mammals)
 ```
 
+
 ## OLS regression on logged data {.smaller}
 
 ```{r}
 fm <- lm(log_Forearm ~ log_Mass, data = mammals)
 summary(fm)
 ```
+
 
 ## Test of a specific slope
 
@@ -268,6 +269,7 @@ log_Mass    0.307339   0.004427   69.42   <2e-16
 2 * pt(t_value, df = 658 - 2)
 ```
 
+
 ## Caveats
 
 Think about your power to detect an effect.
@@ -282,6 +284,7 @@ Think about error in measurement of Body Mass
 Think about independence of observations
 
 - Bats are phylogenetically closely related
+
 
 ## Types of errors and statistical power
 
@@ -299,6 +302,7 @@ Type II error probability depends on:
 - The value of $\alpha$
 - How "wrong" H~0~ is
 
+
 ## Power
 
 - Probability that a random sample will lead to a rejection of H~0~
@@ -308,6 +312,7 @@ Type II error probability depends on:
     - Low power $\rightarrow$ high type II errors
 - Power analysis will come later (Experimental Design, etc.)
 
+
 ## Controversy
 
 Philosophical and practical problems have been raised since the 1960's.
@@ -316,10 +321,11 @@ Philosophical and practical problems have been raised since the 1960's.
 - *Basic and Applied Social Psychology* banned *P*-values in 2015
 - In 2016, the American Statistical Association published a "Statement on *P*-Values: Context, Process, and Purpose" which critiqued the (mis)use of *P*-values.
 
+
 ## History
 
 - K. Pearson: Pearson's correlation, $\chi^2$, eugenics
-- Fisher: Fisher's exact test, "null hypothesis", ANOVA (*F*)
+- Fisher: Fisher's exact test, "null hypothesis", ANOVA (*F*), eugenics
 - Gosset: *t* distribution, Student's *t*-tests, Guinness
 - Neyman and E. Pearson: "null hypothesis" testing, confidence intervals, decision theory
 
@@ -328,12 +334,14 @@ The modern idea is traced to these statisticians, but has been warped into somet
 - Test statistics (*F*, *t*, $\chi^2$) applied to Neyman-Pearson "null hypotheses"
 - H~0~ becomes a straw man hypothesis of no difference or no effect
 
+
 ## Problem with *P*-values
 
 - Originally an informal concept that got co-opted for what became null hypothesis significance testing (NHST)
 - Apparent objectivity but actually arbitrary and dependent on the data collected and not collected
 - Experimental biases (experimenter introduced, sample size)
 - Science-wide publication bias
+
 
 ## Science-wide publication bias {.smaller}
 
@@ -346,6 +354,7 @@ Corollaries proposed by Ioannidis [-@Ioannidis2005-od]:
 5. The greater the financial and other interests and prejudices in a scientific field, the less likely the research findings are to be true.
 6. The hotter a scientific field (with more scientific teams involved), the less likely the research findings are to be true.
 
+
 ## Alternative suggested approaches
 
 Preregistration of experimental designs
@@ -355,10 +364,5 @@ Preregistration of experimental designs
 
 Either of above could be done in a Likelihood or Bayesian Framework
 
-## Quiz 06-4
-
-Complete Quiz 06-4 on Canvas.
-
-This is the final lecture of the week.
 
 ## References {.references}

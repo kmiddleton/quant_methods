@@ -1,7 +1,7 @@
 ---
 title: "Confidence Intervals"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,10 +13,11 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
-library(wesanderson)
 library(rethinking)
+theme_set(theme_cowplot())
 source("Shade_Distributions.R")
 ```
+
 
 ## Confidence intervals measure the uncertainty in a parameter estimate
 
@@ -28,6 +29,7 @@ source("Shade_Distributions.R")
     - Identify the range of likelihoods summing to 0.95
 - Bayesian Credible Intervals
     - Region including highest 95% of posterior density
+
 
 ## Calculating exact confidence intervals
 
@@ -72,15 +74,16 @@ norm <- tibble(
   y = dnorm(x, 0, 1)
 )
 
-pal <- wes_palette("Moonrise3", 3, type = "discrete")
+pal <- palette()[2:4]
 
 ggplot() +
+  geom_line(data = norm, aes(x, y), size = 3) +
   geom_line(data = sim, aes(x, y, color = Parameters), size = 1.5) +
-  geom_line(data = norm, aes(x, y)) +
   scale_color_manual(values = pal, name = "Degrees of\nFreedom") +
   labs(x = "x", y = "Relative Likelihood") +
   theme(legend.position = c(0.85, 0.75))
 ```
+
 
 ## Calculating exact confidence intervals
 
@@ -94,24 +97,40 @@ qt(0.975, 1000000000 - 1)
 qnorm(0.975, 0, 1)
 ```
 
+
+## Deciphering the `r`, `d`, `p`, and `q` functions for distributions
+
+Example for a normal distribution (Specify `mean` and `sd` or defaults is standard normal: $\mu = 0$, $\sigma = 1$):
+
+1. `rnorm(n, ...)`: `n` random draws
+1. `dnorm(x, ...)`: Relative likelihood (density) at `x` values
+1. `pnorm(q, ...)`: (Lower) tail probability for a quantile `q` 
+1. `qnorm(p, ...)`: Quantile for a given (lower) tail probability `p`
+
+- `lower.tail = FALSE` for the upper tail
+- `log = TRUE` for log-probability
+
+
 ## 95% CI for snake undulation (*n* = 8)
 
 ```{r}
 undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
 undulation_mean <- mean(undulation_rate)
-undulation_SEM <- sd(undulation_rate) / sqrt(length(undulation_rate))
+(undulation_SEM <- sd(undulation_rate) / sqrt(length(undulation_rate)))
 (crit <- qt(0.025, df = 7, lower.tail = FALSE))
 lower <- undulation_mean - crit * undulation_SEM
 upper <- undulation_mean + crit * undulation_SEM
 c(lower, undulation_mean, upper)
 ```
 
+
 ## Bayesian Credible Intervals
 
 - Summarize the posterior distributions of Bayesian analyses
-- Range of the most plausible estimates given the model
+- Range of the most plausible estimates given the data and the model
 - XX% highest density interval
 - XX% quantile
+
 
 ## MCMC sampling
 
@@ -119,27 +138,29 @@ c(lower, undulation_mean, upper)
 - No complicated integrals
 - Requires time and computational power
 
+
 ## MCMC sampling
 
-```{r echo=TRUE, cache=TRUE}
-fm <- map2stan(
+```{r stan_sample, echo=TRUE, cache=TRUE, message=FALSE, warning=FALSE, results='hide'}
+fm <- ulam(
   alist(
     undulation_rate ~ dnorm(mu, sigma),
     mu ~ cauchy(0, 5),
-    sigma ~ cauchy(0, 5)
+    sigma ~ exponential(0.5)
   ),
   data = list(undulation_rate = undulation_rate),
   iter = 1e4,
-  warmup = 1e3,
-  WAIC = FALSE
+  chains = 4
 )
 ```
+
 
 ## MCMC sampling output
 
 ```{r echo=FALSE, fig.height = 3}
 rstan::traceplot(fm@stanfit, pars = c("mu", "sigma"))
 ```
+
 
 ## MCMC sampling
 
@@ -152,8 +173,10 @@ post %>%
   gather(variable, value, -Sample) %>% 
   ggplot(aes(Sample, value)) +
   geom_line() +
+  geom_point() +
   facet_grid(variable ~ ., scales = "free")
 ```
+
 
 ## MCMC method
 
@@ -161,6 +184,7 @@ post %>%
 - Propose a change (has a likelihood)
 - Move to proposed values with probability proportional to their ratio
 - "Bad" jumps are possible with some non-zero probability
+
 
 ## Current estimates
 
@@ -172,6 +196,7 @@ rel_liks <- dnorm(undulation_rate, mean = post$mu[1],
                   sd = post$sigma[1], log = TRUE)
 (current_ll <- sum(rel_liks))
 ```
+
 
 ## Proposed estimates
 
@@ -193,6 +218,7 @@ Ratio > 1, so definitely move.
 current_ll <- proposed_ll
 ```
 
+
 ## Proposed estimates
 
 ```{r}
@@ -205,6 +231,7 @@ exp(proposed_ll) / exp(current_ll)
 Ratio < 1, so the probability of moving is equal the ratio (here ~10%).
 
 - This allows moves to lower likelihood estimates (as long as the probability of moving is not too small).
+
 
 ## MCMC sampling
 
@@ -222,6 +249,7 @@ post %>%
   facet_grid(variable ~ ., scales = "free")
 ```
 
+
 ## Bayesian credible intervals
 
 Posterior distribution of mean undulation, given, the model (including priors) and data:
@@ -235,6 +263,7 @@ p <- post %>%
 p
 ```
 
+
 ## Bayesian credible intervals
 
 95% Highest density interval is the most probable location for the mean (given the model and the data).
@@ -244,6 +273,7 @@ p
 p + 
   geom_vline(xintercept = cred, color = "coral", size = 1.5)
 ```
+
 
 ## Interpreting intervals
 
@@ -257,8 +287,3 @@ Bayesian interval: `r round(cred[1], 2)` -- `r round(cred[2], 2)`
 - These data and this model
 - Relative probability within a region
 
-## Quiz 06-3
-
-Complete quiz 06-3.
-
-Move on to Lecture 06-4.

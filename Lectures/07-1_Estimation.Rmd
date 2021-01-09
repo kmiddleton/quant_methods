@@ -1,7 +1,7 @@
 ---
-title: "Estimation"
+title: "Estimation and Hypotheses"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,16 +13,17 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
 
-## Estimation
+## Estimation and hypotheses
 
 1. Parameter (point) estimation
-    - Given a model, with unknown parameters ($\theta_0$, $\theta_1$, ..., $\theta_k$), how do we estimate values of those parameters?
+    - Given a model, with unknown parameters ($\theta_0$, $\theta_1$, ..., $\theta_k$), how to estimate values of those parameters?
 2. Interval estimation
-    - How do we quantify the uncertainty associated with parameter estimates?
+    - How to quantify the uncertainty associated with parameter estimates?
 3. Hypothesis testing
-    - How do we test a hypothesis about a parameter estimate?
+    - How to test hypotheses about parameter estimates?
 
 ## Example: Is normal body temperature 98.6 F?
 
@@ -37,6 +38,7 @@ HBT %>%
   geom_vline(xintercept = 98.6, color = "steelblue", size = 2.5) +
   labs(x = "Temperature (F)", y = "Count")
 ```
+
 
 ## Example: Wing Dimorphic Crickets
 
@@ -58,6 +60,7 @@ Controlling for body mass,
 - Average metabolic rate of long-wings is lower
 
 </div>
+
 
 ## Example: Genetics of Corn Oil Content
 
@@ -82,11 +85,35 @@ Controlling for body mass,
 
 </div>
 
+
+## Example: Species Richness in Lakes
+
+> Does the number of phytoplankton species change with agricultural intensity around lakes?
+
+
+<div class="columns-2">
+
+<center>
+<br />
+<img src="https://imgur.com/GoOM9bb.png" width="90%" />
+<br />
+<br />
+<br />
+</center>
+
+- There is no relationship between species richness and agricultural intensity
+- There is a positive relationship
+- There is a negative relationship
+
+</div>
+
+
 ## Horned lizard predation
 
 <center>
 <img src="https://i.imgur.com/Pe87bEn.jpg" width="100%" />
 </center>
+
 
 ## Horned lizard predation
 
@@ -101,6 +128,7 @@ HL %>%
   labs(x = "Horn Length (mm)", y = "Count")
 ```
 
+
 ## Estimation
 
 1. Parameter (point) estimation
@@ -110,6 +138,7 @@ HL %>%
 3. Hypothesis testing
     - Is a difference that large likely to happen by chance alone?
 
+
 ## 1. Estimate of group means
 
 ```{r}
@@ -118,6 +147,7 @@ HL %>% group_by(group) %>%
             horn_SEM = sd(horn_length) / length(horn_length))
 ```
 
+
 ## 2. 95% confidence interval of group means
 
 Using Mean $\pm$ 2 $\times$ SEM:
@@ -125,11 +155,13 @@ Using Mean $\pm$ 2 $\times$ SEM:
 - Alive: 24.28 (95% CI = `r round(24.28 - 2 * 0.017, 2)` -- `r round(24.28 + 2 * 0.017, 2)`)
 - Dead: 21.99 (95% CI = `r round(21.99 - 2 * 0.09, 2)` -- `r round(21.99 + 2 * 0.09, 2)`)
 
+
 ## 3a. *t*-test for equality of means {.smaller}
 
 ```{r}
 t.test(horn_length ~ group, data = HL, var.equal = TRUE)
 ```
+
 
 ## 3b. Linear model for equality of means {.smaller}
 
@@ -139,9 +171,3 @@ summary(fm)
 ```
 
 Each line contains a hypothesis test of estimate = 0.
-
-## Quiz 06-1
-
-Complete Quiz 06-1 (a little longer than usual)
-
-Watch Lecture 06-2

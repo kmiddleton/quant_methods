@@ -1,7 +1,7 @@
 ---
 title: "Tail Probabilities"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,30 +13,31 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 source("Shade_Distributions.R")
 ```
 
-## Recall from Problem Set 3
+## Random normal values
 
-- Generate 100000 values from a normal distribution with a mean of 5 and a standard deviation of 1
-- Generate 100000 values from a normal distribution with a mean of 5 and a standard deviation of 5
+- Generate 100,000 values from a normal distribution with a mean of 5 and a standard deviation of 1
+- Generate 100,000 values from a normal distribution with a mean of 5 and a standard deviation of 5
 
 ```{r}
 set.seed(832476)
-# 3
-xx3 <- tibble(num = rnorm(100000, 5, 1))
-
-# 6
-xx6 <- tibble(num = rnorm(100000, 5, 5))
+sd1 <- tibble(y = rnorm(100000, 5, 1))
+sd5 <- tibble(y = rnorm(100000, 5, 5))
 ```
+
 
 ## Plots of random normal values
 
 ```{r echo=FALSE}
-p1 <- xx3 %>% ggplot(aes(num)) +
-  geom_histogram(bins = 50)
-p2 <- xx6 %>% ggplot(aes(num)) +
-  geom_histogram(bins = 50)
+p1 <- sd1 %>% ggplot(aes(y)) +
+  geom_histogram(bins = 50) +
+  labs(y = "Count")
+p2 <- sd5 %>% ggplot(aes(y)) +
+  geom_histogram(bins = 50) +
+  labs(y = "Count")
 
 plot_grid(p1, p2, ncol = 2)
 ```
@@ -45,12 +46,10 @@ plot_grid(p1, p2, ncol = 2)
 ## What proportion of values from each set are above 7?
 
 ```{r}
-#3 
-nrow(xx3[xx3$num > 7, ]) / nrow(xx3)
-
-#6
-nrow(xx6[xx6$num > 7, ]) / nrow(xx6)
+nrow(sd1[sd1$y > 7, ]) / nrow(sd1)
+nrow(sd5[sd5$y > 7, ]) / nrow(sd5)
 ```
+
 
 ## Use `pnorm()` to calculate the probability of observing a value of 7 or greater for each distribution.
 
@@ -61,12 +60,14 @@ pnorm(7, mean = 5, sd = 5, lower.tail = FALSE)
 
 Compare the values returned by `pnorm()` to those you calculated manually above.
 
+
 ## Tail probabilities
 
 ```{r fig.height = 3}
 shade_normal(0.025, tail = "both")
 qnorm(0.025)
 ```
+
 
 ## *t* Distribution
 
@@ -75,12 +76,14 @@ shade_t(0.025, df = 5)
 qt(0.025, df = 5)
 ```
 
+
 ## *F* Distribution
 
 ```{r fig.height = 3}
 shade_F(0.05, df1 = 2, df2 = 10)
 qf(0.05, df1 = 2, df2 = 10, lower.tail = FALSE)
 ```
+
 
 ## $\chi^2$ Distribution
 
@@ -89,9 +92,10 @@ shade_chisq(0.05, df = 2)
 qchisq(0.05, df = 2, lower.tail = FALSE)
 ```
 
-## Why do we always use 0.05 or 0.025?
 
-5% is a special number  - the consensus threshold for statistical significance
+## Why do we always seem to use 0.05 or 0.025?
+
+5% is a special number - the arbitrary threshold for statistical significance
 
 <div class="columns-2">
 
@@ -103,15 +107,10 @@ shade_normal(0.025, tail = "both")
 shade_normal(0.05, tail = "upper")
 ```
 
-</center>
 
 ## We could choose any probability for any distribution
 
 ```{r, fig.height=3.5}
 shade_normal(0.34, tail='upper')
 ```
-
-## No Quiz
-
-Watch Lecture 06-3
 
