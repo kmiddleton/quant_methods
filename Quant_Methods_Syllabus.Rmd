@@ -105,11 +105,12 @@ Following each four week period, we will spend one week reviewing what we have l
 ### Grading
 
 Your grade in the course will be a function of:
-    1. Quiz questions 
-    1. Problem sets 
-    1. Peer evaluations (both your own completion of and others' evaluation of you)
-    1. In class contributions
-    1. Progress checks 
+
+1. Quiz questions 
+1. Problem sets 
+1. Peer evaluations (both your own completion of and others' evaluation of you)
+1. In class contributions
+1. Progress checks 
 
 ----
 \newpage
