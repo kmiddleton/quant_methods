@@ -113,7 +113,7 @@ Absolute value wouldn't capture the greater variability in the right image.
 
 ## Sample variance
 
-Sum of squares standardized by one minus the sample size ($n - 1$):
+Sum of squares standardized by the sample size minus one ($n - 1$):
 
 $$
 s^2 = \frac{\sum \left(Y_i - \bar{Y}\right)^2}{n - 1}
