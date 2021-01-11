@@ -1,0 +1,47 @@
+---
+title: "Data Transformation"
+author: "Elizabeth King, Kevin Middleton and Lauren Sullivan"
+subtitle: Quantitative Methods in Life Sciences
+output:
+  html_document:
+    df_print: paged
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+theme_set(theme_cowplot())
+```
+
+
+## Data Manipulation Goals -- Reminder
+
+Once we have tidy data, we may need to update its format, create new variables, filter out other variables, etc.
+
+
+- Perform all manipulation in R
+    
+    - Preserves data integrity
+    - This will take a lot of time at first but is worth the effort
+    - Remember Google is your friend!
+
+
+## Data Transformation with dplyr
+
+
+<center>
+<br />
+<br />
+<img src="https://i.imgur.com/fDpfRDA.png" width="85%" />
+</center>  
+  
+  
+
+
+
