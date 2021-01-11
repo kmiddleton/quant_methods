@@ -1,10 +1,8 @@
 ---
 title: "Data Transformation"
-author: "Elizabeth King, Kevin Middleton and Lauren Sullivan"
-subtitle: Quantitative Methods in Life Sciences
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
-  html_document:
-    df_print: paged
   ioslides_presentation:
     fig_width: 7
     css: styles.css
@@ -42,6 +40,245 @@ Once we have tidy data, we may need to update its format, create new variables, 
 </center>  
   
   
+## Useful transformation functions
+
+- `filter()`
+- `arrange()`
+- `select()`
+- `mutate()` and `transmute()`
+- `summarize()`
+
+
+## Eastern Red Bat morphology data
+
+<center><img src="https://imgur.com/vG2psDp.png" width="100%" /></center>  
+
+
+## Eastern Red Bat morphology data
+
+<center><img src="https://imgur.com/RHmGsV8.png" width="100%" /></center>  
+
+
+
+## Eastern Red Bat morphology data
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE}
+bats <- read_csv("../data/bats.csv")
+bats[1:10,]
+```
+
+
+## `filter()` {.smaller}
+
+Subsets observations based on their values. The first argument is the object to filter, and the following arguments are the expressions for how you want to filter. So say we only want to look at female bats.
+
+```{r,  echo=TRUE, message=FALSE}
+filter(bats, sex == "F")
+```
+
+
+## `filter()` {.smaller}
+
+Or we only want to look at male bats with a mass above 15g.
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>%
+  filter(sex == "M", mass > 15)
+```
+
+
+## `filter()` {.smaller}
+
+Remember, if we want to use the `%>%` we don't have to specify the dataframe.
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  filter(sex == "M", mass > 15)
+```
+
+
+## Logical Operators 
+
+You can use `filter()` combined with logical or Boolean operators to select various sets. 
+
+  - `&` is "and", `|` is "or", `!` is "not"
+  - Note: `filter()` excludes rows with `NA` for the variables specified.
+
+
+## Logical Operators
+
+<center><img src="https://imgur.com/MiHIo1n.png" width="100%" /><br />
+<br /></center>  
+
+*Boolean operators. The left circle is x, the right circle is y, and the shaded region indicates the given subset selected.*
+
+## `filter()` with Boolean {.smaller}
+
+So say you want the set of male bats with mass > 15g. You can also write this with boolean operators.  
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  filter(sex == "M" & mass > 15)
+```
+
+
+## `filter()` with Boolean {.smaller}
+
+Or you could get the same result by asking for bats that are not (`!=`) female.
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  filter(sex != "F" & mass > 15)
+```
+
+
+
+## `filter()` with Boolean {.smaller}
+
+Or say you want the set of bats that are adult females
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  filter(sex == "F" & age == "A")
+```
+
+ 
+## `filter()` with Boolean {.smaller}
+
+Or you want the set of bats that either have condition "NR" or "L"
+
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  filter(condition == "NR" | condition == "L")
+```
+
+
+## `arrange()` {.smaller}
+
+The function `arrange()` sorts by both ascending numerical and alphabetical order, but you can flip this to descending order with `desc()`.
+  
+  - `arrange()` always puts `NA`'s at the end, no matter if your sort in ascending or descending order.
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  arrange(desc(avg_temp), desc(condition), desc(RFA))
+```
+
+
+
+## `select()` {.smaller}
+
+If you want to select certain columns, use `select()`. For example, select the columns for sex, moonlight and mass.
+
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  select(sex, moonlight, mass)
+```
+
+
+
+## `mutate()` and `transmute()` {.smaller}
+
+Mutate always adds a new column at the end of the data. So say you want to know the ratio of each bat's right forearm length (RFA) to its bodymass (mass).
+
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  mutate(ratio = RFA / mass)
+```
+
+-   Reminder: `bats$ratio <- bats$RFA / bats$mass` is equivalent
+
+
+
+## `mutate()` and `transmute()` {.smaller}
+
+If all you care about is the new variable, use `transmute()`
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% transmute(ratio = RFA / mass)
+```
+
+
+## Useful Creation Functions
+
+There are a lot of useful functions for creating new variables out there.  Examples include: 
+
+- Arithmetic operators: `+, -, *, /, ^`
+- Logs: `log()` - which is a natural log, `log2()`, `log10()`
+- Offsets: `lead()`, `lag()`
+- Cumulative: `cumsum()`, `cumprod()`, ..., etc
+- Ranking: `min_rank()`, `row_number()`, `percent_rank()`, ..., etc
+
+
+## `summarize()`
+
+This is a very useful function. And allows you to collapse parts of tibbles into a single row (i.e. summarize your data based on specifications). So say we want to get an average mass of bats  
+
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  summarize(avg_mass = mean(mass))
+```
+
+
+## `summarize()` and `group_by()` {.smaller}
+
+If you want to summarize by multiple groups, use `group_by()` and `%>%`
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  group_by(sex) %>%
+  summarize(avg_mass = mean(mass))
+```
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  group_by(sex, age) %>%
+  summarize(avg_mass = mean(mass))
+```
+
+
+## `summarize()`
+
+Here are some of the many functions that can be useful with `summarize()`
+
+
+- **Exploratory statistics:** `mean(x)`, `median(x)`, `sd(x)`, `IQR(x)`
+- **Measures of rank or position:** `min(x)`, `quantile(x, c(0.05, 0.95))`, `max(x)`, `first(x)`, `nth(x, 2)`, `last(x)`
+- **Counts:** `n()` - size of current group, `sum(x)` (try `sum(~is.na(x)` to make sure you don't include `NA`'s), `n_distinct(x)` - the number of unique elements
+
+
+
+
+## Combine functions to explore data! {.smaller}
+
+Summarize by group and arrange by mass
+
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  group_by(sex, age, condition) %>%
+  summarize(avg_mass = mean(mass)) %>%
+  arrange(desc(avg_mass))
+```
+
+
+
+## Combine functions to explore data!  {.smaller}
+
+Find all groups bigger than a threshold
+
+
+```{r,  echo=TRUE, message=FALSE}
+bats %>% 
+  group_by(sex, age) %>%
+  filter(mass > 15)
+```
+
+
 
 
 
