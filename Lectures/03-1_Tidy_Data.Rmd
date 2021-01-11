@@ -58,11 +58,11 @@ You may notice when you load the tidyverse you get a message that says that some
 ## Tibbles  {.smaller}
 
 The tidyverse (via `read_csv()`) reads in files as tibbles instead of data.frames.
-<br />
-<br />
+
+-   Also `read_excel()`, `read_table()`, etc
 
 ```{r echo=TRUE, message=FALSE}
-dat <- read_csv("composition_data.csv")
+dat <- read_csv("../data/composition_data.csv")
 dat
 ```
     

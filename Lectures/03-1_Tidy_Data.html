@@ -3242,9 +3242,13 @@ slide:not(.current) .plotly.html-widget{
 
 </article></slide><slide class=""><hgroup><h2>Tibbles</h2></hgroup><article  id="tibbles" class="smaller">
 
-<p>The tidyverse (via <code>read_csv()</code>) reads in files as tibbles instead of data.frames. <br /> <br /></p>
+<p>The tidyverse (via <code>read_csv()</code>) reads in files as tibbles instead of data.frames.</p>
 
-<pre class = 'prettyprint lang-r'>dat &lt;- read_csv(&quot;composition_data.csv&quot;)
+<ul>
+<li>Also <code>read_excel()</code>, <code>read_table()</code>, etc</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>dat &lt;- read_csv(&quot;../data/composition_data.csv&quot;)
 dat</pre>
 
 <pre >## # A tibble: 1,343 x 4
@@ -3292,13 +3296,13 @@ dat</pre>
 <pre class = 'prettyprint lang-r'>df</pre>
 
 <pre >## # A tibble: 5 x 2
-##       x       y
-##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1 0.785 -0.0871
-## 2 0.631  1.66  
-## 3 0.192 -0.551 
-## 4 0.840  0.287 
-## 5 0.693  0.222</pre>
+##        x       y
+##    &lt;dbl&gt;   &lt;dbl&gt;
+## 1 0.0249 -0.114 
+## 2 0.695  -0.0666
+## 3 0.0628 -0.758 
+## 4 0.277  -0.476 
+## 5 0.466   1.01</pre>
 
 </article></slide><slide class=""><hgroup><h2>Subsetting Tibbles</h2></hgroup><article  id="subsetting-tibbles">
 
@@ -3306,17 +3310,17 @@ dat</pre>
 
 <pre class = 'prettyprint lang-r'>df$x</pre>
 
-<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+<pre >## [1] 0.02493543 0.69528790 0.06282442 0.27731378 0.46581137</pre>
 
 <pre class = 'prettyprint lang-r'>df[[&quot;x&quot;]]</pre>
 
-<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+<pre >## [1] 0.02493543 0.69528790 0.06282442 0.27731378 0.46581137</pre>
 
 <p>Extract by position</p>
 
 <pre class = 'prettyprint lang-r'>df[[1]]</pre>
 
-<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+<pre >## [1] 0.02493543 0.69528790 0.06282442 0.27731378 0.46581137</pre>
 
 </article></slide><slide class=""><hgroup><h2>Subsetting Tibbles</h2></hgroup><article  id="subsetting-tibbles-1">
 
@@ -3326,11 +3330,11 @@ dat</pre>
 
 <pre class = 'prettyprint lang-r'>df %&gt;% .$x</pre>
 
-<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+<pre >## [1] 0.02493543 0.69528790 0.06282442 0.27731378 0.46581137</pre>
 
 <pre class = 'prettyprint lang-r'>df %&gt;% .[[&quot;x&quot;]]</pre>
 
-<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+<pre >## [1] 0.02493543 0.69528790 0.06282442 0.27731378 0.46581137</pre>
 
 </article></slide><slide class=""><hgroup><h2>Tidy Data</h2></hgroup><article  id="tidy-data">
 
