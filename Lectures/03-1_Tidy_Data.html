@@ -3272,21 +3272,405 @@ dat</pre>
 <li>You can transpose a tibble with <code>tribble()</code></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Tibbles vs Data Frames</h2></hgroup><article  id="tibbles-vs-data-frames">
+</article></slide><slide class=""><hgroup><h2>Tibbles</h2></hgroup><article  id="tibbles-2">
 
-<p>Two big differences between tibbles and data.frames</p>
+<p>Two main differences between tibbles and data.frames</p>
+
+<p><strong>1. Printing:</strong> Tibbles only print 10 rows, and columns display their type (e.g. &ldquo;chr&rdquo;, &ldquo;int&rdquo;), whereas data frames will print the whole thing, and you have to use <code>str()</code> to see data types.</p>
+
+<ul>
+<li><p>You can specify what parts of the tibble you want printed with <code>print(tibble, n=x, width=x)</code> where <code>n</code> is the number of rows, and <code>width</code> is the width to display.</p></li>
+<li><p>You can look at the start of a tibble with <code>head(&lt;tibble_name&gt;)</code>, or the end of a tibble with <code>tail(&lt;tibble_name&gt;)</code>.</p></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Tibbles</h2></hgroup><article  id="tibbles-3">
+
+<p>Two main differences between tibbles and data.frames</p>
+
+<p><strong>2. Subsetting:</strong> is done by name with <code>$</code>, or by name or position with <code>[[]]</code>.</p>
+
+<pre class = 'prettyprint lang-r'>df</pre>
+
+<pre >## # A tibble: 5 x 2
+##       x       y
+##   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 0.785 -0.0871
+## 2 0.631  1.66  
+## 3 0.192 -0.551 
+## 4 0.840  0.287 
+## 5 0.693  0.222</pre>
+
+</article></slide><slide class=""><hgroup><h2>Subsetting Tibbles</h2></hgroup><article  id="subsetting-tibbles">
+
+<p>Extract by name</p>
+
+<pre class = 'prettyprint lang-r'>df$x</pre>
+
+<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+
+<pre class = 'prettyprint lang-r'>df[[&quot;x&quot;]]</pre>
+
+<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+
+<p>Extract by position</p>
+
+<pre class = 'prettyprint lang-r'>df[[1]]</pre>
+
+<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+
+</article></slide><slide class=""><hgroup><h2>Subsetting Tibbles</h2></hgroup><article  id="subsetting-tibbles-1">
+
+<p>When using the pipe <code>%&gt;%</code>, you need to use a special placeholder <code>.</code> when subsetting:</p>
+
+<p>Here the <code>.</code> stands in for the tibble named &ldquo;df&rdquo;</p>
+
+<pre class = 'prettyprint lang-r'>df %&gt;% .$x</pre>
+
+<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+
+<pre class = 'prettyprint lang-r'>df %&gt;% .[[&quot;x&quot;]]</pre>
+
+<pre >## [1] 0.7852258 0.6309184 0.1919010 0.8401188 0.6925075</pre>
+
+</article></slide><slide class=""><hgroup><h2>Tidy Data</h2></hgroup><article  id="tidy-data">
+
+<p>There are lots of ways to represent the same set of data in tables, but not all are tidy.</p>
+
+<center>
+
+<img src="https://imgur.com/DrgbZQw.png" width="100%" /> <br /> <br />
+
+</center>
+
+<p><em>This is a dataset of tuberculosis cases in 1999 and 2000 from several countries from the World Health Organization. All examples can be found within the Tidyverse package. If you load the tidyverse library, and type in table1 for example, the first table will show up.</em></p>
+
+</article></slide><slide class=""><hgroup><h2>Tidy Rules</h2></hgroup><article  id="tidy-rules">
+
+<p>Three interrelated rules make a dataset tidy:</p>
 
 <ol>
-<li>Tibbles only print 10 rows, so you can work with large datsets easily, and columns display their type (e.g. &ldquo;chr&rdquo;, &ldquo;int&rdquo;).</li>
+<li>Each variable must have its own column.</li>
+<li>Each observation must have its own row.</li>
+<li>Each value must have its own cell.</li>
 </ol>
 
-<pre >-   You can specify what parts of the tibble you want printed with `print(tibble, n=x, width=x)` where `n` is the number of rows, and `width` is the width to display.
--   You can look at the start of a tibble with `head(&lt;tibble_name&gt;)`, or the end of a tibble with `tail(&lt;tibble_name&gt;)`.
--   See a full scrollable version of the data with `View()`.</pre>
+<center>
+
+<br /> <img src="https://imgur.com/qav6ips.png" width="100%" />
+
+</center>
+
+</article></slide><slide class=""><hgroup><h2>Which Dataset is Tidy?</h2></hgroup><article  id="which-dataset-is-tidy">
+
+<center>
+
+<br /> <br /> <img src="https://imgur.com/DrgbZQw.png" width="100%" /> <br /> <br />
+
+</center>
+
+</article></slide><slide class=""><hgroup><h2>Why is Tidy Data Useful?</h2></hgroup><article  id="why-is-tidy-data-useful">
+
+<ul>
+<li>It helps to pick a consistent way to store data.</li>
+<li>R is a vectorized language, so when you put variables in columns, R’s at its best.</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>How to Create Tidy Data</h2></hgroup><article  id="how-to-create-tidy-data">
+
+<p>Most often, data does not start out as tidy because it is organized in a format that’s easy for collection and entry. Thus we must tidy our data.</p>
+
+
+
+<p>Two important functions to learn:</p>
 
 <ol>
-<li>Subsetting is done by name with <code>$</code>, or by name or position with <code>[[]]</code>.</li>
-</ol></article></slide>
+<li><p><strong><code>pivot_longer()</code></strong> - when some of the column names are not the names of variables but the <em>values</em> of the variables.</p>
+
+<ul>
+<li>Wide to Long data</li>
+</ul></li>
+<li><p><strong><code>pivot_wider()</code></strong> - when an observation is scattered across multiple rows.</p>
+
+<ul>
+<li>Long to Wide data</li>
+</ul></li>
+</ol>
+
+</article></slide><slide class=""><hgroup><h2><code>pivot_longer()</code></h2></hgroup><article  id="pivot_longer">
+
+<p>Column names are not the names of variables but the <em>values</em> of the variables. </p>
+
+<pre class = 'prettyprint lang-r'>table4a</pre>
+
+<pre >## # A tibble: 3 x 3
+##   country     `1999` `2000`
+## * &lt;chr&gt;        &lt;int&gt;  &lt;int&gt;
+## 1 Afghanistan    745   2666
+## 2 Brazil       37737  80488
+## 3 China       212258 213766</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>pivot_longer()</code></h2></hgroup><article  id="pivot_longer-1">
+
+<pre class = 'prettyprint lang-r'>table4a %&gt;%
+  pivot_longer(c(&quot;1999&quot;, &quot;2000&quot;), names_to = &quot;year&quot;, values_to = &quot;cases&quot;)</pre>
+
+<p>In the tidyverse, you can combine multiple operations with the &ldquo;pipe&rdquo;, or <code>%&gt;%</code>.</p>
+
+<ul>
+<li><p>This makes your code clean and more human-readable if you translate <code>%&gt;%</code> to &ldquo;then&rdquo;.</p>
+
+<ul>
+<li>The code above would read, &ldquo;take <code>table4a</code>, then pivot the columns <code>1999</code> and <code>2000</code> into one longer column named <code>year</code>, and its values should be called <code>cases</code>.&rdquo;</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2><code>pivot_longer()</code></h2></hgroup><article  id="pivot_longer-2" class="smaller">
+
+<pre >## # A tibble: 3 x 3
+##   country     `1999` `2000`
+## * &lt;chr&gt;        &lt;int&gt;  &lt;int&gt;
+## 1 Afghanistan    745   2666
+## 2 Brazil       37737  80488
+## 3 China       212258 213766</pre>
+
+<pre class = 'prettyprint lang-r'>table4a %&gt;%
+  pivot_longer(c(&quot;1999&quot;, &quot;2000&quot;), names_to = &quot;year&quot;, values_to = &quot;cases&quot;)</pre>
+
+<pre >## # A tibble: 6 x 3
+##   country     year   cases
+##   &lt;chr&gt;       &lt;chr&gt;  &lt;int&gt;
+## 1 Afghanistan 1999     745
+## 2 Afghanistan 2000    2666
+## 3 Brazil      1999   37737
+## 4 Brazil      2000   80488
+## 5 China       1999  212258
+## 6 China       2000  213766</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>pivot_longer()</code></h2></hgroup><article  id="pivot_longer-3">
+
+<p>This is what just happened. Wide to long data.</p>
+
+<center>
+
+<br /> <img src="https://imgur.com/157Odvw.png" width="100%" /> <br /> <br />
+
+</center>
+
+</article></slide><slide class=""><hgroup><h2><code>pivot_wider()</code></h2></hgroup><article  id="pivot_wider">
+
+<p>Observation is scattered across multiple rows.</p>
+
+<ul>
+<li>Here for example, data from Afghanistan in 1999 is in multiple rows</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>print(table2, n = 8, width = Inf)</pre>
+
+<pre >## # A tibble: 12 x 4
+##   country      year type           count
+##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;          &lt;int&gt;
+## 1 Afghanistan  1999 cases            745
+## 2 Afghanistan  1999 population  19987071
+## 3 Afghanistan  2000 cases           2666
+## 4 Afghanistan  2000 population  20595360
+## 5 Brazil       1999 cases          37737
+## 6 Brazil       1999 population 172006362
+## 7 Brazil       2000 cases          80488
+## 8 Brazil       2000 population 174504898
+## # … with 4 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>pivot_wider()</code></h2></hgroup><article  id="pivot_wider-1" class="smaller">
+
+<pre >## # A tibble: 12 x 4
+##   country      year type           count
+##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;          &lt;int&gt;
+## 1 Afghanistan  1999 cases            745
+## 2 Afghanistan  1999 population  19987071
+## 3 Afghanistan  2000 cases           2666
+## 4 Afghanistan  2000 population  20595360
+## 5 Brazil       1999 cases          37737
+## 6 Brazil       1999 population 172006362
+## 7 Brazil       2000 cases          80488
+## 8 Brazil       2000 population 174504898
+## # … with 4 more rows</pre>
+
+<pre class = 'prettyprint lang-r'>table2 %&gt;%
+  pivot_wider(names_from = type, values_from = count) %&gt;% 
+  print(n = 4)</pre>
+
+<pre >## # A tibble: 6 x 4
+##   country      year cases population
+##   &lt;chr&gt;       &lt;int&gt; &lt;int&gt;      &lt;int&gt;
+## 1 Afghanistan  1999   745   19987071
+## 2 Afghanistan  2000  2666   20595360
+## 3 Brazil       1999 37737  172006362
+## 4 Brazil       2000 80488  174504898
+## # … with 2 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>pivot_wider()</code></h2></hgroup><article  id="pivot_wider-2">
+
+<p>This is what just happened. Long to wide data</p>
+
+<center>
+
+<br /> <img src="https://imgur.com/bWvSwUw.png" width="100%" /> <br /> <br />
+
+</center>
+
+</article></slide><slide class=""><hgroup><h2><code>separate()</code></h2></hgroup><article  id="separate" class="smaller">
+
+<p>Pulls apart one column into multiple columns wherever a separator appears.</p>
+
+
+
+<pre >## # A tibble: 6 x 3
+##   country      year rate           
+## * &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;          
+## 1 Afghanistan  1999 745/19987071   
+## 2 Afghanistan  2000 2666/20595360  
+## 3 Brazil       1999 37737/172006362
+## 4 Brazil       2000 80488/174504898
+## # … with 2 more rows</pre>
+
+<pre class = 'prettyprint lang-r'>table3 %&gt;% 
+  separate(rate, into = c(&quot;cases&quot;, &quot;population&quot;), sep = &quot;/&quot;)</pre>
+
+<pre >## # A tibble: 6 x 4
+##   country      year cases  population
+##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;     
+## 1 Afghanistan  1999 745    19987071  
+## 2 Afghanistan  2000 2666   20595360  
+## 3 Brazil       1999 37737  172006362 
+## 4 Brazil       2000 80488  174504898 
+## 5 China        1999 212258 1272915272
+## 6 China        2000 213766 1280428583</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>separate()</code></h2></hgroup><article  id="separate-1" class="smaller">
+
+<p>If you look carefully, the resulting tibble from the previous set of operations resulted in two new columns that were both <em>characters</em> because the original column was a character before the separation. Therefore you should have the function convert to a better type of data using <code>convert = TRUE</code>. <br /> <br /></p>
+
+<pre class = 'prettyprint lang-r'>table3 %&gt;% 
+  separate(rate, into = c(&quot;cases&quot;, &quot;population&quot;), sep = &quot;/&quot;,
+                    convert = TRUE)</pre>
+
+<pre >## # A tibble: 6 x 4
+##   country      year  cases population
+##   &lt;chr&gt;       &lt;int&gt;  &lt;int&gt;      &lt;int&gt;
+## 1 Afghanistan  1999    745   19987071
+## 2 Afghanistan  2000   2666   20595360
+## 3 Brazil       1999  37737  172006362
+## 4 Brazil       2000  80488  174504898
+## 5 China        1999 212258 1272915272
+## 6 China        2000 213766 1280428583</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>unite()</code></h2></hgroup><article  id="unite" class="smaller">
+
+<p>Turns two columns into one. The default for <code>sep</code> is an underscore (_), so if you want something different you must specify.</p>
+
+<pre >## # A tibble: 6 x 4
+##   country     century year  rate             
+## * &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;            
+## 1 Afghanistan 19      99    745/19987071     
+## 2 Afghanistan 20      00    2666/20595360    
+## 3 Brazil      19      99    37737/172006362  
+## 4 Brazil      20      00    80488/174504898  
+## 5 China       19      99    212258/1272915272
+## 6 China       20      00    213766/1280428583</pre>
+
+<pre class = 'prettyprint lang-r'>table5 %&gt;% 
+  unite(year_4digit, century, year, sep = &quot;&quot;)</pre>
+
+<pre >## # A tibble: 6 x 3
+##   country     year_4digit rate             
+##   &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;            
+## 1 Afghanistan 1999        745/19987071     
+## 2 Afghanistan 2000        2666/20595360    
+## 3 Brazil      1999        37737/172006362  
+## 4 Brazil      2000        80488/174504898  
+## 5 China       1999        212258/1272915272
+## 6 China       2000        213766/1280428583</pre>
+
+</article></slide><slide class=""><hgroup><h2>Missing Values</h2></hgroup><article  id="missing-values">
+
+<p>Manipulating your data brings up the importance of missing values. These can either be…</p>
+
+<ol>
+<li><strong>Explicit</strong> - flagged with an <code>NA</code></li>
+<li><strong>Implicit</strong> - not present in the data</li>
+</ol>
+
+</article></slide><slide class=""><hgroup><h2>Missing Values</h2></hgroup><article  id="missing-values-1">
+
+<pre class = 'prettyprint lang-r'>frogs &lt;- tibble(
+  year     = c(2019, 2019, 2019, 2019, 2018, 2018, 2018),
+  individual  = c(1,    2,    3,    4,    2,    3,    4),
+  mass     = c(2.88, 3.51, 1.95,   NA, 2.72, 2.17, 3.32))</pre>
+
+<pre >## # A tibble: 7 x 3
+##    year individual  mass
+##   &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;
+## 1  2019          1  2.88
+## 2  2019          2  3.51
+## 3  2019          3  1.95
+## 4  2019          4 NA   
+## 5  2018          2  2.72
+## 6  2018          3  2.17
+## 7  2018          4  3.32</pre>
+
+</article></slide><slide class=""><hgroup><h2>Missing Values</h2></hgroup><article  id="missing-values-2">
+
+<p>In our case here, you can make implicit missing values become <strong>explicit</strong> by using <code>pivot_wider()</code> to turn the years into columns</p>
+
+<pre class = 'prettyprint lang-r'>frogs %&gt;% 
+  pivot_wider(names_from = year, values_from = mass)</pre>
+
+<pre >## # A tibble: 4 x 3
+##   individual `2019` `2018`
+##        &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1          1   2.88  NA   
+## 2          2   3.51   2.72
+## 3          3   1.95   2.17
+## 4          4  NA      3.32</pre>
+
+</article></slide><slide class=""><hgroup><h2>Missing Values</h2></hgroup><article  id="missing-values-3">
+
+<p>If missing values are not important, you can turn these explicit values into <strong>implicit</strong> ones by using <code>values_drop_na = TRUE</code>.</p>
+
+
+
+<pre class = 'prettyprint lang-r'>frogs %&gt;%
+  pivot_wider(names_from = year, values_from = mass) %&gt;%
+  pivot_longer(c(&#39;2018&#39;,&#39;2019&#39;), names_to = &quot;year&quot;, values_to = &quot;mass&quot;, 
+               values_drop_na = TRUE)</pre>
+
+<pre >## # A tibble: 6 x 3
+##   individual year   mass
+##        &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
+## 1          1 2019   2.88
+## 2          2 2018   2.72
+## 3          2 2019   3.51
+## 4          3 2018   2.17
+## 5          3 2019   1.95
+## 6          4 2018   3.32</pre>
+
+</article></slide><slide class=""><hgroup><h2>Missing Values</h2></hgroup><article  id="missing-values-4">
+
+<p>You can also make missing values explicit with <code>complete()</code></p>
+
+<pre class = 'prettyprint lang-r'>frogs %&gt;%
+  complete(year, individual)</pre>
+
+<pre >## # A tibble: 8 x 3
+##    year individual  mass
+##   &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;
+## 1  2018          1 NA   
+## 2  2018          2  2.72
+## 3  2018          3  2.17
+## 4  2018          4  3.32
+## 5  2019          1  2.88
+## 6  2019          2  3.51
+## 7  2019          3  1.95
+## 8  2019          4 NA</pre></article></slide>
 
 
   <slide class="backdrop"></slide>

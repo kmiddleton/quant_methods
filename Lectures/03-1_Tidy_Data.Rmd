@@ -78,16 +78,310 @@ Tibbles and data frames are essentially the same thing, but a tibble is more mod
     
 ## Tibbles
 
-Some differences between tibbles and data.frames
+Two main differences between tibbles and data.frames
   
-  1. Tibbles only print 10 rows, and columns display their type (e.g. "chr", "int"), whereas data frames will print the whole thing, and you have to use `str()` to see data types.
+  **1. Printing:**  Tibbles only print 10 rows, and columns display their type (e.g. "chr", "int"), whereas data frames will print the whole thing, and you have to use `str()` to see data types.
+
+-   You can specify what parts of the tibble you want printed with `print(tibble, n=x, width=x)` where `n` is the number of rows, and `width` is the width to display.
     
-    -   You can specify what parts of the tibble you want printed with `print(tibble, n=x, width=x)` where `n` is the number of rows, and `width` is the width to display.
-    -   You can look at the start of a tibble with `head(<tibble_name>)`, or the end of a tibble with `tail(<tibble_name>)`.
-
-  2. Subsetting is done by name with `$`, or by name or position with `[[]]`.
+-   You can look at the start of a tibble with `head(<tibble_name>)`, or the end of a tibble with `tail(<tibble_name>)`.
 
 
+## Tibbles
 
-## NEXT
+Two main differences between tibbles and data.frames
+  
+  **2. Subsetting:** is done by name with `$`, or by name or position with `[[]]`.
+
+
+```{r, echo=FALSE, eval=TRUE}
+df <- tibble(
+  x = runif(5),
+  y = rnorm(5)
+)
+```
+
+```{r, echo=TRUE, eval=TRUE}
+df
+```
+
+## Subsetting Tibbles
+
+Extract by name
+```{r, echo=TRUE, eval=TRUE}
+df$x
+df[["x"]]
+```
+
+Extract by position
+```{r, echo=TRUE, eval=TRUE}
+
+df[[1]]
+```
+
+
+## Subsetting Tibbles
+
+When using the pipe `%>%`, you need to use a special placeholder `.` when subsetting:
+
+Here the `.` stands in for the tibble named "df"
+```{r, echo=TRUE, eval=TRUE}
+
+df %>% .$x
+
+df %>% .[["x"]]
+```
+
+
+
+## Tidy Data
+
+There are lots of ways to represent the same set of data in tables, but not all are tidy.
+
+<center><img src="https://imgur.com/DrgbZQw.png" width="100%" />
+<br />
+<br />
+</center>  
+
+*This is a dataset of tuberculosis cases in 1999 and 2000 from several countries from the World Health Organization. All examples can be found within the Tidyverse package.  If you load the tidyverse library, and type in table1 for example, the first table will show up.*
+
+
+## Tidy Rules
+
+Three interrelated rules make a dataset tidy:
+
+  1. Each variable must have its own column.
+  1. Each observation must have its own row.
+  1. Each value must have its own cell.
+  
+  
+<center>
+<br />
+<img src="https://imgur.com/qav6ips.png" width="100%" />
+</center>   
+
+
+
+## Which Dataset is Tidy?
+
+<center>
+<br />
+<br />
+<img src="https://imgur.com/DrgbZQw.png" width="100%" />
+<br />
+<br />
+</center>  
+
+
+## Why is Tidy Data Useful?
+
+- It helps to pick a consistent way to store data.
+- R is a vectorized language, so when you put variables in columns, R's at its best.
+
+
+## How to Create Tidy Data
+
+Most often, data does not start out as tidy because it is organized in a format that's easy for collection and entry. Thus we must tidy our data.
+
+\bigskip
+
+Two important functions to learn:  
+
+1.  **`pivot_longer()`** - when some of the column names are not the names of variables but the *values* of the variables. 
     
+    - Wide to Long data
+  
+1.  **`pivot_wider()`** - when an observation is scattered across multiple rows.
+    
+    - Long to Wide data
+
+
+## `pivot_longer()`
+
+Column names are not the names of variables but the *values* of the variables. \textcolor{red}{*Here for example, 1999 and 2000 are both values of the variable year*}
+
+
+```{r, echo=TRUE}
+table4a
+```
+  
+  
+## `pivot_longer()`  
+  
+```{r, echo=TRUE, eval=FALSE}
+table4a %>%
+  pivot_longer(c("1999", "2000"), names_to = "year", values_to = "cases")
+```
+
+
+In the tidyverse, you can combine multiple operations with the "pipe", or `%>%`.
+
+-   This makes your code clean and more human-readable if you translate `%>%` to "then".
+    
+    -   The code above would read, "take `table4a`, then pivot the columns `1999` and `2000` into one longer column named `year`, and its values should be called `cases`."  
+
+ 
+ 
+## `pivot_longer()`  {.smaller}
+
+```{r, eval=TRUE, echo=FALSE}
+table4a 
+```
+
+```{r, eval=TRUE, echo=TRUE}
+table4a %>%
+  pivot_longer(c("1999", "2000"), names_to = "year", values_to = "cases")
+```
+
+
+## `pivot_longer()` 
+
+This is what just happened. Wide to long data.
+
+<center>
+<br />
+<img src="https://imgur.com/157Odvw.png" width="100%" />
+<br />
+<br />
+</center>  
+
+
+## `pivot_wider()`
+
+Observation is scattered across multiple rows. 
+
+- Here for example, data from Afghanistan in 1999 is in multiple rows
+
+
+```{r, echo=TRUE}
+print(table2, n = 8, width = Inf)
+```
+
+
+## `pivot_wider()` {.smaller}
+
+```{r, eval=TRUE, echo=FALSE}
+print(table2, n = 8)
+```
+
+```{r,  echo=TRUE}
+table2 %>%
+  pivot_wider(names_from = type, values_from = count) %>% 
+  print(n = 4)
+```
+
+## `pivot_wider()` 
+
+This is what just happened. Long to wide data
+
+<center>
+<br />
+<img src="https://imgur.com/bWvSwUw.png" width="100%" />
+<br />
+<br />
+</center>  
+
+
+
+## `separate()`  {.smaller}
+
+Pulls apart one column into multiple columns wherever a separator appears.
+
+\scriptsize
+```{r, eval=TRUE, echo=FALSE}
+print(table3, n = 4, width = Inf)
+```
+
+```{r,  echo=TRUE}
+table3 %>% 
+  separate(rate, into = c("cases", "population"), sep = "/")
+```
+
+
+## `separate()` {.smaller}
+
+If you look carefully, the resulting tibble from the previous set of operations resulted in two new columns that were both *characters* because the original column was a character before the separation. Therefore you should have the function convert to a better type of data using `convert = TRUE`.
+<br />
+<br />
+
+```{r,  echo=TRUE}
+table3 %>% 
+  separate(rate, into = c("cases", "population"), sep = "/",
+                    convert = TRUE)
+```
+
+
+
+## `unite()` {.smaller}
+
+Turns two columns into one. The default for `sep` is an underscore (_), so if you want something different you must specify.
+
+
+```{r, eval=TRUE, echo=FALSE}
+table5
+```
+
+```{r,  echo=TRUE}
+table5 %>% 
+  unite(year_4digit, century, year, sep = "")
+```
+
+
+## Missing Values
+
+Manipulating your data brings up the importance of missing values. These can either be...
+
+1. **Explicit** - flagged with an `NA`
+2. **Implicit** - not present in the data
+
+
+## Missing Values
+
+```{r,  echo=TRUE}
+frogs <- tibble(
+  year     = c(2019, 2019, 2019, 2019, 2018, 2018, 2018),
+  individual  = c(1,    2,    3,    4,    2,    3,    4),
+  mass     = c(2.88, 3.51, 1.95,   NA, 2.72, 2.17, 3.32))
+```
+
+
+```{r, eval=TRUE, echo=FALSE}
+frogs
+```
+
+
+
+## Missing Values
+
+In our case here, you can make implicit missing values become **explicit** by using `pivot_wider()` to turn the years into columns
+
+
+```{r, eval=TRUE, echo=TRUE}
+frogs %>% 
+  pivot_wider(names_from = year, values_from = mass)
+```
+
+
+## Missing Values
+
+If missing values are not important, you can turn these explicit values into **implicit** ones by using `values_drop_na = TRUE`.
+
+\footnotesize
+```{r, eval=TRUE, echo=TRUE}
+frogs %>%
+  pivot_wider(names_from = year, values_from = mass) %>%
+  pivot_longer(c('2018','2019'), names_to = "year", values_to = "mass", 
+               values_drop_na = TRUE)
+
+```
+
+## Missing Values
+
+You can also make missing values explicit with `complete()`
+
+
+```{r, eval=TRUE, echo=TRUE}
+frogs %>%
+  complete(year, individual)
+```
+
