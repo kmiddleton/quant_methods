@@ -1,0 +1,43 @@
+---
+title: "Relational Data"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+theme_set(theme_cowplot())
+```
+
+## Relational Data
+
+It is good practice to maintain smaller datasets and then merge them together through code. Using multiple tables of data is called *Relational Data* because we are interested in the relations between datasets, not individual ones.
+
+Relations are always built between pairs of tables. And to do this work we need some terminology.
+
+\bigskip
+
+- **Mutating joins**: adds a new variable to one data frame from matching observations in another
+- **Filtering joins**: filters observations from one data frame based on if they match an observation from another data frame.
+- **Set operations**: treats observations as if they were set elements.
+
+
+## Relational Data with dplyr
+
+
+
+<center>
+<br />
+<br />
+<img src="https://i.imgur.com/fDpfRDA.png" width="85%" />
+</center>  
+
+
