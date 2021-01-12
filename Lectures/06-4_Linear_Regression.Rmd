@@ -229,7 +229,7 @@ plot(SumSq,
      xlab = TeX("$\\theta_1$"),
      ylab = "Sum of Squares")
 points(minSS.theta_1, minSS.SS, col = "red", pch = 16, cex = 1.5)
-text(-10, 200, paste("b =", minSS.theta_1, "\nSS =", round(minSS.SS, 2)),
+text(-10, 250, paste("b =", minSS.theta_1, "\nSS =", round(minSS.SS, 2)),
      pos = 4, cex = 2)
 ```
 
