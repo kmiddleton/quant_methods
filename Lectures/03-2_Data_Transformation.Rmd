@@ -248,7 +248,7 @@ Here are some of the many functions that can be useful with `summarize()`
 
 - **Exploratory statistics:** `mean(x)`, `median(x)`, `sd(x)`, `IQR(x)`
 - **Measures of rank or position:** `min(x)`, `quantile(x, c(0.05, 0.95))`, `max(x)`, `first(x)`, `nth(x, 2)`, `last(x)`
-- **Counts:** `n()` - size of current group, `sum(x)` (try `sum(~is.na(x)` to make sure you don't include `NA`'s), `n_distinct(x)` - the number of unique elements
+- **Counts:** `n()` - size of current group, `sum(x)` (try `sum(~is.na(x))` to make sure you don't include `NA`'s), `n_distinct(x)` - the number of unique elements
 
 
 
