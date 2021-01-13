@@ -167,7 +167,7 @@ $$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\righ
 sum(log(liks_Y))
 ```
 
-## Likelihood from linear regression with $\theta_0 = 0$
+## Likelihood from linear regression with $\theta_1 = 0$
 
 Fit a linear model (`lm()`) with only an intercept (`~ 1`) and use the built-in function `logLik()` to extract the log-likelihood.
 
@@ -178,7 +178,7 @@ logLik(fm)
 
 ## Maximizing the log-Likelihood
 
-Function to calculate the log-likelihood. Input the slope ($\theta_0$) and observed values of $X$ and $Y$. Return the log-likelihood.
+Function to calculate the log-likelihood. Input the slope ($\theta_1$) and observed values of $X$ and $Y$. Return the log-likelihood.
 
 ```{r log_lik}
 log_lik <- function(theta_1, X, Y){
@@ -195,32 +195,32 @@ log_lik <- function(theta_1, X, Y){
 
 ## Maximizing the log-Likelihood
 
-For a range of $\theta_0$ from -10 to 10 in increments of 0.01, calculate the log-likelihood of the model. Save to a variable called `lls`. Then find the maximum value of `lls`, the associated $\theta_0$ and log-likelihood.
+For a range of $\theta_1$ from -10 to 10 in increments of 0.01, calculate the log-likelihood of the model. Save to a variable called `lls`. Then find the maximum value of `lls`, the associated $\theta_0$ and log-likelihood.
 
 ```{r}
-theta_0 <- seq(-10, 10, by = 0.01)
-lls <- numeric(length(theta_0))
-for (ii in 1:length(theta_0)) {
-  lls[ii] <- log_lik(theta_0[ii], X, Y)
+theta_1 <- seq(-10, 10, by = 0.01)
+lls <- numeric(length(theta_1))
+for (ii in 1:length(theta_1)) {
+  lls[ii] <- log_lik(theta_1[ii], X, Y)
 }
 
 # Location of maximum log-likelihood
 max.ll <- lls[which.max(lls)]
 
 # Slope at maximum log-likelihood
-theta_0_hat <- theta_0[which.max(lls)]
+theta_1_hat <- theta_1[which.max(lls)]
 ```
 
 ## Maximizing the log-Likelihood
 
 ```{r echo=FALSE}
-plot(lls ~ theta_0,
+plot(lls ~ theta_1,
      cex.lab = 1.5,
      type = "l", lwd = 2,
-     xlab = "Slope (b)",
+     xlab = "Slope",
      ylab = "log-Likelihood")
-points(theta_0_hat, max.ll, col = "red", pch = 16, cex = 1.5)
-text(-10, -60, paste("theta_0 =", theta_0_hat, "\nlogLik =", round(max.ll, 2)),
+points(theta_1_hat, max.ll, col = "red", pch = 16, cex = 1.5)
+text(-10, -60, paste("theta_1 =", theta_1_hat, "\nlogLik =", round(max.ll, 2)),
      pos = 4, cex = 2)
 ```
 
