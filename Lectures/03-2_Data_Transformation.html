@@ -3248,90 +3248,90 @@ slide:not(.current) .plotly.html-widget{
 <pre class = 'prettyprint lang-r'>bats &lt;- read_csv(&quot;../data/bats.csv&quot;)
 bats[1:10,]</pre>
 
-<pre >## # A tibble: 10 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     M     NR         34.5   5          99     23.4
-##  2 A     M     NR         41.1  11.3        77     25.4
-##  3 A     F     L          42.9  13          77     25.4
-##  4 A     M     NR         44.5  12          77     25.4
-##  5 A     M     NR         35.7   8.8        85     25.0
-##  6 A     F     L          46.6  22          85     25.0
-##  7 A     F     L          43.9  12          77     26.5
-##  8 A     F     L          40.2  11.5        58     26.3
-##  9 A     F     P          33.4  10          58     26.3
-## 10 A     F     L          44.6  13.3        58     26.3</pre>
+<pre >## # A tibble: 10 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1      1 A     M     NR         34.5   5         990     23.4
+##  2      2 A     M     NR         41.1  11.3        77     25.4
+##  3      3 A     F     L          42.9  13          77     25.4
+##  4      4 A     M     NR         44.5  12          77     25.4
+##  5      5 A     M     NR         35.7   8.8        85     25.0
+##  6      6 A     F     L          46.6  22          85     25.0
+##  7      7 A     F     L          43.9  12          77     26.5
+##  8      8 A     F     L          40.2  11.5        58     26.3
+##  9      9 A     F     P          33.4  10          58     26.3
+## 10     10 A     F     L          44.6  13.3        58     26.3</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  class="smaller" id="filter">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  id="filter" class="smaller">
 
 <p>Subsets observations based on their values. The first argument is the object to filter, and the following arguments are the expressions for how you want to filter. So say we only want to look at female bats.</p>
 
 <pre class = 'prettyprint lang-r'>filter(bats, sex == &quot;F&quot;)</pre>
 
-<pre >## # A tibble: 87 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     F     L          42.9  13          77     25.4
-##  2 A     F     L          46.6  22          85     25.0
-##  3 A     F     L          43.9  12          77     26.5
-##  4 A     F     L          40.2  11.5        58     26.3
-##  5 A     F     P          33.4  10          58     26.3
-##  6 A     F     L          44.6  13.3        58     26.3
-##  7 A     F     L          42.2  11.8        58     26.3
-##  8 A     F     L          39.7  13.8         9     23.3
-##  9 A     F     L          36.5  12.5         3     24.9
-## 10 A     F     L          30.5  13          10     17.2
+<pre >## # A tibble: 87 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1      3 A     F     L          42.9  13          77     25.4
+##  2      6 A     F     L          46.6  22          85     25.0
+##  3      7 A     F     L          43.9  12          77     26.5
+##  4      8 A     F     L          40.2  11.5        58     26.3
+##  5      9 A     F     P          33.4  10          58     26.3
+##  6     10 A     F     L          44.6  13.3        58     26.3
+##  7     12 A     F     L          42.2  11.8        58     26.3
+##  8     13 A     F     L          39.7  13.8         9     23.3
+##  9     15 A     F     L          36.5  12.5         3     24.9
+## 10     18 A     F     L          30.5  13          10     17.2
 ## # … with 77 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  class="smaller" id="filter-1">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  id="filter-1" class="smaller">
 
 <p>Or we only want to look at male bats with a mass above 15g.</p>
 
 <pre class = 'prettyprint lang-r'>bats %&gt;%
   filter(sex == &quot;M&quot;, mass &gt; 15)</pre>
 
-<pre >## # A tibble: 14 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     M     NR         46.9  17.5        10     17.2
-##  2 A     M     NR         46.2  20          10     17.2
-##  3 A     M     NR         46.4  20.5        81     27.3
-##  4 J     M     NR         47.3  18.5        94     26.8
-##  5 A     M     NR         44    17          50     25.4
-##  6 J     M     NR         45.6  17.8        29     26.6
-##  7 J     M     TD         46.1  16           4     26.7
-##  8 J     M     TD         46.2  15.5         0     24.0
-##  9 A     M     NR         45.2  15.5         0     24.0
-## 10 A     M     TD         45.5  19           2     23.0
-## 11 A     M     NR         45    19.5         2     23.0
-## 12 A     M     NR         44.5  16.8         7     28.1
-## 13 A     M     TD         46.5  17.8         7     28.1
-## 14 A     M     TD         50    18.5        96     19.5</pre>
+<pre >## # A tibble: 14 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1     16 A     M     NR         46.9  17.5        10     17.2
+##  2     17 A     M     NR         46.2  20          10     17.2
+##  3     48 A     M     NR         46.4  20.5        81     27.3
+##  4     65 J     M     NR         47.3  18.5        94     26.8
+##  5     69 A     M     NR         44    17          50     25.4
+##  6     83 J     M     NR         45.6  17.8        29     26.6
+##  7    106 J     M     TD         46.1  16           4     26.7
+##  8    110 J     M     TD         46.2  15.5         0     24.0
+##  9    111 A     M     NR         45.2  15.5         0     24.0
+## 10    118 A     M     TD         45.5  19           2     23.0
+## 11    119 A     M     NR         45    19.5         2     23.0
+## 12    127 A     M     NR         44.5  16.8         7     28.1
+## 13    130 A     M     TD         46.5  17.8         7     28.1
+## 14    160 A     M     TD         50    18.5        96     19.5</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  class="smaller" id="filter-2">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  id="filter-2" class="smaller">
 
 <p>Remember, if we want to use the <code>%&gt;%</code> we don’t have to specify the dataframe.</p>
 
 <pre class = 'prettyprint lang-r'>bats %&gt;% 
   filter(sex == &quot;M&quot;, mass &gt; 15)</pre>
 
-<pre >## # A tibble: 14 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     M     NR         46.9  17.5        10     17.2
-##  2 A     M     NR         46.2  20          10     17.2
-##  3 A     M     NR         46.4  20.5        81     27.3
-##  4 J     M     NR         47.3  18.5        94     26.8
-##  5 A     M     NR         44    17          50     25.4
-##  6 J     M     NR         45.6  17.8        29     26.6
-##  7 J     M     TD         46.1  16           4     26.7
-##  8 J     M     TD         46.2  15.5         0     24.0
-##  9 A     M     NR         45.2  15.5         0     24.0
-## 10 A     M     TD         45.5  19           2     23.0
-## 11 A     M     NR         45    19.5         2     23.0
-## 12 A     M     NR         44.5  16.8         7     28.1
-## 13 A     M     TD         46.5  17.8         7     28.1
-## 14 A     M     TD         50    18.5        96     19.5</pre>
+<pre >## # A tibble: 14 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1     16 A     M     NR         46.9  17.5        10     17.2
+##  2     17 A     M     NR         46.2  20          10     17.2
+##  3     48 A     M     NR         46.4  20.5        81     27.3
+##  4     65 J     M     NR         47.3  18.5        94     26.8
+##  5     69 A     M     NR         44    17          50     25.4
+##  6     83 J     M     NR         45.6  17.8        29     26.6
+##  7    106 J     M     TD         46.1  16           4     26.7
+##  8    110 J     M     TD         46.2  15.5         0     24.0
+##  9    111 A     M     NR         45.2  15.5         0     24.0
+## 10    118 A     M     TD         45.5  19           2     23.0
+## 11    119 A     M     NR         45    19.5         2     23.0
+## 12    127 A     M     NR         44.5  16.8         7     28.1
+## 13    130 A     M     TD         46.5  17.8         7     28.1
+## 14    160 A     M     TD         50    18.5        96     19.5</pre>
 
 </article></slide><slide class=""><hgroup><h2>Logical Operators</h2></hgroup><article  id="logical-operators">
 
@@ -3352,101 +3352,101 @@ bats[1:10,]</pre>
 
 <p><em>Boolean operators. The left circle is x, the right circle is y, and the shaded region indicates the given subset selected.</em></p>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  class="smaller" id="filter-with-boolean">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  id="filter-with-boolean" class="smaller">
 
 <p>So say you want the set of male bats with mass &gt; 15g. You can also write this with boolean operators.</p>
 
 <pre class = 'prettyprint lang-r'>bats %&gt;% 
   filter(sex == &quot;M&quot; &amp; mass &gt; 15)</pre>
 
-<pre >## # A tibble: 14 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     M     NR         46.9  17.5        10     17.2
-##  2 A     M     NR         46.2  20          10     17.2
-##  3 A     M     NR         46.4  20.5        81     27.3
-##  4 J     M     NR         47.3  18.5        94     26.8
-##  5 A     M     NR         44    17          50     25.4
-##  6 J     M     NR         45.6  17.8        29     26.6
-##  7 J     M     TD         46.1  16           4     26.7
-##  8 J     M     TD         46.2  15.5         0     24.0
-##  9 A     M     NR         45.2  15.5         0     24.0
-## 10 A     M     TD         45.5  19           2     23.0
-## 11 A     M     NR         45    19.5         2     23.0
-## 12 A     M     NR         44.5  16.8         7     28.1
-## 13 A     M     TD         46.5  17.8         7     28.1
-## 14 A     M     TD         50    18.5        96     19.5</pre>
+<pre >## # A tibble: 14 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1     16 A     M     NR         46.9  17.5        10     17.2
+##  2     17 A     M     NR         46.2  20          10     17.2
+##  3     48 A     M     NR         46.4  20.5        81     27.3
+##  4     65 J     M     NR         47.3  18.5        94     26.8
+##  5     69 A     M     NR         44    17          50     25.4
+##  6     83 J     M     NR         45.6  17.8        29     26.6
+##  7    106 J     M     TD         46.1  16           4     26.7
+##  8    110 J     M     TD         46.2  15.5         0     24.0
+##  9    111 A     M     NR         45.2  15.5         0     24.0
+## 10    118 A     M     TD         45.5  19           2     23.0
+## 11    119 A     M     NR         45    19.5         2     23.0
+## 12    127 A     M     NR         44.5  16.8         7     28.1
+## 13    130 A     M     TD         46.5  17.8         7     28.1
+## 14    160 A     M     TD         50    18.5        96     19.5</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  class="smaller" id="filter-with-boolean-1">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  id="filter-with-boolean-1" class="smaller">
 
 <p>Or you could get the same result by asking for bats that are not (<code>!=</code>) female.</p>
 
 <pre class = 'prettyprint lang-r'>bats %&gt;% 
   filter(sex != &quot;F&quot; &amp; mass &gt; 15)</pre>
 
-<pre >## # A tibble: 14 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     M     NR         46.9  17.5        10     17.2
-##  2 A     M     NR         46.2  20          10     17.2
-##  3 A     M     NR         46.4  20.5        81     27.3
-##  4 J     M     NR         47.3  18.5        94     26.8
-##  5 A     M     NR         44    17          50     25.4
-##  6 J     M     NR         45.6  17.8        29     26.6
-##  7 J     M     TD         46.1  16           4     26.7
-##  8 J     M     TD         46.2  15.5         0     24.0
-##  9 A     M     NR         45.2  15.5         0     24.0
-## 10 A     M     TD         45.5  19           2     23.0
-## 11 A     M     NR         45    19.5         2     23.0
-## 12 A     M     NR         44.5  16.8         7     28.1
-## 13 A     M     TD         46.5  17.8         7     28.1
-## 14 A     M     TD         50    18.5        96     19.5</pre>
+<pre >## # A tibble: 14 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1     16 A     M     NR         46.9  17.5        10     17.2
+##  2     17 A     M     NR         46.2  20          10     17.2
+##  3     48 A     M     NR         46.4  20.5        81     27.3
+##  4     65 J     M     NR         47.3  18.5        94     26.8
+##  5     69 A     M     NR         44    17          50     25.4
+##  6     83 J     M     NR         45.6  17.8        29     26.6
+##  7    106 J     M     TD         46.1  16           4     26.7
+##  8    110 J     M     TD         46.2  15.5         0     24.0
+##  9    111 A     M     NR         45.2  15.5         0     24.0
+## 10    118 A     M     TD         45.5  19           2     23.0
+## 11    119 A     M     NR         45    19.5         2     23.0
+## 12    127 A     M     NR         44.5  16.8         7     28.1
+## 13    130 A     M     TD         46.5  17.8         7     28.1
+## 14    160 A     M     TD         50    18.5        96     19.5</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  class="smaller" id="filter-with-boolean-2">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  id="filter-with-boolean-2" class="smaller">
 
 <p>Or say you want the set of bats that are adult females</p>
 
 <pre class = 'prettyprint lang-r'>bats %&gt;% 
   filter(sex == &quot;F&quot; &amp; age == &quot;A&quot;)</pre>
 
-<pre >## # A tibble: 37 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     F     L          42.9  13          77     25.4
-##  2 A     F     L          46.6  22          85     25.0
-##  3 A     F     L          43.9  12          77     26.5
-##  4 A     F     L          40.2  11.5        58     26.3
-##  5 A     F     P          33.4  10          58     26.3
-##  6 A     F     L          44.6  13.3        58     26.3
-##  7 A     F     L          42.2  11.8        58     26.3
-##  8 A     F     L          39.7  13.8         9     23.3
-##  9 A     F     L          36.5  12.5         3     24.9
-## 10 A     F     L          30.5  13          10     17.2
+<pre >## # A tibble: 37 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1      3 A     F     L          42.9  13          77     25.4
+##  2      6 A     F     L          46.6  22          85     25.0
+##  3      7 A     F     L          43.9  12          77     26.5
+##  4      8 A     F     L          40.2  11.5        58     26.3
+##  5      9 A     F     P          33.4  10          58     26.3
+##  6     10 A     F     L          44.6  13.3        58     26.3
+##  7     12 A     F     L          42.2  11.8        58     26.3
+##  8     13 A     F     L          39.7  13.8         9     23.3
+##  9     15 A     F     L          36.5  12.5         3     24.9
+## 10     18 A     F     L          30.5  13          10     17.2
 ## # … with 27 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  class="smaller" id="filter-with-boolean-3">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  id="filter-with-boolean-3" class="smaller">
 
 <p>Or you want the set of bats that either have condition &ldquo;NR&rdquo; or &ldquo;L&rdquo;</p>
 
 <pre class = 'prettyprint lang-r'>bats %&gt;% 
   filter(condition == &quot;NR&quot; | condition == &quot;L&quot;)</pre>
 
-<pre >## # A tibble: 129 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     M     NR         34.5   5          99     23.4
-##  2 A     M     NR         41.1  11.3        77     25.4
-##  3 A     F     L          42.9  13          77     25.4
-##  4 A     M     NR         44.5  12          77     25.4
-##  5 A     M     NR         35.7   8.8        85     25.0
-##  6 A     F     L          46.6  22          85     25.0
-##  7 A     F     L          43.9  12          77     26.5
-##  8 A     F     L          40.2  11.5        58     26.3
-##  9 A     F     L          44.6  13.3        58     26.3
-## 10 A     M     NR         36.3   9.5        58     26.3
+<pre >## # A tibble: 129 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1      1 A     M     NR         34.5   5         990     23.4
+##  2      2 A     M     NR         41.1  11.3        77     25.4
+##  3      3 A     F     L          42.9  13          77     25.4
+##  4      4 A     M     NR         44.5  12          77     25.4
+##  5      5 A     M     NR         35.7   8.8        85     25.0
+##  6      6 A     F     L          46.6  22          85     25.0
+##  7      7 A     F     L          43.9  12          77     26.5
+##  8      8 A     F     L          40.2  11.5        58     26.3
+##  9     10 A     F     L          44.6  13.3        58     26.3
+## 10     11 A     M     NR         36.3   9.5        58     26.3
 ## # … with 119 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>arrange()</code></h2></hgroup><article  class="smaller" id="arrange">
+</article></slide><slide class=""><hgroup><h2><code>arrange()</code></h2></hgroup><article  id="arrange" class="smaller">
 
 <p>The function <code>arrange()</code> sorts by both ascending numerical and alphabetical order, but you can flip this to descending order with <code>desc()</code>.</p>
 
@@ -3457,22 +3457,22 @@ bats[1:10,]</pre>
 <pre class = 'prettyprint lang-r'>bats %&gt;% 
   arrange(desc(avg_temp), desc(condition), desc(RFA))</pre>
 
-<pre >## # A tibble: 168 x 7
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     M     TD         46.5  17.8         7     28.1
-##  2 J     M     TD         38.5   9.5         7     28.1
-##  3 J     M     TD         36.5   9.5         7     28.1
-##  4 J     M     TD         35.5   9           7     28.1
-##  5 A     M     NR         44.5  16.8         7     28.1
-##  6 J     F     NR         42.9  10.3         7     28.1
-##  7 J     F     NR         42.6  12           7     28.1
-##  8 J     F     NR         42    11.8         7     28.1
-##  9 J     F     NR         41.6  12           7     28.1
-## 10 J     F     NR         40.4  12           7     28.1
+<pre >## # A tibble: 168 x 8
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1    130 A     M     TD         46.5  17.8         7     28.1
+##  2    125 J     M     TD         38.5   9.5         7     28.1
+##  3    121 J     M     TD         36.5   9.5         7     28.1
+##  4    124 J     M     TD         35.5   9           7     28.1
+##  5    127 A     M     NR         44.5  16.8         7     28.1
+##  6    129 J     F     NR         42.9  10.3         7     28.1
+##  7    126 J     F     NR         42.6  12           7     28.1
+##  8    123 J     F     NR         42    11.8         7     28.1
+##  9    128 J     F     NR         41.6  12           7     28.1
+## 10    131 J     F     NR         40.4  12           7     28.1
 ## # … with 158 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>select()</code></h2></hgroup><article  class="smaller" id="select">
+</article></slide><slide class=""><hgroup><h2><code>select()</code></h2></hgroup><article  id="select" class="smaller">
 
 <p>If you want to select certain columns, use <code>select()</code>. For example, select the columns for sex, moonlight and mass.</p>
 
@@ -3482,7 +3482,7 @@ bats[1:10,]</pre>
 <pre >## # A tibble: 168 x 3
 ##    sex   moonlight  mass
 ##    &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;
-##  1 M            99   5  
+##  1 M           990   5  
 ##  2 M            77  11.3
 ##  3 F            77  13  
 ##  4 M            77  12  
@@ -3494,33 +3494,33 @@ bats[1:10,]</pre>
 ## 10 F            58  13.3
 ## # … with 158 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>mutate()</code> and <code>transmute()</code></h2></hgroup><article  class="smaller" id="mutate-and-transmute">
+</article></slide><slide class=""><hgroup><h2><code>mutate()</code> and <code>transmute()</code></h2></hgroup><article  id="mutate-and-transmute" class="smaller">
 
 <p>Mutate always adds a new column at the end of the data. So say you want to know the ratio of each bat’s right forearm length (RFA) to its bodymass (mass).</p>
 
 <pre class = 'prettyprint lang-r'>bats %&gt;% 
   mutate(ratio = RFA / mass)</pre>
 
-<pre >## # A tibble: 168 x 8
-##    age   sex   condition   RFA  mass moonlight avg_temp ratio
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
-##  1 A     M     NR         34.5   5          99     23.4  6.9 
-##  2 A     M     NR         41.1  11.3        77     25.4  3.64
-##  3 A     F     L          42.9  13          77     25.4  3.3 
-##  4 A     M     NR         44.5  12          77     25.4  3.71
-##  5 A     M     NR         35.7   8.8        85     25.0  4.06
-##  6 A     F     L          46.6  22          85     25.0  2.12
-##  7 A     F     L          43.9  12          77     26.5  3.66
-##  8 A     F     L          40.2  11.5        58     26.3  3.50
-##  9 A     F     P          33.4  10          58     26.3  3.34
-## 10 A     F     L          44.6  13.3        58     26.3  3.35
+<pre >## # A tibble: 168 x 9
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp ratio
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
+##  1      1 A     M     NR         34.5   5         990     23.4  6.9 
+##  2      2 A     M     NR         41.1  11.3        77     25.4  3.64
+##  3      3 A     F     L          42.9  13          77     25.4  3.3 
+##  4      4 A     M     NR         44.5  12          77     25.4  3.71
+##  5      5 A     M     NR         35.7   8.8        85     25.0  4.06
+##  6      6 A     F     L          46.6  22          85     25.0  2.12
+##  7      7 A     F     L          43.9  12          77     26.5  3.66
+##  8      8 A     F     L          40.2  11.5        58     26.3  3.50
+##  9      9 A     F     P          33.4  10          58     26.3  3.34
+## 10     10 A     F     L          44.6  13.3        58     26.3  3.35
 ## # … with 158 more rows</pre>
 
 <ul>
 <li>Reminder: <code>bats$ratio &lt;- bats$RFA / bats$mass</code> is equivalent</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2><code>mutate()</code> and <code>transmute()</code></h2></hgroup><article  class="smaller" id="mutate-and-transmute-1">
+</article></slide><slide class=""><hgroup><h2><code>mutate()</code> and <code>transmute()</code></h2></hgroup><article  id="mutate-and-transmute-1" class="smaller">
 
 <p>If all you care about is the new variable, use <code>transmute()</code></p>
 
@@ -3565,7 +3565,7 @@ bats[1:10,]</pre>
 ##      &lt;dbl&gt;
 ## 1     11.7</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>summarize()</code> and <code>group_by()</code></h2></hgroup><article  class="smaller" id="summarize-and-group_by">
+</article></slide><slide class=""><hgroup><h2><code>summarize()</code> and <code>group_by()</code></h2></hgroup><article  id="summarize-and-group_by" class="smaller">
 
 <p>If you want to summarize by multiple groups, use <code>group_by()</code> and <code>%&gt;%</code></p>
 
@@ -3602,7 +3602,7 @@ bats[1:10,]</pre>
 <li><strong>Counts:</strong> <code>n()</code> - size of current group, <code>sum(x)</code> (try <code>sum(~is.na(x)</code> to make sure you don’t include <code>NA</code>’s), <code>n_distinct(x)</code> - the number of unique elements</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Combine functions to explore data!</h2></hgroup><article  class="smaller" id="combine-functions-to-explore-data">
+</article></slide><slide class=""><hgroup><h2>Combine functions to explore data!</h2></hgroup><article  id="combine-functions-to-explore-data" class="smaller">
 
 <p>Summarize by group and arrange by mass</p>
 
@@ -3625,7 +3625,7 @@ bats[1:10,]</pre>
 ## 8 F     A     P            10   
 ## 9 M     J     TD            9.83</pre>
 
-</article></slide><slide class=""><hgroup><h2>Combine functions to explore data!</h2></hgroup><article  class="smaller" id="combine-functions-to-explore-data-1">
+</article></slide><slide class=""><hgroup><h2>Combine functions to explore data!</h2></hgroup><article  id="combine-functions-to-explore-data-1" class="smaller">
 
 <p>Find all groups bigger than a threshold</p>
 
@@ -3633,20 +3633,20 @@ bats[1:10,]</pre>
   group_by(sex, age) %&gt;%
   filter(mass &gt; 15)</pre>
 
-<pre >## # A tibble: 24 x 7
+<pre >## # A tibble: 24 x 8
 ## # Groups:   sex, age [3]
-##    age   sex   condition   RFA  mass moonlight avg_temp
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 A     F     L          46.6  22          85     25.0
-##  2 A     M     NR         46.9  17.5        10     17.2
-##  3 A     M     NR         46.2  20          10     17.2
-##  4 A     F     L          43.1  16          27     22.8
-##  5 A     F     L          41    16          57     21.4
-##  6 A     F     L          41.5  15.8        98     24.4
-##  7 A     F     L          44    22.5        81     27.3
-##  8 A     M     NR         46.4  20.5        81     27.3
-##  9 A     F     PL         48.7  21          81     27.3
-## 10 A     F     PL         51.9  27          81     27.3
+##    bat_ID age   sex   condition   RFA  mass moonlight avg_temp
+##     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1      6 A     F     L          46.6  22          85     25.0
+##  2     16 A     M     NR         46.9  17.5        10     17.2
+##  3     17 A     M     NR         46.2  20          10     17.2
+##  4     26 A     F     L          43.1  16          27     22.8
+##  5     33 A     F     L          41    16          57     21.4
+##  6     45 A     F     L          41.5  15.8        98     24.4
+##  7     47 A     F     L          44    22.5        81     27.3
+##  8     48 A     M     NR         46.4  20.5        81     27.3
+##  9     49 A     F     PL         48.7  21          81     27.3
+## 10     51 A     F     PL         51.9  27          81     27.3
 ## # … with 14 more rows</pre></article></slide>
 
 

@@ -301,7 +301,7 @@ bats %>%
 1. Was there a data entry error?
     - Check the original data sheets
     
-## Filter out with `filter()`
+## Filter
 
 ```{r}
 bats_filt <- bats %>%
