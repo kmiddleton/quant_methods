@@ -14,8 +14,6 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
-library(RcppEigen)
-library(rethinking)
 library(latex2exp)
 
 ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE){
@@ -233,10 +231,3 @@ text(-10, 250, paste("theta_1 =", minSS.theta_1, "\nSS =", round(minSS.SS, 2)),
      pos = 4, cex = 2)
 ```
 
-## Frameworks for inference
-
-1. ~~Analytical~~
-2. Maximum likelihood
-    - Minimizing the residual sum of squares is numerically equal to *maximizing* the model likelihood.
-3. Resampling
-4. Bayesian

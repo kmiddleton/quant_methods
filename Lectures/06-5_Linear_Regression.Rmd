@@ -87,11 +87,11 @@ $$\phi\left(Y_i\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu
 
 ## Define a model
 
-$$y = \bar{Y} + bX$$
+$$y = \bar{Y} + \theta_0 X$$
 
-$$b = 0$$
+$$\theta_0 = 0$$
 
-This is a flat line ($b = 0$) through the mean of $Y$.
+This is a flat line ($\theta_0 = 0$) through the mean of $Y$.
 
 ## Define a model
 
@@ -167,7 +167,7 @@ $$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\righ
 sum(log(liks_Y))
 ```
 
-## Likelihood from linear regression with $b = 0$
+## Likelihood from linear regression with $\theta_0 = 0$
 
 Fit a linear model (`lm()`) with only an intercept (`~ 1`) and use the built-in function `logLik()` to extract the log-likelihood.
 
@@ -178,14 +178,14 @@ logLik(fm)
 
 ## Maximizing the log-Likelihood
 
-Function to calculate the log-likelihood. Input the slope ($b$) and observed values of $X$ and $Y$. Return the log-likelihood.
+Function to calculate the log-likelihood. Input the slope ($\theta_0$) and observed values of $X$ and $Y$. Return the log-likelihood.
 
 ```{r log_lik}
-log_lik <- function(b, X, Y){
+log_lik <- function(theta_1, X, Y){
   Y_bar <- mean(Y)
   X_bar <- mean(X)
-  a <- Y_bar - b * X_bar
-  Y_hat <- a + b * X
+  theta_0 <- Y_bar - theta_1 * X_bar
+  Y_hat <- theta_0 + theta_1 * X
   var_hat <- sum((Y - Y_hat) ^ 2) / (length(Y))
   sd_hat <- sqrt(var_hat)
   liks_Y <- dnorm(Y, mean = Y_hat, sd = sd_hat)
@@ -195,32 +195,32 @@ log_lik <- function(b, X, Y){
 
 ## Maximizing the log-Likelihood
 
-For a range of $b$ from -10 to 10 in increments of 0.01, calculate the log-likelihood of the model. Save to a variable called `lls`. Then find the maximum value of `lls`, the associated $b$ and log-likelihood.
+For a range of $\theta_0$ from -10 to 10 in increments of 0.01, calculate the log-likelihood of the model. Save to a variable called `lls`. Then find the maximum value of `lls`, the associated $\theta_0$ and log-likelihood.
 
 ```{r}
-b <- seq(-10, 10, by = 0.01)
-lls <- numeric(length(b))
-for (ii in 1:length(b)) {
-  lls[ii] <- log_lik(b[ii], X, Y)
+theta_0 <- seq(-10, 10, by = 0.01)
+lls <- numeric(length(theta_0))
+for (ii in 1:length(theta_0)) {
+  lls[ii] <- log_lik(theta_0[ii], X, Y)
 }
 
 # Location of maximum log-likelihood
 max.ll <- lls[which.max(lls)]
 
 # Slope at maximum log-likelihood
-b_hat <- b[which.max(lls)]
+theta_0_hat <- theta_0[which.max(lls)]
 ```
 
 ## Maximizing the log-Likelihood
 
 ```{r echo=FALSE}
-plot(lls ~ b,
+plot(lls ~ theta_0,
      cex.lab = 1.5,
      type = "l", lwd = 2,
      xlab = "Slope (b)",
      ylab = "log-Likelihood")
-points(b_hat, max.ll, col = "red", pch = 16, cex = 1.5)
-text(-10, -60, paste("b =", b_hat, "\nlogLik =", round(max.ll, 2)),
+points(theta_0_hat, max.ll, col = "red", pch = 16, cex = 1.5)
+text(-10, -60, paste("theta_0 =", theta_0_hat, "\nlogLik =", round(max.ll, 2)),
      pos = 4, cex = 2)
 ```
 
@@ -232,7 +232,7 @@ fm <- lm(Y ~ 1 + X) # Fit model with intercept and slope
 logLik(fm)      # Use built-in function to extract log-likelihood
 ```
 
-The values are not identical, because we only calculated $b$ in increments of 0.01.
+The values are not identical, because we only calculated $$\theta_1$$ in increments of 0.01.
 
 ## Bayesian priors
 
