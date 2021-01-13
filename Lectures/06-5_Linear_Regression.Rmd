@@ -58,9 +58,9 @@ ggplot(M, aes(X, Y)) + geom_point()
 
 ```
 
-What values of $\theta_1$ and $\theta_2$ provide the best fit line through $Y$ as a function of $X$?
+What values of $\theta_0$ and $\theta_1$ provide the best fit line through $Y$ as a function of $X$?
 
-$$Y = \theta_1 + \theta_2 X$$
+$$Y = \theta_0 + \theta_1 X$$
 
 ## Frameworks for inference
 
