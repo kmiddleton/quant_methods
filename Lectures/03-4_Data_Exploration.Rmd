@@ -1,0 +1,354 @@
+---
+title: "Data Exploration"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+```
+
+
+
+## Exploratory Data Analysis
+
+Visually exploring your data is often called Exploratory Data Analysis (EDA)
+
+- Helps you figure out what is going on.
+- Gives you a clearer picture of if your data entry and analyses are correct. 
+- An imperative first step to data analysis.
+- Allows you to feel confident with analyses.
+- Not a formal process, simply whatever you like to do to examine your data.
+
+
+## EDA with ggplot2
+
+
+<center>
+<br />
+<br />
+<img src="https://i.imgur.com/fDpfRDA.png" width="85%" />
+</center>  
+
+
+## Let's do some EDA on our Bats Data
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE}
+bats <- read_csv("../data/bats.csv")
+bats[1:10,]
+```
+
+
+## Summary Tables
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE}
+summary(bats)
+```
+
+
+## Look at Your Data - Boxplots
+
+Different variations, but the most standard recipe is:
+
+1. Median = center line
+1. Box = IQR (25th to 75th percentiles)
+1. Whiskers at 1.5 X 25th and 75th percentiles
+1. Dots for anything outside 1.5 X 25th and 75th percentiles
+
+
+
+## Look at Your Data - Boxplots
+
+\scriptsize
+```{r,  echo=TRUE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=6}
+
+ggplot(data = bats, aes(x = sex, y = mass))+
+  geom_boxplot()
+  
+```
+
+## Raw data as an alternative to boxplots
+
+\scriptsize
+```{r,  echo=TRUE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=6}
+
+ggplot(bats, aes(x = sex, y = mass))+
+  geom_point()
+  
+```
+
+
+
+## Raw data as an alternative to boxplots
+
+Add a little jitter and transparency on the x axis to keep from overplotting.
+
+```{r eval=FALSE}
+ggplot(bats, aes(x = sex, y = mass))+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5)
+```
+
+## Raw data as an alternative to boxplots
+
+Add a little jitter and transparency on the x axis to keep from overplotting.
+
+```{r echo=FALSE}
+ggplot(bats, aes(x = sex, y = mass))+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5)
+```
+
+
+## Boxplots and raw data
+
+```{r eval=FALSE}
+ggplot(bats, aes(x = sex, y = mass))+
+  geom_boxplot()+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
+             color = "blue")
+```
+
+
+## Boxplots and raw data
+
+```{r echo=FALSE}
+ggplot(bats, aes(x = sex, y = mass))+
+  geom_boxplot()+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
+             color = "blue")
+```
+
+## Boxplots and raw data
+
+You can "bring the boxplot to the front" by switching the order of `geom_point()` and `geom_boxplot()`.
+
+```{r eval=FALSE}
+ggplot(bats, aes(x = sex, y = mass))+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
+             color = "blue")+
+  geom_boxplot(alpha = 2/3)
+```
+
+## Boxplots and raw data
+
+You can "bring the boxplot to the front" by switching the order of `geom_point()` and `geom_boxplot()`.
+
+```{r echo=FALSE}
+ggplot(bats, aes(x = sex, y = mass))+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
+             color = "blue")+
+  geom_boxplot(alpha = 1/3)
+```
+
+
+## Boxplots and coord flips
+
+You can also pick a different variable to group by and flip your axes.
+
+```{r,  eval=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=6}
+
+ggplot(bats, aes(x = condition, y = RFA))+
+  geom_boxplot()+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
+             color = "blue")+
+  coord_flip()
+
+```
+
+## Boxplots and coord flips
+
+You can also pick a different variable to group by and flip your axes.
+
+```{r,  echo=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=6}
+
+ggplot(bats, aes(x = condition, y = RFA))+
+  geom_boxplot()+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
+             color = "blue")+
+  coord_flip()
+```
+
+
+
+## Boxplots Re-ordered
+
+Sometimes you want your groups in a specific order, not alphabetical
+
+```{r,  eval=FALSE, warning = FALSE, message = FALSE, fig.height=3.5, fig.width=6}
+
+bats$condition<-factor(bats$condition, levels = 
+                        c("L", "P","PL", "TD", "NR"))
+
+ggplot(bats, aes(x = condition, y = RFA))+
+  geom_boxplot()+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
+             color = "blue")+
+  coord_flip()
+
+
+```
+
+
+## Boxplots Re-ordered
+
+Sometimes you want your groups in a specific order, not alphabetical
+
+```{r,  echo=FALSE, warning = FALSE, message = FALSE, fig.height=3.5, fig.width=6}
+
+bats$condition<-factor(bats$condition, levels = 
+                        c("L", "P","PL", "TD", "NR"))
+
+ggplot(bats, aes(x = condition, y = RFA))+
+  geom_boxplot()+
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
+             color = "blue")+
+  coord_flip()
+
+
+```
+
+## Look at Your Data - Distributions {.smaller}
+
+`geom_histogram()` - allows you to see the distribution of your data
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE, fig.height=4}
+
+ggplot(bats)+
+  geom_histogram(aes(x = mass), binwidth=.5)+
+  theme(text = element_text(size=18))
+  
+```
+
+
+## Look at Your Data - Distributions {.smaller}
+
+`geom_freqpoly()` - same calculations as `geom_histogram()` but displays as lines instead of bars.
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE, fig.height=4}
+
+ggplot(bats)+
+  geom_freqpoly(aes(x = mass), binwidth = 0.5)+
+  theme(text = element_text(size=18))
+  
+```
+
+
+## Look at Your Data - Distributions {.smaller}
+
+`geom_freqpoly()` - helpful if you want to look at multiple distributions at once.
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE, fig.height=4}
+
+ggplot(bats)+
+  geom_freqpoly(aes(x = mass, color = sex), binwidth = 0.5)+
+  theme(text = element_text(size=18))
+  
+```
+
+
+## Look at Your Data - Distributions {.smaller}
+
+`geom_density()` - normalizes your data instead of counts.
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE, fig.height=4}
+
+ggplot(bats)+
+  geom_density(aes(x = mass, fill = sex))+
+  theme(text = element_text(size=18))
+  
+```
+
+## Look at Your Data - Distributions {.smaller}
+
+Let's check the moonlight data
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE, fig.height=4}
+
+ggplot(bats)+
+  geom_histogram(aes(x = moonlight), alpha = 0.5)+
+  theme(text = element_text(size=18))
+  
+```
+
+
+## Finding suspect observations
+
+```{r message=FALSE, warning=FALSE}
+bats %>% 
+  select(bat_ID, age, mass, moonlight) %>% 
+  arrange(moonlight)
+```
+
+## Finding suspect observations
+
+```{r}
+bats %>% 
+  select(bat_ID, age, mass, moonlight) %>% 
+  arrange(desc(moonlight))
+```
+
+## What to do?
+
+1. Are the observations really incorrect?
+    - Malfunction
+1. Was there a data entry error?
+    - Check the original data sheets
+    
+## Filter out with `filter()`
+
+```{r}
+bats_filt <- bats %>%
+  filter(moonlight < 100)
+
+max(bats_filt$moonlight)
+```
+
+## Replace values
+
+```{r}
+bats$moonlight[bats$moonlight == 1000] <- 100
+
+bats$moonlight[bats$moonlight == 990 &
+                  bats$bat_ID == 155] <- 99
+
+bats$moonlight[bats$moonlight == 990 &
+                  bats$bat_ID == 1] <- 0
+```
+
+
+## Doublecheck your fixes
+
+```{r message=FALSE, warning=FALSE}
+bats %>% 
+  select(bat_ID, age, mass, moonlight) %>% 
+  arrange(moonlight)
+```
+
+## Doublecheck your fixes
+
+```{r}
+bats %>% 
+  select(bat_ID, age, mass, moonlight) %>% 
+  arrange(desc(moonlight)) %>%
+  print(n = 11)
+```
+
+
+## Doublecheck your fixes {.smaller}
+
+Let's re-check the moonlight data
+
+```{r,  echo=TRUE, warning=FALSE, message=FALSE, fig.height=4}
+
+ggplot(bats)+
+  geom_histogram(aes(x = moonlight), alpha = 0.5)+
+  theme(text = element_text(size=18))
+  
+```

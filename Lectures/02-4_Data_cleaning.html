@@ -30,7 +30,7 @@
       // Author information
       presenters: [
             {
-        name:  'Elizabeth King and Kevin Middleton' ,
+        name:  'Elizabeth King, Kevin Middleton' ,
         company: '',
         gplus: '',
         twitter: '',
@@ -3306,7 +3306,7 @@ str(M)</pre>
 
 <p>We should probably drop those rows or go back to the original data sheets.</p>
 
-</article></slide><slide class=""><hgroup><h2>Filtering out unwanted rows</h2></hgroup><article  class="smaller" id="filtering-out-unwanted-rows">
+</article></slide><slide class=""><hgroup><h2>Filtering out unwanted rows</h2></hgroup><article  id="filtering-out-unwanted-rows" class="smaller">
 
 <pre class = 'prettyprint lang-r'>M_no_NAs &lt;- M %&gt;% filter(!is.na(Sex))</pre>
 
@@ -3328,7 +3328,7 @@ str(M)</pre>
 ## 1     0      13.0    2.24
 ## 2     1      13.8    2.46</pre>
 
-</article></slide><slide class=""><hgroup><h2>Filtering out unwanted rows</h2></hgroup><article  class="smaller" id="filtering-out-unwanted-rows-1">
+</article></slide><slide class=""><hgroup><h2>Filtering out unwanted rows</h2></hgroup><article  id="filtering-out-unwanted-rows-1" class="smaller">
 
 <pre class = 'prettyprint lang-r'>M_no_NAs &lt;- M %&gt;% drop_na(Sex)</pre>
 

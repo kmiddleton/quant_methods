@@ -1,7 +1,7 @@
 ---
 title: "Data Cleaning"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton'
 output:
   ioslides_presentation:
     fig_width: 7
