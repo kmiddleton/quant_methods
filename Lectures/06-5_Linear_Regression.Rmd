@@ -232,7 +232,7 @@ fm <- lm(Y ~ 1 + X) # Fit model with intercept and slope
 logLik(fm)      # Use built-in function to extract log-likelihood
 ```
 
-The values are not identical, because we only calculated $$\theta_1$$ in increments of 0.01.
+The values are not identical, because we only calculated $\theta_1$ in increments of 0.01.
 
 ## Bayesian priors
 
