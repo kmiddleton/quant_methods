@@ -3239,7 +3239,7 @@ weather   # weather at each NYC airport each hour</pre>
 
 </center>
 
-</article></slide><slide class=""><hgroup><h2>Relational data for nycflights13</h2></hgroup><article  id="relational-data-for-nycflights13-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Relational data for nycflights13</h2></hgroup><article  class="smaller" id="relational-data-for-nycflights13-1">
 
 <div class="columns-2">
 <center>
@@ -3301,7 +3301,7 @@ weather   # weather at each NYC airport each hour</pre>
 
 </center>
 
-</article></slide><slide class=""><hgroup><h2>Mutating Joins</h2></hgroup><article  id="mutating-joins" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Mutating Joins</h2></hgroup><article  class="smaller" id="mutating-joins">
 
 <p>Mutating joins combine variables from two tables.</p>
 
@@ -3324,7 +3324,7 @@ flights2</pre>
 ## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA     
 ## # … with 336,766 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2>Mutating Joins</h2></hgroup><article  id="mutating-joins-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Mutating Joins</h2></hgroup><article  class="smaller" id="mutating-joins-1">
 
 <p>To add the full name of the airline to <code>flights2</code>, you combine <code>airlines</code> with <code>flights2</code> with <code>left_join()</code>.</p>
 
@@ -3349,12 +3349,12 @@ flights2</pre>
 ## 10  2013     1     1     6 N3ALAA  AA      American Airlines Inc.  
 ## # … with 336,766 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2>Joins, How Do They Work?</h2></hgroup><article  id="joins-how-do-they-work" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Joins, How Do They Work?</h2></hgroup><article  class="smaller" id="joins-how-do-they-work">
 
 <div class="columns-2">
 <center>
 
-<br /> <br /> <img src="https://imgur.com/iujFwAK.png" width="85%" /> <br /> <br />
+<br /> <br /> <br /> <img src="https://imgur.com/iujFwAK.png" width="85%" /> <br /> <br />
 
 </center>
 
@@ -3378,7 +3378,7 @@ flights2</pre>
 ## 2     2 y2   
 ## 3     4 y3</pre></div>
 
-</article></slide><slide class=""><hgroup><h2>Joins, How Do They Work?</h2></hgroup><article  id="joins-how-do-they-work-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Joins, How Do They Work?</h2></hgroup><article  class="smaller" id="joins-how-do-they-work-1">
 
 <p>Imagine you have two datasets, x (on the left) and y (on the right), and they each have <em>key</em> variables (colored column). The following diagram shows all potential matches with the grid lines</p>
 
@@ -3502,7 +3502,7 @@ flights2</pre>
 ## 3     3 x3    &lt;NA&gt; 
 ## 4     4 &lt;NA&gt;  y3</pre>
 
-</article></slide><slide class=""><hgroup><h2>Duplicate Keys</h2></hgroup><article  id="duplicate-keys" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Duplicate Keys</h2></hgroup><article  class="smaller" id="duplicate-keys">
 
 <p>Sometimes keys are not unique. There are two possibilities.</p>
 
@@ -3526,7 +3526,7 @@ flights2</pre>
 ## 3     2 x3    y2   
 ## 4     1 x4    y1</pre>
 
-</article></slide><slide class=""><hgroup><h2>Duplicate Keys</h2></hgroup><article  id="duplicate-keys-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Duplicate Keys</h2></hgroup><article  class="smaller" id="duplicate-keys-1">
 
 <ul>
 <li>Both tables have duplicate keys. This is often an error because neither table has a unique identifier.</li>
@@ -3552,7 +3552,7 @@ flights2</pre>
 ## 5     2 x3    y3   
 ## 6     3 x4    y4</pre>
 
-</article></slide><slide class=""><hgroup><h2>Defining Keys in Real Life</h2></hgroup><article  id="defining-keys-in-real-life" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Defining Keys in Real Life</h2></hgroup><article  class="smaller" id="defining-keys-in-real-life">
 
 <p><em>Natural joins</em>, or <code>by = NULL</code> (the default) uses all variables that are in both tables. The <code>flights</code> and <code>weather</code> table have <code>year</code>, <code>month</code>, <code>day</code>, <code>hour</code>, and <code>origin</code> in common.</p>
 
@@ -3578,7 +3578,7 @@ flights2</pre>
 ## #   wind_speed &lt;dbl&gt;, wind_gust &lt;dbl&gt;, precip &lt;dbl&gt;, pressure &lt;dbl&gt;,
 ## #   visib &lt;dbl&gt;, time_hour &lt;dttm&gt;</pre>
 
-</article></slide><slide class=""><hgroup><h2>Defining Keys in Real Life</h2></hgroup><article  id="defining-keys-in-real-life-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Defining Keys in Real Life</h2></hgroup><article  class="smaller" id="defining-keys-in-real-life-1">
 
 <p>You can join by a <em>character vector</em> with <code>by = &quot;x&quot;</code>. Try joining <code>flights</code> and <code>planes</code> by <code>tailnum</code>.</p>
 
@@ -3603,7 +3603,7 @@ flights2</pre>
 
 <p>You can see that both datasets had a <code>year</code> column but they had different values, so the resulting variables are <code>year.x</code> and <code>year.y</code>.</p>
 
-</article></slide><slide class=""><hgroup><h2>Defining Keys in Real Life</h2></hgroup><article  id="defining-keys-in-real-life-2" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Defining Keys in Real Life</h2></hgroup><article  class="smaller" id="defining-keys-in-real-life-2">
 
 <p>A <em>named character vector</em>, for example <code>by = c(&quot;a&quot; = &quot;b&quot;)</code> allows you to match the same variables when they have different names in different tables (e.g. the <code>dest</code> column in <code>flights2</code> is the same as the <code>faa</code> column in <code>airports</code>).</p>
 
@@ -3650,7 +3650,7 @@ flights2</pre>
 
 </center>
 
-</article></slide><slide class=""><hgroup><h2><code>semi_join()</code></h2></hgroup><article  id="semi_join" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>semi_join()</code></h2></hgroup><article  class="smaller" id="semi_join">
 
 <p>So say you have a table of the top destinations (<code>top_dest</code>) and you want to know what flights go to those destinations.</p>
 
@@ -3676,7 +3676,7 @@ flights2</pre>
 ## 10  2013     1     1      600            600         0      851
 ## # … with 141,135 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>anti_join()</code></h2></hgroup><article  id="anti_join" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>anti_join()</code></h2></hgroup><article  class="smaller" id="anti_join">
 
 <p>Anti-joins are useful for figuring out mismatches. So say you want to know the <code>flights</code> that do not have a match in <code>planes</code>.</p>
 
@@ -3701,7 +3701,7 @@ mismatch[,1:7]</pre>
 ## 10  2013     1     1      629            630        -1      824
 ## # … with 52,596 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2>Set Operations</h2></hgroup><article  id="set-operations" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Set Operations</h2></hgroup><article  class="smaller" id="set-operations">
 
 <p>Set operations work with complete rows, and compare the values of every variable. For set operations, it is assumed that <code>x</code> and <code>y</code> have the same variables, and treat all observations as sets.</p>
 

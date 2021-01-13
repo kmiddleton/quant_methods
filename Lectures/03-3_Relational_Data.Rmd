@@ -197,6 +197,7 @@ y <- tribble(
 <center>
 <br />
 <br />
+<br />
 <img src="https://imgur.com/iujFwAK.png" width="85%" />
 <br />
 <br />
