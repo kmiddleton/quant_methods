@@ -195,7 +195,7 @@ log_lik <- function(theta_1, X, Y){
 
 ## Maximizing the log-Likelihood
 
-For a range of $\theta_1$ from -10 to 10 in increments of 0.01, calculate the log-likelihood of the model. Save to a variable called `lls`. Then find the maximum value of `lls`, the associated $\theta_0$ and log-likelihood.
+For a range of $\theta_1$ from -10 to 10 in increments of 0.01, calculate the log-likelihood of the model. Save to a variable called `lls`. Then find the maximum value of `lls`, the associated $\theta_1$ and log-likelihood.
 
 ```{r}
 theta_1 <- seq(-10, 10, by = 0.01)
