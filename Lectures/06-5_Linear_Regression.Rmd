@@ -87,11 +87,11 @@ $$\phi\left(Y_i\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu
 
 ## Define a model
 
-$$y = \bar{Y} + \theta_0 X$$
+$$y = \bar{Y} + \theta_1 X$$
 
-$$\theta_0 = 0$$
+$$\theta_1 = 0$$
 
-This is a flat line ($\theta_0 = 0$) through the mean of $Y$.
+This is a flat line ($\theta_1 = 0$) through the mean of $Y$.
 
 ## Define a model
 
