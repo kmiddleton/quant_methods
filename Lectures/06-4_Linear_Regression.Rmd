@@ -22,7 +22,7 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE){
   n <- length(X)
   SSy <- sum((Y - (X * b + (mean(Y) - b * mean(X)))) ^ 2)
   if (do.labels) {
-    main <- paste("b =", sprintf("%.2f", b), "\nSS =", 
+    main <- paste(bquote(theta_1), " =", sprintf("%.2f", b), "\nSS =", 
                   sprintf("%.2f", SSy))
   } else {
     main <- ""
