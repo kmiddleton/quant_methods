@@ -67,7 +67,7 @@ $$Y = \theta_0 + \theta_1 X$$
 <img src="https://i.imgur.com/hbkIVLg.gif" width="30%" />
 </center>
 
-- How do we estimate $\theta_1$ and $\theta_2$?
+- How do we estimate $\theta_0$ and $\theta_1$?
 - What is "best fit"?
 
 ## Generate data
