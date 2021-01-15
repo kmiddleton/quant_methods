@@ -124,7 +124,7 @@ _#_  | _Date_  | _Topic_                          |
 00   | F 1/15  | Pre-workshop. Installing R, etc. |
 01   | F 1/22  | Reproducible research, programming with data |
 02   | F 1/29  | Data organization, loading, visualization |
-03   | F 2/05  | Data cleaning |
+03   | F 2/05  | Tidy data and transformations |
 04   | F 2/12  | Probability and distributions |
 --   | F 2/19  | Progress Check: Weeks 1-4
 05   | F 2/26  | Frameworks for inference |
