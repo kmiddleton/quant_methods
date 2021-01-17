@@ -138,17 +138,17 @@ _#_  | _Date_  | _Topic_                          |
 02   | F 1/29  | Data organization, loading, visualization |
 03   | F 2/05  | Tidy data and transformations |
 04   | F 2/12  | Probability and distributions |
---   | F 2/19  | Progress Check: Weeks 1-4
+--   | F 2/19  | Progress Check: Weeks 1-4  |
 05   | F 2/26  | Frameworks for inference |
 06   | F 3/05  | Central tendency, differences of means, linear regression |
 07   | F 3/12  | Parameter estimation |
 08   | F 3/19  | Multiple predictors |
---   | F 3/26  | Progress Check: Weeks 5-8
-09   | F 4/09  | Partitioning variance, interactions, multilevel models |
+--   | F 3/26  | Progress Check: Weeks 5-8  |
+09   | F 4/09  | Partitioning variance, multilevel models |
 10   | F 4/16  | Model comparison, model-based inference, cross-validation |
-11   | F 4/23  | Experimental Design, multiple comparisons, power  |
+11   | F 4/23  | Experimental Design, multiple comparison procedures, power analysis |
 12   | F 4/30  | Advanced Data Analysis Topics |
---   | F 5/07  | Progress Check Weeks: 9-12
+--   | F 5/07  | Progress Check Weeks: 9-12  |
 
 
 ## Course Communication
