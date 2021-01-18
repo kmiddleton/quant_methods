@@ -26,9 +26,9 @@ bibliography: Multivariate.bib
 
 There is no one-size-fits-all statistics textbook.
 
-  - Any that we chose would be a compromise.
-  - Lots of free material online.
-  - Many recommendations on Canvas if you are looking for a book.
+- Any that we chose would be a compromise.
+- Lots of free material online.
+- Many recommendations on Canvas if you are looking for a book.
 
 ## Online lectures
 
@@ -37,27 +37,24 @@ There is no one-size-fits-all statistics textbook.
 
 ## Grading
 
-Participation (50%): Your participation grade in the course will be a function of:
+Participation: Your participation grade in the course will be a function of:
 
 - Quiz questions (completion)
 - Problem sets (completion)
 - Peer evaluations (both your own completion of and others' evaluation of you)
 - In class contributions
 
-Don't worry about what it says in the gradebook.
+Don't worry about what it says in the gradebook. Those numbers don't mean anything to us.
 
 ## Grading
 
-Review Project (10%)
+Progress Checks
 
-- Details in the coming weeks
-
-## Grading
-
-Final Exam (40%)
-
-- The final exam will be distributed at the beginning of May and will be due on 5/15.
-- You can not work with other members of the class or anyone else on this exam.
+- Each 4 week block will end with a Progress Check.
+    - No new material that week
+    - Class time used to answer questions
+    - Like a problem set
+- You can not work with other members of the class or anyone else on this assignment
 - You will be able to use all other available resources (books, notes, lectures, internet, etc.).
 
 ## Quiz questions
@@ -83,10 +80,14 @@ Final Exam (40%)
 
 ## Typical weekly schedule
 
-*Monday*: Lectures online
+*Monday*: Lectures, "quizzes", readings (when applicable) posted online to Canvas
 
-*Wednesday*: Problem set online, previous problem set submitted through Canvas (midnight)
+*Wednesday*: Problem set posted online to Canvas
 
-*Thursday*: Quizzes due (midnight)
+*Thursday*: Assignments due at midnight:
 
-*Friday*: class meeting, discuss any issues from that week, previous peer evaluations due (midnight)
+1. Previous week's problem set submitted through Canvas
+1. Peer evaluations
+1. Weekly quizzes
+
+*Friday*: Class meeting, discuss any issues from that week, previous peer evaluations due (midnight)
