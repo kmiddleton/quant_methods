@@ -15,6 +15,8 @@ library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
 source("Shade_Distributions.R")
+
+options(pillar.sigfig = 4)
 ```
 
 ## Hypotheses
@@ -86,13 +88,106 @@ shade_t(0.005, 10,tail = "both") +
 
 ## Maximum Likelihood
 
-- Does a given model explain significantly more variation than a model with fewer parameters?
+```{r, echo=FALSE}
+set.seed(4)
+n <- 30
+X <- rnorm(n, mean = 10, sd = 1)
+Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
+M <- data.frame(X, Y)
 
-- Likelihood ratios
-    - Likelihood of Model 2 (more parameters)/Likelihood of Model 1 (fewer parameters)
-    - Follow a $\chi^2$ Distribution (*df* = difference in number of estimated parameters)
+log_lik <- function(theta_1, X, Y){
+  Y_bar <- mean(Y)
+  X_bar <- mean(X)
+  theta_0 <- Y_bar - theta_1 * X_bar
+  Y_hat <- theta_0 + theta_1 * X
+  var_hat <- sum((Y - Y_hat) ^ 2) / (length(Y))
+  sd_hat <- sqrt(var_hat)
+  liks_Y <- dnorm(Y, mean = Y_hat, sd = sd_hat, log = TRUE)
+  return(sum(liks_Y))
+}
 
-*Stay Tuned for Model Comparisons*
+theta_1 <- seq(0, 5.5, by = 0.001)
+lls <- numeric(length(theta_1))
+for (ii in 1:length(theta_1)) {
+  lls[ii] <- log_lik(theta_1[ii], X, Y)
+}
+
+D <- tibble(theta_1, model_likelihood = lls)
+
+# Location of maximum log-likelihood
+max_ll <- lls[which.max(lls)]
+
+# Slope at maximum log-likelihood
+theta_1_hat <- theta_1[which.max(lls)]
+
+p <- ggplot() +
+  geom_line(data = D, aes(x = theta_1, y = model_likelihood), size = 2) +
+  geom_point(data = tibble(theta_1_hat, max_ll),
+             aes(x = theta_1_hat, y = max_ll), color = "red", size = 4) +
+  labs(y = "Model likelihood")
+```
+
+
+What are the bounds of parameter estimates at the desired quantiles of the likelihood?
+
+```{r, echo=FALSE}
+print(p)
+```
+
+
+## Maximum Likelihood
+
+Likelihood difference between the model (1) with a slope and (2) without a slope follows a $\chi^2$ distribution with $df = 1$ (for the slope).
+
+Critical value:
+
+```{r}
+qchisq(p = 0.95, df = 1)
+```
+
+We need the interval around the maximum log-likelihood within 1/2 of the critical value.
+
+```{r}
+(crit <- qchisq(p = 0.95, df = 1) / 2)
+```
+
+
+## Maximum Likelihood
+
+```{r, echo=FALSE}
+p +
+  geom_hline(yintercept = max_ll - crit, color = "blue", size = 2)
+```
+
+
+## Maximum Likelihood
+
+```{r}
+CI <- D %>% 
+  filter(model_likelihood >= max_ll - crit) %>% 
+  summarize(lower_theta_1 = min(theta_1),
+            upper_theta_1 = max(theta_1))
+CI
+```
+
+
+## Maximum Likelihood
+
+```{r, echo=FALSE}
+p +
+  geom_hline(yintercept = max_ll - crit, color = "blue", size = 2) +
+  geom_vline(xintercept = CI$lower_theta_1, color = "red", size = 2) +
+  geom_vline(xintercept = CI$upper_theta_1, color = "red", size = 2)
+```
+
+
+## Maximum Likelihood
+
+```{r}
+fm <- lm(Y ~ X)
+confint(fm, "X")
+CI
+```
 
 
 ## Bayesian Inference
@@ -104,11 +199,13 @@ shade_t(0.005, 10,tail = "both") +
 
 ## Tests of arbitrary slopes and intercepts
 
-$$t = \frac{b - \beta_{0}}{\mbox{SE}_{b}}$$
+$$t = \frac{\theta - \theta_{null}}{\mbox{SE}_{\theta}}$$
 
 is a general equation that can be used to test any null hypothesized parameter estimate.
 
-- $b$ is the parameter estimate, $\beta_0$ is the null hypothesized value (often and by default $\beta_0 = 0$)
+- $\theta$ is the parameter estimate
+- $\theta_{null}$ is the null hypothesized value
+    - often and by default $\theta_{null} = 0$
 - Analyses of allometry: the study of scaling relationships
 
 
@@ -223,8 +320,8 @@ $$\log{Y} = \log{\theta_0} + \theta_1 \log{M}$$
 ```{r mammals_log_plot, eval=FALSE}
 ggplot(mammals, aes(x = Mass, y = Forearm)) +
   geom_point() +
-  xlab("log-10 Adult Body Mass (g)") +
-  ylab("log-10 Adult Forearm Length (mm)") +
+  labs(x = "log-10 Adult Body Mass (g)",
+       y = "log-10 Adult Forearm Length (mm)") +
   scale_x_log10() +
   scale_y_log10()
 ```
@@ -263,9 +360,9 @@ summary(fm)
 
 ## Test of a specific slope
 
-Isometric slope $= \theta_1 = Mass^{1/3}$
+Isometric slope $= \theta_{null} = Mass^{1/3}$
 
-$$t = \frac{b - \theta_1}{SE_{\theta_1}}$$
+$$t = \frac{\theta_1 - \theta_{null}}{SE_{\theta_1}}$$
 
 ```
             Estimate Std. Error t value Pr(>|t|)
@@ -337,9 +434,12 @@ Philosophical and practical problems have been raised since the 1960's.
 - Gosset: *t* distribution, Student's *t*-tests, Guinness
 - Neyman and E. Pearson: "null hypothesis" testing, confidence intervals, decision theory
 
+
+## History
+
 The modern idea is traced to these statisticians, but has been warped into something different:
 
-- Test statistics (*F*, *t*, $\chi^2$) applied to Neyman-Pearson "null hypotheses"
+- Test statistics ($F$, $t$, $\chi^2$) and Fisher's rule-of-thumb $P = 0.05$ applied to Neyman-Pearson "null hypotheses"
 - H~0~ becomes a straw man hypothesis of no difference or no effect
 
 
