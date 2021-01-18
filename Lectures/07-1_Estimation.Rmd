@@ -34,9 +34,10 @@ HBT <- read_csv("../data/HumanBodyTemp.csv")
 
 HBT %>% 
   ggplot(aes(temp)) +
-  geom_histogram(bins = 10) +
+  geom_histogram(binwidth = 0.1) +
   geom_vline(xintercept = 98.6, color = "steelblue", size = 2.5) +
-  labs(x = "Temperature (F)", y = "Count")
+  labs(x = "Temperature (F)", y = "Count") +
+  scale_x_continuous(breaks = seq(97, 101, by = 0.5), )
 ```
 
 
@@ -150,7 +151,7 @@ HL %>% group_by(group) %>%
 
 ## 2. 95% confidence interval of group means
 
-Using Mean $\pm$ 2 $\times$ SEM:
+Using Mean $\pm 2 \times SEM$:
 
 - Alive: 24.28 (95% CI = `r round(24.28 - 2 * 0.017, 2)` -- `r round(24.28 + 2 * 0.017, 2)`)
 - Dead: 21.99 (95% CI = `r round(21.99 - 2 * 0.09, 2)` -- `r round(21.99 + 2 * 0.09, 2)`)
