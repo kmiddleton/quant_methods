@@ -23,10 +23,10 @@ source("Shade_Distributions.R")
 
 - Analytical Confidence Intervals  
     - Approximate calculation relying on $\pm 2 \times SEM$ 
-    - Exact calculate using a critical *t*-value
+    - Exact calculate using a critical *t*-value and appropriate degrees of freedom
 - Maximum Likelihood Confidence Intervals
     - Iterate over possible parameter values 
-    - Identify the range of likelihoods summing to some level of probability
+    - Identify the range of parameter values associated with likelihoods around the maximum likelihood estimate
 - Bayesian Credible Intervals
     - Region including highest desired percentage of posterior density
 
