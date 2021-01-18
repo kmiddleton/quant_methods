@@ -365,12 +365,12 @@ Corollaries proposed by Ioannidis [-@Ioannidis2005-od]:
 
 ## Alternative suggested approaches
 
-Preregistration of experimental designs
+Preregistration of experimental design and planned analysis
 
 1. Report parameter estimates and confidence intervals only 
 1. Model selection
 
-Either of above could be done in a Likelihood or Bayesian Framework
+Either of above could be done in a frequentist, likelihood or Bayesian framework
 
 
 ## References {.references}
