@@ -1,6 +1,6 @@
 ---
 title: 'Problem Set 01'
-author: "Your Name Here: Group X"
+author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
 output:
   html_document:
@@ -9,6 +9,10 @@ output:
     toc: true
     toc_float: true
 ---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+```
 
 ## How to use the problem sets
 
@@ -30,15 +34,15 @@ $$\bar{Y} = \frac{\sum^{n}_{i = 1}Y_i}{n}$$
 
 R Markdown is the marriage of R and [markdown](https://en.wikipedia.org/wiki/Markdown), allowing you to write text and R code together that can include analysis, figures, and tables. R Markdown has been extended for making slides (like the ones we use in this class), adding references, bibliographies, and cross references.
 
-Our usage in this class will be fairly pedestrian, but you can do some really complex things, like writing entire manuscripts using the bookdown package. Read more about [R Markdown]( http://rmarkdown.rstudio.com/) and [bookdown](https://bookdown.org/yihui/bookdown/).
+Our usage in this class will be fairly pedestrian, but you can do some really complex things, like writing entire manuscripts using the [bookdown](https://bookdown.org/yihui/bookdown/) package, make a [CV](https://cran.r-project.org/web/packages/vitae/index.html), or generate a [website](https://bookdown.org/yihui/blogdown/). Read more about [R Markdown]( http://rmarkdown.rstudio.com/).
 
 R markdown (.Rmd) files can be converted to different formats. We will use HTML (PDF and Word are other options). 
 
-- Click "Knit HTML" at the top of this window right now.
+- Click "Knit" at the top of this window right now.
 
 You might get a message about installing some packages. Click yes to install the required packages. After a few seconds, another window should open with this document rendered as a visually pleasing file.
 
-You have just compiled an R Markdown file into HTML. These Rmd and HTML files will be the basic currency of the problems sets you will do in this class.
+You have just compiled an R Markdown file into HTML. These Rmd and HTML files will be the basic currency of the problems sets and progress checks you will do in this class.
 
 ## Insert an R code chunk
 
@@ -56,7 +60,7 @@ Enter some R code into the chunk on the blank line: `sqrt(2)`. Then compile the 
 
 You can also run code interactively from an Rmd file to the R console. To run a single line, press *Ctrl-Enter* / *Cmd-Return*. To run the current chunk, use *Ctrl-Alt-c* / *Cmd-Shift-Return*. This is a good way to test code that you are working on, rather then waiting to compile the Rmd to HTML (or whatever format you are using).
 
-You can also enter the code for code chunks manually, but I find it easier to use the insert code chunk shortcut.
+You can also enter the code to set up code chunks manually, but we find it easier to use the insert code chunk shortcut.
 
 ## Naming R objects
 
@@ -66,7 +70,7 @@ Some names to avoid: `c`, `mean`, `df`, `matrix`, `t`, `T`, `F`. The last two ar
 
 If you want to take the mean of a vector `x`, we recommend using `mean_x`, `x_bar`, or `x_mean`.^[KMM prefers the latter because of RStudio's auto-completion feature.] There are two benefits of using one of these variable names over using `mean`.
 
-1. You don't confuse your `mean` object with the `mean()` function.
+1. You don't confuse your `mean` object with the `mean()` function. R will *usually* figure out which one you want, but we always encourage users to be explicit rather than relying on defaults.
 2. What if you later want to take the mean of a different vector. Which one does `mean` refer to?
 
 You could do this, for example:
@@ -82,6 +86,8 @@ sd(4:10)
 Execute the chunk above and look at the R console output. Explain what we have done here and what R must be doing without telling you. Write your answer after the ">" below. (">"" is the Rmd for a block quote, which will make finding your answers easier.)
 
 > 
+
+Now add comments to the code chunk above briefly annotating your answer above. 
 
 ## Vectors
 
@@ -165,9 +171,16 @@ Matrices are square objects (rows and columns) in which all of the cells have th
 
 (a) Use the `matrix()` function and `rnorm(36, mean = 10, sd = 5)` to create a 6 X 6 matrix. The `rnorm()` draw random normally distributed numbers. By supplying the `mean` and `sd` arguments, we can specify the mean and standard deviation of the distribution.
 
+You might need to refer to the help for matrix (`?matrix`) for assistance with arguments.
+
 ```{r}
+set.seed(37)
 
 ```
+
+What is the default order for creating matrices?
+
+> 
 
 (b) Use the `colMeans()` function to calculate the column means of your matrix.
 
@@ -197,7 +210,7 @@ Compare the results of the column means with the results of part (c). What is R 
 
 ## data.frames
 
-`data.frame`s are one of the most important objects that you will work with in R. They are the closest thing to an Excel spreadsheet in R (with the added restriction that a column must be all of one data type). When you read in files from csv or from Excel, you will almost always get a `data.frame` or its cousin the "tibble" (`tbl_df`).
+`data.frame`s (and their cousins `tibble`s) are one of the most important objects that you will work with in R. They are the closest thing to an Excel spreadsheet in R (with the added restriction that a column must be all of one data type)..
 
 ### Activity
 
@@ -278,3 +291,24 @@ Try functions operating on the matrix you created above.
 ```{r}
 
 ```
+
+## Cleaning up code
+
+Whitespace is your friend. Imaginetryingtoreadasentencethathasnospacing. It's pretty difficult. Writing clean code helps your future self and those you work with to understand the steps of your analysis.
+
+### Activity
+
+Take the following code chunk and make the code more readable by adding whitespace (and carriage returns) as well as explicitly naming some of the arguments (check the help files for the assumed ordering of argument).
+
+```{r}
+M1 <- data.frame(x=11:20,y=c(20:11),l=letters[1:10])
+M2 <- tibble(ID=seq(1,100),x=rnorm(100,10,5),y=8.4*x+rnorm(100))
+```
+
+What is `letters`?
+
+> 
+
+Explain how `y` is constructed in `M2`.
+
+> 

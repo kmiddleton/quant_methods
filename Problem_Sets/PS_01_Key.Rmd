@@ -1,6 +1,6 @@
 ---
 title: 'Problem Set 01'
-author: "Your Name Here: Group X"
+author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
 output:
   html_document:
@@ -9,6 +9,10 @@ output:
     toc: true
     toc_float: true
 ---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+```
 
 ## How to use the problem sets
 
@@ -20,7 +24,7 @@ Right now, go up to the header and change the line "author:" to have your name a
 
 As you work through the exercises, really think about what you are doing. In the upcoming problem sets, you will be learning how to think through analyses step by step, from loading data, to visualizing it, to actually carrying out statistical tests, and then interpreting the results.
 
-Read the code like you would a textbook (meaning studying and digesting as you go). It's easy to copy and paste or just run code chunks without really thinking about what the code is doing (we've done it too), but that's not a good way to learn.
+Read the code like you would a textbook (meaning studying and digesting as you go). It's easy to copy and paste or just run code chunks without really thinking about what the code is doing (we've done it too), but that's not a good way to learn.=
 
 ## R Markdown $\rightarrow$ HTML
 
@@ -30,15 +34,15 @@ $$\bar{Y} = \frac{\sum^{n}_{i = 1}Y_i}{n}$$
 
 R Markdown is the marriage of R and [markdown](https://en.wikipedia.org/wiki/Markdown), allowing you to write text and R code together that can include analysis, figures, and tables. R Markdown has been extended for making slides (like the ones we use in this class), adding references, bibliographies, and cross references.
 
-Our usage in this class will be fairly pedestrian, but you can do some really complex things, like writing entire manuscripts using the bookdown package. Read more about [R Markdown]( http://rmarkdown.rstudio.com/) and [bookdown](https://bookdown.org/yihui/bookdown/).
+Our usage in this class will be fairly pedestrian, but you can do some really complex things, like writing entire manuscripts using the [bookdown](https://bookdown.org/yihui/bookdown/) package, make a [CV](https://cran.r-project.org/web/packages/vitae/index.html), or generate a [website](https://bookdown.org/yihui/blogdown/). Read more about [R Markdown]( http://rmarkdown.rstudio.com/).
 
 R markdown (.Rmd) files can be converted to different formats. We will use HTML (PDF and Word are other options). 
 
-- Click "Knit HTML" at the top of this window right now.
+- Click "Knit" at the top of this window right now.
 
 You might get a message about installing some packages. Click yes to install the required packages. After a few seconds, another window should open with this document rendered as a visually pleasing file.
 
-You have just compiled an R Markdown file into HTML. These Rmd and HTML files will be the basic currency of the problems sets you will do in this class.
+You have just compiled an R Markdown file into HTML. These Rmd and HTML files will be the basic currency of the problems sets and progress checks you will do in this class.
 
 ## Insert an R code chunk
 
@@ -56,7 +60,7 @@ Enter some R code into the chunk on the blank line: `sqrt(2)`. Then compile the 
 
 You can also run code interactively from an Rmd file to the R console. To run a single line, press *Ctrl-Enter* / *Cmd-Return*. To run the current chunk, use *Ctrl-Alt-c* / *Cmd-Shift-Return*. This is a good way to test code that you are working on, rather then waiting to compile the Rmd to HTML (or whatever format you are using).
 
-You can also enter the code for code chunks manually, but I find it easier to use the insert code chunk shortcut.
+You can also enter the code to set up code chunks manually, but we find it easier to use the insert code chunk shortcut.
 
 ## Naming R objects
 
@@ -66,14 +70,19 @@ Some names to avoid: `c`, `mean`, `df`, `matrix`, `t`, `T`, `F`. The last two ar
 
 If you want to take the mean of a vector `x`, we recommend using `mean_x`, `x_bar`, or `x_mean`.^[KMM prefers the latter because of RStudio's auto-completion feature.] There are two benefits of using one of these variable names over using `mean`.
 
-1. You don't confuse your `mean` object with the `mean()` function.
+1. You don't confuse your `mean` object with the `mean()` function. R will *usually* figure out which one you want, but we always encourage users to be explicit rather than relying on defaults.
 2. What if you later want to take the mean of a different vector. Which one does `mean` refer to?
 
 You could do this, for example:
 
 ```{r}
+# Assign the standard deviation of the vector 1 to 6 to an object called sd.
 sd <- sd(1:6)
+
+# Print standard deviation of 1-6
 sd
+
+# Print standard deviation of 4-10
 sd(4:10)
 ```
 
@@ -82,6 +91,8 @@ sd(4:10)
 Execute the chunk above and look at the R console output. Explain what we have done here and what R must be doing without telling you. Write your answer after the ">" below. (">"" is the Rmd for a block quote, which will make finding your answers easier.)
 
 > The first line creates and object called `sd` that contains the standard deviation of the number 1, 2, 3, 4, 5, 6. The second line prints that value. The third line prints the standard deviation of the numbers 4 through 10. R must be somehow keeping our variable `sd` separate from its internal function `sd()`. If you were able to overwrite the `sd()` function, then the last line would not work correctly. Although R is good about not overwriting variables (in almost all cases), it is best practice to not use R function names for variables.
+
+Now add comments to the code chunk above briefly annotating your answer above. 
 
 ## Vectors
 
@@ -229,45 +240,51 @@ Matrices are square objects (rows and columns) in which all of the cells have th
 
 (a) Use the `matrix()` function and `rnorm(36, mean = 10, sd = 5)` to create a 6 X 6 matrix. The `rnorm()` draw random normally distributed numbers. By supplying the `mean` and `sd` arguments, we can specify the mean and standard deviation of the distribution.
 
+You might need to refer to the help for matrix (`?matrix`) for assistance with arguments.
+
 ```{r}
 set.seed(37)
-M6x6 <- matrix(rnorm(36, mean = 10, sd = 5), nrow = 6)
-M6x6
+M6_by_6 <- matrix(rnorm(36, mean = 10, sd = 5), nrow = 6)
+M6_by_6
 ```
+
+What is the default order for creating matrices?
+
+> Matrices are created by columns (i.e., down column 1, down column 2, etc.). You can check this with `matrix(1:10, nrow = 5)`
 
 (b) Use the `colMeans()` function to calculate the column means of your matrix.
 
 ```{r}
-colMeans(M6x6)
+colMeans(M6_by_6)
 ```
 
 (c) Use an inequality to find all values less than 10.
 
 ```{r}
-M6x6 < 10
+M6_by_6 < 10
 ```
 
 What kind of matrix is returned?
 
 > A 6 X 6 matrix of TRUE and FALSE.
 
-(d) Use your inequality from part (c) and `colMeans()` to calculate the average proportion of values less than 10 in your matrix.
+(d) Use your inequality from part (c) and `colMeans()` to calculate the proportion of values less than 10 in your matrix.
 
 ```{r}
-colMeans(M6x6 < 10)
+colMeans(M6_by_6 < 10)
 ```
 
 Compare the results of the column means with the results of part (c). What is R doing with the `TRUE` and `FALSE` values in order to be able to use `colMeans()`?
 
 > R is converting TRUE to 1 and FALSE to 0 and then using the 0's and 1's to take column means. This "coercion" is a very handy trick that we will use in the future.
 
-## data.frames
+## data.frames and tibbles
 
-`data.frame`s are one of the most important objects that you will work with in R. They are the closest thing to an Excel spreadsheet in R (with the added restriction that a column must be all of one data type). When you read in files from csv or from Excel, you will almost always get a `data.frame` or its cousin the "tibble" (`tbl_df`).
+`data.frame`s (and their cousins `tibble`s) are one of the most important objects that you will work with in R. They are the closest thing to an Excel spreadsheet in R (with the added restriction that a column must be all of one data type)..
 
 ### Activity
 
-Create a data.frame with the following columns:
+Create a data.frame or tibble with the following columns:
 
 - A character vector `Tx_Group` with the values "control" and "high", each repeated 10 times.
 - A numeric vector `Replicate` with values 1 and 2, repeated 5 times each for both values in `Tx_Group`.
@@ -362,3 +379,24 @@ sd(x)
 median(x)
 t(x)
 ```
+
+## Cleaning up code
+
+Whitespace is your friend. Imaginetryingtoreadasentencethathasnospacing. It's pretty difficult. Writing clean code helps your future self and those you work with to understand the steps of your analysis.
+
+### Activity
+
+Take the following code chunk and make the code more readable by adding whitespace (and carriage returns) as well as explicitly naming some of the arguments (check the help files for the assumed ordering of argument).
+
+```{r}
+M1 <- data.frame(x=11:20,y=c(20:11),l=letters[1:10])
+M2 <- tibble(ID=seq(1,100),x=rnorm(100,10,5),y=8.4*x+rnorm(100))
+```
+
+What is `letters`?
+
+> A string vector containing the letters a-z.
+
+Explain how `y` is constructed in `M2`.
+
+> The values from `x` that are produced are passed into the function to create `y`.
