@@ -33,7 +33,7 @@ There is no one-size-fits-all statistics textbook.
 ## Online lectures
 
 - Available Mondays (or sooner)
-- Watch, rewatch, take notes, look up things you don't understand, etc.
+- Watch, pause, take notes, rewatch, look up things you don't understand, etc.
 
 ## Grading
 
@@ -44,18 +44,18 @@ Participation: Your participation grade in the course will be a function of:
 - Peer evaluations (both your own completion of and others' evaluation of you)
 - In class contributions
 
-Don't worry about what it says in the gradebook. Those numbers don't mean anything to us.
+Don't worry about what numbers are in the gradebook.
 
 ## Grading
 
-Progress Checks
+Progress Checks:
 
 - Each 4 week block will end with a Progress Check.
     - No new material that week
     - Class time used to answer questions
     - Like a problem set
-- You can not work with other members of the class or anyone else on this assignment
-- You will be able to use all other available resources (books, notes, lectures, internet, etc.).
+- You may not work with other members of the class or anyone else on this assignment
+- You should use all other available resources (books, notes, lectures, internet, etc.).
 
 ## Quiz questions
 
@@ -68,6 +68,9 @@ Progress Checks
 
 - Practical experience
 - Gradually less guidance
+- Experience solving challenges as a team
+- All members of the group should participate
+- Each group member should submit the same set of answers
 
 ## Groups
 
@@ -76,13 +79,11 @@ Progress Checks
 ## Reviewing your work
 
 - Problem sets not graded
-- You are responsible for checking
+- You are responsible for checking your group's answers against the answer key
 
 ## Typical weekly schedule
 
 *Monday*: Lectures, "quizzes", readings (when applicable) posted online to Canvas
-
-*Wednesday*: Problem set posted online to Canvas
 
 *Thursday*: Assignments due at midnight:
 
@@ -90,4 +91,6 @@ Progress Checks
 1. Peer evaluations
 1. Weekly quizzes
 
-*Friday*: Class meeting, discuss any issues from that week, previous peer evaluations due (midnight)
+*Thursday* or *Friday*: Problem set posted online to Canvas. Download at the beginning of class.
+
+*Friday*: Class meeting, discuss any issues from that week (anonymous or not), previous peer evaluations due (midnight)
