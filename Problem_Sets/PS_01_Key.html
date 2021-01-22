@@ -1552,7 +1552,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Problem Set 01</h1>
 <h4 class="author">Your Name Here</h4>
-<h4 class="date">Last updated: 2021-01-19</h4>
+<h4 class="date">Last updated: 2021-01-22</h4>
 
 </div>
 
@@ -1942,15 +1942,19 @@ x</code></pre>
 <div id="activity-8" class="section level3">
 <h3>Activity</h3>
 <p>Take the following code chunk and make the code more readable by adding whitespace (and carriage returns) as well as explicitly naming some of the arguments (check the help files for the assumed ordering of argument).</p>
-<pre class="r"><code>M1 &lt;- data.frame(x=11:20,y=c(20:11),l=letters[1:10])
-M2 &lt;- tibble(ID=seq(1,100),x=rnorm(100,10,5),y=8.4*x+rnorm(100))</code></pre>
+<pre class="r"><code>M1 &lt;- data.frame(x = 11:20,
+                 y = c(20:11),
+                 l = letters[1:10])
+M2 &lt;- tibble(ID = seq(1, 100, by = 1),
+             x = rnorm(n = 100, mean = 10, sd = 5),
+             y = 8.4 * x + rnorm(n = 100, mean = 0, sd = 1))</code></pre>
 <p>What is <code>letters</code>?</p>
 <blockquote>
 <p>A string vector containing the letters a-z.</p>
 </blockquote>
 <p>Explain how <code>y</code> is constructed in <code>M2</code>.</p>
 <blockquote>
-<p>The values from <code>x</code> that are produced are passed into the function to create <code>y</code>.</p>
+<p>The values from <code>x</code> that are produced are passed on to the next like to create <code>y</code>. This an important difference with data.frame(). tibble() allows you to use a variable any time after it has been created. data.frame() does not.</p>
 </blockquote>
 </div>
 </div>

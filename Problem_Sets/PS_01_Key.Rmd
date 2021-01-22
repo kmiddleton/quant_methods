@@ -389,8 +389,12 @@ Whitespace is your friend. Imaginetryingtoreadasentencethathasnospacing. It's pr
 Take the following code chunk and make the code more readable by adding whitespace (and carriage returns) as well as explicitly naming some of the arguments (check the help files for the assumed ordering of argument).
 
 ```{r}
-M1 <- data.frame(x=11:20,y=c(20:11),l=letters[1:10])
-M2 <- tibble(ID=seq(1,100),x=rnorm(100,10,5),y=8.4*x+rnorm(100))
+M1 <- data.frame(x = 11:20,
+                 y = c(20:11),
+                 l = letters[1:10])
+M2 <- tibble(ID = seq(1, 100, by = 1),
+             x = rnorm(n = 100, mean = 10, sd = 5),
+             y = 8.4 * x + rnorm(n = 100, mean = 0, sd = 1))
 ```
 
 What is `letters`?
@@ -399,4 +403,4 @@ What is `letters`?
 
 Explain how `y` is constructed in `M2`.
 
-> The values from `x` that are produced are passed into the function to create `y`.
+> The values from `x` that are produced are passed on to the next like to create `y`. This an important difference with data.frame(). tibble() allows you to use a variable any time after it has been created. data.frame() does not.
