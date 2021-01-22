@@ -17,6 +17,11 @@ bibliography: Multivariate.bib
 
 ## About you
 
+- Your preferred name
+- Your preferred pronouns
+- Your home department and home lab
+- Your research area
+
 ## What you need
 
 - Laptop
