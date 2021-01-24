@@ -85,13 +85,110 @@ shade_t(0.005, 10,tail = "both") +
 
 </center>
 
+
 ## Maximum Likelihood
 
-- Likelihood ratios
-    - Likelihood of Model 2 (more parameters)/Likelihood of Model 1 (fewer parameters)
-    - Follow a $\chi^2$ Distribution (*df* = difference in number of estimated parameters)
+```{r, echo=FALSE}
+set.seed(4)
+n <- 30
+X <- rnorm(n, mean = 10, sd = 1)
+Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
+M <- data.frame(X, Y)
 
-*Stay Tuned for Model Comparisons*
+log_lik <- function(theta_1, X, Y){
+  Y_bar <- mean(Y)
+  X_bar <- mean(X)
+  theta_0 <- Y_bar - theta_1 * X_bar
+  Y_hat <- theta_0 + theta_1 * X
+  var_hat <- sum((Y - Y_hat) ^ 2) / (length(Y))
+  sd_hat <- sqrt(var_hat)
+  liks_Y <- dnorm(Y, mean = Y_hat, sd = sd_hat, log = TRUE)
+  return(sum(liks_Y))
+}
+
+theta_1 <- seq(0, 5.5, by = 0.001)
+lls <- numeric(length(theta_1))
+for (ii in 1:length(theta_1)) {
+  lls[ii] <- log_lik(theta_1[ii], X, Y)
+}
+
+D <- tibble(theta_1, model_likelihood = lls)
+
+# Location of maximum log-likelihood
+max_ll <- lls[which.max(lls)]
+
+# Slope at maximum log-likelihood
+theta_1_hat <- theta_1[which.max(lls)]
+
+p <- ggplot() +
+  geom_line(data = D, aes(x = theta_1, y = model_likelihood), size = 2) +
+  geom_point(data = tibble(theta_1_hat, max_ll),
+             aes(x = theta_1_hat, y = max_ll), color = "red", size = 4) +
+  labs(y = "Model likelihood")
+```
+
+
+What are the bounds of parameter estimates at the desired quantiles of the likelihood?
+
+```{r, echo=FALSE}
+print(p)
+```
+
+
+## Maximum Likelihood
+
+Likelihood difference between the model (1) with a slope and (2) without a slope follows a $\chi^2$ distribution with $df = 1$ (for the slope).
+
+Critical value:
+
+```{r}
+qchisq(p = 0.95, df = 1)
+```
+
+We need the interval around the maximum log-likelihood within 1/2 of the critical value.
+
+```{r}
+(crit <- qchisq(p = 0.95, df = 1) / 2)
+```
+
+
+## Maximum Likelihood
+
+```{r, echo=FALSE}
+p +
+  geom_hline(yintercept = max_ll - crit, color = "blue", size = 2)
+```
+
+
+## Maximum Likelihood
+
+```{r}
+CI <- D %>% 
+  filter(model_likelihood >= max_ll - crit) %>% 
+  summarize(lower_theta_1 = min(theta_1),
+            upper_theta_1 = max(theta_1))
+CI
+```
+
+
+## Maximum Likelihood
+
+```{r, echo=FALSE}
+p +
+  geom_hline(yintercept = max_ll - crit, color = "blue", size = 2) +
+  geom_vline(xintercept = CI$lower_theta_1, color = "red", size = 2) +
+  geom_vline(xintercept = CI$upper_theta_1, color = "red", size = 2)
+```
+
+
+## Maximum Likelihood
+
+```{r}
+fm <- lm(Y ~ X)
+confint(fm, "X")
+CI
+```
+
 
 ## Bayesian Inference
 

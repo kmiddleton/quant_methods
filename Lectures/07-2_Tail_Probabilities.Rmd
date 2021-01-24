@@ -58,7 +58,7 @@ pnorm(7, mean = 5, sd = 1, lower.tail = FALSE)
 pnorm(7, mean = 5, sd = 5, lower.tail = FALSE)
 ```
 
-Compare the values returned by `pnorm()` to those you calculated manually above.
+Compare the values returned by `pnorm()` to the proportions on the previous slide.
 
 
 ## Tail probabilities
