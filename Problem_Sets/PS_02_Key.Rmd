@@ -48,10 +48,27 @@ As you get more comfortable with R, you can move files around, use sub-directori
 
 ### Activity
 
-Organize your files and set the working directory to the directory where this file and the required data files for this problem set are located.
+Organize your files and set the working directory to the directory where this file and the required data files for this problem set are located. In the code chunk below set your working directory and use the '#' to outline and describe the folder structure you have chosen
 
 ```{r}
+# FIXME
 getwd()
+
+# Should include folder structure here
+# Our example looks like:
+# - Quant_Meth_LifeSci
+#     - Lecture_Slides
+#     - Docs
+#     - Problem_Sets
+#         - PS_01
+#             - `PS_1.Rmd`
+#             - other files
+#         - PS_02
+#             - `PS_02.Rmd`
+#             - other files
+#         - PS_03, etc.
+
+
 ```
 
 ## Loading Packages
@@ -215,20 +232,25 @@ We prefer to use `write_csv()`, which is part of tidyverse, to R's built-in `wri
 M <- read_csv("../data/Size_Dimorphism_corrected.csv")
 ```
 
-## Data Counts
 
-Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups.
+<!-- THIS CHUNK COMMENTED BELOW IS NOT DONE TILL WEEK 3 -->
 
-### Activity
+<!-- ## Data Counts -->
 
-In the chunk below, pipe `M` to `group_by()`, grouping by both species and sex. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way.
+<!-- Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups. -->
 
-```{r}
-#FIXME
-M %>% group_by(Species, Sex) %>% tally()
-```
+<!-- ### Activity -->
 
-You should now see 50 observations per sex within species. 
+<!-- In the chunk below, pipe `M` to `group_by()`, grouping by both species and sex. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way. -->
+
+<!-- ```{r} -->
+<!-- #FIXME -->
+<!-- M %>% group_by(Species, Sex) %>% tally() -->
+<!-- ``` -->
+
+<!-- You should now see 50 observations per sex within species.  -->
+
+
 
 ## Data Filtering
 
@@ -236,7 +258,9 @@ A very common activity wher you are analyzing data is to take subsets, be they s
 
 ### Activity
 
-To give you some practice filtering, filter your data in the following ways using *both* base R and tidyverse functions. You do not need to save the resulting `data.frame`s.
+<!-- REMOVED THE TIDYVERSE OPTION THERE BC THEY DON'T LEARN IT TILL WEEK 3 -->
+
+To give you some practice filtering, filter your data in the following ways using base R functions. We will talk about they tidyverse version of these functions next week, but if you want to get ahead you can google these and try them here. You do not need to save the resulting `data.frame`s.
 
 1. All *Pardosa ramulosa* 
 2. All females of both species
@@ -322,19 +346,21 @@ ggplot(M, aes(BodyLength)) +
 
 With this you can clearly see SSD in *Nephila* but not in *Pardosa*. 
 
-## Aggregating
+<!-- THE COMMENTED CHUNK BELOW ISN"T DONE TILL WEEK 3 -->
 
-Along with the minimum, maximum, and range, two of the simplest and most common descriptive statistics are means and standard deviations.
+<!-- ## Aggregating -->
 
-### Activity
+<!-- Along with the minimum, maximum, and range, two of the simplest and most common descriptive statistics are means and standard deviations. -->
 
-Calculate the mean and standard deviation for body length for each species per each sex. Use `group_by()` and `summarize()`. You should not have to separate the data into two `data.frame`s.
+<!-- ### Activity -->
 
-```{r}
-# FIXME
-M %>% group_by(Sex, Species) %>%
-  summarize(mean(BodyLength), sd(BodyLength))
-```
+<!-- Calculate the mean and standard deviation for body length for each species per each sex. Use `group_by()` and `summarize()`. You should not have to separate the data into two `data.frame`s. -->
+
+<!-- ```{r} -->
+<!-- # FIXME -->
+<!-- M %>% group_by(Sex, Species) %>% -->
+<!--   summarize(mean(BodyLength), sd(BodyLength)) -->
+<!-- ``` -->
 
 ## Scatterplot
 
@@ -360,7 +386,7 @@ Because body length and body mass are related by an exponential power, if we tak
 
 $$Mass \propto Length^b$$
 $$\log(Mass) \propto b \log(Length)$$
-
+<!-- DO WE WANT THEM TO GOOGLE THIS MUTATE()?  NOT IN LECTURES -->
 Make two new variables that are the log10-transformations of body length and body mass using `mutate()` and plot the data again. Add new axis labels.
 
 ```{r}
