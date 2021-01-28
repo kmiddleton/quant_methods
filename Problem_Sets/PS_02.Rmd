@@ -10,9 +10,11 @@ output:
     toc_float: true
 ---
 
+
 ## Setup
 
 ```{r setup, message=FALSE, warning=FALSE}
+
 
 ```
 
@@ -44,20 +46,20 @@ As you get more comfortable with R, you can move files around, use sub-directori
 
 ### Activity
 
-Organize your files and set the working directory to the directory where this file and the required data files for this problem set are located.
+Organize your files and set the working directory to the directory where this file and the required data files for this problem set are located. In the code chunk below set your working directory and use the '#' to outline and describe the folder structure you have chosen
 
 ```{r}
-getwd()
+
 ```
 
 ## Loading Packages
 
-> In R, the fundamental unit of shareable code is the package. A package bundles together code, data, documentation, and tests, and is easy to share with others. As of January 2015, there were over 6,000^[There are >10,000 now] packages available on the Comprehensive R Archive Network, or CRAN, the public clearing house for R packages. This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you’re working on, and you can benefit from their work by downloading their package. (http://r-pkgs.had.co.nz/intro.html)
+> In R, the fundamental unit of shareable code is the package. A package bundles together code, data, documentation, and tests, and is easy to share with others. As of January 2015, there were over 6,000^[There are >10,000 now] packages available on the Comprehensive R Archive Network, or CRAN, the public clearing house for R packages. This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you're working on, and you can benefit from their work by downloading their package. (http://r-pkgs.had.co.nz/intro.html)
 
 The `library()` function with the following syntax is used to load packages:
 
 ```{r eval=FALSE}
-library("tidyverse")
+library(tidyverse)
 ```
 
 Packages much be installed before they can be loaded. If you get a message like:
@@ -70,13 +72,13 @@ It means that the package is not installed. First install the package (note that
 install.packages("tidyverse")
 ```
 
-and then rerun the code chunk that includes the `library()`^[Inside the call to `library()`, package names do notneed to be quoted (but they can be without incident). `install.packages()`, on the other hand, expects to receive a string or vector of strings, so you do need quotes.] commands. `cowplot` is a package that changes some of the ggplot defaults to be a little more friendly.
+and then rerun the code chunk that includes the `library()`^[Inside the call to `library()`, package names do not need to be quoted (but they can be without incident). `install.packages()`, on the other hand, expects to receive a string or vector of strings, so you do need quotes.] commands.
 
 ### Best practices (things to remember)
 
 - It is best to install packages (e.g., `install.packages("cowplot")`) from the command line only. If you include this code in a R code chunk, you risk R trying to reinstall the package each time you knit your file. 
 - Packages only need to be installed once on each computer. They are stored locally.
-- Packages need to be loaded (`library()`) each time you restart R. Loaded packages are not persistent across R sessions.
+- Packages do need to be loaded (`library()`) each time you restart R. Loaded packages are not persistent across R sessions.
 - Load all of the packages you need at the start of a document to keep track of what packages your analysis needs.
 
 ### Activity
@@ -149,7 +151,7 @@ This experiment is balanced, meaning there are equal numbers of males and female
 
 ### Activity 
 
-Check that this is the case by creating a logical vector and summing the resulting TRUE/FALSE vector. i.e. how many female *Nephila clavipes* are there?
+Check that this is the case by creating a logical and summing the resulting TRUE/FALSE vector. i.e. how many female *Nephila clavipes* are there? 
 
 ```{r}
 
@@ -178,9 +180,7 @@ Now check the `Species` column in the same way. Fix any errors that you find.
 
 Saving yourself the trouble of doing this exercise is one big reason to be careful when you enter data!!
 
-One last step, let's write out your new, typo-free data. Look at the help for `write_csv()`, and write out your data to a new csv file named, `Size_Dimorphism_corrected.csv`.
-
-We prefer to use `write_csv()`, which is part of tidyverse, to R's built-in `write.csv()` (note _ vs. .). `write_csv()` has some friendlier defaults settings.
+One last step, let's write out your new, typo-free data. Look at the help for `write_csv()`, and write out your data to a new csv file named, `Size_Dimorphism_corrected.csv`. 
 
 ```{r}
 
@@ -188,36 +188,24 @@ We prefer to use `write_csv()`, which is part of tidyverse, to R's built-in `wri
 
 Now read your new file back in as if this next section is a new script. Feel free to overwrite your previous object, `M`. This is a good idea to avoid confusion. Use `read_csv()`.
 
-```{r}
-
-```
-
-## Data Counts
-
-Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups.
-
-### Activity
-
-In the chunk below, pipe `M` to `group_by()`, grouping by both species and sex. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way.
+We prefer to use `write_csv()`, which is part of tidyverse, to R's built-in `write.csv()` (note _ vs. .). `write_csv()` has some friendlier defaults settings.
 
 ```{r}
 
 ```
-
-You should now see 50 observations per sex within species. 
 
 ## Data Filtering
 
-A very common activity wher you are analyzing data is to take subsets, be they subsets of rows or one or more columns (or both simultaneously). Gaining experience at this kind of filtering will make you much more efficient.
+A very common activity when you are analyzing data is to take subsets, be they subsets of rows or one or more columns (or both simultaneously). Gaining experience at this kind of filtering will make you much more efficient.
 
 ### Activity
 
-To give you some practice filtering, filter your data in the following ways using *both* base R and tidyverse functions. You do not need to save the resulting `data.frame`s.
+To give you some practice filtering, filter your data in the following ways using base R functions. We will talk about they tidyverse version of these functions next week, but if you want to get ahead you can google these and try them here. You do not need to save the resulting `data.frame`s.
 
 1. All *Pardosa ramulosa* 
 2. All females of both species
 3. Body mass and sex for *Nephila clavipes*
-4. Rows 1-50 (either using base R or the `slice()` function from tidyverse)
+4. Rows 1-50 (either using base R or the `slice()` function from tidyverse [use `?slice` to load the help file])
 5. Mass of the largest female (by mass) in each species
 6. Male *Pardosa ramulosa* with body lengths less than 4 or greater than 6
 
@@ -230,6 +218,8 @@ To give you some practice filtering, filter your data in the following ways usin
 To start looking at sexual size dimorphism, we will make some histograms. This is the easiest method to visualize univariate data.
 
 ### Activity
+
+The `cowplot` has a nice built-in ggplot theme that produces nice plots (there are lots of ggplot themes available). A good place to set this is in the setup chunk at the top of this document. Go there and add this code (without the tic marks): `theme_set(theme_cowplot())`.
 
 Start with a histogram of body length overall. Follow the code in the lectures if you need to.
 
@@ -248,7 +238,6 @@ You will get a message saying that "`stat_bin()` using `bins = 30`. Pick better 
 We could also visualize all groups with `facet_grid()`. Here is an example:
 
 ```{r eval=FALSE}
-# Change eval=FALSE to eval=TRUE
 ggplot(M, aes(BodyLength)) +
   geom_histogram() +
   facet_grid(Sex ~ Species)
@@ -258,17 +247,6 @@ ggplot(M, aes(BodyLength)) +
 
 With this you can clearly see SSD in *Nephila* but not in *Pardosa*. 
 
-## Aggregating
-
-Along with the minimum, maximum, and range, two of the simplest and most common descriptive statistics are means and standard deviations.
-
-### Activity
-
-Calculate the mean and standard deviation for body length for each species per each sex. Use `group_by()` and `summarize()`. You should not have to separate the data into two `data.frame`s.
-
-```{r}
-
-```
 
 ## Scatterplot
 
@@ -286,12 +264,13 @@ Describe the patterns you observe. Do you think this is a useful visualization? 
 
 > 
 
+
 Because body length and body mass are related by an exponential power, if we take advantage of the math of logarithms and log-transform the data, that will linearize the relationship. Ignoring the y-intercepts:
 
 $$Mass \propto Length^b$$
 $$\log(Mass) \propto b \log(Length)$$
 
-Make two new variables that are the log10-transformations of body length and body mass using `mutate()` and plot the data again. Add new axis labels.
+Make two new variables that are the log10-transformations of body length and body mass using `mutate()` and plot the data again. Look at the help for `mutate` for hints. Then add new axis labels.
 
 ```{r}
 
