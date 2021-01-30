@@ -1,7 +1,7 @@
 ---
 title: "Linear Models: Multiple Categories"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -10,12 +10,15 @@ csl: evolution.csl
 bibliography: Multivariate.bib
 ---
 
+
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(multcomp)
 source("Shade_Distributions.R")
 ```
+
 
 ## Hierarchy of GLMs
 
@@ -59,13 +62,15 @@ Possible predictors:
 
 We have done prediction with only two groups (levels)
 
-- Horned lizards example
 - Are the means different?
+  
+    - Horned lizards example
 
 Now predict with three or more groups
 
 - Is *at least* one mean different?
-- Then, *which* mean(s) is/are different
+
+    - Then, *which* mean(s) is/are different
 
 ## Does bright light treatment alleviate jet lag symptoms?
 
@@ -215,8 +220,11 @@ It is possible to have a significant parameter estimate an a non-significant ove
 ## Visualizing ANOVA
 
 <center>
-<img src="images/JetLag_Means.png" width="100%" />
+<img src="https://i.imgur.com/dNF4ph0.png" width="100%" />
 </center>
+
+<br />
+<br />
 
 $$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
 
@@ -332,9 +340,3 @@ post_hoc <- glht(fm_lm,
                                    "knee - control = 0")))
 summary(post_hoc)
 ```
-
-## Quiz 07-2
-
-Complete Quiz 07-2
-
-Watch Lecture 07-3

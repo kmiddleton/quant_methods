@@ -1,7 +1,7 @@
 ---
 title: "General(ized) Linear Models"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,17 +13,9 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
 
-## Resources
-
-- Whitlock and Schluter [-@Whitlock2014-nj]: *Analysis of Biological Data*
-- Tabachnick and Fidell [-@Tabachnick2013-yo]: *Using Multivariate Statistics*
-- Sokal and Rohlf [-@Sokal2011-if]: *Biometry*
-- Zar [-@Zar2009-am]: *Biostatistical Analysis*
-- Fox [-@Fox2010-eu]: *Applied Regression Analysis and Generalized Linear Models*
-- Harrell [-@Harrell2010-ql]: *Regression Modeling Strategies: With Applications to Linear Models, Logistic Regression, and Survival Analysis*
-- Kutner et al. [-@Kutner2004-oo]: *Applied Linear Statistical Models*
 
 ## Problem
 
@@ -153,8 +145,3 @@ $Y$ follows some distribution (e.g., normal or binomial)
 <img src="https://i.imgur.com/sdx4fMz.png" width="100%" />
 </center>
 
-## No quiz for this lecture
-
-Watch Lecture 07-2
-
-## References {.references}

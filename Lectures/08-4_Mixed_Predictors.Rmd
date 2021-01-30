@@ -1,7 +1,7 @@
 ---
 title: "Linear Models: Mixed Predictors"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,10 +13,11 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(wesanderson)
 library(knitr)
 knitr::opts_chunk$set(cache = TRUE)
-library(rethinking)
+#library(rethinking)
 ```
 
 ## Hierarchy of GLMs
@@ -234,69 +235,63 @@ CasteWorker  0.39334    0.14611   2.692   0.0112
 1. OLS regression (body mass only, no grouping)
 1. ANCOVA, intercepts varying
 
-> Which model is best?
+<!-- > Which model is best? -->
 
-Model comparison in a few weeks...
+<!-- Model comparison in a few weeks... -->
 
-## Bayesian approach
+<!-- ## Bayesian approach -->
 
-Data setup:
+<!-- Data setup: -->
 
-```{r echo=FALSE}
-# Drop predicted data columns
-M <- M %>% 
-  select(-contains("pred"))
-```
+<!-- ```{r echo=FALSE} -->
+<!-- # Drop predicted data columns -->
+<!-- M <- M %>%  -->
+<!--   select(-contains("pred")) -->
+<!-- ``` -->
 
-```{r}
-M_bayes <- M %>% 
-  mutate(Caste_Worker = if_else(Caste == "Worker", 1, 0)) %>% 
-  select(-Caste) %>% 
-  as.data.frame()
-head(M_bayes)
-```
+<!-- ```{r} -->
+<!-- M_bayes <- M %>%  -->
+<!--   mutate(Caste_Worker = if_else(Caste == "Worker", 1, 0)) %>%  -->
+<!--   select(-Caste) %>%  -->
+<!--   as.data.frame() -->
+<!-- head(M_bayes) -->
+<!-- ``` -->
 
-## Bayesian approach
+<!-- ## Bayesian approach -->
 
-```{r}
-fm_Bayes <- rethinking::map(
-  alist(
-    Energy ~ dnorm(mu, sigma),
-    mu <- 
-      a +
-      aWorker * Caste_Worker + # 0 when Caste == Non-worker
-      bMass * Mass,
-    a ~ dnorm(0, 5),
-    aWorker ~ dnorm(0, 5),
-    bMass ~ dnorm(0, 2),
-    sigma ~ dcauchy(0, 2)
-  ),
-  data = M_bayes,
-  start = list(bMass = 0.1, a = 0, aWorker = 0, sigma = 0.1)
-)
-```
+<!-- ```{r} -->
+<!-- fm_Bayes <- rethinking::map( -->
+<!--   alist( -->
+<!--     Energy ~ dnorm(mu, sigma), -->
+<!--     mu <-  -->
+<!--       a + -->
+<!--       aWorker * Caste_Worker + # 0 when Caste == Non-worker -->
+<!--       bMass * Mass, -->
+<!--     a ~ dnorm(0, 5), -->
+<!--     aWorker ~ dnorm(0, 5), -->
+<!--     bMass ~ dnorm(0, 2), -->
+<!--     sigma ~ dcauchy(0, 2) -->
+<!--   ), -->
+<!--   data = M_bayes, -->
+<!--   start = list(bMass = 0.1, a = 0, aWorker = 0, sigma = 0.1) -->
+<!-- ) -->
+<!-- ``` -->
 
-## Bayesian approach
+<!-- ## Bayesian approach -->
 
-```{r echo=FALSE}
-post <- extract.samples(fm_Bayes, n = 1e5) %>% 
-  select(-sigma)
-post %>% 
-  gather(Parameter, Estimate) %>% 
-  ggplot(aes(Estimate)) +
-  geom_line(stat = "density") +
-  facet_grid(. ~ Parameter, scales = "free")
-```
+<!-- ```{r echo=FALSE} -->
+<!-- post <- extract.samples(fm_Bayes, n = 1e5) %>%  -->
+<!--   select(-sigma) -->
+<!-- post %>%  -->
+<!--   gather(Parameter, Estimate) %>%  -->
+<!--   ggplot(aes(Estimate)) + -->
+<!--   geom_line(stat = "density") + -->
+<!--   facet_grid(. ~ Parameter, scales = "free") -->
+<!-- ``` -->
 
-## Bayesian approach
+<!-- ## Bayesian approach -->
 
-```{r}
-coef(fm4)
-precis(fm_Bayes)
-```
-
-## Quiz 07-4
-
-Complete Quiz 07-4
-
-Last lecture for this week
+<!-- ```{r} -->
+<!-- coef(fm4) -->
+<!-- precis(fm_Bayes) -->
+<!-- ``` -->

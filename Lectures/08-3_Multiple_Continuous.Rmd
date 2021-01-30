@@ -1,7 +1,7 @@
 ---
 title: "Linear Models: Multiple Continuous Predictors"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,6 +13,7 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(readxl)
 library(GGally)
 library(ggrepel)
@@ -405,8 +406,4 @@ ggplot(M, aes(resid_Neo, Milk_Energy, label = Species)) +
   geom_text_repel(size = 3, force = 15)
 ```
 
-## Quiz 07-3
 
-Complete Quiz 07-3
-
-Watch Lecture 07-4
