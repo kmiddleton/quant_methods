@@ -1,7 +1,7 @@
 ---
 title: "Linear Models: In Class"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -14,6 +14,7 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(ggrepel)
 library(cowplot)
+theme_set(theme_cowplot())
 library(readxl)
 library(knitr)
 library(GGally)

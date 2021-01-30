@@ -1,7 +1,7 @@
 ---
 title: "General(ized) Linear Models: Interactions"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,8 +13,8 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(readxl)
-library(cowplot)
 library(car)
 ```
 
@@ -31,6 +31,18 @@ library(car)
 
 If you have multiple categorical variables, you should *always* do factorial designs (unless you know why you aren't).
 
+
+
+## Factorial designs and interactions
+
+
+<center>
+<img src="https://imgur.com/tcMSr7k.png" width="100%" />
+</center>
+
+
+
+
 ## Interaction model
 
 Add a new predictor ($\beta_3$) that is the product of $X_1$ and $X_2$:
@@ -39,9 +51,28 @@ $$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 (X_1 X_2) + \epsilon$$
 
 The value of $X_1$ varies with change in the value of $X_2$ (and vice versa - these are not really separable).
 
+
 ## Factorial data
 
-Weight gain in rats fed two diets with high and low protein from two different sources.
+Biomass gain in plants fertilized with either added nitrogen or phosphorous.
+
+
+<center>
+<img src="https://imgur.com/5VY9vwE.png" width="70%" />
+</center>
+
+
+## Factorial data
+
+Biomass gain in plants fertilized with either added nitrogen or phosphorous.
+
+```{r message=FALSE}
+biomass <- read_csv("../data/biomass.csv")
+str(biomass)
+```
+
+
+## CUT
 
 ```{r}
 data("weightgain", package = "HSAUR3")
@@ -49,34 +80,41 @@ WG <- weightgain
 str(WG)
 ```
 
+
+
+
 ## Factorial data
 
 Balanced data: Equal *n* in each group
 
 ```{r}
-WG %>% group_by(source, type) %>% tally()
+biomass %>% group_by(nitrogen, phosphorous) %>% tally()
 ```
 
 Balanced data is the best to work with.
 
 ## Visualizing factorial data
 
+
 ```{r echo=FALSE}
-ggplot(WG, aes(x = source, y = weightgain, color = type)) +
+ggplot(biomass, aes(x = nitrogen, y = biomass, color = phosphorous)) +
   geom_point(position = position_jitter(width = 0.1))
 ```
+
+
 
 ## Interaction plot
 
 ```{r int_plot1, eval=FALSE}
-ggplot(WG, aes(x = source,
-               y = weightgain,
-               color = type,
-               group = type)) +
+ggplot(biomass, aes(x = nitrogen,
+               y = biomass,
+               color = phosphorous,
+               group = phosphorous)) +
   geom_point(position = position_jitter(width = 0.1)) +
-  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
-  stat_summary(fun.y = mean, geom = "line")
+  stat_summary(fun = mean, geom = "point", pch = 12, size = 5) +
+  stat_summary(fun = mean, geom = "line")
 ```
+
 
 ## Interaction plot
 
@@ -86,35 +124,45 @@ ggplot(WG, aes(x = source,
 ## Interaction plot
 
 ```{r int_plot2, echo=FALSE}
-ggplot(WG, aes(x = type,
-               y = weightgain,
-               color = source,
-               group = source)) +
+ggplot(biomass, aes(x = phosphorous,
+               y = biomass,
+               color = nitrogen,
+               group = nitrogen)) +
   geom_point(position = position_jitter(width = 0.1)) +
-  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
-  stat_summary(fun.y = mean, geom = "line")
+  stat_summary(fun = mean, geom = "point", pch = 12, size = 5) +
+  stat_summary(fun = mean, geom = "line")
 ```
+
+
+## Types of Interactions
+
+<center>
+<img src="https://imgur.com/W4dqiiZ.png" width="100%" />
+</center>
+
+
 
 ## Group means
 
 ```{r}
-WG %>% group_by(source, type) %>%
-  summarize(mean = mean(weightgain))
+biomass %>% group_by(nitrogen, phosphorous) %>%
+  summarize(mean = mean(biomass))
 ```
 
 ## Two-way factorial ANOVA
 
 ```{r}
-fm <- lm(weightgain ~ source * type, data = WG)
+fm <- lm(biomass ~ nitrogen * phosphorous, data = biomass)
 ```
 
-`source * type` expands to:
+`nitrogen * phosphorous` expands to:
 
 ```{r eval=FALSE}
-fm <- lm(weightgain ~ source + type + source:type, data = WG)
+fm <- lm(biomass ~ nitrogen + phosphorous + nitrogen:phosphorous, 
+         data = biomass)
 ```
 
-`source:type` is the interaction term
+`nitrogen:phosphorous` is the interaction term
 
 ## Two-way factorial ANOVA {.smaller}
 
@@ -124,17 +172,22 @@ summary(fm)
 
 ## ANOVA table
 
+If you have a significant interaction, the main effects not interpertable **without** clarification.
+
 ```{r}
-fm2 <- lm(weightgain ~ type * source, data = WG)
+fm2 <- lm(biomass ~ phosphorous * nitrogen, data = biomass)
 anova(fm2)
 ```
+
+
 
 ## Interpretations
 
 ```{r ref.label="int_plot1", echo=FALSE, eval=TRUE}
 ```
 
-## Power to detect interactions is low [@Wahlsten1990-hc]
+
+## Power to detect interactions is low (Wahlsten1990)
 
 For a 2 X 2 design
 
@@ -148,19 +201,21 @@ ANOVA will suggest additivity of effects when in fact they are multiplicative
 Numeric representations of `source` and `type`:
 
 ```{r}
-WG$source_num <- ifelse(WG$source == "Beef", 0, 1)
-WG$type_num <- ifelse(WG$type == "High", 0, 1)
+biomass$n_num <- ifelse(biomass$nitrogen == "N+", 0, 1)
+biomass$p_num <- ifelse(biomass$phosphorous == "P+", 0, 1)
 ```
 
 Numeric representation of the interaction (multiple the other two numeric representations):
 
 ```{r}
-WG$interact <- WG$source_num * WG$type_num
+biomass$interact <- biomass$n_num * biomass$p_num
 ```
 
-1's only for the "Cereal" & "Low" groups. 0's for all others.
+1's only for the "N" & "P" groups. 0's for all others.
 
 ## 4 parameters define 4 groups
+
+NOT SURE HOW TO TRANSLATE THIS TO MY EXAMPLE!
 
 1. $\beta_0$ = `(Intercept)` = "Beef" & "High" group mean
 1. $\beta_1$ = `source_num` = "Cereal" & "High" addition
@@ -170,7 +225,7 @@ WG$interact <- WG$source_num * WG$type_num
 ## Under the hood {.smaller}
 
 ```{r}
-summary(lm(weightgain ~ source_num + type_num + interact, data = WG))
+summary(lm(biomass ~ n_num + p_num + interact, data = biomass))
 ```
 
 ## Model matrix {.smaller}
@@ -178,7 +233,8 @@ summary(lm(weightgain ~ source_num + type_num + interact, data = WG))
 R does the factor $\rightarrow$ numeric conversion behind the scenes:
 
 ```{r}
-model.matrix(weightgain ~ source * type, data = WG)
+mm <- model.matrix(biomass ~ nitrogen * phosphorous, data = biomass)
+mm[15:25,]
 ```
 
 ## Into the abyss...
@@ -222,25 +278,25 @@ Each type tests subtly different hypotheses.
 
 ## Unbalanced groups
 
-Randomly drop 5 rows:
+Randomly drop 20 rows:
 
 ```{r}
 set.seed(15)
-WG_ub <- WG %>% slice(sample(1:nrow(.), nrow(.) - 5))
-WG_ub %>% group_by(source, type) %>% tally()
+biomass_ub <- biomass %>% slice(sample(1:nrow(.), nrow(.) - 20))
+biomass_ub %>% group_by(nitrogen, phosphorous) %>% tally()
 ```
 
 ## ANOVA Model 1
 
 ```{r}
-fm1 <- lm(weightgain ~ source * type, data = WG_ub)
+fm1 <- lm(biomass ~ nitrogen * phosphorous, data = biomass_ub)
 anova(fm1)
 ```
 
 ## ANOVA Model 2
 
 ```{r}
-fm2 <- lm(weightgain ~ type * source, data = WG_ub)
+fm2 <- lm(biomass ~ phosphorous * nitrogen, data = biomass_ub)
 anova(fm2)
 ```
 
@@ -279,9 +335,8 @@ Split your data and do two analyses unless you really must.
 
 ## I really want to know more about these Type III sums of squares
 
-- https://www.stats.ox.ac.uk/pub/MASS3/Exegeses.pdf
-- http://stats.stackexchange.com/q/60362/597
-- http://www.matthewckeller.com/TypeIorTypeIIISS.pdf
+Check the Canvas resources.
+
 
 ## These disagreements are all specific to sums of squares and variance component estimation.
 
@@ -291,9 +346,3 @@ Alternatives:
 
 - Bayesian Analyses
 
-
-## Quiz 08-2
-
-Watch Lecture 08-3
-
-## References
