@@ -235,63 +235,6 @@ CasteWorker  0.39334    0.14611   2.692   0.0112
 1. OLS regression (body mass only, no grouping)
 1. ANCOVA, intercepts varying
 
-<!-- > Which model is best? -->
+**Which model is best?**
 
-<!-- Model comparison in a few weeks... -->
-
-<!-- ## Bayesian approach -->
-
-<!-- Data setup: -->
-
-<!-- ```{r echo=FALSE} -->
-<!-- # Drop predicted data columns -->
-<!-- M <- M %>%  -->
-<!--   select(-contains("pred")) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- M_bayes <- M %>%  -->
-<!--   mutate(Caste_Worker = if_else(Caste == "Worker", 1, 0)) %>%  -->
-<!--   select(-Caste) %>%  -->
-<!--   as.data.frame() -->
-<!-- head(M_bayes) -->
-<!-- ``` -->
-
-<!-- ## Bayesian approach -->
-
-<!-- ```{r} -->
-<!-- fm_Bayes <- rethinking::map( -->
-<!--   alist( -->
-<!--     Energy ~ dnorm(mu, sigma), -->
-<!--     mu <-  -->
-<!--       a + -->
-<!--       aWorker * Caste_Worker + # 0 when Caste == Non-worker -->
-<!--       bMass * Mass, -->
-<!--     a ~ dnorm(0, 5), -->
-<!--     aWorker ~ dnorm(0, 5), -->
-<!--     bMass ~ dnorm(0, 2), -->
-<!--     sigma ~ dcauchy(0, 2) -->
-<!--   ), -->
-<!--   data = M_bayes, -->
-<!--   start = list(bMass = 0.1, a = 0, aWorker = 0, sigma = 0.1) -->
-<!-- ) -->
-<!-- ``` -->
-
-<!-- ## Bayesian approach -->
-
-<!-- ```{r echo=FALSE} -->
-<!-- post <- extract.samples(fm_Bayes, n = 1e5) %>%  -->
-<!--   select(-sigma) -->
-<!-- post %>%  -->
-<!--   gather(Parameter, Estimate) %>%  -->
-<!--   ggplot(aes(Estimate)) + -->
-<!--   geom_line(stat = "density") + -->
-<!--   facet_grid(. ~ Parameter, scales = "free") -->
-<!-- ``` -->
-
-<!-- ## Bayesian approach -->
-
-<!-- ```{r} -->
-<!-- coef(fm4) -->
-<!-- precis(fm_Bayes) -->
-<!-- ``` -->
+Model comparison in a few weeks...
