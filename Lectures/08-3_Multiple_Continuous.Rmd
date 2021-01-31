@@ -99,7 +99,7 @@ M$fit <- fm$fitted.values
 
 p1 <- M %>%
   ggplot(aes(X, Y)) +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
   geom_point()
 print(p1)
 ```
@@ -120,7 +120,7 @@ M$fit <- fm$fitted.values
 
 p1 <- M %>%
   ggplot(aes(X, Y)) +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
   geom_segment(aes(x = X, xend = X, y = Y, yend = fit),
                color = "red") +
   geom_point()
@@ -226,7 +226,7 @@ head(M)
 
 ```{r echo=FALSE}
 F_v_L <- ggplot(M, aes(Lactose, Fat, label = Species)) +
-  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
   geom_point() +
   labs(x = "Percent Lactose", y = "Percent Fat")
 print(F_v_L + geom_text_repel(size = 3, force = 15))
@@ -238,7 +238,8 @@ print(F_v_L + geom_text_repel(size = 3, force = 15))
 milk_res_lact <- ggplot(M, aes(resid_Lact, Milk_Energy,
                                label = Species)) +
   geom_vline(xintercept = 0, color = "blue") +
-  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "darkgreen") +
   geom_point() +
   labs(x = "Residual Fat Percent", y = "Milk Energy")
 print(milk_res_lact + geom_text_repel(size = 3, force = 15))
@@ -265,7 +266,7 @@ M$resid_Fat <- residuals(fm_Fat)
 
 ```{r echo=FALSE}
 L_v_F <- ggplot(M, aes(Fat, Lactose, label = Species)) +
-  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
   geom_point() +
   labs(y = "Percent Lactose", x = "Percent Fat")
 print(L_v_F + geom_text_repel(size = 3, force = 15))
@@ -277,7 +278,8 @@ print(L_v_F + geom_text_repel(size = 3, force = 15))
 milk_res_fat <- ggplot(M, aes(resid_Fat, Milk_Energy,
                               label = Species)) +
   geom_vline(xintercept = 0, color = "blue") +
-  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "darkgreen") +
   geom_point() +
   labs(x = "Residual Lactose Percent", y = "Milk Energy")
 print(milk_res_fat + geom_text_repel(size = 3, force = 15))
@@ -335,12 +337,12 @@ M <- M %>% mutate(log_Mass = log(Mass))
 
 p1 <- ggplot(M, aes(log_Mass, Milk_Energy, label = Species)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
   labs(x = "log Mass (kg)", y = "Milk Energy (kcal/g)") +
   geom_text_repel(size = 3, force = 15)
 p2 <- ggplot(M, aes(Neocortex, Milk_Energy, label = Species)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
   labs(x = "Percentage Neocortex", y = "Milk Energy (kcal/g)") +
   geom_text_repel(size = 3, force = 15)
 plot_grid(p2, p1, ncol = 2)
@@ -390,7 +392,7 @@ Regression asks (and answers):
 ggplot(M, aes(log_Mass, Neocortex, label = Species)) +
   geom_point() +
   labs(x = "log Mass (kg)", y = "Neocortex Percentage") +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
   geom_text_repel(size = 3, force = 15)
 ```
 
@@ -402,7 +404,8 @@ ggplot(M, aes(resid_Neo, Milk_Energy, label = Species)) +
   geom_vline(xintercept = 0, color = "blue") +
   geom_point() +
   labs(x = "Residual Neocortex", y = "Milk Energy") +
-  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "darkgreen") +
   geom_text_repel(size = 3, force = 15)
 ```
 

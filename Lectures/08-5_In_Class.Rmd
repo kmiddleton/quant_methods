@@ -107,7 +107,7 @@ head(M)
 desc <- 'Large negative residual'
 
 F_v_L <- ggplot(M, aes(Lactose, Fat, label = Species)) +
-  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
   geom_point() +
   labs(x = "Percent Lactose", y = "Percent Fat")
 print(F_v_L +
@@ -121,9 +121,11 @@ print(F_v_L +
 
 ```{r echo=FALSE}
 milk_res_lact <- ggplot(M, aes(resid_Lact, Milk_Energy, label = Species)) +
-  geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf), fill = "gray80") +
+  geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf),
+            fill = "gray80") +
   geom_vline(xintercept = 0, color = "blue") +
-  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "darkgreen") +
   geom_point() +
   labs(x = "Residual Fat Percent", y = "Milk Energy")
 print(milk_res_lact +
@@ -155,7 +157,7 @@ M$resid_Fat <- residuals(fm_Fat)
 
 ```{r echo=FALSE}
 L_v_F <- ggplot(M, aes(Fat, Lactose, label = Species)) +
-  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
   geom_point() +
   labs(y = "Percent Lactose", x = "Percent Fat")
 print(L_v_F +
@@ -166,13 +168,16 @@ print(L_v_F +
 
 ```{r echo=FALSE}
 milk_res_fat <- ggplot(M, aes(resid_Fat, Milk_Energy, label = Species)) +
-  geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf), fill = "gray80") +
+  geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf),
+            fill = "gray80") +
   geom_vline(xintercept = 0, color = "blue") +
-  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "darkgreen") +
   geom_point() +
   labs(x = "Residual Lactose Percent", y = "Milk Energy")
 print(milk_res_fat +
-        annotate(geom = "label", x = -4.4, y = 0.97, label = "Less lactose than predicted",
+        annotate(geom = "label", x = -4.4, y = 0.97,
+                 label = "Less lactose than predicted",
                  color = "red", size = 5) +
         geom_text_repel(size = 3, force = 15))
 ```
@@ -272,7 +277,7 @@ knitr::kable(head(yy))
 ```{r echo=FALSE, message = FALSE, fig.width = 4, warning=FALSE}
 ggplot(yy, aes(LightLevel, SoilType)) +
   geom_jitter(width=0.05, height=0.05, alpha=0.5) +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
 ```
 
 </div>

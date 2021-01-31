@@ -63,14 +63,14 @@ Possible predictors:
 We have done prediction with only two groups (levels)
 
 - Are the means different?
-  
-    - Horned lizards example
+
+- Horned lizards example
 
 Now predict with three or more groups
 
 - Is *at least* one mean different?
 
-    - Then, *which* mean(s) is/are different
+- Then, *which* mean(s) is/are different
 
 ## Does bright light treatment alleviate jet lag symptoms?
 
@@ -85,11 +85,11 @@ Now predict with three or more groups
 </center>
 
 - 3 groups
-    - No light (control)
-    - Bright light in eyes
-    - Bright light in knees
+- No light (control)
+- Bright light in eyes
+- Bright light in knees
 - Outcome
-    - Shift in circadian pattern (hours)
+- Shift in circadian pattern (hours)
 
 </div>
 
@@ -120,8 +120,8 @@ $F$-statistic is the ratio of the two.
 1. The variance is the same in all populations
 
 - ANOVA is very robust to violations of these assumptions
-    - Central limit theorem!
-    - Equal sample sizes helps with violations of equal variances
+- Central limit theorem!
+- Equal sample sizes helps with violations of equal variances
 - ANOVA is the *Maximum Likelihood Solution* given these assumptions
 
 ## Does bright light treatment alleviate jet lag symptoms?
@@ -137,11 +137,11 @@ $F$-statistic is the ratio of the two.
 </center>
 
 - 3 groups
-    - No light (control)
-    - Bright light in eyes
-    - Bright light in knees
+- No light (control)
+- Bright light in eyes
+- Bright light in knees
 - Outcome
-    - Shift in circadian pattern (hours)
+- Shift in circadian pattern (hours)
 
 </div>
 
@@ -165,21 +165,22 @@ ggplot(JL, aes(x = Treatment, y = Shift)) +
 
 ```{r}
 JL %>% group_by(Treatment) %>%
-  summarise(mean(Shift), sd(Shift))
+  summarise(mean(Shift), sd(Shift),
+            .groups = "drop")
 ```
 
 ## Compare group means and standard errors
 
 ```{r echo=FALSE}
 ggplot(JL, aes(x = Treatment, y = Shift)) +
-  geom_point(position = position_jitter(width = 0.1)) +
+  geom_point(position = position_jitter(width = 0.1), size = 2) +
   xlab("Light Treatment") +
   ylab("Shift in Circadian Rhythm (h)") +
-  stat_summary(fun.y = mean, geom = "point", size = 3,
-               color = "red") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar",
-               width = 0.1,
-               color = "red", size = 0.7)
+  stat_summary(fun.data = "mean_se",
+               position = position_dodge(width = 0.5),
+               colour = "red",
+               size = 1)
+
 ```
 
 ## ANOVA as a Linear Model {.smaller}
@@ -200,8 +201,8 @@ summary(fm_lm)
 ```
 
 1. `(Intercept)`: Mean for 1st level of factor
-1. `Treatmenteyes`: Adjustment from `(Intercept)` for eyes group (Intercept + Treatmenteyes)
-1. `Treatmentknee`: Adjustment from `(Intercept)` for knee group (Intercept + Treatmentknee)
+1. `Treatmenteyes`: Adjustment from `(Intercept)` for eyes group (`Intercept` + `Treatmenteyes`)
+1. `Treatmentknee`: Adjustment from `(Intercept)` for knee group (`Intercept` + `Treatmentknee`)
 
 *t*-tests and *P* values are suggestive of significant differences, but we need to look at the overall ANOVA first.
 
@@ -214,8 +215,8 @@ anova(fm_lm)
 *P* = 0.004 for the overall ANOVA.
 
 It is possible to have a significant parameter estimate an a non-significant overall ANOVA.
-  - Nothing more to do.
-  - No post hoc test
+- Nothing more to do.
+- No post hoc test
 
 ## Visualizing ANOVA
 
@@ -316,16 +317,16 @@ We'll use the Tukey-Kramer test (only one you need to know right now)
 ## Tukey-Kramer test
 
 - Assumes that we have already performed an ANOVA and rejected the null hypothesis
-    - If the overall ANOVA is not significant, then a post hoc test makes no sense.
+- If the overall ANOVA is not significant, then a post hoc test makes no sense.
 - The familywise error rate (FWER) with a Tukey-Kramer test is no larger than $\alpha$.
-    - FWER is the overall probability of a Type I error
+- FWER is the overall probability of a Type I error
 - Tukey-Kramer test makes all the same assumptions as ANOVA.
-    - Defaults to all pairwise combinations of levels
+- Defaults to all pairwise combinations of levels
 
 ## Tukey-Kramer test: `multcomp` library {.smaller}
 
 - Alternative but less general: `TukeyHSD()` in R
-    - Only takes an object from `aov()`
+- Only takes an object from `aov()`
 
 ```{r}
 tukey <- glht(fm_lm, linfct = mcp(Treatment = "Tukey"))
