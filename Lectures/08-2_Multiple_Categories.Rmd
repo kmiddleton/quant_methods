@@ -287,9 +287,9 @@ $$F = \frac{\mbox{MS}_{group}}{\mbox{MS}_{error}}$$
 
 What role does within vs. between group variation have in determining $F$?
 
-## If you perfomed pairwise t-tests for all pairs of groups, how often would you expect to get a signficant result by chance?
+## If you perfomed pairwise t-tests for all pairs of groups, how often would you expect to get a significant result by chance?
 
-## If you perfomed pairwise t-tests for all pairs of groups, how often would you expect to get a signficant result by chance?
+## If you perfomed pairwise t-tests for all pairs of groups, how often would you expect to get a significant result by chance?
 
 - 1 out of every 20 tests
 - $\alpha$ for a single comparison?
