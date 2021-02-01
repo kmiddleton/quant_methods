@@ -214,7 +214,8 @@ anova(fm_lm)
 
 *P* = 0.004 for the overall ANOVA.
 
-It is possible to have a significant parameter estimate an a non-significant overall ANOVA.
+It is possible to have a significant parameter estimate and a non-significant overall ANOVA.
+
 - Nothing more to do.
 - No post hoc test
 
