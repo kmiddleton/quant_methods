@@ -1,0 +1,192 @@
+---
+title: 'Problem Set 03'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
+library(cowplot)
+theme_set(theme_cowplot())
+```
+
+
+## Tidy Data
+
+We will be using `library(tidyverse)` a lot in this course, and one thing that makes this set of packages function really well is having "tidy" data.  This will help you for future data manipulation, cleaning, visualization and analysis.
+
+### Activity
+
+What are the 3 rules that make data tidy?
+
+> Tidy data has 3 rules. 1) Each variable must have its own column. 2) Each observation must have its own row. 3) Each value must have its own cell.
+
+
+To practice learning how to tidy data, we will will use a dataset from Hautier, Yann et al. (2020), *Fast and furious: Early differences in growth rate drive short-term plant dominance and exclusion under eutrophication.*  In this paper, the authors are trying to understand the mechanisms by which diversity is lost under fertilization (i.e. eutrophication).  One way they think some species have an advantage is by having a fast early growth rate.  Let's tidy up this dataset so we can look at the trends in growth of different plant speices.
+
+
+Next, read in the plant growth data `"growthrate_data.csv"`, save it as an object `gr`, and look at the data. What are the dimensions of the resulting tibble?
+
+```{r, message=FALSE}
+# FIXME
+gr <- read_csv("../data/growthrate_data.csv")
+gr
+```
+
+This appears to be how the scientists entered their data, with columns for species, plot, and then multiple columns for the biomass at the various days they collected their measurements. Unfortunately, this data is not tidy.  Why not?
+
+> Observaitons are in rows, but the variable "biomass" is found in most of the columns.  This should have a single column, with date as another column.
+
+
+To make this data go from wide to long format, you need to use the function `pivot_longer()`.  Use this to create a new dataset called `gr_long` that is tidy, with biomass as the value that runs for a full column.
+
+
+```{r, message=FALSE}
+# FIXME
+gr_long <- gr %>%
+              pivot_longer(cols = c("day_0","day_13","day_34","day_54","day_61","day_68",
+                                    "day_75","day_90","day_97", "day_103", "day_112"), 
+                           names_to ="day", 
+                           values_to ="biomass")
+gr_long
+
+
+#PRO TIP:  You can also make your life easier by just specifying the column numbers!
+gr_long2 <- gr %>%
+              pivot_longer(cols = c(3:13), 
+                           names_to ="day", 
+                           values_to ="biomass")
+gr_long2
+```
+
+
+Now that you have tidied this data, explain why it is tidy. Hint - use the column and row descriptions to explain each of the three rules above.
+
+> Each variable has it's own column, including plot, species, day and biomass (plus the random text column).  Each row is a unique plot by species combination, thus each row is an observation.  Finally, each cell is a value, there is one actual number/entry for each cell in the dataset.
+
+
+## Separating Columns
+
+The `separate()` function allows you to split columns of your data into two.
+
+### Activity
+
+You can see our `day` column is a `<chr>`. To be able to plot plant biomass growth through time, in the chunk below, pipe `gr_long` to `separate()` to split this column into two, making sure the column of integers for the day number is called `days`.
+
+
+
+```{r, message=FALSE}
+# FIXME
+gr_long <- gr_long %>%
+                separate(day, into = c("text", "days"), convert = TRUE)
+
+#you can also remove this extraneous column using this the [] and - the column of interest
+gr_long <- gr_long[,-3]
+gr_long
+
+```
+
+You may notice that your new column `days` is still a character.  If so, go back and fix the code above so it is no longer a character.
+
+
+
+## Data Counts
+
+Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups.
+
+### Activity
+
+In the chunk below, pipe `gr_long` to `group_by()`, grouping by species. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way.
+
+```{r}
+#FIXME
+gr_long %>% group_by(species) %>% tally()
+```
+
+Do you have equal sample size across all species?
+
+> Yes, 55.
+
+
+## NA's
+
+Missing data can sometimes throw off our estimates if we are not sure if data is there or not. R will code blank cells in your dataset as `NA` when you read your data in.  `NA`'s are explicit if you can see them in your dataset, and they are implicit if a row does not exist in a dataset when a data value is missing.
+
+### Activity
+
+So it seems clear we have equal sample size because of our code above, however you may have noticed that in our initial dataset there are some `NA`'s.  Do we still have `NA`'s in our dataset? Use `View()` to investigate `gr_long` and find out.
+
+```{r}
+#FIXME
+View(gr_long)
+```
+
+> Yes we still have NA's.
+
+So based on this, do we really have equal sample size?  Why not?
+
+> We do not have equal sample size because we have explicit NA's
+
+The `drop_na()` function allows you to drop rows that have `NA`s in them in order to check to see if your sample size is equal.  In the chunk below, pipe `gr_long` to `drop_na()` and save it as a new dataset called `gr_long2`. Then re-tally your data to see if you have equal sample size across all species.  
+
+```{r}
+#FIXME
+gr_long2 <- gr_long %>%
+              drop_na()
+
+gr_long2 %>% group_by(species) %>% tally()
+```
+
+> No, now we see we have different sample sizes per species. 
+
+
+
+
+## Data Exploration
+
+Let's look at this growth rate data to see if we see any differences between species.  
+
+### Activity
+
+Using your object `gr_long2`, create a plot that shows the biomass per species at each date as a scatter plot, and draw a smoothing line through the average of all points per species using `geom_smooth()`.  Make sure each species is differentiated in some way. Also make sure to clean up your image if your points are strongly overlapping.
+
+
+```{r, message=FALSE}
+# FIXME
+ggplot(gr_long2, aes(x = days, y = biomass, color = species))+
+  geom_point(position = position_jitter(width = 1), alpha = 1/3)+
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Which species appears to have the fastest rate of growth (biomass change per time)?
+
+> H and Al.
+
+
+
+
+
+
+
+
+<!-- ## Aggregating -->
+
+<!-- Along with the minimum, maximum, and range, two of the simplest and most common descriptive statistics are means and standard deviations. -->
+
+<!-- ### Activity -->
+
+<!-- Calculate the mean and standard deviation for body length for each species per each sex. Use `group_by()` and `summarize()`. You should not have to separate the data into two `data.frame`s. -->
+
+<!-- ```{r} -->
+<!-- # FIXME -->
+<!-- M %>% group_by(Sex, Species) %>% -->
+<!--   summarize(mean(BodyLength), sd(BodyLength)) -->
+<!-- ``` -->
