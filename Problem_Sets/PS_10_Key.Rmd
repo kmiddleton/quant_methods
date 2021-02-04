@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 10'
+title: 'Problem Set 09'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -11,388 +11,291 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
+# FIXME
 library(tidyverse)
 library(readxl)
 library(cowplot)
 library(forcats)
+library(ggsci)
 
-# This option turn on cacheing of chunks. This will dramatically
-# speed up knitting, because only chunks that have changed will
-# be recompiled.
+library(lmtest)
+library(AICcmodavg)
+
+library(nlme)
+library(car)
+library(epiDisplay)
+library(cvTools)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
-## General Framework for This Week's Problem Set
+Some useful color palettes for ggplot: https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html
 
-This week we will approach hypothesis testing for several of the models we have fit previously with generalized linear models in a randomization framework. For each, you should:
+Try adding `scale_color_d3()`, `scale_color_aaas()`, and others to your ggplots.
 
-1. Fit the model to the observed data (feel free to copy your code from original problem set).
-1. Decide on a test statistic to use for the randomization.
-1. Perform the randomization:
-    1. Calculate the test statistic for the *observed* data
-    1. Randomly shuffle the observations
-    1. Calculate the test statistic for that group
-    1. Repeat thousands of times
-1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
-1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+## Nested Sites in Streams
 
-Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide.
+Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the original file from Dryad.
 
-Remember to start with a small number of iterations (10 or 100) until you get the code working correctly. Then increase to 10,000 for a final analysis.
+Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8
 
-## Stalk-eyed flies (PS 05)
+### Activity
 
-Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
-
-```{r flies1, message=FALSE}
-# Read data
-stalk <- read_csv("../data/Stalkies.csv")
-
-# Some thoughtful plotting
-ggplot(stalk, aes(x = food_source, y = eye_span)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Food Source", y = "Eye Span")
-
-set.seed(8987324)
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- t.test(eye_span ~ food_source, data = stalk)$statistic
-
-for (ii in 2:nreps) {
-  t_stats[ii] <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
-}
-
-tibble(t_stats) %>%
-  ggplot(aes(t_stats)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1], color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats >= t_stats[1])
-
-t.test(eye_span ~ food_source, data = stalk)
-```
-
-10^5^ iterations took 124.7 seconds on a single processor. We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical P is 6e-10, so we expect the empirical P to be close to that scale.
-
-We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
-
-The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the combination of `foreach()` and `dopar()`, which handle the parallelization and collection of the results.
-
-```{r flies2, eval=FALSE}
-library(parallel)
-library(foreach)
-library(doParallel)
-
-t_obs <- t.test(eye_span ~ food_source, data = stalk)
-
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- t_obs$statistic
-
-# Set up parallel processor
-n_cores <- 2
-cl <- makeCluster(n_cores)
-registerDoParallel(cl, cores = n_cores)
-
-# Function to do the randomized t-test and return the t-value only.
-t_rand <- function() {
-  rnd_t <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
-  return(as.numeric(rnd_t))
-}
-
-# Parallel randomization execute t_rand(), and combine the output into t_stats.
-t_stats[2:nreps] <- foreach(i = 2:nreps, .combine = c) %dopar% t_rand()
-
-2 * mean(t_stats >= t_stats[1])
-
-# Close cluster
-stopImplicitCluster()
-```
-
-The same number of iterations but using 2 processors takes 93 seconds.
+Load the `TemperatureData` sheet from the `Streams.xlsx` file. Look at the structure of the file. You should have 5 columns: `Site`, `Date`, `AirTemp_observed`, `AirTempPredicted`, and `WaterTemp`. If you don't, then you probably did not load the correct sheet. Check the `read_excel()` help to see how to do this.
 
 ```{r}
-# Iterations per second, 1 processor
-(p1 <- 124.7 / nreps)
-
-# Iterations per second, 2 processors
-(p6 <- 93 / nreps)
-
-p1 / p6
+# FIXME
+Temp_Data <- read_excel("../data/Streams.xlsx", "TemperatureData")
 ```
 
-We get a speed-up of about 1.34 times. There is some overhead in the parallelization, and there were other things going on on the computer, so we don't get double the speed.
+Now load the `SiteData` sheet from the Excel file. It has four columns, including the mapping from `Stream_Name` to `Site`. We need to merge the two data.frames^[tibbles] together. Because they share a column `Site`, we can match rows, yielding a single data.frame.
 
-## Earwigs (PS 05)
+Base R has a `merge()` function, but it can be somewhat finicky. `tidyverse` has a complex set of functions for joining data.frames. The most useful are:
 
-In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
+1. `inner_join()`: "return all rows from x where there are matching values in y, and all columns from x and y. If there are multiple matches between x and y, all combination of the matches are returned."
+2. `left_join()`: "return all rows from x, and all columns from x and y. Rows in x with no match in y will have NA values in the new columns. If there are multiple matches between x and y, all combinations of the matches are returned."
+3. `full_join()`: "return all rows and all columns from both x and y. Where there are not matching values, returns NA for the one missing."
 
-```{r earwigs}
-EW <- read_csv("../data/Earwigs.csv")
-
-EW %>%
-  ggplot(aes(Density, Proportion_Forceps)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-
-fm <- lm(Proportion_Forceps ~ Density, data = EW)
-summary(fm)
-
-set.seed(28476)
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- summary(fm)$coefficients[2, 3]
-
-for (ii in 2:nreps) {
-  fm_rnd <- lm(sample(Proportion_Forceps) ~ Density, data = EW)
-  t_stats[ii] <- summary(fm_rnd)$coefficients[2, 3]
-}
-
-tibble(t_stats) %>%
-  ggplot(aes(t_stats)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1], color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats >= t_stats[1])
-
-factorial(7)
-```
-
-## Heart Transplant Survivorship (PS 07)
-
-For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
-
-```{r heart_transplants}
-M <- read_excel("../data/Heart_Transplants.xlsx") %>%
-  mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
-
-ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Mismatch Degree", y = "Survival (days)")
-
-fm <- lm(Survival_Days ~ Mismatch_Degree, data = M)
-obs <- summary(fm)
-
-set.seed(823476)
-nreps <- 1e4
-F_stats <- numeric(nreps)
-F_stats[1] <- obs$fstatistic["value"]
-
-for (ii in 2:nreps) {
-  fm_rand <- lm(sample(Survival_Days) ~ Mismatch_Degree,
-                    data = M)
-  F_stats[ii] <- summary(fm_rand)$fstatistic["value"]
-}
-
-tibble(F_stats) %>%
-  ggplot(aes(F_stats)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = F_stats[1], color = "red") +
-  labs(x = "F statistics", y = "Count")
-
-mean(F_stats >= F_stats[1])
-```
-
-## Bird abundance (PS 07)
-
-We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors.
-
-There are four predictors, and you will have 5 randomization tests, though you will fit a single model with multiple predictors to obtain the test statistics for each:
-
-1. The overall multple regression (F-test)
-2. Area: "Island" size (thousands of square km)
-3. Elevation: Elevation (thousands of meters)
-4. Dist_to_Ecuador: Distance to Ecuador (km)
-5. Dist_to_Island: Distance to nearest island (km)
-
-You should do the randomization and collect the output test statistics using just one loop.
-
-```{r bird_abundance}
-M <- read_excel("../data/Birds.xlsx")
-fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
-         data = M)
-obs <- summary(fm)
-
-set.seed(2876)
-nreps <- 1e4
-
-t_stats <- matrix(NA, nrow = nreps, ncol = 5)
-colnames(t_stats) <- c(rownames(obs$coefficients)[2:5], "Fstat")
-t_stats[1, 1:4] <- obs$coefficients[2:5, 3]
-t_stats[1, 5] <- obs$fstatistic[1]
-
-for (ii in 2:nreps) {
-  fm_rand <- lm(sample(N_Species) ~ Dist_to_Island + Elevation +
-                  Area + Dist_to_Ecuador, data = M)
-  t_stats[ii, 1:4] <- summary(fm_rand)$coefficients[2:5, 3]
-  t_stats[ii, 5] <- summary(fm_rand)$fstatistic[1]
-  
-}
-
-# Dist_to_Island
-tibble(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
-  ggplot(aes(Dist_to_Island)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Dist_to_Island"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Dist_to_Island"] >= t_stats[1, "Dist_to_Island"])
-
-# Elevation
-tibble(Elevation = t_stats[, "Elevation"]) %>%
-  ggplot(aes(Elevation)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Elevation"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Elevation"] >= t_stats[1, "Elevation"])
-
-# Area
-tibble(Area = t_stats[, "Area"]) %>%
-  ggplot(aes(Area)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Area"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Area"] >= t_stats[1, "Area"])
-
-# Dist_to_Ecuador
-tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
-  ggplot(aes(Dist_to_Ecuador)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Dist_to_Ecuador"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Dist_to_Ecuador"] <= t_stats[1, "Dist_to_Ecuador"])
-
-tibble(Fstat = t_stats[, "Fstat"]) %>%
-  ggplot(aes(Fstat)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Fstat"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-mean(t_stats[, "Fstat"] >= t_stats[1, "Fstat"])
-```
-
-## Aspirin and cancer (PS 08)
-
-In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
-
-```{r aspirin1}
-M <- read_csv("../data/Aspirin.csv") %>%
-  mutate_each("factor")
-fm <- glm(Cancer ~ Treatment, M, family = "binomial")
-
-# We will use the deviance first.
-
-set.seed(8736)
-nreps <- 1e3
-devs <- numeric(nreps)
-devs[1] <- fm$deviance
-
-system.time({
-  for (ii in 2:nreps) {
-    devs[ii] <- glm(sample(Cancer) ~ Treatment, M,
-                    family = "binomial")$deviance
-  }
-})
-
-tibble(devs) %>%
-  ggplot(aes(devs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = devs[1], color = "red") +
-  labs(x = "Deviance", y = "Count")
-
-mean(devs <= devs[1])
-```
-
-We can also use the Z-score for `TreatmentPlacebo`. This runs more slowly, because you have to generate the summary for each model.
+`left_join()` the temperature data and the site data and assign to a new object. This will add the columns of one to the other, matching on `Site`. You should end up with a 3,744 x 8 tibble.
 
 ```{r}
-set.seed(8736)
-nreps <- 1e3
-Zs <- numeric(nreps)
-Zs[1] <- summary(fm)$coefficients[2, 3]
+Site_Data <- read_excel("../data/Streams.xlsx", "SiteData")
+M <- left_join(Temp_Data, Site_Data)
 
-system.time({
-  for (ii in 2:nreps) {
-    fm_rand <- glm(sample(Cancer) ~ Treatment, M,
-                    family = "binomial")
-    Zs[ii] <- summary(fm_rand)$coefficients[2, 3]
-  }
-})
-
-tibble(Zs) %>%
-  ggplot(aes(Zs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = Zs[1], color = "red") +
-  labs(x = "Z-score", y = "Count")
-
-mean(Zs <= Zs[1]) * 2
+M %>% group_by(Site, Stream_Name) %>% tally()
 ```
 
-We can also do something similar with a standard $\chi^2$ test:
+Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). Ultimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
 
-```{r aspirin2}
-obs <- chisq.test(xtabs(~ Treatment + Cancer, M),
-                  correct = FALSE)
+We then need to do one more thing: make a new variable that converts `Date` into a day number. We can do this with the function `as.numeric()`. Make a new variable `Day`, which is the numeric representation of `Date`. It will look something like: `mutate(Day = as.numeric(Date))`.
 
-set.seed(8736)
-nreps <- 1e3
-chisqs <- numeric(nreps)
-chisqs[1] <- obs$statistic
-
-system.time({
-  for (ii in 2:nreps) {
-    chisqs[ii] <- chisq.test(xtabs(~ sample(Treatment) + Cancer, M),
-                             correct = FALSE)$statistic
-  }
-})
-
-tibble(chisqs) %>%
-  ggplot(aes(chisqs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = chisqs[1], color = "red") +
-  labs(x = "Chi-squared Statistic", y = "Count")
-
-mean(chisqs >= chisqs[1])
+```{r}
+# FIXME
+M <- M %>%
+  mutate(Site = factor(Site),
+         Date = factor(Date),
+         Stream_Name = factor(Stream_Name),
+         Day = as.numeric(Date))
 ```
 
-## Correlation
+Because not all observations have observed air temperature, first we should check for correlation between observed and predicted air temperatures. Calculate the correlation between the two. We could filter out missing data, but instead just provide the argument `use = "pairwise.complete.obs"` to `cor()`, which will tell the function to use only complete pairs for the calculation. If you find that the correlation is `NA`, that means R is using incomplete cases. Correlation with `NA`s is `NA`.
 
-Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
-
-```{r correlation}
-M <- read_excel("../data/Birds.xlsx")
-
-set.seed(2876)
-nreps <- 1e4
-
-corrs <- numeric(length = nreps)
-corrs[1] <- cor(M$Area, M$Elevation)
-
-for (ii in 2:nreps) {
-  corrs[ii] <- cor(sample(M$Area), M$Elevation)
-}
-
-tibble(corrs) %>%
-  ggplot(aes(corrs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = corrs[1], color = "red") +
-  labs(x = "Correlation", y = "Count")
-
-mean(corrs >= corrs[1])
+```{r}
+# FIXME
+cor(M$AirTemp_observed, M$AirTempPredicted, use = "pairwise.complete.obs")
 ```
+
+The correlation should be pretty high. So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete). Let's plot: make a line plot with day on the x axis and predicted air temp on the y axis. Then facet by `Stream_Name`.
+
+One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly.
+
+Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable.)
+
+```{r fig.height = 10}
+# FIXME
+ggplot(M, aes(Day, AirTempPredicted, group = Site)) +
+  geom_line() +
+  theme(legend.position = "none") +
+  facet_grid(Stream_Name ~ .) +
+  labs(title = "Air Temperature")
+
+ggplot(M, aes(Day, WaterTemp, group = Site)) +
+  geom_line() +
+  theme(legend.position = "none") +
+  facet_grid(Stream_Name ~ .) +
+  labs(title = "Water Temperature")
+```
+
+What general patterns do you see, comparing the two plots?
+
+> Air temperature appears to vary more day to day than water temperature does. Air temperatures at a given stream are highly conserved, but water temperature varies much more within a stream.
+
+We want to fit two models to these data. In both models we want to model water temperature by predicted air temperature. The difference between the models will be in the random effects.
+
+We have an added wrinkle with these data that we have not yet encountered: nesting. Each site is only associated with one stream, so we need to tell R to only expect sites in some stream names. In an R formula, you can designate nesting using /. If B is nested in A, this would be coded as `A/B`.^[http://conjugateprior.org/2013/01/formulae-in-r-anova/ has a good overview of R's model formula.]
+
+1. Fit a model where the intercept for site nested in stream is random
+2. Fit a model where the intercept for site nested in stream is random and day is also included (as a continuous random predictor).
+
+Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood.
+
+```{r}
+# FIXME
+fm1 <- lme(WaterTemp ~ AirTempPredicted,
+           random = ~ 1 | Stream_Name/Site,
+           data = M, method = "ML")
+summary(fm1)
+
+fm2 <- lme(WaterTemp ~ AirTempPredicted,
+           random = ~ Day | Stream_Name/Site,
+           data = M, method = "ML")
+summary(fm2)
+```
+
+Looking at the `summary()` of each, you should see sections in the random effects for `Stream_Name` and `Site %in% Stream_Name`.
+
+Explain in non-mathematical words what the addition of day in the random effects part of the formula accomplishes.
+
+> Addition of day in the random effects part of the model allows the linear relationship (slope) of the water temperature relationship to change on a daily basis. Each day can essentially have its own trajectory.
+
+Load the `AICcmodavg` package and use the `aictab()` function to compare the two models you fit above.
+
+```{r}
+# FIXME
+library(AICcmodavg)
+aictab(list(fm1, fm2))
+```
+
+Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the model comparison make sense in light of your understanding of the difference between the two models?
+
+> The second model is massively preferred (deltaAIC = 2560). This makes sense because there is a lot of day to day variation in temperature. We could probably do even better by adding a main effect of day to model the overall trend of increasing temperature.
+
+```{r}
+# FIXME
+fm3 <- lme(WaterTemp ~ AirTempPredicted + Day,
+           random = ~ Day | Stream_Name/Site,
+           data = M, method = "ML")
+aictab(list(fm1, fm2, fm3))
+```
+
+## Sole
+
+In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by the salinity of the water. That data set has a great deal of additional information. In this question, we will explore the predictors of sole being found in the estuary.
+
+### Activity
+
+Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
+
+```{r}
+# FIXME
+M <- read_excel("../data/Sole.xlsx")
+M <- M %>% mutate(season = factor(season),
+                  month = factor(month),
+                  area = factor(area),
+                  Solea_solea = factor(Solea_solea))
+M <- M %>% as.data.frame()
+str(M)
+```
+
+Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
+
+```{r}
+# FIXME
+M %>% group_by(season, area) %>% tally()
+```
+
+If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary.
+
+Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
+
+```{r}
+# FIXME
+fm <- glm(Solea_solea ~ season + area, data = M,
+          family = "binomial")
+```
+
+Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
+
+```{r}
+# FIXME
+Anova(fm, type = "III")
+```
+
+Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
+
+> Only area is a good predictor (P = 0.0001).
+
+Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
+
+```{r}
+# FIXME
+logistic.display(fm)
+```
+
+See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
+
+> Adjusted odds ratio for season isn't significant (i.e., after setting area to 0), with a CI that crosses 1. Each area is compared to area 1, and all are significantly different from one another. It seems reasonable to conclude that there is considerable variation in the presence/absence of sole among the four areas. This is actullay bad, because area to area variation is higher than seasonal variation. There appears to be substantial geographic heterogeneity in sole presence.
+
+## Neandertal Brains
+
+There are well-known differences in both body size between modern humans and Neanderthals. But are there differences in brain size as well, adjusted for body size. Ruff and colleagues (1997) tried to answer just that question.^[Ruff, C.B., E. Trinkaus, and T.W. Holliday. 1997. Body mass and encephalization in Pleistocene _Homo_. _Nature_ 387: 173-176.]
+
+### Activity
+
+The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log brain size, and `Species`. Load the file, and convert `Species` to a factor.
+
+```{r}
+# FIXME
+M <- read_csv("../data/NeandertalBrainSize.csv") %>% 
+  mutate(Species = fct_relevel(Species, "Recent"))
+```
+
+Make a scatterplot of brain size vs. body mass, with points colored by species. See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner.
+
+```{r}
+# FIXME
+M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+  geom_point(size = 2) +
+  scale_color_d3() +
+  theme(legend.position = c(0.75, 0.12),
+        legend.background = element_rect(size = 0.5,
+                                         color = "black",
+                                         linetype = "solid")) +
+  labs(x = "ln Body Mass", y = "ln Brain Size")
+```
+
+Fit and save three linear models:
+
+1. Brain size modeled by body mass
+2. Brain size modeled by body mass and species (additive)
+3. Brain size modeled by body mass and species with the mass X species interaction
+
+```{r}
+# FIXME
+fm1 <- lm(ln_Brain ~ ln_Mass, M)
+fm2 <- lm(ln_Brain ~ ln_Mass + Species, M)
+fm3 <- lm(ln_Brain ~ ln_Mass * Species, M)
+```
+
+Use the `lrtest()` function from the `lmtest` package to perform a likelihood ratio test on the three models.
+
+```{r}
+# FIXME
+lmtest::lrtest(fm1, fm2, fm3)
+```
+
+What is your interpretation of the likelihood ratio test?
+
+> The additive model is significantly better than then mass only model. The interaction is not significantly better.
+
+Use the `aictab()` function from the `AICcmodavg` package to compare AICc for the three models.
+
+```{r}
+# FIXME
+library(AICcmodavg)
+aictab(list(fm1, fm2, fm3))
+```
+
+What is your interpretation of the results?
+
+> The additive and interaction models are both well supported. 61% of the Akaike weight is on the additive model, and 30% on the interaction model. They both deserve discussion
+
+In lecture, we wrote out own code to do cross-validation. In practice, you would use code from others to automate this process, which is more general than any specific code you would write. A good package for cross-validation is `cvTools`. Install this package.
+
+The function `cvFit()` performs cross-validation on a variety of R objects, including `lm()`. Look at the help for `cvFit()`. Running cross-validation is simple.
+
+`cvFit(fm1, data = M, y = M$ln_Brain, K = 10, R = 100)`
+
+The basic parts are a fitted model (`fm1`), a source for the data, the ID of the `y` variable. Optionally, you can supply the number of `K` folds (default is 5 fold) and the number of replicates `R`. Increasing the number of replicates is important to get a more accurate estimate for the error.
+
+Run 10-fold cross-validation on the three models with 100 replicates of each.
+
+```{r}
+# FIXME
+cvFit(fm1, data = M, y = M$ln_Brain, K = 10, R = 100)
+cvFit(fm2, data = M, y = M$ln_Brain, K = 10, R = 100)
+cvFit(fm3, data = M, y = M$ln_Brain, K = 10, R = 100)
+```
+
+What do the results indicate? Which model has the lowest error?
+
+> The additive model has the lowest error (0.071) relative to the other models (0.073).

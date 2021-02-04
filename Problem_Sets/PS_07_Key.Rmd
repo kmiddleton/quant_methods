@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 07'
+title: 'Problem Set 06'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -19,413 +19,292 @@ library(cowplot)
 library(knitr)
 ```
 
-## Variation Within and Between Groups
-
-In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`, as well as some `apply` relatives in the `tidyverse` that take some of the difficulty from apply functions across R structures.
-
-Let's start with `apply()`. `apply()` is part of a family of base-R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
-
-```{r}
-ap.test <- tibble(x1 = seq(1, 10),
-                  x2 = rep(5, 10),
-                  x3 = seq(20, 65, length.out = 10))
-
-# Built in R funtions
-(max.ap.row <- apply(ap.test, 1, max))
-
-(max.ap.col <- apply(ap.test, 2, max))
-
-(mean.ap.row <- apply(ap.test, 1, mean)) # == rowMeans()
-
-(mean.ap.col <- apply(ap.test, 2, mean)) # == colMeans()
-
-# Anonymous function in the apply().
-(ss <- apply(ap.test, 1, function(x) (x[1] * x[2]) / x[3]))
-```
-
-The `tidyverse` has a family of `map` and `pmap` functions that alleviate some of the difficulty in programming with apply, especially when you are trying to pass multiple values to a function (as in the last example above with `x[1]`, `x[2]`, and `x[3]`). `map()` and relatives (e.g., `map_dbl()` which converts the returned values to a numeric vector [whereas `map()` by default returns a list]) are not as useful to us right now. We will instead focus on the `map2` functions that operate across `data.frame`s or `tibble`s.
-
-`pmap()` (for "parallel" `map`) passes the entire row of a `data.frame` to a function. By default, it returns a list. However, `pmap_dbl()` expects a numeric vector to be returned from the function, and `pmap_dfr()` expects a `data.frame`.
-
-We will use our example `ap.test` from above.
-
-```{r}
-# Convert anonymous function into a standalone function 
-myfun <- function(x1, x2, x3) (x1 * x2) / x3
-
-pmap_dbl(ap.test, myfun) # Note that this is the same as above
-```
-
-One nice thing about `pmap` is that it will figure out the correct order for passing variables to the function. If we reorder the columns, they are still correctly interpreted by the function. Doing the same would give the wrong answer for `apply()`.
-
-```{r}
-ap.test.reorder <- ap.test[, c(3, 2, 1)]
-pmap_dbl(ap.test.reorder, myfun) # Note that this is the same as above
-```
-
-Another nice feature of `pmap()` is that it offers some protection from passing the wrong column names to the function. The following code would fail, because the function expects "x1", "x2", and "x3".
-
-```{r, eval=FALSE}
-names(ap.test.rename) <- c("y1", "y2", "y3")
-pmap_dbl(ap.test.rename, myfun) # Fails with an error
-```
-
-`pmap()` will work with anonymous functions, just like `apply`. This can be handy if your function is quick and/or you want to just append the calculated value onto the existing object.
-
-```{r}
-pmap_dbl(ap.test, function(x1, x2, x3) (x1 * x2) / x3)
-
-# Note the . below in pmap_dbl, to indicate ap.test should be passed to
-# the function
-ap.test <- ap.test %>% 
-  mutate(x4 = pmap_dbl(., function(x1, x2, x3) (x1 * x2) / x3))
-
-ap.test
-```
-
-### Activity
-
-Now let's try our simulation. We will simulate two groups that have different means (the true means are different) but change the variance and see how F is affected. Here is the pseudocode:
-
-1) Write a function called `getF`. (hint: try getting this to work for one set of values before making it a function)
-
-    - Pass the function the following: mean for group 1 (`mu1`), mean for group 2 (`mu2`), a single standard deviation for both groups (`sd_both`), a single number of observations in the groups (`nobs`).
-    - Inside the function, create a `data.frame` with two columns: `y` and `x`. `x` is the group id (repeat 1 and 2 each for the number of observations). `y` is the outcome. Pull values for the number of observations from a normal distribution with the mean for each group, the standard deviation. Fit a linear model and then ANOVA using `anova(lm())` and assign this to an object named `aa`.
-    - Look at the structure of `aa`. Try to figure out how to extract just the F-value from this object.
-    - Set up the function to return the F-value
-    - Test out your function to see that it works.
-
-```{r}
-# FIXME
-set.seed(2351222)
-
-# Step 1
-getF <- function(mu1, mu2, sd_both, nobs) {
-  x <- factor(rep(c(1, 2), each = nobs))
-  y1 <- rnorm(nobs, mu1, sd_both)
-  y2 <- rnorm(nobs, mu2, sd_both)
-  y <- c(y1, y2)
-  M <- data.frame(x, y)
-  fm <- anova(lm(y ~ x, data = M))
-  F_val <- fm$"F value"[1]
-  return(F_val)
-}
-getF(mu1 = 0, mu2 = 1, sd_both = 1, nobs = 100)
-```
-
-2) Set up a `data.frame()` or `tibble()` with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).
-
-```{r}
-# Step 2
-sds <- seq(1, 5, by = 0.25)
-sims <- data.frame(
-  sd_both = sds,
-  mu1 = rep(0, length = length(sds)),
-  mu2 = rep(1, length = length(sds)),
-  nobs = rep(100, length = length(sds))
+```{r echo=FALSE, eval=FALSE}
+# Generate data for question 1.
+# P = 0.0495
+n <- 15
+set.seed(1064)
+M1 <- tibble(
+  Proportion_Surviving = c(rnorm(n, 0.28, 0.07),
+                           rnorm(n, 0.242, 0.07)),
+  Trout = factor(rep(c("Absent", "Present"), each = n))
 )
-```
+write_csv(M1, path = "../data/BrookTrout1.csv")
 
-3) Use `pmap_dbl()` to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful not to have any extra column names other than the ones that `getF()` is expecting.
-
-```{r}
-# Step 3
-Fs <- pmap_dbl(sims, getF)
-sims$Fs <- Fs
-```
-
-4) Plot the $F$-statistic vs. the standard deviation. Add a horizontal line at the critical value for an $\alpha$ of 0.05.
-
-```{r}
-# Step 4
-fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
-
-ggplot(sims, aes(x = sds, y = Fs)) +
-  geom_point() +
-  geom_hline(yintercept = fcrit, color = 'coral')
-```
-
-5) There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Make a copy of your function (call it `getF2`) and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value. Then plot as above.
-
-```{r}
-# Step 5
-
-getF2 <- function(mu1, mu2, sd_both, nobs) {
-  niter <- 100
-  Fs <- numeric(length = niter)
-  for (ii in 1:niter) {
-    x <- factor(rep(c(1, 2), each = nobs))
-    y1 <- rnorm(nobs, mu1, sd_both)
-    y2 <- rnorm(nobs, mu2, sd_both)
-    y <- c(y1, y2)
-    M <- data.frame(x, y)
-    fm <- anova(lm(y ~ x, data = M))
-    Fs[ii] <- fm$"F value"[1]
-  }
-  return(mean(Fs))
-}
-
-# Start over with a new copy of sims
-sims <- data.frame(
-  sd_both = sds,
-  mu1 = rep(0, length = length(sds)),
-  mu2 = rep(1, length = length(sds)),
-  nobs = rep(100, length = length(sds))
-)
-
-sims <- sims %>% 
-  mutate(Fs = pmap_dbl(sims, getF2))
-
-fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
-
-ggplot(sims, aes(x = sds, y = Fs)) +
-  geom_point() +
-  geom_hline(yintercept = fcrit, color = 'coral')
-```
-
-What do you observe in the plot?
-
-> As the standard deviation increases, the $F$-statistic decreases.
-
-Think of all the variables in this simulation. Which should be altered to change the within-group variance, and which to change the between-group variance?
-
-> Within-group variance == standard deviation (what we have done here). Between-group variance == mean value for each group.
-
-What do you think is the lower limit of $F$ (i.e., if you increased the standard deviation difference to a very large number)?
-
-> $F$ asymptotes at 0.
-
-## Predicting height from limb lengths
-
-```{r}
-# FIXME
-# Simulate data
-set.seed(921)
-N <- 100
-height <- rnorm(N, 175, 2)
-limb_prop <- runif(N, 0.4, 0.5)
-left_limb <- limb_prop * height + rnorm(N, 0, 0.02)
-right_limb <- limb_prop * height + rnorm(N, 0, 0.02)
-M <- data.frame(height, left_limb, right_limb)
-# write_csv(round(M, 1), "../data/Limb_Lengths.csv")
-```
-
-We should be able to predict someone's height from the lengths of their limbs. The file `Limb_Lengths.csv` contains data for 100 heights and associated left and right limb lengths. We know that limb length is about 40-50% of total height, but we can develop a linear model for prediction.
-
-### Activity
-
-Load the data for limb lengths. Use `summarize_all()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
-
-```{r}
-# FIXME
-M <- read_csv("../data/Limb_Lengths.csv")
-M %>% head()
-M %>% summarize_all(.funs = c("mean", "sd"))
-```
-
-Make two plots, one for left limb length vs. height and one for right limb length vs. height. Use `plot_grid()` to put them side by side.
-
-```{r echo=FALSE}
-# FIXME
-p1 <- ggplot(M, aes(left_limb, height)) + geom_point() +
-  labs(x = "Limb Length (cm)", y = "Height (cm)") +
-  ggtitle("Left Limb")
-p2 <- ggplot(M, aes(right_limb, height)) + geom_point() +
-  labs(x = "Limb Length (cm)", y = "Height (cm)") +
-  ggtitle("Right Limb")
-plot_grid(p1, p2, ncol = 2)
-```
-
-Fit a single linear model in which height is predicted by both left and right limb lengths (this is an "additive" model). Print out the summary of the model.
-
-```{r}
-# FIXME
-fm_LR <- lm(height ~ left_limb + right_limb, data = M)
-summary(fm_LR)
-```
-
-Explain the results that you find. Why do you think that neither left nor right limb length is a good predictor of height in the model you fit?
-
-```{r}
-# FIXME
-cor(M$left_limb, M$right_limb)
-```
-
-> When we fit a model that includes both limb lengths, there is severe multicollinearity. Separately each is probably a good predictor, but together, they are not good. The correlation between them is > 0.99.
-
-Fit separate linear models in which height is predicted by left and then right limb length.
-
-```{r}
-# FIXME
-fm_L <- lm(height ~ left_limb, data = M)
-summary(fm_L)
-fm_R <- lm(height ~ right_limb, data = M)
-summary(fm_R)
-```
-
-Do these models make more sense?
-
-> Yes, for each limb length is a significant predictor of height. This result is what we expect to see.
-
-## Heart Transplant Survivorship
-
-The data in `Heart_Transplants.xlsx` contains data on survivorship (in days; `Survival_Days`) for three groups of heart transplant patients. Patients were groups by the severity of the mismatch between donor and recipient (`Mismatch_Degree`): `Low`, `Medium`, and `High`. A low mismatch means a *good* match.
-
-### Activity
-
-Load the data from the Excel file and look at the structure with either `str()` or `glimpse()` (from tidyverse).
-
-```{r}
-# FIXME
-M <- read_excel("../data/Heart_Transplants.xlsx")
-str(M)
-```
-
-Notice that `Mismatch_Degree` is currently a character vector. To use it in a linear model, we need to convert it to a factor. We could do this with R's built-in function `factor()`. The drawback is that, by default, `factor()` will order the factors in alphabetical order. For these data, the alphabetical order will put the `High` mismatch first, which is not ideal. We want to have `Low` come first.
-
-[`forcats`](https://forcats.tidyverse.org/) is a package that greatly simplifies working with factors in R. It has functions to create factors in the order that they appear in the data.frame, in the order of frequency, and in any arbitrary order. `forcats` is built into the tidyverse, so you do not need to load it separately.
-
-Because the data or organized so that the `Low` group is first, we can use `fct_inorder()` to make the factor in the sequence that we want.
-
-Use `mutate()` and `fct_inorder()` to make `Mismatch_Degree` into a factor.
-
-```{r}
-# FIXME
-M <- M %>%
-  mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
-```
-
-There are only 39 observations total, so we may as well plot the raw data. Modify the code from the last two problem sets for plotting the points with the group means and standard errors.
-
-```{r}
-ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
+ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
   stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
-  labs(x = "Mismatch Degree", y = "Survival (days)")
+  labs(x = "Trout", y = "Survival", title = "BrookTrout1")
+
+summary(lm(Proportion_Surviving ~ Trout, M1))
+
+# P = 0.0536
+n <- 15
+set.seed(1064)
+M2 <- tibble(
+  Proportion_Surviving = c(rnorm(n, 0.282, 0.07),
+                           rnorm(n, 0.245, 0.07)),
+  Trout = factor(rep(c("Absent", "Present"), each = n))
+)
+write_csv(M2, path = "../data/BrookTrout2.csv")
+
+ggplot(M2, aes(x = Trout, y = Proportion_Surviving)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Trout", y = "Survival", title = "BrookTrout2")
+
+summary(lm(Proportion_Surviving ~ Trout, M2))
 ```
 
-Describe what you see in the plots. You would like to be able to use a linear model (ANOVA) to compare the mean survival days between groups. In what way does the data not appear to satisfy the assumptions of ANOVA?
+## Brook trout
 
-> The good and medium quality match groups are strongly right skewed. One of the assumptions of ANOVA is equal variance across the groups. We could explicitly thest this assuption, but there isn't any reason to. The test will be significant for inequality. So we should just transform and go from there.
+You and a collaborator are studying the role of an introduced species (brook trout, *Salvelinus fontinalis*) on survival of native Chinook salmon (*Oncorhynchus tshawytscha*). Because you are located at different universities, you each have a different set of streams to sample. Independently, each of you measures survivorship of Chinook salmon in 15 streams that have introduced brook trout and in 15 streams that are free of brook trout. To estimate survivorship (percent alive), you released an equal number of tagged juvenile Chinook salmon into each stream and then resampled over the course of a year.
 
-Find a transformation of `Survival_Days` that corrects the problems observed above. Plot your data each time with the transform. Briefly explain why you chose what you chose.
+The two data files are:
 
-```{r}
-# FIXME
-M <- M %>% mutate(log_Survival = log(Survival_Days))
-ggplot(M, aes(x = Mismatch_Degree, y = log_Survival)) +
-  geom_point(position = position_jitter(width = 0.1)) +
-  xlab("Mismatch Degree") +
-  ylab("log Survival (d)")
-```
-
-> To handle the right skew, we tried square-root first. It didn't rein in the large values enough. log (here, natural), seems to do the trick. The variances look pretty similar.
-
-Using `lm()`, fit a linear model in which transformed survival is modeled by the degree of mismatch. Save this to an object. Use `anova()` on that object to get the ANOVA table for the model you just fit.
-
-```{r}
-# FIXME
-fm <- lm(log_Survival ~ Mismatch_Degree, data = M)
-anova(fm)
-summary(fm)
-```
-
-What do the results of this linear model show?
-
-> Log-transformed survival (days) is not significantly different in the the three groups.
-
-Fit another linear model just like the one above, but remove the intercept term by including `- 1` in the model: `lm(... ~ ... - 1)`. Compare the `summary()` of this model to the group means for each `Mismatch_Degree` (using `group_by()` and `summarize()`).
-
-```{r}
-fm2 <- lm(log_Survival ~ Mismatch_Degree - 1, data = M)
-anova(fm2)
-summary(fm2)
-
-M %>% group_by(Mismatch_Degree) %>%
-  summarize(mean_survival = mean(log_Survival))
-```
-
-What does removing the intercept term from an ANOVA linear model do?
-
-> It forces R to estimate separate means for each group separately. This can be a useful technique.
-
-## Bird abundance
-
-The file `Birds.xlsx` contains data from Vuilleumier, F. (1970) Insular Biogeography in Continental Regions. I. The Northern Andes of South America. *American Naturalist* 104:373-388.
-
-This paper explores the numbers of bird species in isolated "islands" of paramo vegetation in the Andes. The Missouri Botanical Garden can explain it better than we can (http://bit.ly/1PNWfsq):
-
-> Within the tropical regions of Mexico, Central and South America, Africa, Malesia including New Guinea, and Hawaii, there is a vegetation type that occurs between the upper limit of continuous, closed-canopy forest (i.e., forest line or timberline) and the upper limit of plant life (i.e., snow line) that is characterized by tussock grasses, large rosette plants, shrubs with evergreen, coriaceous and sclerophyllous leaves, and cushion plants.  This vegetation type is scattered along the crests of the highest mountain ranges or on isolated mountaintops between about 3000 meters (m) and 5000 m, like islands in a sea of forest.
-
-We would like to use these data to see what the best predictor(s) of bird abundance is/are. The data contain species abundance (`N_Species`) and geographical information for 14 "islands". Other data include:
-
-1. `Area`: "Island" size (thousands of square km)
-1. `Elevation`: Elevation (thousands of meters)
-1. `Dist_to_Ecuador`: Distance to Ecuador (km)
-1. `Dist_to_Island`: Distance to nearest island (km)
+1. Your data: `BrookTrout1.csv`
+2. You collaborator's data: `BrookTrout2.csv`
 
 ### Activity
 
-We will use multiple regression to find the relative importance of each of these variables in predicting species abundance.
-
-Start by loading the data and plotting histograms of the variables. You can make 5 different plots. Think about any variables that might need transformation. There are only 14 observations, so it's going to be hard to discern normality. Here you are just looking for really obviously right or left skewed distributions.
-
-```{r message=FALSE}
-# FIXME
-M <- read_excel("../data/Birds.xlsx")
-ggplot(M, aes(x = N_Species)) + geom_histogram()
-ggplot(M, aes(x = Area)) + geom_histogram()
-ggplot(M, aes(x = Elevation)) + geom_histogram()
-ggplot(M, aes(x = Dist_to_Ecuador)) + geom_histogram()
-ggplot(M, aes(x = Dist_to_Island)) + geom_histogram()
-```
-
-Describe any patterns you see in the raw data.
-
-> Area might be right skewed, but there really isn't any way to tell for certain with so few observations. We could do some kind of normality test, but it would be terribly underpowered and thus not terribly informative. Square-root transforming area doesn't appear to do much. Let's just use the data as is, aware that we'll have trouble drawing meaningful conclusions.
-
-> We will tackle this same problem later in the course and explore ways to deal with the small sample size.
-
-When you have multivariate data like this, it's usually a good idea to look at all the pairwise correlations between variables. You can do this with `cor()`. If you have a data.frame called `M` and data in columns 2 to 5, `print(cor(M[, 2:6]), digits = 3)` will give the correlation table. Wrapping the call to `cor()` in `print()` with `digits = 3` just make R print fewer digits.
-
-Insert a code chunk below and calculate the correlation table for the numeric variables.
+Load each of the files into R.
 
 ```{r}
 # FIXME
-print(cor(M[, 2:6]), digits = 3)
+BT1 <- read_csv("../data/BrookTrout1.csv")
+BT2 <- read_csv("../data/BrookTrout2.csv")
 ```
 
-What patterns do you see in the correlations? Note that 1's run along the diagonal (a variable correlated to itself is 1), and that the upper and lower triangles are symmetrical. Also note that you haven't done any tests of significance, so you can't say anything definitive about "significant correlations".
+Make a plot of each data set using the same ggplot code you used to visualized the stalk-eyed fly data in Problem Set 5. Plot the raw data (points) for the two groups (trout `Absent` and `Present`). For the points, include jitter and transparency. Include means and standard errors plotted in a different color.
 
-> There are both positive and negative correlations. Some are moderately large ($\pm0.5-0.7$) and some are quite small (distance to the nearest island and elevation). Nothing really stands out good or bad.
+Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plot 2). Then use the `plot_grid()` function in the `cowplot` package to stack the two plots on top of one another. You code for the last step will look something like: `plot_grid(p1, p2, nrow = 2)`. If you used `ncol = 2` instead, you would get plots side by side.
 
-Fit a linear model wherein species abundance is predicted by the other four variables. Save this model to an R object.
+`plot_grid()` is a really handy function for combining different ggplots into a single figure. It has facilities for adding labels ("a.", "b.", etc.), changing the spacing between plots, and much more. For us, it is indispensable for making publication-ready figures.
 
 ```{r}
 # FIXME
-fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
-         data = M)
+p1 <- ggplot(BT1, aes(x = Trout, y = Proportion_Surviving)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Trout", y = "Survival", title = "My Data")
+p2 <- ggplot(BT2, aes(x = Trout, y = Proportion_Surviving)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Trout", y = "Survival", title = "My Collaborator's Data")
+
+plot_grid(p1, p2, nrow = 2)
 ```
 
-Use `summary()` to get information about the model fit.
+Considering the plot you just made, do you think that mean survivorship is significantly different in the Absent/Present treatment groups? Do you think that the two sets of data are different from one another?
+
+> There is much variability, but survival does appear to be higher in the trout absent treatment group. The SEMs don't overlap it seems. There might be a significant different between treatments. The patterns look the same across locations.
+
+First, fit a linear model to **your data** (from `BrookTrout1.csv`), in which the proportion of salmon surviving is modeled by presence or absence of trout. Print out the `summary()` of this linear model.
 
 ```{r}
 # FIXME
-summary(fm)
+fm1 <- lm(Proportion_Surviving ~ Trout, BT1)
+summary(fm1)
 ```
 
-R^2^ is a measure of how much of the variation in the outcome variable (`N_Species`) is explained by the predictors. R^2^ for linear models in R is "Multiple R-squared" (ignore "Adjusted R-squared") in the summary.
+How do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
 
-What is the R^2^ for the regression model?
+> At $\alpha = 0.05$, there is a significant difference between the groups with lower salmon survivorship in the presence of trout (mean difference = 0.055; P = 0.0495).
 
-> *R*^2^ = 0.73
+Now fit the same model to your **collaborator's data** (from `BrookTrout2.csv`).
 
-Overall, are the four variables able to predict species abundance in combination (overall ANOVA)?
+```{r}
+# FIXME
+fm2 <- lm(Proportion_Surviving ~ Trout, BT2)
+summary(fm2)
+```
 
-> Yes, the overall ANOVA for the linear model is *F*~4,9~ = 6.1 and *P* = 0.011. So the combination of these four variables is able to predict species abundance.
+What do you conclude about your collaborator's data?
 
-What variable or variables are significantly different from 0? Does species abundance increase or decrease with a one unit increase in this/these variable(s)?
+> $P = 0.054$ here. So we conclude, based on $\alpha = 0.05$, that there is not a significant difference in means.
 
-> The only significant predictor is distance to Ecuador: *P* = 0.01. As distance to Ecuador increases, species abundance decreases. For each 1 km farther from Ecuador, species abundance drops by 0.02 species.
+How do you feel about the results of these two studies?
+
+> They are nearly identical, but the arbitrarily chosen $\alpha$ level comes to two different conclusions.
+
+Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the aggregate data, which might look something like this table:
+
+```{r echo=FALSE}
+M <- tibble(Survival = c("Survived", "Did not survive"),
+            `Trout absent` = c(946, 3470),
+            `Trout present` = c(919, 3876))
+knitr::kable(M)
+```
+
+Why is this test not advisable in this case?
+
+> The observations (whether an individual salmon juvenile was alive or not) are not independent of one another, streams add a level of structure to the data (all salmon in a stream are more likely to have the same survival probability).
+
+## Exact confidence intervals
+
+We ultimately want to calculate exact confidence intervals for the proportion surviving in your data. First, we want to explore the adjustment for degrees of freedom (the critical *t*-value). Originally, we showed you how to calculate the approximate CI, using twice the standard error of the mean. Using 2 will result in too narrow CIs for small degrees of freedom and too wide CIs for large degrees of freedom.
+
+### Activity
+
+Make a plot of the critical value for a *t*-distribution for the 0.975 quantile (upper tail of 2.5%) where the degrees of freedom ranges from 2 to 100. First set up the vector of degrees of freedom (don't call it df, because that is the name of an R function). Then calculate the critical values. Make a data.frame and plot the results. Then add a differently colored horizontal line at the critical value for the 0.975 quantile for a standard normal distribution. Note that the critical value approaches the asymptotic limit as the degrees of freedom increases.
+
+```{r}
+# FIXME
+CVs <- tibble(dfs = seq(2, 100, by = 1),
+                  crit_vals = qt(0.975, df = dfs,
+                                 lower.tail = TRUE))
+
+CVs %>%
+  ggplot(aes(dfs, crit_vals)) +
+  geom_line() +
+  geom_hline(yintercept = qnorm(0.025, lower.tail = FALSE),
+             color = "blue") +
+  labs(x = "Degrees of Freedom", y = "Critical value (0.975)")
+```
+
+Now calculate the exact 95% confidence intervals for the two groups in your data (from `BrookTrout1.csv`). Either pull the critical value from your data.frame or just calculate anew.
+
+```{r}
+# Let's just adapt the approximate CI function from
+# Problem Set 5. We will make it a little more flexible
+# by allowing us to specify the desired interval with
+# `prob`. Default to 95% CI.
+SEM <- function(x) return(sd(x) / sqrt(length(x)))
+
+exact_CI <- function(x, prob = 0.95) {
+  t_crit <- qt((1 - prob) / 2,
+               df = length(x) - 1,
+               lower.tail = FALSE)
+  Upper <- mean(x) + t_crit * SEM(x)
+  Lower <- mean(x) - t_crit * SEM(x)
+  return(tibble(Lower, Mean = mean(x), Upper))
+}
+
+CIs <- BT1 %>%
+  group_by(Trout) %>%
+  do(exact_CI(.$Proportion_Surviving))
+
+knitr::kable(CIs)
+```
+
+## Working with lists
+
+Lists are one of the most flexible data structures in R. They can hold any combination of other types of R objects (including other lists). R functions like `lm()` return lists.^[R functions can only return a single object (unlike languages like python and MATLAB, which can return multiple objects). So everything that needs to be returned from a function is placed into a list, which gets returned.]
+
+Lists are indexed a little differently from vectors and matrices. List indices are indexed using double brackets: `[[1]]` extracts (or assigns) the first element. Run the following code:
+
+```{r}
+mylist <- list()
+mylist[[3]] <- 24
+mylist
+```
+
+We first create an empty list, using the `list()` function. The second line assigns 24 to the 3rd element. When we print the list (last line), you can see that the 1st and 2nd elements are created and left as `NULL`. Managing lists can be harrowing:
+
+```{r}
+mylist[[1]] <- "hello world"
+mylist[[2]] <- list(x = 12, y = "y", z = seq(1, 5, by = 0.2))
+mylist
+```
+
+Now the 1st element has a string, the 2nd has a list (which itself contains a numeric, a string, and a vector). How would you extract the 3rd element from the `z` vector?
+
+```{r}
+mylist[[2]]$z[3]
+```
+
+We will use lists in a much less convoluted way, which is what you should do until you get comfortable. For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
+
+### Activity
+
+The file `mammals.xlsx` contains data for about 50 different traits. *All* 5416 species of mammals are included in the file, though none has data for all traits. We want to make some quick plots of four different traits plotted against body mass.
+
+Rather than creating separate plots, we want to make them inside a loop, where we iterate through the columns of interest. This will make it easy to modify the format of the plots all at once, reducing the amount of code to keep up with. For example, change all the points to be transparent in one line rather than in four places.
+
+1. Load the data from `mammals.xlsx`.
+2. Create a column that holds the log10 transformation of `adult_body_mass_g` and one for the log10 of `basal_met_rate_m_l_o2hr`.
+3. Create a vector of strings that we will use to iterate through the columns for analysis (we used `cols_analyze`). It should contain the following strings:
+    - "ageat_eye_opening_d"
+    - "log_BMR" (or whatever you called the log10 of `basal_met_rate_m_l_o2hr`)
+    - "gestation_len_d"
+    - "litter_size"
+4. Create a vector of strings to use for the y axis labels. Make sure that the order matches the order in your vector #3.
+5. Create an empty list to hold plots: `pp <- list()` for example.
+
+This is all we need for the setup. At this point, you have the data, two vectors (one of columns names and one of y axis labels), and an empty list.
+
+```{r warning=FALSE}
+# FIXME
+M <- read_excel("../data/mammals.xlsx", na = "NA") %>%
+  mutate(log_Mass = log10(adult_body_mass_g),
+         log_BMR = log10(basal_met_rate_m_l_o2hr))
+
+cols_analyze <- c("ageat_eye_opening_d",
+                  "log_BMR",
+                  "gestation_len_d",
+                  "litter_size")
+
+axis_labels <- c("Age at Eye Opening",
+                 "log10 BMR",
+                 "Gestation Length",
+                 "Litter Size")
+
+pp <- list()
+```
+
+No we can work on a loop to iterate through the columns, making a plot for each column. Here is the pseudocode:
+
+1. Create the framework for a `for` loop.
+    - We want to iterate from 1 to `length(cols_analyze)`
+2. Extract the *i*th element of the columns to analyze vector. Assign to an object.
+3. Extract the *i*th element of the y axis label.
+4. Make a bivariate plot of the column vs. log Body Mass (assign to an object). This will look a little different from ggplots you have made before, particularly the aesthetics. Because you are supplying raw strings, you need to use `aes_string`. It will look something like (`col` is the variable that holds the string with the column name):
+    - `aes_string("log_Mass", col)`
+5. Assign the plot to the *i*th element of your list.
+
+```{r warning=FALSE}
+# FIXME
+for (ii in 1:length(cols_analyze)) {
+  col <- cols_analyze[ii]
+  lab <- axis_labels[ii]
+  p <- ggplot(M, aes_string("log_Mass", col)) +
+    geom_point(alpha = 0.5, size = 0.5) +
+    labs(x = "log10 Body Mass (g)", y = lab) +
+    theme(axis.text = element_text(size = 10),
+          axis.title = element_text(size = 10))
+  pp[[ii]] <- p
+}
+```
+
+At the end of the loop you will have a list that contains 4 plots. Try printing a plot by running `pp[[1]]` at the command line. If you get warnings saying something like `Removed 4948 rows containing missing values (geom_point).`, that is just ggplot saying that there are `NA`s in the data.
+
+Now you can make a 2x2 grid of plots. The cowplot function `plot_grid()` can take a list of plots as an argument: `plotlist = ...`. Pass your list of plots, and specify 2 columns and 2 rows (check the help for `plot_grid()`).
+
+```{r warning=FALSE}
+# FIXME
+plot_grid(plotlist = pp, ncol = 2, nrow = 2,
+          labels = c("a", "b", "c", "d"))
+```
+
+Now you can fine tune the plots:
+
+- Add labels for x and y. The y label is the string you extracted from your vector of y axis labels.
+- Make the points smaller (`size = 0.5`) and transparent
+- Change the font size on the axis labels by adding the following code to your ggplot:
+
+```
++ theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10))
+```
+
+- Pass the argument `labels = c("a", "b", "c", "d")` to `plot_grid()` to add labels for each plot.
+
+As you can see rather than sequentially editing 4 sets of code, trying to make sure they all stay in sync, we can just edit one plotting statement and change the data in each iteration.

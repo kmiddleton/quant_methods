@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 14'
+title: 'Problem Set 13'
 author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -9,145 +9,240 @@ output:
 ---
 
 ```{r setup, echo=TRUE, message=FALSE, warning=FALSE}
-
+library(tidyverse)
 ```
 
-## Planning experiments
+## Exploring PCA 
 
-Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
+The code below generates data from a multivariate normal distribution with a specified correlation coefficient (`rho`). You can specify means for the variables (`mu`), and their standard deviations `sigma`, as well as the number of points to generate (`n`). The function `mvrnorm()` generates the data, taking `n` and `Sigma` (the covariance matrix) as parameters. You should be able to follow the rest of the code. `mvrnorm()` returns a matrix, which, when converted to a `data.frame` gets variables `V1` and `V2`.
+
+```{r}
+set.seed(10)  # Set the random number generator seed
+rho <- 0.5    # Desired correlation coefficient
+mu <- c(0, 0) # Means for V1 and V2
+sigma <- 1    # Standard deviations of V1 and V2
+n <- 20       # Number of data points to simulate
+
+# Construct the covariance matrix
+Sigma <- matrix(c(sigma^2, rho*sigma^2, rho*sigma^2, sigma^2), 2)
+
+# Simulate the data
+x <- MASS::mvrnorm(n, mu, Sigma, empirical = TRUE)
+ggplot(as.data.frame(x), aes(V1, V2)) + geom_point()
+
+# Perform PCA
+# Because x is a matrix, we don't need a formula
+# Note center = TRUE is the default but scale. = TRUE is not
+# to make the results compatible with S. You should always 
+# use scale. = TRUE or manually scale your variables.
+z <- prcomp(x, center = TRUE, scale. = TRUE)
+summary(z)
+```
 
 ### Activity
 
-Use `cohen.ES()` to look up the effect size for a "small" effect for a *t*-test.
+Rerun the code above, changing different parameters as you go, to answer the following questions, which are designed to allow you to explore the relationship between data and PCA. You should be able to just change values and then execute the whole chunk.
 
-```{r}
-
-```
-
-Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
-
-```{r}
-
-```
-
-Repeat the test above but for a paired *t*-test.
-
-```{r}
-
-```
-
-Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
-
-```{r}
-
-```
-
-Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
-
-```{r}
-
-```
-
-## Calcium concentration in bird plasma
-
-The file `Bird_Plasma.xlsx` contains factorial data on blood plasma calcium concentration (`Calcium`, mg / 100 mL) in male and female birds (`Sex`) each of which was treated or not with a hormone (`Hormone`).
-
-### Activity
-
-Load the Excel file, and convert treatment and sex to factors.
-
-```{r}
-
-```
-
-Use `group_by()` and `tally()` to determine the sample size in each of the groups.
-
-```{r}
-
-```
-
-Assume that the researchers who carried out this study had performed a power analysis prior to collecting data. Calculate the minimum effect size for a main effect they could detect with their experimental design if they use an ANOVA to analyze the data. Assume that there are 4 groups and power is 0.80.
-
-```{r}
-
-```
-
-How do you interpret the minimum effect size that the researchers could detect at power of 0.8?
+Keeping `rho`, `sigma`, and `n` constant, how does changing `mu` influence the proportion of variance accounted for by `V1` and `V2`? Briefly explain.
 
 > 
 
+Keeping `rho`, `mu`, and `sigma` constant, how does changing `n` influence the proportion of variance accounted for by `V1` and `V2`? Briefly explain.
 
-## Power via simulation
+> 
 
-A more appropriate way to analyze the bird plasma data is to use a factorial ANOVA (both main effects and their interaction term). Imagine that you are planning just such an experiment:
+Keeping `rho`, `mu`, and `n` constant, how does changing `sigma` influence the proportion of variance accounted for by `V1` and `V2`? Briefly explain.
 
-- Two treatment groups which each have two levels (a 2 X 2 design)
-- n = 5 in each group
-- Your alpha will be 0.05
-- You are interested in detecting main effects and interactions (full factorial model)
+> 
 
-We will simulate data where the main effect of one term varies and the interaction effect varies, figure out the power across a range of different means, and make the assumption that within-group standard deviations are equal at 4 and the main effect of the other variable does not change (for now). We will build up this simulation in steps, first considering one parameter combination and one iteration before setting up the entire simulation.
+Keeping `mu`, `sigma`, and `n` constant, how does changing `rho` influence the proportion of variance accounted for by `V1` and `V2`? Be sure to explore the full possible range of `rho`. Briefly explain.
 
-a. Generate two vectors, which will represent the range of differences in treatment and the range of differences for the interaction. For now, test the sequence from -10 to 10, with a length of 10 (`length.out = 10`).
+> 
 
-The `tidyr` package, which is loaded with `tidyverse` has a handy function `crossing()`, which will expand vectors with all pairwise combinations into a `tibble`. Use this function to cross the vectors. You should have a 100 X 2 `tibble`.
+## Return of the Sole
 
-```{r}
-d_tx <- seq(-10, 10, length.out = 10)
-d_int <- seq(-10, 10, length.out = 10)
-ds <- crossing(d_tx, d_int)
-```
+In Week 8, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by different factors such as the salinity of the water and the season. This week we will focus on the composition of the substrate.  
 
-Use `mutate()` at add two additional `numeric()` columns, one each for the power to detect a treatment effect and the sex X treatment interaction.
+### Activity
 
-```{r}
-ds <- ds %>% 
-  mutate(pwr_tx = NA,
-         pwr_int = NA)
-```
-
-b. Let's start by considering a single parameter combination: the first row of your `tibble` from above. First we will calculate the means for the four groups defined by sex and treatment (you might call these `s0t0`, `s1t0`, `s0t1`, `s1t1`). Assign `s0t0` to have a mean of zero. Because we are focusing only on treatment, we will not simulate a main effect of sex so assign `s1t0` to also have a mean of zero. For the effect of treatment, because we are also simulating an interaction, we need to consider both when assigning the means. That is what an interaction is, the effect of one term is dependent on the state of the other. We will add the effect of the main effect and the interaction effect which will be conditional on sex. So, for `s0t1`, add the effect for treatment to 0.5 multiplied by the effect of the interaction. And for `s1t1`, add the effect for treatment to -0.5 multiplied by the effect of the interaction. This will create a set of means in which there is an overall main effect for treatment, no main effect for sex, and an interaction effect.
-
-Confirm this by calculating the values for your means.  
-
-```{r}
-s0t0 <- 0
-s1t0 <- 0
-s0t1 <- as.numeric(ds[1, "d_tx"]) + 0.5 * as.numeric(ds[1, "d_int"])
-s1t1 <- as.numeric(ds[1, "d_tx"]) + -0.5 * as.numeric(ds[1, "d_int"]) 
-c(s0t0, s1t0, s0t1, s1t1)
-```
-
-
-c. Now that you have code to assign the means for each group, we can move on to simulating one iteration for this parameter combination. We want to generate data for each group from a random normal distribution. All have the same standard deviation (4). Use the sample sizes for the groups defined above. Set up a `data.frame` with these data and labels for the groups (think about how `lm()` will need the data to be formatted). Then we will fit the ANOVA using `anova(lm())` and assign a TRUE/FALSE for the treatment term and interaction term that will tell us whether it is significant or not at our alpha level.  
-
-```{r}
-n <- 5
-sdd <- 4
-y_s0t0 <- rnorm(n, s0t0, sdd)
-y_s1t0 <- rnorm(n, s1t0, sdd)
-y_s0t1 <- rnorm(n, s0t1, sdd)
-y_s1t1 <- rnorm(n, s1t1, sdd)
-
-d <- data.frame(
-  Ca = c(y_s0t0, y_s1t0, y_s0t1, y_s1t1),
-  Sex = factor(c(rep(0:1, each = 5), rep(0:1, each = 5))),
-  Tx = factor(rep(0:1, each = 10))
-)
-```
-
-d. You now have all of the code you need to do the simulation. You just need to set it up with two loops. You want to loop through each of your parameter combinations. Then, for each combination, you want to loop through several iterations. First set this up with a small number of iterations. Then scale up to 1000.
-
-Use `Sys.time()` to get a sense for how long your program will run when you scale up. Start by assigning the output of `Sys.time()` to a variable before you loop starts (`t_start <- Sys.time()`). After your loop, subtract that from `Sys.time()` (e.g., `Sys.time() - t_start`).
-
-```{r}
-fm <- lm(Ca ~ Sex * Tx, data = d)
-```
-
-
-e. Now we want to visualize the results. Make separate plots of with your sets of differences for the treatment and for the interaction on the x and y axes. Color the points by the power associated with the treatment effect in the first plot and by the power associated with the interaction effect in the second. The output should look like a grid of points (one for each combination of values) that are color coded by power. This is a kind of manual heatmap.
+Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
 
 ```{r}
 
 ```
 
+The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent their proportional concentrations in the substrate (they sum to 100). Calculate a composite score for "substrate". Use principal components analysis on these columns.
+
+```{r}
+
+```
+
+Use the `summary()` and `print()` methods to determine the percent of variance accounted for by each PC and the relative loadings of each variable.
+
+```{r}
+
+```
+
+Fit a logistic regression where presence of sole is predicted by the first PC from the PCA above. Refer to the lecture slides if you need to.
+
+```{r}
+
+```
+
+Try to interpret the output of the summary of the fitted model from part d. Why kind of substrate do sole appear to prefer?
+
+```{r}
+
+```
+
+> 
+
+## Egyptian skulls
+
+The file `Egyptian_Skulls.xlsx` contains 4 measurements of 150 skulls from 5 time periods of Egypt from Thompson and Randall-Maciver (1905). Here is an image of the measurements that we found online (with typos):
+
+![](http://i.imgur.com/KrKDPGX.jpg)
+
+We will explore this data set and try to predict some of the measurements.
+
+Thompson, A. and Randall-Maciver, R. (1905) *Ancient races of the Thebaid: Being an Anthropometrical Study of the Inhabitants of Upper Egypt from the Earliest Prehistoric Times to the Mohammedan Conquest, Based Upon the Examination of Over 1,500 Crania*. Oxford University Press.
+
+### Activity
+
+Load the file. Convert `Time_Period` to a factor. Group by `Time_Period` and use `tally()` to confirm that there are 30 skulls per time period. Also, relevel the time periods so they go in chronological order (if you convert to factor with `forcats::fct_inorder()`, this will happen automagically).
+
+```{r}
+
+```
+
+Use MANOVA to predict `Maximum_Breadth`, `Basibregmatic_Height` `Basialveolar_Length`, and `Nasal_Height` from `Time_Period` using the `lm()` function (see the lecture notes). 
+
+```{r}
+
+```
+
+Generate the MANOVA table with `Anova()` using type III sums of squares.
+
+```{r}
+
+```
+
+What is your interpretation of the results of the MANOVA?
+
+> 
+
+We can also flip the analysis around and try to classify skulls by time period by their measurements. Use discriminant function analysis (linear discriminant analysis) to classify skulls by time period. See the lecture notes.
+
+```{r}
+
+```
+
+Calculate the percent correct classification for the DFA using the full dataset.
+
+```{r}
+
+```
+
+Generate the confusion matrix for the classification. Are there any patterns as to which time periods are best or worst predicted?
+
+```{r}
+
+```
+
+> 
+
+Now use the `CV=TRUE` option to perform leave-one-out cross validation (see the help for `lda()`). 
+
+```{r}
+
+```
+
+How does the percent correct compare to using the full data set to estimate this quantity? Explain why you observe a difference.
+
+> 
+
+## Pottery
+
+The file `pottery.xslx` contains data on the chemical composition (oxides) of 45 samples of Romano-British pottery as well as a column (`kiln`) to indicate the source of the pottery.
+
+A. Tubb and N. J. Parker and G. Nickless (1980), The analysis of Romano-British pottery by atomic absorption spectrophotometry. *Archaeometry*, 22, 153-171.
+
+### Activity
+
+Load the file `pottery.xslx` and check the structure, and create a new object having dropped the column `kiln`. This will leave you with 9 columns of data in your new object. We will return to the `data.frame` with `kiln` later.
+
+```{r}
+
+```
+
+Calculate the principal components using centered and scaled data.
+
+```{r}
+
+```
+
+Using the `summary()` output: (1) what percentage of the variance does PC1 account for? (2) What percentage of the variation do the first 5 PCs cumulatively account for?
+
+```{r}
+
+```
+
+> 
+
+Using the `print()` method for a `prcomp` object, (1) what variables load positively on PC1? (2) What variables load negatively on PC1? (3) What variables have minimal loading on PC1?
+
+```{r}
+
+```
+
+> 
+
+Make a biplot of PC2 vs. PC1. What variables have similar loadings on these two axes?
+
+```{r}
+
+```
+
+> 
+
+Return to the full dataset including the `kiln` column. Convert `kiln` to a factor.
+
+```{r}
+
+```
+
+Perform discriminant function analysis on the kiln column predicted by the first 9 variables. Calculate the percent correct classification for the full set (as above).
+
+```{r}
+
+```
+
+Calculate the confusion table for the classification.
+
+```{r}
+
+```
+
+Use the `CV = TRUE` option to perform cross validation and calculate the % correct and confusion table as in question 2, part h. 
+
+```{r}
+
+```
+
+A piece of pottery is found, but it's source is unknown. Chemical analysis reveals the following composition. Predict the source kiln it came from. Which kiln has the highest posterior probability? Use the `lda()` performed without `CV=TRUE` as that changes the structure of the output and won't work with `predict()`. 
+
+- Al2O3: 12.1
+- Fe2O3: 5.61
+- MgO: 5.55
+- CaO: 0.16
+- Na2O: 0.19
+- K2O: 4.45
+- TiO2: 0.71
+- MnO: 0.991
+- BaO: 0.016
+
+```{r}
+
+```
+
+> 

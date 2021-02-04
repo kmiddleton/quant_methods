@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 10'
+title: 'Problem Set 09'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -11,61 +11,210 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-
-# This option turn on cacheing of chunks. This will dramatically
-# speed up knitting, because only chunks that have changed will
-# be recompiled.
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
-## General Framework for This Week's Problem Set
+Some useful color palettes for ggplot: https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html
 
-This week we will approach hypothesis testing for several of the models we have fit previously with generalized linear models in a randomization framework. For each, you should:
+Try adding `scale_color_d3()`, `scale_color_aaas()`, and others to your ggplots.
 
-1. Fit the model to the observed data (feel free to copy your code from original problem set).
-1. Decide on a test statistic to use for the randomization.
-1. Perform the randomization:
-    1. Calculate the test statistic for the *observed* data
-    1. Randomly shuffle the observations
-    1. Calculate the test statistic for that group
-    1. Repeat thousands of times
-1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
-1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+## Nested Sites in Streams
 
-Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide. 
+Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the original file from Dryad.
 
-Remember to start with a small number of iterations (10 or 100) until you get the code working correctly. Then increase to 10,000 for a final analysis.
+Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8
 
-## Stalk-eyed flies (PS 05)
+### Activity
 
-Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
+Load the `TemperatureData` sheet from the `Streams.xlsx` file. Look at the structure of the file. You should have 5 columns: `Site`, `Date`, `AirTemp_observed`, `AirTempPredicted`, and `WaterTemp`. If you don't, then you probably did not load the correct sheet. Check the `read_excel()` help to see how to do this.
 
-## Earwigs (PS 05)
+```{r}
 
-In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
+```
 
-## Heart Transplant Survivorship (PS 07)
+Now load the `SiteData` sheet from the Excel file. It has four columns, including the mapping from `Stream_Name` to `Site`. We need to merge the two data.frames^[tibbles] together. Because they share a column `Site`, we can match rows, yielding a single data.frame.
 
-For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
+Base R has a `merge()` function, but it can be somewhat finicky. `tidyverse` has a complex set of functions for joining data.frames. The most useful are:
 
-## Bird abundance (PS 07)
+1. `inner_join()`: "return all rows from x where there are matching values in y, and all columns from x and y. If there are multiple matches between x and y, all combination of the matches are returned."
+2. `left_join()`: "return all rows from x, and all columns from x and y. Rows in x with no match in y will have NA values in the new columns. If there are multiple matches between x and y, all combinations of the matches are returned."
+3. `full_join()`: "return all rows and all columns from both x and y. Where there are not matching values, returns NA for the one missing."
 
-We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors. 
+`left_join()` the temperature data and the site data and assign to a new object. This will add the columns of one to the other, matching on `Site`. You should end up with a 3,744 x 8 tibble.
 
-There are four predictors, and you will have 5 randomization tests, though you will fit a single model with multiple predictors to obtain the test statistics for each:
+```{r}
 
-1. The overall multple regression (F-test)
-2. Area: "Island" size (thousands of square km)
-3. Elevation: Elevation (thousands of meters)
-4. Dist_to_Ecuador: Distance to Ecuador (km)
-5. Dist_to_Island: Distance to nearest island (km)
+```
 
-You should do the randomization and collect the output test statistics using just one loop.
+Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). Ultimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
 
-## Aspirin and cancer (PS 08)
+We then need to do one more thing: make a new variable that converts `Date` into a day number. We can do this with the function `as.numeric()`. Make a new variable `Day`, which is the numeric representation of `Date`. It will look something like: `mutate(Day = as.numeric(Date))`.
 
-In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
+```{r}
 
-## Correlation
+```
 
-Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
+Because not all observations have observed air temperature, first we should check for correlation between observed and predicted air temperatures. Calculate the correlation between the two. We could filter out missing data, but instead just provide the argument `use = "pairwise.complete.obs"` to `cor()`, which will tell the function to use only complete pairs for the calculation. If you find that the correlation is `NA`, that means R is using incomplete cases. Correlation with `NA`s is `NA`.
+
+```{r}
+
+```
+
+The correlation should be pretty high. So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete). Let's plot: make a line plot with day on the x axis and predicted air temp on the y axis. Then facet by `Stream_Name`.
+
+One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly.
+
+Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable.)
+
+```{r fig.height = 10}
+
+```
+
+What general patterns do you see, comparing the two plots?
+
+> 
+
+We want to fit two models to these data. In both models we want to model water temperature by predicted air temperature. The difference between the models will be in the random effects.
+
+We have an added wrinkle with these data that we have not yet encountered: nesting. Each site is only associated with one stream, so we need to tell R to only expect sites in some stream names. In an R formula, you can designate nesting using /. If B is nested in A, this would be coded as `A/B`.^[http://conjugateprior.org/2013/01/formulae-in-r-anova/ has a good overview of R's model formula.]
+
+1. Fit a model where the intercept for site nested in stream is random
+2. Fit a model where the intercept for site nested in stream is random and day is also included (as a continuous random predictor).
+
+Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood.
+
+```{r}
+
+```
+
+Looking at the `summary()` of each, you should see sections in the random effects for `Stream_Name` and `Site %in% Stream_Name`.
+
+Explain in non-mathematical words what the addition of day in the random effects part of the formula accomplishes.
+
+> 
+
+Load the `AICcmodavg` package and use the `aictab()` function to compare the two models you fit above.
+
+```{r}
+
+```
+
+Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the model comparison make sense in light of your understanding of the difference between the two models?
+
+> 
+
+```{r}
+
+```
+
+## Sole
+
+In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by the salinity of the water. That data set has a great deal of additional information. In this question, we will explore the predictors of sole being found in the estuary.
+
+### Activity
+
+Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
+
+```{r}
+
+```
+
+Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
+
+```{r}
+
+```
+
+If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary.
+
+Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
+
+```{r}
+
+```
+
+Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
+
+```{r}
+
+```
+
+Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
+
+> 
+
+Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
+
+```{r}
+
+```
+
+See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
+
+> 
+
+## Neandertal Brains
+
+There are well-known differences in both body size between modern humans and Neanderthals. But are there differences in brain size as well, adjusted for body size. Ruff and colleagues (1997) tried to answer just that question.^[Ruff, C.B., E. Trinkaus, and T.W. Holliday. 1997. Body mass and encephalization in Pleistocene _Homo_. _Nature_ 387: 173-176.]
+
+### Activity
+
+The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log brain size, and `Species`. Load the file, and convert `Species` to a factor.
+
+```{r}
+
+```
+
+Make a scatterplot of brain size vs. body mass, with points colored by species. See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner.
+
+```{r}
+
+```
+
+Fit and save three linear models:
+
+1. Brain size modeled by body mass
+2. Brain size modeled by body mass and species (additive)
+3. Brain size modeled by body mass and species with the mass X species interaction
+
+```{r}
+
+```
+
+Use the `lrtest()` function from the `lmtest` package to perform a likelihood ratio test on the three models.
+
+```{r}
+
+```
+
+What is your interpretation of the likelihood ratio test?
+
+> 
+
+Use the `aictab()` function from the `AICcmodavg` package to compare AICc for the three models.
+
+```{r}
+
+```
+
+What is your interpretation of the results?
+
+> 
+
+In lecture, we wrote out own code to do cross-validation. In practice, you would use code from others to automate this process, which is more general than any specific code you would write. A good package for cross-validation is `cvTools`. Install this package.
+
+The function `cvFit()` performs cross-validation on a variety of R objects, including `lm()`. Look at the help for `cvFit()`. Running cross-validation is simple.
+
+`cvFit(fm1, data = M, y = M$ln_Brain, K = 10, R = 100)`
+
+The basic parts are a fitted model (`fm1`), a source for the data, the ID of the `y` variable. Optionally, you can supply the number of `K` folds (default is 5 fold) and the number of replicates `R`. Increasing the number of replicates is important to get a more accurate estimate for the error.
+
+Run 10-fold cross-validation on the three models with 100 replicates of each.
+
+```{r}
+
+```
+
+What do the results indicate? Which model has the lowest error?
+
+> 

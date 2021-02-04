@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 08'
+title: 'Problem Set 07'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -11,226 +11,297 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-
+library(tidyverse)
 ```
 
-## Calcium concentration in bird plasma
+## Variation Within and Between Groups
 
-The file `Bird_Plasma.xlsx` contains factorial data on blood plasma calcium concentration (`Calcium`, mg / 100 mL) in male and female birds (`Sex`) each of which was treated or not with a hormone (`Treatment`).
+In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`, as well as some `apply` relatives in the `tidyverse` that take some of the difficulty from apply functions across R structures.
+
+Let's start with `apply()`. `apply()` is part of a family of base-R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
+
+```{r}
+ap.test <- tibble(x1 = seq(1, 10),
+                  x2 = rep(5, 10),
+                  x3 = seq(20, 65, length.out = 10))
+
+# Built in R funtions
+(max.ap.row <- apply(ap.test, 1, max))
+
+(max.ap.col <- apply(ap.test, 2, max))
+
+(mean.ap.row <- apply(ap.test, 1, mean)) # == rowMeans()
+
+(mean.ap.col <- apply(ap.test, 2, mean)) # == colMeans()
+
+# Anonymous function in the apply().
+(ss <- apply(ap.test, 1, function(x) (x[1] * x[2]) / x[3]))
+```
+
+The `tidyverse` has a family of `map` and `pmap` functions that alleviate some of the difficulty in programming with apply, especially when you are trying to pass multiple values to a function (as in the last example above with `x[1]`, `x[2]`, and `x[3]`). `map()` and relatives (e.g., `map_dbl()` which converts the returned values to a numeric vector [whereas `map()` by default returns a list]) are not as useful to us right now. We will instead focus on the `map2` functions that operate across `data.frame`s or `tibble`s.
+
+`pmap()` (for "parallel" `map`) passes the entire row of a `data.frame` to a function. By default, it returns a list. However, `pmap_dbl()` expects a numeric vector to be returned from the function, and `pmap_dfr()` expects a `data.frame`.
+
+We will use our example `ap.test` from above.
+
+```{r}
+# Convert anonymous function into a standalone function 
+myfun <- function(x1, x2, x3) (x1 * x2) / x3
+
+pmap_dbl(ap.test, myfun) # Note that this is the same as above
+```
+
+One nice thing about `pmap` is that it will figure out the correct order for passing variables to the function. If we reorder the columns, they are still correctly interpreted by the function. Doing the same would give the wrong answer for `apply()`.
+
+```{r}
+ap.test.reorder <- ap.test[, c(3, 2, 1)]
+pmap_dbl(ap.test.reorder, myfun) # Note that this is the same as above
+```
+
+Another nice feature of `pmap()` is that it offers some protection from passing the wrong column names to the function. The following code would fail, because the function expects "x1", "x2", and "x3".
+
+```{r, eval=FALSE}
+names(ap.test.rename) <- c("y1", "y2", "y3")
+pmap_dbl(ap.test.rename, myfun) # Fails with an error
+```
+
+`pmap()` will work with anonymous functions, just like `apply`. This can be handy if your function is quick and/or you want to just append the calculated value onto the existing object.
+
+```{r}
+pmap_dbl(ap.test, function(x1, x2, x3) (x1 * x2) / x3)
+
+# Note the . below in pmap_dbl, to indicate ap.test should be passed to
+# the function
+ap.test <- ap.test %>% 
+  mutate(x4 = pmap_dbl(., function(x1, x2, x3) (x1 * x2) / x3))
+
+ap.test
+```
 
 ### Activity
 
-Load the Excel file, and convert hormone and sex to factors. The levels of `Treatment` are "Hormone" and "None". Because "Hormone" is first alphabetically, it becomes the base level of the factor. Use `fct_relevel` from the `forcats` package to make "None" the base level.
+Now let's try our simulation. We will simulate two groups that have different means (the true means are different) but change the variance and see how F is affected. Here is the pseudocode:
 
-```{r, message = FALSE}
+1) Write a function called `getF`. (hint: try getting this to work for one set of values before making it a function)
 
-```
-
-Use `group_by()` and `tally()` to determine the sample size in each of the groups.
-
-```{r}
-
-```
-
-Create interaction plots of the calcium concentration data. Use the code from lecture as a template. Make two plots, one with `Treatment` on the x axis and one with `Sex` on the x axis. Use `plot_grid()` to place them side by side
+    - Pass the function the following: mean for group 1 (`mu1`), mean for group 2 (`mu2`), a single standard deviation for both groups (`sd_both`), a single number of observations in the groups (`nobs`).
+    - Inside the function, create a `data.frame` with two columns: `y` and `x`. `x` is the group id (repeat 1 and 2 each for the number of observations). `y` is the outcome. Pull values for the number of observations from a normal distribution with the mean for each group, the standard deviation. Fit a linear model and then ANOVA using `anova(lm())` and assign this to an object named `aa`.
+    - Look at the structure of `aa`. Try to figure out how to extract just the F-value from this object.
+    - Set up the function to return the F-value
+    - Test out your function to see that it works.
 
 ```{r}
+# Step 1
 
 ```
 
-What do you learn from these plots?
-
-> 
-
-Fit a factorial linear model (both main effects and the interaction term) and save the result to an R object.
+2) Set up a `data.frame()` or `tibble()` with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).
 
 ```{r}
+# Step 2
 
 ```
 
-Using the `Anova()` function in the `car` package, calculate an ANOVA table with type III sums of squares. You might have to install `car` first.
+3) Use `pmap_dbl()` to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful not to have any extra column names other than the ones that `getF()` is expecting.
 
 ```{r}
+# Step 3
 
 ```
 
-Describe the results of the analysis.
+4) Plot the $F$-statistic vs. the standard deviation. Add a horizontal line at the critical value for an $\alpha$ of 0.05.
 
-> 
+```{r}
+# Step 4
 
-## Effect of predation on zooplankton
+```
 
-The file `Zooplankton.csv` contains data on the concentration of zooplankton in three predator treatment groups (control, low, and high). Each of the three treatments were measured in five replicate blocks.
+5) There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Make a copy of your function (call it `getF2`) and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value. Then plot as above.
+
+```{r}
+# Step 5
+
+```
+
+What do you observe in the plot?
+
+>
+
+Think of all the variables in this simulation. Which should be altered to change the within-group variance, and which to change the between-group variance?
+
+>
+
+What do you think is the lower limit of $F$ (i.e., if you increased the standard deviation difference to a very large number)?
+
+>
+
+## Predicting height from limb lengths
+
+We should be able to predict someone's height from the lengths of their limbs. The file `Limb_Lengths.csv` contains data for 100 heights and associated left and right limb lengths. We know that limb length is about 40-50% of total height, but we can develop a linear model for prediction.
 
 ### Activity
 
-Read in the data and convert both Treatment and Block into factors. It is especially important to make sure that Block is a factor, because Blocks are coded 1-5. We need to make sure that R converts them to a model matrix (0's and 1's).
-
-```{r, message = FALSE}
-
-```
-
-Make two plots, one in which Treatment is on the x axis and Block is encoded by color, and the second in which Block is on the x axis and Treatment is encoded by color. Notice how you learn different things about the data from each of these plots.
+Load the data for limb lengths. Use `summarize_all()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
 
 ```{r}
 
 ```
 
-We want to test for significant differences in Treatment while accounting for the replicated blocks. We can fit this model in two different ways:
+Make two plots, one for left limb length vs. height and one for right limb length vs. height. Use `plot_grid()` to put them side by side.
 
-1. `lm()` and `anova()` with an additive model including Treatment and Block
-2. `lme()` from the `nlme` package with Block as a random effect
+```{r echo=FALSE}
 
-Fit both of these models 
+```
+
+Fit a single linear model in which height is predicted by both left and right limb lengths (this is an "additive" model). Print out the summary of the model.
 
 ```{r}
 
 ```
 
-Compare the output of the two models.
+Explain the results that you find. Why do you think that neither left nor right limb length is a good predictor of height in the model you fit?
 
-> 
+```{r}
 
-## Intraclass correlation coefficient
+```
 
-The model you use to calculate the intraclass correlation coefficient *is* a multilevel model. You have repeated measurements for a single specimen. Those measurements are obviously not independent from one another. The major question you want to ask is: What is the relative between *measurement* vs. between *specimen* variation?
+>
 
-We will fit this model in two ways: using `anova(lm())` and using `lme()`. There are minor differences in the mathematics underlying how fixed and random effects are handled, which means that the differences in ICC will be small (not numerically identical).
+Fit separate linear models in which height is predicted by left and then right limb length.
+
+```{r}
+
+```
+
+Do these models make more sense?
+
+>
+
+## Heart Transplant Survivorship
+
+The data in `Heart_Transplants.xlsx` contains data on survivorship (in days; `Survival_Days`) for three groups of heart transplant patients. Patients were groups by the severity of the mismatch between donor and recipient (`Mismatch_Degree`): `Low`, `Medium`, and `High`. A low mismatch means a *good* match.
 
 ### Activity
 
-Load the data in `G44_Morphometrics.xlsx` and plot the two measurements for head height (`HeadHt`) against one another. 
+Load the data from the Excel file and look at the structure with either `str()` or `glimpse()` (from tidyverse).
 
 ```{r}
 
 ```
 
-Based on your plot, do you expect repeatability to be high or low? Give an estimate?
+Notice that `Mismatch_Degree` is currently a character vector. To use it in a linear model, we need to convert it to a factor. We could do this with R's built-in function `factor()`. The drawback is that, by default, `factor()` will order the factors in alphabetical order. For these data, the alphabetical order will put the `High` mismatch first, which is not ideal. We want to have `Low` come first.
 
-> 
+[`forcats`](https://forcats.tidyverse.org/) is a package that greatly simplifies working with factors in R. It has functions to create factors in the order that they appear in the data.frame, in the order of frequency, and in any arbitrary order. `forcats` is built into the tidyverse, so you do not need to load it separately.
 
-Follow the example from lecture to calculate repeatability of the head height (`HeadHt`) measurement using `anova(lm())`.
+Because the data or organized so that the `Low` group is first, we can use `fct_inorder()` to make the factor in the sequence that we want.
 
-```{r}
-
-```
-
-Calculate repeatability of the head height (HeadHt) measurement using `lme()` with MouseID treated as a random effect. 
-
-1) Fit a linear model using `lme()` with MouseID treated as a random effect.
+Use `mutate()` and `fct_inorder()` to make `Mismatch_Degree` into a factor.
 
 ```{r}
 
 ```
 
-2) Extract the coefficients of your model. Compare these with the means for each MouseID. Hint: `group_by()` and `summarize()` will help here. What is the relationship between the intercept estimates and the means calculated for each MouseID??
- 
-> 
+There are only 39 observations total, so we may as well plot the raw data. Modify the code from the last two problem sets for plotting the points with the group means and standard errors.
 
 ```{r}
 
 ```
 
-3) Use `VarCorr()` to calculate the variace components for your model object. The first column of the output hold the two estimated variance components. No need to do further calculations. These are true variances, not mean squares. Use these to calculate repeatability. Also, use `var()` to get the variance of the means per MouseID you calculated in #2. What is the relationship between the variance of the means per MouseID and the variances from `VarCorr()`?
+Describe what you see in the plots. You would like to be able to use a linear model (ANOVA) to compare the mean survival days between groups. In what way does the data not appear to satisfy the assumptions of ANOVA?
 
-> 
+>
 
-```{r}
-
-```
-
-4) Using the same procedure that you used to calculate the per-mouse means, also calculate the per-mouse variances. What is the relationship between the mean of the variances per MouseID and the variances from `VarCorr()`?
+Find a transformation of `Survival_Days` that corrects the problems observed above. Plot your data each time with the transform. Briefly explain why you chose what you chose.
 
 ```{r}
 
 ```
 
-> 
+>
 
-## Testing a new drug
+Using `lm()`, fit a linear model in which transformed survival is modeled by the degree of mismatch. Save this to an object. Use `anova()` on that object to get the ANOVA table for the model you just fit.
 
-We will use data on the effects of a drug on fever, blood pressure, and pain. There are two treatments here: the drug, and a placebo as a control. We want to ask if the drug affects fever, blood pressure, or pain and conversely whether we can predict drug treatment from the change in symptoms.
+```{r}
+
+```
+
+What do the results of this linear model show?
+
+>
+
+Fit another linear model just like the one above, but remove the intercept term by including `- 1` in the model: `lm(... ~ ... - 1)`. Compare the `summary()` of this model to the group means for each `Mismatch_Degree` (using `group_by()` and `summarize()`).
+
+```{r}
+
+```
+
+What does removing the intercept term from an ANOVA linear model do?
+
+>
+
+## Bird abundance
+
+The file `Birds.xlsx` contains data from Vuilleumier, F. (1970) Insular Biogeography in Continental Regions. I. The Northern Andes of South America. *American Naturalist* 104:373-388.
+
+This paper explores the numbers of bird species in isolated "islands" of paramo vegetation in the Andes. The Missouri Botanical Garden can explain it better than we can (http://bit.ly/1PNWfsq):
+
+>
+
+We would like to use these data to see what the best predictor(s) of bird abundance is/are. The data contain species abundance (`N_Species`) and geographical information for 14 "islands". Other data include:
+
+1. `Area`: "Island" size (thousands of square km)
+1. `Elevation`: Elevation (thousands of meters)
+1. `Dist_to_Ecuador`: Distance to Ecuador (km)
+1. `Dist_to_Island`: Distance to nearest island (km)
 
 ### Activity
 
-First read in the data (`Drug_test.xlsx`) and make `Treatment` a factor. You will need to make "Placebo" as the base level of the factor.     
+We will use multiple regression to find the relative importance of each of these variables in predicting species abundance.
+
+Start by loading the data and plotting histograms of the variables. You can make 5 different plots. Think about any variables that might need transformation. There are only 14 observations, so it's going to be hard to discern normality. Here you are just looking for really obviously right or left skewed distributions.
+
+```{r message=FALSE}
+
+```
+
+Describe any patterns you see in the raw data.
+
+>
+
+When you have multivariate data like this, it's usually a good idea to look at all the pairwise correlations between variables. You can do this with `cor()`. If you have a data.frame called `M` and data in columns 2 to 5, `print(cor(M[, 2:6]), digits = 3)` will give the correlation table. Wrapping the call to `cor()` in `print()` with `digits = 3` just make R print fewer digits.
+
+Insert a code chunk below and calculate the correlation table for the numeric variables.
 
 ```{r}
 
 ```
 
-Use `ggscatmat()` to visualize the relationships between our predictors: `Fever`, `BP`, and `Pain`. Color your points by treatment. 
+What patterns do you see in the correlations? Note that 1's run along the diagonal (a variable correlated to itself is 1), and that the upper and lower triangles are symmetrical. Also note that you haven't done any tests of significance, so you can't say anything definitive about "significant correlations".
+
+>
+
+Fit a linear model wherein species abundance is predicted by the other four variables. Save this model to an R object.
 
 ```{r}
 
 ```
 
-Are there any concerning patterns in the data?
-
-> 
-
-Fit a generalized linear model using `glm()`, predicting `Treatment` from `Fever`, `BP`, and `Pain`. Specify `family` as binomial to perform a logistic regression.
-
-Use 1) `summary()`, 2) `logisitic.display()` from the `epiDisplay` package, and 3) `Anova()`, specifying type III sums of squares to look at the results. What can you conclude?
-
-> 
+Use `summary()` to get information about the model fit.
 
 ```{r}
 
 ```
 
-## Aspirin and cancer
+R^2^ is a measure of how much of the variation in the outcome variable (`N_Species`) is explained by the predictors. R^2^ for linear models in R is "Multiple R-squared" (ignore "Adjusted R-squared") in the summary.
 
-The file `Aspirin.csv` contains data on the frequency of cancer in 39,876 women taking or not taking low-dose aspirin.^[Cook, N.R., I. Lee, J.M. Gaziano, D. Gordon, P.M. Ridker, J.E. Manson, C.H. Hennekens, and J.E. Buring. 2005. Low-dose aspirin in the primary prevention of cancer. _Journal of the American Medical Association_ 294: 47-55.]
+What is the R^2^ for the regression model?
 
-The authors were interested in determining whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin.
+>
 
-### Activity
+Overall, are the four variables able to predict species abundance in combination (overall ANOVA)?
 
-Read in the data, and convert all the variables to factors. Look at the help for `mutate_each()` for a shortcut.
+>
 
-```{r}
+What variable or variables are significantly different from 0? Does species abundance increase or decrease with a one unit increase in this/these variable(s)?
 
-```
-
-Tally up the number of obvervations in each group.
-
-```{r}
-
-```
-
-Another way to look at the same information is using a cross tabulation, also called a contingency table. The R function `xtabs()` takes a one sided formula and returns the count in each group. Your code will look something like `xtabs(~ Treatment + Cancer, M)`.
-
-```{r}
-
-```
-
-The usual way to analyze data consisting of counts is to use a $\chi^2$ test. In R, `chisq.test()` is the function that carries out this test. One of the nice things about `chisq.test()` is that you can pass it the object returned by `xtabs()`.
-
-Run a $\chi^2$ test on the cross tabulation of the aspirin data. Use the `correct = FALSE` argument to *not* use Yates's correction.
-
-```{r}
-
-```
-
-What is your interpretation of the $\chi^2$ test?
-
-> 
-
-Because the outcome variable, `Cancer`, is binomially distributed, we could also use a logistic regression to analyze these data.
-
-Fit a logistic regression where presence of cancer is predicted by treatment. Save the result to an object.
-
-```{r}
-
-```
-
-Analyze the model you fit using ANOVA with type III sums of squares and using `logistic.display()`.
-
-```{r}
-
-```
-
-From these results, what can you conclude about a $\chi^2$ test and logistic regressin in this case?
-
-> 
+>

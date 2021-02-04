@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 11'
+title: 'Problem Set 10'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -14,9 +14,7 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
-library(ape)
-library(nlme)
-library(MCMCglmm)
+library(forcats)
 
 # This option turn on cacheing of chunks. This will dramatically
 # speed up knitting, because only chunks that have changed will
@@ -24,296 +22,377 @@ library(MCMCglmm)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
-Packages that you will need for this problem set that you might not have installed yet:
+## General Framework for This Week's Problem Set
 
-- `ape`
-- `MCMCglmm`
+This week we will approach hypothesis testing for several of the models we have fit previously with generalized linear models in a randomization framework. For each, you should:
 
-Go ahead and install them now. Also load the `nlme` package, which has the `gls()` function.
+1. Fit the model to the observed data (feel free to copy your code from original problem set).
+1. Decide on a test statistic to use for the randomization.
+1. Perform the randomization:
+    1. Calculate the test statistic for the *observed* data
+    1. Randomly shuffle the observations
+    1. Calculate the test statistic for that group
+    1. Repeat thousands of times
+1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
+1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
 
-## Grass Species Richness
+Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide.
 
-At the Conard Environmental Research Area, there are 20 experimental plots with 10 burned each fall and 10 unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
+Remember to start with a small number of iterations (10 or 100) until you get the code working correctly. Then increase to 10,000 for a final analysis.
 
-```{r }
-set.seed(112)
-mms <- c(rnorm(10, 5.5, 2), rnorm(10, 6.5, 2))
-all.rich <- numeric(0)
-for(ii in mms) {
-  all.rich <- c(all.rich, as.integer(rnorm(5, ii, 1)))
+## Stalk-eyed flies (PS 05)
+
+Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
+
+```{r flies1, message=FALSE}
+# Read data
+stalk <- read_csv("../data/Stalkies.csv")
+
+# Some thoughtful plotting
+ggplot(stalk, aes(x = food_source, y = eye_span)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Food Source", y = "Eye Span")
+
+set.seed(8987324)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- t.test(eye_span ~ food_source, data = stalk)$statistic
+
+for (ii in 2:nreps) {
+  t_stats[ii] <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
 }
 
-rich.dat <- data.frame('plot' = as.factor(rep(seq(1, 20), each = 5)), 
-                       'treatment' = rep(c('burned', 'unburned'), each = 50), 
-                       'richness' = all.rich)
-write.table(rich.dat, file="../data/richness.txt",
-            sep="\t", row.names = FALSE)
+tibble(t_stats) %>%
+  ggplot(aes(t_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1], color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats >= t_stats[1])
+
+t.test(eye_span ~ food_source, data = stalk)
 ```
 
-### Activity
+10^5^ iterations took 124.7 seconds on a single processor. We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical P is 6e-10, so we expect the empirical P to be close to that scale.
 
-Load in the richness data (richness.txt). Plot species richness vs. treatment. Include an appropriate amount of jitter and transparency and color points by plot. 
+We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
+
+The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the combination of `foreach()` and `dopar()`, which handle the parallelization and collection of the results.
+
+```{r flies2, eval=FALSE}
+library(parallel)
+library(foreach)
+library(doParallel)
+
+t_obs <- t.test(eye_span ~ food_source, data = stalk)
+
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- t_obs$statistic
+
+# Set up parallel processor
+n_cores <- 2
+cl <- makeCluster(n_cores)
+registerDoParallel(cl, cores = n_cores)
+
+# Function to do the randomized t-test and return the t-value only.
+t_rand <- function() {
+  rnd_t <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
+  return(as.numeric(rnd_t))
+}
+
+# Parallel randomization execute t_rand(), and combine the output into t_stats.
+t_stats[2:nreps] <- foreach(i = 2:nreps, .combine = c) %dopar% t_rand()
+
+2 * mean(t_stats >= t_stats[1])
+
+# Close cluster
+stopImplicitCluster()
+```
+
+The same number of iterations but using 2 processors takes 93 seconds.
 
 ```{r}
-rich.dat <- read_delim("../data/richness.txt",
-                       delim = "\t") %>% 
-  mutate(plot = factor(plot))
+# Iterations per second, 1 processor
+(p1 <- 124.7 / nreps)
 
-ggplot(rich.dat, aes(x = treatment, y = richness, color = plot)) +
-  geom_point(position = position_jitter(0.1), alpha = 0.5) +
-    guides(colour = guide_legend(ncol = 2, byrow = FALSE))
+# Iterations per second, 2 processors
+(p6 <- 93 / nreps)
+
+p1 / p6
 ```
 
-Do you think there is a relationship between species richness and burning?
+We get a speed-up of about 1.34 times. There is some overhead in the parallelization, and there were other things going on on the computer, so we don't get double the speed.
 
-> Probably not. It doesn't look like a strong relationship.
+## Earwigs (PS 05)
 
-First, fit a model predicting species richness from treatment without considering plot membership. What can you conclude from the results of this model?
+In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
 
-> It is difficult to interpret without considering plot as there is pseudoreplication.
+```{r earwigs}
+EW <- read_csv("../data/Earwigs.csv")
+
+EW %>%
+  ggplot(aes(Density, Proportion_Forceps)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+fm <- lm(Proportion_Forceps ~ Density, data = EW)
+summary(fm)
+
+set.seed(28476)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- summary(fm)$coefficients[2, 3]
+
+for (ii in 2:nreps) {
+  fm_rnd <- lm(sample(Proportion_Forceps) ~ Density, data = EW)
+  t_stats[ii] <- summary(fm_rnd)$coefficients[2, 3]
+}
+
+tibble(t_stats) %>%
+  ggplot(aes(t_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1], color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats >= t_stats[1])
+
+factorial(7)
+```
+
+## Heart Transplant Survivorship (PS 07)
+
+For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
+
+```{r heart_transplants}
+M <- read_excel("../data/Heart_Transplants.xlsx") %>%
+  mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
+
+ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Mismatch Degree", y = "Survival (days)")
+
+fm <- lm(Survival_Days ~ Mismatch_Degree, data = M)
+obs <- summary(fm)
+
+set.seed(823476)
+nreps <- 1e4
+F_stats <- numeric(nreps)
+F_stats[1] <- obs$fstatistic["value"]
+
+for (ii in 2:nreps) {
+  fm_rand <- lm(sample(Survival_Days) ~ Mismatch_Degree,
+                    data = M)
+  F_stats[ii] <- summary(fm_rand)$fstatistic["value"]
+}
+
+tibble(F_stats) %>%
+  ggplot(aes(F_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = F_stats[1], color = "red") +
+  labs(x = "F statistics", y = "Count")
+
+mean(F_stats >= F_stats[1])
+```
+
+## Bird abundance (PS 07)
+
+We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors.
+
+There are four predictors, and you will have 5 randomization tests, though you will fit a single model with multiple predictors to obtain the test statistics for each:
+
+1. The overall multple regression (F-test)
+2. Area: "Island" size (thousands of square km)
+3. Elevation: Elevation (thousands of meters)
+4. Dist_to_Ecuador: Distance to Ecuador (km)
+5. Dist_to_Island: Distance to nearest island (km)
+
+You should do the randomization and collect the output test statistics using just one loop.
+
+```{r bird_abundance}
+M <- read_excel("../data/Birds.xlsx")
+fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
+         data = M)
+obs <- summary(fm)
+
+set.seed(2876)
+nreps <- 1e4
+
+t_stats <- matrix(NA, nrow = nreps, ncol = 5)
+colnames(t_stats) <- c(rownames(obs$coefficients)[2:5], "Fstat")
+t_stats[1, 1:4] <- obs$coefficients[2:5, 3]
+t_stats[1, 5] <- obs$fstatistic[1]
+
+for (ii in 2:nreps) {
+  fm_rand <- lm(sample(N_Species) ~ Dist_to_Island + Elevation +
+                  Area + Dist_to_Ecuador, data = M)
+  t_stats[ii, 1:4] <- summary(fm_rand)$coefficients[2:5, 3]
+  t_stats[ii, 5] <- summary(fm_rand)$fstatistic[1]
+  
+}
+
+# Dist_to_Island
+tibble(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
+  ggplot(aes(Dist_to_Island)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Dist_to_Island"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Dist_to_Island"] >= t_stats[1, "Dist_to_Island"])
+
+# Elevation
+tibble(Elevation = t_stats[, "Elevation"]) %>%
+  ggplot(aes(Elevation)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Elevation"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Elevation"] >= t_stats[1, "Elevation"])
+
+# Area
+tibble(Area = t_stats[, "Area"]) %>%
+  ggplot(aes(Area)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Area"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Area"] >= t_stats[1, "Area"])
+
+# Dist_to_Ecuador
+tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
+  ggplot(aes(Dist_to_Ecuador)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Dist_to_Ecuador"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Dist_to_Ecuador"] <= t_stats[1, "Dist_to_Ecuador"])
+
+tibble(Fstat = t_stats[, "Fstat"]) %>%
+  ggplot(aes(Fstat)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Fstat"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+mean(t_stats[, "Fstat"] >= t_stats[1, "Fstat"])
+```
+
+## Aspirin and cancer (PS 08)
+
+In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
+
+```{r aspirin1}
+M <- read_csv("../data/Aspirin.csv") %>%
+  mutate_each("factor")
+fm <- glm(Cancer ~ Treatment, M, family = "binomial")
+
+# We will use the deviance first.
+
+set.seed(8736)
+nreps <- 1e3
+devs <- numeric(nreps)
+devs[1] <- fm$deviance
+
+system.time({
+  for (ii in 2:nreps) {
+    devs[ii] <- glm(sample(Cancer) ~ Treatment, M,
+                    family = "binomial")$deviance
+  }
+})
+
+tibble(devs) %>%
+  ggplot(aes(devs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = devs[1], color = "red") +
+  labs(x = "Deviance", y = "Count")
+
+mean(devs <= devs[1])
+```
+
+We can also use the Z-score for `TreatmentPlacebo`. This runs more slowly, because you have to generate the summary for each model.
 
 ```{r}
-anova(lm(richness ~ treatment, data = rich.dat))
+set.seed(8736)
+nreps <- 1e3
+Zs <- numeric(nreps)
+Zs[1] <- summary(fm)$coefficients[2, 3]
+
+system.time({
+  for (ii in 2:nreps) {
+    fm_rand <- glm(sample(Cancer) ~ Treatment, M,
+                    family = "binomial")
+    Zs[ii] <- summary(fm_rand)$coefficients[2, 3]
+  }
+})
+
+tibble(Zs) %>%
+  ggplot(aes(Zs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = Zs[1], color = "red") +
+  labs(x = "Z-score", y = "Count")
+
+mean(Zs <= Zs[1]) * 2
 ```
 
-Now, get the mean species richness value for each plot. Fit a model predicting mean species richness from treatment. What can you conclude from this model?
+We can also do something similar with a standard $\chi^2$ test:
 
-```{r}
-mean.plot <- rich.dat %>%
-  group_by(plot, treatment) %>%
-  summarize(meanrich = mean(richness))
-anova(lm(meanrich ~ treatment, data = mean.plot))
+```{r aspirin2}
+obs <- chisq.test(xtabs(~ Treatment + Cancer, M),
+                  correct = FALSE)
+
+set.seed(8736)
+nreps <- 1e3
+chisqs <- numeric(nreps)
+chisqs[1] <- obs$statistic
+
+system.time({
+  for (ii in 2:nreps) {
+    chisqs[ii] <- chisq.test(xtabs(~ sample(Treatment) + Cancer, M),
+                             correct = FALSE)$statistic
+  }
+})
+
+tibble(chisqs) %>%
+  ggplot(aes(chisqs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = chisqs[1], color = "red") +
+  labs(x = "Chi-squared Statistic", y = "Count")
+
+mean(chisqs >= chisqs[1])
 ```
 
-> There is no effect of treatment on species richness.
+## Correlation
 
-Use the `lme()` function to fit a model predicting richness from treatment with plot as a random effect. 
+Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
 
-```{r}
-summary(lme(richness ~ treatment, random = ~1 | plot, data = rich.dat))
+```{r correlation}
+M <- read_excel("../data/Birds.xlsx")
+
+set.seed(2876)
+nreps <- 1e4
+
+corrs <- numeric(length = nreps)
+corrs[1] <- cor(M$Area, M$Elevation)
+
+for (ii in 2:nreps) {
+  corrs[ii] <- cor(sample(M$Area), M$Elevation)
+}
+
+tibble(corrs) %>%
+  ggplot(aes(corrs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = corrs[1], color = "red") +
+  labs(x = "Correlation", y = "Count")
+
+mean(corrs >= corrs[1])
 ```
-
-Compare your results to the approach using the mean value. What can you conclude from this model? 
-
-> The results are consistent with the model using the mean values. 
-
-Why would you use `lme()` versus means per group?
-
-> 
-
-These 20 plots exist in an alternating pattern going from south to north on either side of an access road. What other source of non-independence should you consider? How would you account for this factor?
-
-> The spatial relationship between plots needs to be accounted for. You could include a continuous variable coding for position along the south to north axis and/or side of the road.
-
-## Indian meal moth
-
-For this activity, we will use a dataset measuring the amount of phenoloxidase (PO) produced by indian meal moth caterpillars in full-sibling families. 
-
-### Activity
-
-First we will load the `MCMCglmm` library and get the moth data called `PlodiaPO`.
-
-```{r}
-library(MCMCglmm)
-data(PlodiaPO)
-```
-
-Examine the data. Look at the first few rows and use `unique()` to see the list of families in this dataset. Plot a histogram of the PO values and calculate the overall mean value.
-
-
-```{r}
-head(PlodiaPO)
-unique(PlodiaPO$FSfamily)
-
-ggplot(PlodiaPO, aes(x = PO)) +
-  geom_histogram()
-
-mean(PlodiaPO$PO)
-```
-
-Now we will fit the MCMCglmm model with family as a random effect.
-
-```{r}
-fm <- MCMCglmm(PO ~ 1,
-               random = ~ FSfamily,
-               data = PlodiaPO,
-               verbose = TRUE)
-```
-
-Refer to the lecture slides for the next section. Plot the fixed effects and calculate the median for the estimate of the intercept. Compare this value to the mean value you calculated above. 
-
-```{r}
-plot(fm$Sol)
-
-mean(PlodiaPO$PO)
-median(fm$Sol)
-```
-
-Now plot the random effects and calculate heritability for all the MCMC samples. Because we have fit family here instead of using an animal model like in lecture, you should multiply your estimate by 2. This is because full-sib families share 50% of their genes on average. Plot the resulting distribution of heritability estimates. Estimate the median value and the standard error. 
-
-```{r}
-plot(fm$VCV)
-
-h2 <- 2 * fm$VCV[, "FSfamily"]/(fm$VCV[, "FSfamily"] + fm$VCV[, "units"])
-
-plot(h2)
-
-median(h2)
-sd(h2)
-```
-
-## Primate life history
-
-We are going to work with two files, one containing a tree of (extant) primates (226 tips; `Primate_Masses_Tree.nex`) and another containing data of primate life history (`Primate_Masses.xlsx`). We will use these data to explore phylogenetic comparative methods.
-
-### Activity
-
-Load the `Primate_Masses.xlsx` file and explore the contents. You will find columns:
-
-- `Order`: Traditional Linnean order
-- `Family`: Traditional Linnean family
-- `Binomial`: Genus species binomial. *This column matches the tree tip labels.*
-- `AdultBodyMass_g`: Body mass in grams
-- `GestationLen_d`: Gestation length in days
-- `HomeRange_km2`: Home range area in square kilometers
-- `MaxLongevity_m`: Maximum longevity in months
-- `SocialGroupSize`: Mean social group size
-
-As a final step, be sure to convert the object into a `data.frame` from the `tibble` that `read_excel()` produces by default.
-
-```{r}
-# FIXME
-M <- read_excel("../data/Primate_Masses.xlsx") %>% as.data.frame()
-```
-
-Load the tree from the file `Primate_Masses_Tree.nex` using the function `read.nexus()` which is in the `ape` package.
-
-Give it is useful name like `tree`. Plot the tree using the `plot()` method for `phylo` objects (which is what your tree will be). In the `plot()` call, include you can make the tip labels smaller with `cex = 0.8`. We expanded the figure size in the chunk header to keep the tips from overlapping. It will look like a mess in the RStudio window, but will look OK when knitted.
-
-```{r, fig.height=30, fig.width=10}
-# FIXME
-tree <- read.nexus("../data/Primate_Masses_Tree.nex")
-plot(tree, cex = 0.8)
-```
-
-Any time you have comparative data and a tree, you should do a lot of tests to make sure that the tree labels match the data column that codes for them. 
-Some functions will do these checks for you. However, it's important to do these checks yourself, just to be sure. They are absolutely necessary when you are using phylogenetically independent contrasts or another method that makes assumptions about a match between tips and data without an explicit check. Using `gls()` for PGLS will do this also, albeit with a warning message.
-
-Start by looking at both the `Binomial` column of your data frame and the tip labels of the tree (e.g., `tree$tip.label`).
-
-```{r}
-# FIXME
-M$Binomial
-tree$tip.label
-```
-
-Let's figure out what tree tips are not represented in the data file (a lot probably) and what data are not represented in the tree (hopefully only a few). Let's start by looking at the species that are present in both the data and the tree. We use the intersection of the `Binomial` column and the tip labels (the function `intersect()`). Change `eval` to true in the following chunk.
-
-```{r eval=TRUE}
-# FIXME
-intersect(tree$tip.label, M$Binomial)
-```
-
-How many species are present in both? How many rows of data are there? How many tips or taxa need to be dropped in total (we don't know yet which are tips are which are taxa)?
-
-> 83 are present in both. There are 91 data observations, so 8 must not match up.
-
-The first step in the process is to keep only the tips of the tree where tips are present in the data. The `setdiff()` function returns a vector of the differences between two sets. If we use the same syntax as above but with `setdiff` rather than `intersect`, we'll get the list of tips that need to be dropped. Create that variable and call it something memorable like `tips_to_drop`. There should be 143 tips in the list.
-
-```{r}
-tips_to_drop <- setdiff(tree$tip.label, M$Binomial)
-length(tips_to_drop)
-```
-
-Now we can actually drop the tips from the tree. The `ape` package has a function `drop.tip()` which does just this. Create a new tree (e.g., `tree_pruned`) where all the orphan tips are dropped. Look at the help for `drop.tip()` for the syntax. Then plot your tree to make sure it still looks OK. We we use this tree for the rest of this exercise.
-
-```{r, fig.height=15, fig.width=10}
-# FIXME
-tree_pruned <- drop.tip(tree, tips_to_drop)
-plot(tree_pruned)
-```
-
-We should probably also remove any rows from the data that are not present in the tree. This isn't strictly necessary in most cases, but it's good practice. We can use `setdiff()` again, but this time reverse the order: `setdiff(M$Binomial, tree_pruned$tip.label)`. Do this, and save to a new variable `rows_to_drop`. You should find 8 rows that need to be dropped from the data frame.
-
-```{r}
-# FIXME
-rows_to_drop <- setdiff(M$Binomial, tree_pruned$tip.label)
-length(rows_to_drop)
-```
-
- Drop the rows from the data that are not in the tree. The best (though least clear) way to do this is with a notation like `M[!(M$Binomial %in% rows_to_drop), ]`. The `!` negates the entire parenthetical that follows. Inside parentheses, the function `%in%` returns true for all the rows in `M$Binomial` that match any items in `rows_to_drop`. So by negating this set, we get all the rows that are *not* in `rows_to_drop`.
-
-Assign a new variable the data frame resulting from dropping all rows not in the tree file. Check the number of rows. You should find 83.
-
-```{r}
-# FIXME
-M_pruned <- M[!(M$Binomial %in% rows_to_drop), ]
-nrow(M_pruned)
-```
-
-The final thing to do is to assign `Binomial` to the row names (`row.names()`) of the data.frame.
-
-```{r}
-# FIXME
-row.names(M_pruned) <- M_pruned$Binomial
-```
-
-We have finally arrived at the point of being able to do something with these data. As you may have realized, working with comparative data is much more involved in terms of processing than working with regular data.
-
-For the rest of this question, we will be exploring the relationship between body mass and maximum longevity. Make a scatterplot of the raw data for maximum longevity vs. body mass.
-
-```{r}
-# FIXME
-ggplot(M_pruned, aes(x = AdultBodyMass_g, y = MaxLongevity_m)) +
-  geom_point()
-```
-
-Assess the bivariate relationship and transform either or both of the variables if they require it.
-
-```{r}
-# FIXME
-M_pruned$log_Mass <- log10(M_pruned$AdultBodyMass_g)
-M_pruned$log_Longevity <- log10(M_pruned$MaxLongevity_m)
-ggplot(M_pruned, aes(x = log_Mass, y = log_Longevity, color = Family)) +
-  geom_point()
-```
-
-> We can log10 transform both variables. It's probably adequate to only log mass, but it looks a little better with both transformed.
-
-We're ready to perform PGLS. Fit a PGLS using `gls()` regressing longevity on mass. Use a Brownian motion correlation structure. Follow the lecture slides as an example. Save this model to an R object. Print the summary of the `gls` object that you just made.
-
-```{r}
-# FIXME
-fm1 <- gls(log_Longevity ~ log_Mass, data = M_pruned,
-           correlation = corBrownian(phy = tree_pruned),
-           method = "ML")
-summary(fm1)
-```
-
-e. What is the linear equation for the phylogenetic regression of longevity on body mass?
-
-> log Longevity = 2.07 + 0.11 * log Mass. 
-
-Fit a second model where `Family` is used in addition to mass. Use an additive model and Brownian motion model of trait evolution. Use the `anova()` method to generate an ANOVA table for the model fit.
-
-```{r}
-fm2 <- gls(log_Longevity ~ log_Mass + Family, data = M_pruned,
-           correlation = corBrownian(phy = tree_pruned),
-           method = "ML")
-summary(fm2)
-anova(fm2)
-```
-
-Considering the ANOVA table, does the relationship between longevity and mass differ by family? Briefly explain.
-
-> No. The *P*-value for family is 0.999, so there is no difference in the relationship based on family. The intercepts are all equal to one another.
-
-Extract (`AIC()`) and compare the AICs for the two models you just fit. Interpret the difference in AIC values.
-
-```{r}
-AIC(fm1, fm2)
-```
-
-> The difference is 25 AIC units, with the simpler model *much* preferred.
-
-Feel free to explore other variables in this data set.

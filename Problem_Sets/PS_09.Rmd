@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 09'
+title: 'Problem Set 08'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -11,210 +11,226 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-knitr::opts_chunk$set(cache = TRUE)
+
 ```
 
-Some useful color palettes for ggplot: https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html
+## Calcium concentration in bird plasma
 
-Try adding `scale_color_d3()`, `scale_color_aaas()`, and others to your ggplots.
-
-## Nested Sites in Streams
-
-Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the original file from Dryad.
-
-Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8
+The file `Bird_Plasma.xlsx` contains factorial data on blood plasma calcium concentration (`Calcium`, mg / 100 mL) in male and female birds (`Sex`) each of which was treated or not with a hormone (`Treatment`).
 
 ### Activity
 
-Load the `TemperatureData` sheet from the `Streams.xlsx` file. Look at the structure of the file. You should have 5 columns: `Site`, `Date`, `AirTemp_observed`, `AirTempPredicted`, and `WaterTemp`. If you don't, then you probably did not load the correct sheet. Check the `read_excel()` help to see how to do this.
+Load the Excel file, and convert hormone and sex to factors. The levels of `Treatment` are "Hormone" and "None". Because "Hormone" is first alphabetically, it becomes the base level of the factor. Use `fct_relevel` from the `forcats` package to make "None" the base level.
+
+```{r, message = FALSE}
+
+```
+
+Use `group_by()` and `tally()` to determine the sample size in each of the groups.
 
 ```{r}
 
 ```
 
-Now load the `SiteData` sheet from the Excel file. It has four columns, including the mapping from `Stream_Name` to `Site`. We need to merge the two data.frames^[tibbles] together. Because they share a column `Site`, we can match rows, yielding a single data.frame.
-
-Base R has a `merge()` function, but it can be somewhat finicky. `tidyverse` has a complex set of functions for joining data.frames. The most useful are:
-
-1. `inner_join()`: "return all rows from x where there are matching values in y, and all columns from x and y. If there are multiple matches between x and y, all combination of the matches are returned."
-2. `left_join()`: "return all rows from x, and all columns from x and y. Rows in x with no match in y will have NA values in the new columns. If there are multiple matches between x and y, all combinations of the matches are returned."
-3. `full_join()`: "return all rows and all columns from both x and y. Where there are not matching values, returns NA for the one missing."
-
-`left_join()` the temperature data and the site data and assign to a new object. This will add the columns of one to the other, matching on `Site`. You should end up with a 3,744 x 8 tibble.
+Create interaction plots of the calcium concentration data. Use the code from lecture as a template. Make two plots, one with `Treatment` on the x axis and one with `Sex` on the x axis. Use `plot_grid()` to place them side by side
 
 ```{r}
 
 ```
 
-Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). Ultimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
-
-We then need to do one more thing: make a new variable that converts `Date` into a day number. We can do this with the function `as.numeric()`. Make a new variable `Day`, which is the numeric representation of `Date`. It will look something like: `mutate(Day = as.numeric(Date))`.
-
-```{r}
-
-```
-
-Because not all observations have observed air temperature, first we should check for correlation between observed and predicted air temperatures. Calculate the correlation between the two. We could filter out missing data, but instead just provide the argument `use = "pairwise.complete.obs"` to `cor()`, which will tell the function to use only complete pairs for the calculation. If you find that the correlation is `NA`, that means R is using incomplete cases. Correlation with `NA`s is `NA`.
-
-```{r}
-
-```
-
-The correlation should be pretty high. So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete). Let's plot: make a line plot with day on the x axis and predicted air temp on the y axis. Then facet by `Stream_Name`.
-
-One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly.
-
-Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable.)
-
-```{r fig.height = 10}
-
-```
-
-What general patterns do you see, comparing the two plots?
+What do you learn from these plots?
 
 > 
 
-We want to fit two models to these data. In both models we want to model water temperature by predicted air temperature. The difference between the models will be in the random effects.
-
-We have an added wrinkle with these data that we have not yet encountered: nesting. Each site is only associated with one stream, so we need to tell R to only expect sites in some stream names. In an R formula, you can designate nesting using /. If B is nested in A, this would be coded as `A/B`.^[http://conjugateprior.org/2013/01/formulae-in-r-anova/ has a good overview of R's model formula.]
-
-1. Fit a model where the intercept for site nested in stream is random
-2. Fit a model where the intercept for site nested in stream is random and day is also included (as a continuous random predictor).
-
-Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood.
+Fit a factorial linear model (both main effects and the interaction term) and save the result to an R object.
 
 ```{r}
 
 ```
 
-Looking at the `summary()` of each, you should see sections in the random effects for `Stream_Name` and `Site %in% Stream_Name`.
+Using the `Anova()` function in the `car` package, calculate an ANOVA table with type III sums of squares. You might have to install `car` first.
 
-Explain in non-mathematical words what the addition of day in the random effects part of the formula accomplishes.
+```{r}
+
+```
+
+Describe the results of the analysis.
 
 > 
 
-Load the `AICcmodavg` package and use the `aictab()` function to compare the two models you fit above.
+## Effect of predation on zooplankton
 
-```{r}
-
-```
-
-Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the model comparison make sense in light of your understanding of the difference between the two models?
-
-> 
-
-```{r}
-
-```
-
-## Sole
-
-In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by the salinity of the water. That data set has a great deal of additional information. In this question, we will explore the predictors of sole being found in the estuary.
+The file `Zooplankton.csv` contains data on the concentration of zooplankton in three predator treatment groups (control, low, and high). Each of the three treatments were measured in five replicate blocks.
 
 ### Activity
 
-Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
+Read in the data and convert both Treatment and Block into factors. It is especially important to make sure that Block is a factor, because Blocks are coded 1-5. We need to make sure that R converts them to a model matrix (0's and 1's).
+
+```{r, message = FALSE}
+
+```
+
+Make two plots, one in which Treatment is on the x axis and Block is encoded by color, and the second in which Block is on the x axis and Treatment is encoded by color. Notice how you learn different things about the data from each of these plots.
 
 ```{r}
 
 ```
 
-Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
+We want to test for significant differences in Treatment while accounting for the replicated blocks. We can fit this model in two different ways:
+
+1. `lm()` and `anova()` with an additive model including Treatment and Block
+2. `lme()` from the `nlme` package with Block as a random effect
+
+Fit both of these models 
 
 ```{r}
 
 ```
 
-If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary.
-
-Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
-
-```{r}
-
-```
-
-Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
-
-```{r}
-
-```
-
-Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
+Compare the output of the two models.
 
 > 
 
-Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
+## Intraclass correlation coefficient
 
-```{r}
+The model you use to calculate the intraclass correlation coefficient *is* a multilevel model. You have repeated measurements for a single specimen. Those measurements are obviously not independent from one another. The major question you want to ask is: What is the relative between *measurement* vs. between *specimen* variation?
 
-```
-
-See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
-
-> 
-
-## Neandertal Brains
-
-There are well-known differences in both body size between modern humans and Neanderthals. But are there differences in brain size as well, adjusted for body size. Ruff and colleagues (1997) tried to answer just that question.^[Ruff, C.B., E. Trinkaus, and T.W. Holliday. 1997. Body mass and encephalization in Pleistocene _Homo_. _Nature_ 387: 173-176.]
+We will fit this model in two ways: using `anova(lm())` and using `lme()`. There are minor differences in the mathematics underlying how fixed and random effects are handled, which means that the differences in ICC will be small (not numerically identical).
 
 ### Activity
 
-The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log brain size, and `Species`. Load the file, and convert `Species` to a factor.
+Load the data in `G44_Morphometrics.xlsx` and plot the two measurements for head height (`HeadHt`) against one another. 
 
 ```{r}
 
 ```
 
-Make a scatterplot of brain size vs. body mass, with points colored by species. See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner.
-
-```{r}
-
-```
-
-Fit and save three linear models:
-
-1. Brain size modeled by body mass
-2. Brain size modeled by body mass and species (additive)
-3. Brain size modeled by body mass and species with the mass X species interaction
-
-```{r}
-
-```
-
-Use the `lrtest()` function from the `lmtest` package to perform a likelihood ratio test on the three models.
-
-```{r}
-
-```
-
-What is your interpretation of the likelihood ratio test?
+Based on your plot, do you expect repeatability to be high or low? Give an estimate?
 
 > 
 
-Use the `aictab()` function from the `AICcmodavg` package to compare AICc for the three models.
+Follow the example from lecture to calculate repeatability of the head height (`HeadHt`) measurement using `anova(lm())`.
 
 ```{r}
 
 ```
 
-What is your interpretation of the results?
+Calculate repeatability of the head height (HeadHt) measurement using `lme()` with MouseID treated as a random effect. 
+
+1) Fit a linear model using `lme()` with MouseID treated as a random effect.
+
+```{r}
+
+```
+
+2) Extract the coefficients of your model. Compare these with the means for each MouseID. Hint: `group_by()` and `summarize()` will help here. What is the relationship between the intercept estimates and the means calculated for each MouseID??
+ 
+> 
+
+```{r}
+
+```
+
+3) Use `VarCorr()` to calculate the variace components for your model object. The first column of the output hold the two estimated variance components. No need to do further calculations. These are true variances, not mean squares. Use these to calculate repeatability. Also, use `var()` to get the variance of the means per MouseID you calculated in #2. What is the relationship between the variance of the means per MouseID and the variances from `VarCorr()`?
 
 > 
 
-In lecture, we wrote out own code to do cross-validation. In practice, you would use code from others to automate this process, which is more general than any specific code you would write. A good package for cross-validation is `cvTools`. Install this package.
+```{r}
 
-The function `cvFit()` performs cross-validation on a variety of R objects, including `lm()`. Look at the help for `cvFit()`. Running cross-validation is simple.
+```
 
-`cvFit(fm1, data = M, y = M$ln_Brain, K = 10, R = 100)`
-
-The basic parts are a fitted model (`fm1`), a source for the data, the ID of the `y` variable. Optionally, you can supply the number of `K` folds (default is 5 fold) and the number of replicates `R`. Increasing the number of replicates is important to get a more accurate estimate for the error.
-
-Run 10-fold cross-validation on the three models with 100 replicates of each.
+4) Using the same procedure that you used to calculate the per-mouse means, also calculate the per-mouse variances. What is the relationship between the mean of the variances per MouseID and the variances from `VarCorr()`?
 
 ```{r}
 
 ```
 
-What do the results indicate? Which model has the lowest error?
+> 
+
+## Testing a new drug
+
+We will use data on the effects of a drug on fever, blood pressure, and pain. There are two treatments here: the drug, and a placebo as a control. We want to ask if the drug affects fever, blood pressure, or pain and conversely whether we can predict drug treatment from the change in symptoms.
+
+### Activity
+
+First read in the data (`Drug_test.xlsx`) and make `Treatment` a factor. You will need to make "Placebo" as the base level of the factor.     
+
+```{r}
+
+```
+
+Use `ggscatmat()` to visualize the relationships between our predictors: `Fever`, `BP`, and `Pain`. Color your points by treatment. 
+
+```{r}
+
+```
+
+Are there any concerning patterns in the data?
+
+> 
+
+Fit a generalized linear model using `glm()`, predicting `Treatment` from `Fever`, `BP`, and `Pain`. Specify `family` as binomial to perform a logistic regression.
+
+Use 1) `summary()`, 2) `logisitic.display()` from the `epiDisplay` package, and 3) `Anova()`, specifying type III sums of squares to look at the results. What can you conclude?
+
+> 
+
+```{r}
+
+```
+
+## Aspirin and cancer
+
+The file `Aspirin.csv` contains data on the frequency of cancer in 39,876 women taking or not taking low-dose aspirin.^[Cook, N.R., I. Lee, J.M. Gaziano, D. Gordon, P.M. Ridker, J.E. Manson, C.H. Hennekens, and J.E. Buring. 2005. Low-dose aspirin in the primary prevention of cancer. _Journal of the American Medical Association_ 294: 47-55.]
+
+The authors were interested in determining whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin.
+
+### Activity
+
+Read in the data, and convert all the variables to factors. Look at the help for `mutate_each()` for a shortcut.
+
+```{r}
+
+```
+
+Tally up the number of obvervations in each group.
+
+```{r}
+
+```
+
+Another way to look at the same information is using a cross tabulation, also called a contingency table. The R function `xtabs()` takes a one sided formula and returns the count in each group. Your code will look something like `xtabs(~ Treatment + Cancer, M)`.
+
+```{r}
+
+```
+
+The usual way to analyze data consisting of counts is to use a $\chi^2$ test. In R, `chisq.test()` is the function that carries out this test. One of the nice things about `chisq.test()` is that you can pass it the object returned by `xtabs()`.
+
+Run a $\chi^2$ test on the cross tabulation of the aspirin data. Use the `correct = FALSE` argument to *not* use Yates's correction.
+
+```{r}
+
+```
+
+What is your interpretation of the $\chi^2$ test?
+
+> 
+
+Because the outcome variable, `Cancer`, is binomially distributed, we could also use a logistic regression to analyze these data.
+
+Fit a logistic regression where presence of cancer is predicted by treatment. Save the result to an object.
+
+```{r}
+
+```
+
+Analyze the model you fit using ANOVA with type III sums of squares and using `logistic.display()`.
+
+```{r}
+
+```
+
+From these results, what can you conclude about a $\chi^2$ test and logistic regressin in this case?
 
 > 

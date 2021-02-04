@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 12'
+title: 'Problem Set 11'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -12,269 +12,308 @@ output:
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(stringr)
 library(readxl)
 library(cowplot)
+library(ape)
+library(nlme)
+library(MCMCglmm)
+
+# This option turn on cacheing of chunks. This will dramatically
+# speed up knitting, because only chunks that have changed will
+# be recompiled.
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
-```{r}
-# Data preparation
-set.seed(28462)
+Packages that you will need for this problem set that you might not have installed yet:
 
-quant.norm <- function(y) {
-  nn <- qqnorm(y, plot.it = FALSE)
-  return(nn$x)
+- `ape`
+- `MCMCglmm`
+
+Go ahead and install them now. Also load the `nlme` package, which has the `gls()` function.
+
+## Grass Species Richness
+
+At the Conard Environmental Research Area, there are 20 experimental plots with 10 burned each fall and 10 unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
+
+```{r }
+set.seed(112)
+mms <- c(rnorm(10, 5.5, 2), rnorm(10, 6.5, 2))
+all.rich <- numeric(0)
+for(ii in mms) {
+  all.rich <- c(all.rich, as.integer(rnorm(5, ii, 1)))
 }
 
-sid <- read_csv("../data/Butteryfly_IDs.csv",
-                col_names = c("ID", "Treatment", "Sex", "Population"))
-sid <- sid %>%
-  mutate(Treatment = str_replace(Treatment, "treatment: ", ""),
-         Sex = str_replace(Sex, "Sex: ", ""),
-         Population = str_replace(Population, "population: ", ""),
-         ID2 = str_split(ID, "_", simplify = TRUE)[, 2],
-         ID = str_split(ID, "_", simplify = TRUE)[, 1],
-         ID = str_replace_all(ID, "-", "_")) %>%
-  filter(ID2 == 450) %>%
-  dplyr::select(-ID2)
-
-gg <- read_delim("../data/Butterfly_NormalizedCountsGenes.txt",
-                 delim = "\t")
-samp.names <- colnames(gg)[-1]
-gene.names <- gg$gene
-gg <- t(gg[, -1])
-rr.temp <- row.names(gg)
-gg <- apply(gg, 2, function(x) quant.norm(x))
-colnames(gg) <- gene.names
-rownames(gg) <- rr.temp
-gg <- bind_cols(
-  tibble(ID = str_replace_all(row.names(gg), "-", "_")),
-  as.data.frame(gg))
-
-ngenes <- 100
-gg_samp <- gg[, c(1, sample(size = ngenes, x = 2:ncol(gg)))]
-
-M <- left_join(sid, gg_samp)
-M <- M[,-c(2,4)]
-
-write_csv(M, path = "../data/Butterfly_Gene_Expression.csv")
+rich.dat <- data.frame('plot' = as.factor(rep(seq(1, 20), each = 5)), 
+                       'treatment' = rep(c('burned', 'unburned'), each = 50), 
+                       'richness' = all.rich)
+write.table(rich.dat, file="../data/richness.txt",
+            sep="\t", row.names = FALSE)
 ```
+
+### Activity
+
+Load in the richness data (richness.txt). Plot species richness vs. treatment. Include an appropriate amount of jitter and transparency and color points by plot. 
 
 ```{r}
-getP <- function(fm) {
-  sum.set <- summary(fm)
-  p.set <- lapply(sum.set, function(x) x[['coefficients']][2, 4])
-  return(unlist(p.set))
-}
+rich.dat <- read_delim("../data/richness.txt",
+                       delim = "\t") %>% 
+  mutate(plot = factor(plot))
+
+ggplot(rich.dat, aes(x = treatment, y = richness, color = plot)) +
+  geom_point(position = position_jitter(0.1), alpha = 0.5) +
+    guides(colour = guide_legend(ncol = 2, byrow = FALSE))
 ```
 
-## RNAseq (gene expression) on males and females of the Glanville Fritillary
+Do you think there is a relationship between species richness and burning?
 
-Glanville Fritillary butterflies are a model organism for studying dispersal and metapopulation dynamics, because they live in isolated meadows.
+> Probably not. It doesn't look like a strong relationship.
 
-<div style="width:350px">
-![](http://i1.treknature.com/photos/1289/melitaea_cinxia.jpg)
-</div>
+First, fit a model predicting species richness from treatment without considering plot membership. What can you conclude from the results of this model?
 
-### Activities
-
-Load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `data.frame` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures). We will perform 100 regressions using `lm()`, predicting each gene expression measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the example code below and follow the same procedure to fit all 100 models at once.
+> It is difficult to interpret without considering plot as there is pseudoreplication.
 
 ```{r}
-ex.dat <- data.frame('treatment' = rep(c('a', 'b'), each = 20),
-                     'yy1' = rnorm(40),
-                     'yy2' = rnorm(40))
-
-treat <- ex.dat$treatment
-YYs <- as.matrix(ex.dat[, 2:3])
-
-mods <- lm(YYs ~ treat)
-summary(mods)
-
-#FIXME
-M <- read_csv("../data/Butterfly_Gene_Expression.csv")
-Ys <- as.matrix(M[, 3:ncol(M)])
-fm <- lm(Ys ~ Sex, data = M)
+anova(lm(richness ~ treatment, data = rich.dat))
 ```
 
-Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. Do this for your data and assign it to an object, `obsP`. Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
+Now, get the mean species richness value for each plot. Fit a model predicting mean species richness from treatment. What can you conclude from this model?
 
 ```{r}
-ex.P <- getP(mods)
-
-#FIXME
-set.seed(273645)
-obsP <- data.frame('P' = getP(fm))
-
-ggplot(obsP, aes(P)) +
-  geom_histogram(bins = 20)
-
-qqP <- data.frame('observed' = sort(-log10(obsP$P)),
-                  'expected' = sort(-log10(runif(length(obsP$P), 0, 1))))
-
-ggplot(qqP, aes(x = expected, y = observed)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1)
+mean.plot <- rich.dat %>%
+  group_by(plot, treatment) %>%
+  summarize(meanrich = mean(richness))
+anova(lm(meanrich ~ treatment, data = mean.plot))
 ```
 
-Based on these visualizations, do you think there are true positives in this data set?
+> There is no effect of treatment on species richness.
 
-> Probably. The P-values deviate pretty strongly from the expected line.
+Use the `lme()` function to fit a model predicting richness from treatment with plot as a random effect. 
 
-Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction (Holmes procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a `data.frame` with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.
+```{r}
+summary(lme(richness ~ treatment, random = ~1 | plot, data = rich.dat))
+```
+
+Compare your results to the approach using the mean value. What can you conclude from this model? 
+
+> The results are consistent with the model using the mean values. 
+
+Why would you use `lme()` versus means per group?
+
+> 
+
+These 20 plots exist in an alternating pattern going from south to north on either side of an access road. What other source of non-independence should you consider? How would you account for this factor?
+
+> The spatial relationship between plots needs to be accounted for. You could include a continuous variable coding for position along the south to north axis and/or side of the road.
+
+## Indian meal moth
+
+For this activity, we will use a dataset measuring the amount of phenoloxidase (PO) produced by indian meal moth caterpillars in full-sibling families. 
+
+### Activity
+
+First we will load the `MCMCglmm` library and get the moth data called `PlodiaPO`.
+
+```{r}
+library(MCMCglmm)
+data(PlodiaPO)
+```
+
+Examine the data. Look at the first few rows and use `unique()` to see the list of families in this dataset. Plot a histogram of the PO values and calculate the overall mean value.
+
+
+```{r}
+head(PlodiaPO)
+unique(PlodiaPO$FSfamily)
+
+ggplot(PlodiaPO, aes(x = PO)) +
+  geom_histogram()
+
+mean(PlodiaPO$PO)
+```
+
+Now we will fit the MCMCglmm model with family as a random effect.
+
+```{r}
+fm <- MCMCglmm(PO ~ 1,
+               random = ~ FSfamily,
+               data = PlodiaPO,
+               verbose = TRUE)
+```
+
+Refer to the lecture slides for the next section. Plot the fixed effects and calculate the median for the estimate of the intercept. Compare this value to the mean value you calculated above. 
+
+```{r}
+plot(fm$Sol)
+
+mean(PlodiaPO$PO)
+median(fm$Sol)
+```
+
+Now plot the random effects and calculate heritability for all the MCMC samples. Because we have fit family here instead of using an animal model like in lecture, you should multiply your estimate by 2. This is because full-sib families share 50% of their genes on average. Plot the resulting distribution of heritability estimates. Estimate the median value and the standard error. 
+
+```{r}
+plot(fm$VCV)
+
+h2 <- 2 * fm$VCV[, "FSfamily"]/(fm$VCV[, "FSfamily"] + fm$VCV[, "units"])
+
+plot(h2)
+
+median(h2)
+sd(h2)
+```
+
+## Primate life history
+
+We are going to work with two files, one containing a tree of (extant) primates (226 tips; `Primate_Masses_Tree.nex`) and another containing data of primate life history (`Primate_Masses.xlsx`). We will use these data to explore phylogenetic comparative methods.
+
+### Activity
+
+Load the `Primate_Masses.xlsx` file and explore the contents. You will find columns:
+
+- `Order`: Traditional Linnean order
+- `Family`: Traditional Linnean family
+- `Binomial`: Genus species binomial. *This column matches the tree tip labels.*
+- `AdultBodyMass_g`: Body mass in grams
+- `GestationLen_d`: Gestation length in days
+- `HomeRange_km2`: Home range area in square kilometers
+- `MaxLongevity_m`: Maximum longevity in months
+- `SocialGroupSize`: Mean social group size
+
+As a final step, be sure to convert the object into a `data.frame` from the `tibble` that `read_excel()` produces by default.
 
 ```{r}
 # FIXME
-seq_bonf <- p.adjust(obsP$P, method = "holm")
-tibble(P = obsP$P,
-           seq_bonf) %>%
-  arrange(P) %>%
-  filter(seq_bonf <= 0.05)
-sum(seq_bonf < 0.05)
+M <- read_excel("../data/Primate_Masses.xlsx") %>% as.data.frame()
 ```
 
-Repeat the procedure above, but now use the false discovery rate procedure of Benjamini and Hochberg.
+Load the tree from the file `Primate_Masses_Tree.nex` using the function `read.nexus()` which is in the `ape` package.
+
+Give it is useful name like `tree`. Plot the tree using the `plot()` method for `phylo` objects (which is what your tree will be). In the `plot()` call, include you can make the tip labels smaller with `cex = 0.8`. We expanded the figure size in the chunk header to keep the tips from overlapping. It will look like a mess in the RStudio window, but will look OK when knitted.
+
+```{r, fig.height=30, fig.width=10}
+# FIXME
+tree <- read.nexus("../data/Primate_Masses_Tree.nex")
+plot(tree, cex = 0.8)
+```
+
+Any time you have comparative data and a tree, you should do a lot of tests to make sure that the tree labels match the data column that codes for them. 
+Some functions will do these checks for you. However, it's important to do these checks yourself, just to be sure. They are absolutely necessary when you are using phylogenetically independent contrasts or another method that makes assumptions about a match between tips and data without an explicit check. Using `gls()` for PGLS will do this also, albeit with a warning message.
+
+Start by looking at both the `Binomial` column of your data frame and the tip labels of the tree (e.g., `tree$tip.label`).
 
 ```{r}
 # FIXME
-fdr <- p.adjust(obsP$P, method = "fdr")
-tibble(P = obsP$P,
-           fdr) %>%
-  arrange(P) %>%
-  filter(fdr <= 0.05)
-sum(fdr < 0.05)
+M$Binomial
+tree$tip.label
 ```
 
-Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the `qvalue` package, which is available through Bio conductor (rather than CRAN).
+Let's figure out what tree tips are not represented in the data file (a lot probably) and what data are not represented in the tree (hopefully only a few). Let's start by looking at the species that are present in both the data and the tree. We use the intersection of the `Binomial` column and the tip labels (the function `intersect()`). Change `eval` to true in the following chunk.
+
+```{r eval=TRUE}
+# FIXME
+intersect(tree$tip.label, M$Binomial)
+```
+
+How many species are present in both? How many rows of data are there? How many tips or taxa need to be dropped in total (we don't know yet which are tips are which are taxa)?
+
+> 83 are present in both. There are 91 data observations, so 8 must not match up.
+
+The first step in the process is to keep only the tips of the tree where tips are present in the data. The `setdiff()` function returns a vector of the differences between two sets. If we use the same syntax as above but with `setdiff` rather than `intersect`, we'll get the list of tips that need to be dropped. Create that variable and call it something memorable like `tips_to_drop`. There should be 143 tips in the list.
 
 ```{r}
-library(qvalue)
-qobj <- qvalue(obsP$P, fdr.level = 0.05, pi0.method = "smoother")
-summary(qobj)
+tips_to_drop <- setdiff(tree$tip.label, M$Binomial)
+length(tips_to_drop)
 ```
 
-What is the value of $\pi_0$? What does this value represent?
+Now we can actually drop the tips from the tree. The `ape` package has a function `drop.tip()` which does just this. Create a new tree (e.g., `tree_pruned`) where all the orphan tips are dropped. Look at the help for `drop.tip()` for the syntax. Then plot your tree to make sure it still looks OK. We we use this tree for the rest of this exercise.
 
-> 0.39. This means that only 39% of the null hypotheses are true.
+```{r, fig.height=15, fig.width=10}
+# FIXME
+tree_pruned <- drop.tip(tree, tips_to_drop)
+plot(tree_pruned)
+```
 
-How many P-values are associated with q-values less than 0.05?
-
-> 29 (of 32 nominally less than 0.05)
-
-What is an adjusted $\alpha$-level that will control pDFR at 0.05?
+We should probably also remove any rows from the data that are not present in the tree. This isn't strictly necessary in most cases, but it's good practice. We can use `setdiff()` again, but this time reverse the order: `setdiff(M$Binomial, tree_pruned$tip.label)`. Do this, and save to a new variable `rows_to_drop`. You should find 8 rows that need to be dropped from the data frame.
 
 ```{r}
-max(qobj$pvalues[qobj$qvalues <= 0.05])
+# FIXME
+rows_to_drop <- setdiff(M$Binomial, tree_pruned$tip.label)
+length(rows_to_drop)
 ```
 
-Perform a randomization to estimate the number of expected false positives for this experiment. 1) You will want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) Perform your set of 100 tests in the same way that you did above. 3) Collect the associated p values using the `getP` function. 4) Keep these in a 1000 x 100 matrix with each column as one iteration. This process will take a few minutes to run. You may want to test the steps with a small number of iterations first.
+ Drop the rows from the data that are not in the tree. The best (though least clear) way to do this is with a notation like `M[!(M$Binomial %in% rows_to_drop), ]`. The `!` negates the entire parenthetical that follows. Inside parentheses, the function `%in%` returns true for all the rows in `M$Binomial` that match any items in `rows_to_drop`. So by negating this set, we get all the rows that are *not* in `rows_to_drop`.
 
-```{r randomization, cache=TRUE}
-#FIXME
-set.seed(874628)
-niter <- 1000
-
-Ys <- as.matrix(M[, 3:ncol(M)])
-Sex <- M$Sex
-
-allP <- matrix(NA, ncol(Ys), niter)
-
-for (kk in 1:niter) {
-  fms <- lm(Ys ~ sample(Sex))
-  allP[, kk] <- getP(fms)
-}
-```
-
-Visualize the P-values from one or a few of your iterations as you did above with a histogram and a q-q plot.
+Assign a new variable the data frame resulting from dropping all rows not in the tree file. Check the number of rows. You should find 83.
 
 ```{r}
-it1 <- data.frame('P' = allP[, 5])
-ggplot(it1, aes(P)) +
-  geom_histogram(bins = 20)
-
-qqP <- data.frame('observed' = sort(-log10(it1$P)),
-                  'expected' = sort(-log10(runif(100, 0, 1))))
-
-ggplot(qqP, aes(x = expected, y = observed)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1)
+# FIXME
+M_pruned <- M[!(M$Binomial %in% rows_to_drop), ]
+nrow(M_pruned)
 ```
 
-For each iteration, get a count of the number of positives at a threshold of 0.05. Visualize the number of positives with a histogram. Keep in mind, because you have randomized the data, *all positives here are false postives*.
-
-- Calculate the average number of false positives and the average false positive rate at a threshold of 0.05.
-- Now calculate the Family-Wise Error Rate (FWER) at a threshold of 0.05 by calculating the proportion of iterations that result in at least one significant result.
-- Use your average estimated number of false positives to calculate the false discovery rate at a threshold of 0.05. Note you will need to consider your observed number of positives for this calculation.
-
+The final thing to do is to assign `Binomial` to the row names (`row.names()`) of the data.frame.
 
 ```{r}
-th <- 0.05
-
-pos.counts <- data.frame(
-  'counts' = apply(allP, 2, function(x) sum(x < th)))
-
-ggplot(pos.counts, aes(counts)) +
-  geom_histogram(bins = 20)
-
-mean(pos.counts$counts)
-
-mean(pos.counts$counts) / 100
-
-sum(pos.counts >= 1) / 1000
-
-mean(pos.counts$counts) / sum(obsP$P < th)
+# FIXME
+row.names(M_pruned) <- M_pruned$Binomial
 ```
 
-Now use this same procedure to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `data.frame`.
+We have finally arrived at the point of being able to do something with these data. As you may have realized, working with comparative data is much more involved in terms of processing than working with regular data.
+
+For the rest of this question, we will be exploring the relationship between body mass and maximum longevity. Make a scatterplot of the raw data for maximum longevity vs. body mass.
 
 ```{r}
-thresholds <- seq(0.0005, 0.05 , length = 200)
-
-#FIXME
-output <- data.frame('threshold' = thresholds,
-                      'FP' = numeric(length(thresholds)),
-                     'FWER' = numeric(length(thresholds)),
-                     'FDR' = numeric(length(thresholds)))
-
-for (tt in 1:length(thresholds)) {
-  th <- thresholds[tt]
-  pos.counts <- data.frame(
-    'counts' = apply(allP, 2, function(x) sum(x < th)))
-  output[tt,'FP'] <- mean(pos.counts$counts) / 100
-  output[tt,'FWER'] <- sum(pos.counts >= 1) / 1000
-  output[tt,'FDR'] <- mean(pos.counts$counts) / sum(obsP$P < th)
-}
-output
-max(output$threshold[output$FDR <= 0.05])
+# FIXME
+ggplot(M_pruned, aes(x = AdultBodyMass_g, y = MaxLongevity_m)) +
+  geom_point()
 ```
 
-Make plots of the FDR, FP, and FWER plotted against the threshold (feel free to make three separate plots). In each, draw a horizontal line at 5%.
+Assess the bivariate relationship and transform either or both of the variables if they require it.
 
 ```{r}
-#FIXME
-output %>%
-  ggplot(aes(threshold, FDR)) +
-  geom_point() +
-  geom_hline(yintercept = 0.05)
-
-output %>%
-  ggplot(aes(threshold, FP)) +
-  geom_point() +
-  geom_hline(yintercept = 0.05)
-
-output %>%
-  ggplot(aes(threshold, FWER)) +
-  geom_point() +
-  geom_hline(yintercept = 0.05)
+# FIXME
+M_pruned$log_Mass <- log10(M_pruned$AdultBodyMass_g)
+M_pruned$log_Longevity <- log10(M_pruned$MaxLongevity_m)
+ggplot(M_pruned, aes(x = log_Mass, y = log_Longevity, color = Family)) +
+  geom_point()
 ```
 
-Inspecting the `data.frame` you made above, what P-value threshold should you use if you want a false discovery rate of 5%?
+> We can log10 transform both variables. It's probably adequate to only log mass, but it looks a little better with both transformed.
 
->
-
-Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here.
+We're ready to perform PGLS. Fit a PGLS using `gls()` regressing longevity on mass. Use a Brownian motion correlation structure. Follow the lecture slides as an example. Save this model to an R object. Print the summary of the `gls` object that you just made.
 
 ```{r}
-minP <- apply(allP, 2, min)
-quantile(minP, 0.05)
+# FIXME
+fm1 <- gls(log_Longevity ~ log_Mass, data = M_pruned,
+           correlation = corBrownian(phy = tree_pruned),
+           method = "ML")
+summary(fm1)
 ```
+
+e. What is the linear equation for the phylogenetic regression of longevity on body mass?
+
+> log Longevity = 2.07 + 0.11 * log Mass. 
+
+Fit a second model where `Family` is used in addition to mass. Use an additive model and Brownian motion model of trait evolution. Use the `anova()` method to generate an ANOVA table for the model fit.
+
+```{r}
+fm2 <- gls(log_Longevity ~ log_Mass + Family, data = M_pruned,
+           correlation = corBrownian(phy = tree_pruned),
+           method = "ML")
+summary(fm2)
+anova(fm2)
+```
+
+Considering the ANOVA table, does the relationship between longevity and mass differ by family? Briefly explain.
+
+> No. The *P*-value for family is 0.999, so there is no difference in the relationship based on family. The intercepts are all equal to one another.
+
+Extract (`AIC()`) and compare the AICs for the two models you just fit. Interpret the difference in AIC values.
+
+```{r}
+AIC(fm1, fm2)
+```
+
+> The difference is 25 AIC units, with the simpler model *much* preferred.
+
+Feel free to explore other variables in this data set.

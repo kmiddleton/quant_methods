@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 06'
+title: 'Problem Set 05'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -15,296 +15,313 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
-
-library(knitr)
 ```
 
-```{r echo=FALSE, eval=FALSE}
-# Generate data for question 1.
-# P = 0.0495
-n <- 15
-set.seed(1064)
-M1 <- tibble(
-  Proportion_Surviving = c(rnorm(n, 0.28, 0.07),
-                           rnorm(n, 0.242, 0.07)),
-  Trout = factor(rep(c("Absent", "Present"), each = n))
-)
-write_csv(M1, path = "../data/BrookTrout1.csv")
+## Comparing Models: Differences between group means
 
-ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
+Stalk-eyed flies are a clade of flies whose eyes are at the ends of long projections (stalks) on either side of their head. Shortly after emerging from a pupae, these flies ingest air through their mouth in order to pump it into these stalks to elongate them (watch this craziness here: https://www.youtube.com/watch?v=bGX7zZk0Eo4). Females prefer males with wider eye spans. Photo below:
+
+<div style="width:350px">
+![](https://i.imgur.com/7KxZKQF.jpg)
+</div>
+
+The `Stalkies.csv` data file contains data for an experiment in which male stalk-eyed flies were reared on different food sources (corn and cotton). The hypothesis is that food type affects eye span. In the next few exercises, you will try to answer this question using different approaches.
+
+### Activity 1
+
+Load the `Stalkies.csv` file.
+
+```{r}
+# FIXME
+stalk <- read_csv("../data/Stalkies.csv")
+```
+
+Visualize the dataset in two ways:
+
+1. Make a boxplot showing each food type on the x axis.
+2. Plot the raw data (points) for the two groups. For the points, include jitter and transparency. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate. Change the axis labels to what you would expect on a publication ready figure.
+
+```{r }
+ggplot(stalk, aes(x = food_source, y = eye_span)) +
+  geom_boxplot()
+
+ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
   stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival", title = "BrookTrout1")
-
-summary(lm(Proportion_Surviving ~ Trout, M1))
-
-# P = 0.0536
-n <- 15
-set.seed(1064)
-M2 <- tibble(
-  Proportion_Surviving = c(rnorm(n, 0.282, 0.07),
-                           rnorm(n, 0.245, 0.07)),
-  Trout = factor(rep(c("Absent", "Present"), each = n))
-)
-write_csv(M2, path = "../data/BrookTrout2.csv")
-
-ggplot(M2, aes(x = Trout, y = Proportion_Surviving)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival", title = "BrookTrout2")
-
-summary(lm(Proportion_Surviving ~ Trout, M2))
+  labs(x = "Food Source", y = "Eye Span")
 ```
 
-## Brook trout
+Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show?
 
-You and a collaborator are studying the role of an introduced species (brook trout, *Salvelinus fontinalis*) on survival of native Chinook salmon (*Oncorhynchus tshawytscha*). Because you are located at different universities, you each have a different set of streams to sample. Independently, each of you measures survivorship of Chinook salmon in 15 streams that have introduced brook trout and in 15 streams that are free of brook trout. To estimate survivorship (percent alive), you released an equal number of tagged juvenile Chinook salmon into each stream and then resampled over the course of a year.
+> The mean eye span is higher for flies reared on corn than on cotton. The variance also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups.
 
-The two data files are:
+We will first use the analytical method to determine if the group means are significantly different. In this case, a *t*-test is most appropriate.
 
-1. Your data: `BrookTrout1.csv`
-2. You collaborator's data: `BrookTrout2.csv`
+By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*.
+
+### Activity 2
+
+Perform a *t*-test using the formula method to specify the groups to test (follow the example in lecture if you need to). Print the results.
+
+```{r }
+# FIXME
+myT <- t.test(eye_span ~ food_source, data = stalk)
+myT
+```
+
+What can you conclude from these results?
+
+> The hypothesis that the means for the two groups are equal is very unlikely. There is a statistically significant difference between the groups.
+
+### Activity 3
+
+`t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). `lm()` is a general function that fits many many different kinds of linear models. We will talk quite a lot about linear models in the coming weeks.
+
+A *t*-test is a kind of linear model, so we can also fit the same model using `lm()`.
+
+1. Use the code from above, but use `lm()` in place of `t.test()`. Assign this to a new object. Note that `lm()` always assumes equal variances (there is no `var.equal` argument).
+2. Pass the object that you just created to the function `summary()`.
+
+```{r}
+# FIXME
+fm <- lm(eye_span ~ food_source, data = stalk)
+summary(fm)
+```
+
+Compare the results of the linear model with the results of the *t*-test above. Do you recognize any of the estimates?
+
+> The `(Intercept)` term from `lm()` is equal to the mean for the Corn group. The `food_sourceCotton` estimate is the *difference* between the means for the Corn and Cotton group means.
+
+### Activity 4
+
+In lecture, we gave the equations for calculating the Bayes Factor (likelihood ratio) to compare two models. This type of comparison is applicable in situations when you have model likelihoods available and gives you an estimate of the relative support of one model compared to the another. In the future, we will use variations of this test to compare models.
+
+For now, we will give you most of the steps along the way. Study carefully, so that you understand what every block of code is doing.
+
+```{r}
+# Function to calculate sum of squares of a vector
+SS <- function(x, x_bar = NULL) {
+  # If x_bar is not provided, use the mean of x
+  if (is.null(x_bar)) x_bar <- mean(x, na.rm = TRUE)
+
+  # Return sum of squares
+  return(sum((x - x_bar) ^ 2))
+}
+```
+
+#### Setup data
+
+```{r}
+n1 <- nrow(stalk[stalk$food_source == "Corn", ])
+n2 <- nrow(stalk[stalk$food_source == "Cotton", ])
+
+x <- stalk$eye_span
+x1 <- stalk$eye_span[stalk$food_source == "Corn"]
+x2 <- stalk$eye_span[stalk$food_source == "Cotton"]
+```
+
+#### Data drawn from two separate distributions
+
+Assume equal variances but different means.
+
+$$\hat{\sigma}^2_2 = \frac{1}{n_1 + n_2}\left(\sum^{n_1}_{i=1}\left(y_{1i} - \bar{y}_1\right)^2 +  \sum^{n_2}_{i=1} \left(y_{2i} - \bar{y}_2\right)^2 \right)$$
+
+$$\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|x\right) = \frac{1}{\left(2\pi \hat{\sigma}^2_2\right)^\left(\frac{n_1 + n_2}{2}\right)}e^{\left(-\frac{n_1 + n_2}{2}\right)}$$
+
+```{r}
+s_hat_2 <- (1 / (n1 + n2)) * (SS(x1) + SS(x2))
+
+L_2 <- 1 / (2 * pi * s_hat_2) ^ ((n1 + n2) / 2) * exp(-(n1 + n2) / 2)
+log(L_2)
+```
+
+#### All observations come from the same distribution
+
+$$\hat{\sigma}^2_1 = \frac{1}{n_1 + n_2}\left(\sum^{n_1}_{i=1}\left(y_{1i} - \bar{\bar{y}}\right)^2 +  \sum^{n_2}_{i=1} \left(y_{2i} - \bar{\bar{y}}\right)^2 \right)$$
+
+where $\bar{\bar{y}}$ is the grand mean.
+
+$$\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|x\right) = \frac{1}{\left(2\pi \hat{\sigma}^2_1\right)^\left(\frac{n_1 + n_2}{2}\right)}e^{\left(-\frac{n_1 + n_2}{2}\right)}$$
+
+```{r}
+s_hat_1 <- (1 / (n1 + n2)) * (SS(x1, mean(x)) + SS(x2, mean(x)))
+L_1 <- 1 / ((2 * pi * s_hat_1) ^ ((n1 + n2) / 2)) * exp(-((n1 + n2) / 2))
+log(L_1)
+```
+
+#### Likelihood ratio (Bayes Factor)
+
+The equation for Bayes Factor can be calculated in two ways:
+
+$$BF = \frac{\mathcal{L}(Model~2)}{\mathcal{L}(Model~1)} = \left(\frac{\hat{\sigma}^2_2}{\hat{\sigma}^2_1}\right)^{-\frac{n_1 + n_2}{2}}$$
+
+Use the calculations we have given you above to calculate the Bayes Factor for model 2 (the data come from distributions with different means) vs. model 1 (the data come from a single distribution with one mean).
+
+```{r}
+# FIXME
+L_2 / L_1
+(s_hat_2 / s_hat_1) ^ (-(n1 + n2) / 2)
+```
+
+What do you conclude based on the Bayes Factor comparison?
+
+> There is overwhelming support for the two mean model.
+
+We have actually violated one of the assumptions of the likelihood calculations that we did. What is it?
+
+> The variances are likely *not* equal.
+
+## Confidence intervals
+
+We will use the same data to explore confidence intervals.
 
 ### Activity
 
-Load each of the files into R.
+Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture $\mu$ +/- 2 * SEM.
 
 ```{r}
 # FIXME
-BT1 <- read_csv("../data/BrookTrout1.csv")
-BT2 <- read_csv("../data/BrookTrout2.csv")
-```
+mean(stalk$eye_span[stalk$food_source == 'Cotton']) -
+  2 * sd(stalk$eye_span[stalk$food_source == 'Cotton'] /
+           sqrt(length(stalk$eye_span[stalk$food_source == 'Cotton'])))
 
-Make a plot of each data set using the same ggplot code you used to visualized the stalk-eyed fly data in Problem Set 5. Plot the raw data (points) for the two groups (trout `Absent` and `Present`). For the points, include jitter and transparency. Include means and standard errors plotted in a different color.
+mean(stalk$eye_span[stalk$food_source == 'Cotton']) +
+  2 * sd(stalk$eye_span[stalk$food_source == 'Cotton'] /
+           sqrt(length(stalk$eye_span[stalk$food_source == 'Cotton'])))
 
-Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plot 2). Then use the `plot_grid()` function in the `cowplot` package to stack the two plots on top of one another. You code for the last step will look something like: `plot_grid(p1, p2, nrow = 2)`. If you used `ncol = 2` instead, you would get plots side by side.
+mean(stalk$eye_span[stalk$food_source == 'Corn']) -
+  2 * sd(stalk$eye_span[stalk$food_source == 'Corn'] /
+           sqrt(length(stalk$eye_span[stalk$food_source == 'Corn'])))
 
-`plot_grid()` is a really handy function for combining different ggplots into a single figure. It has facilities for adding labels ("a.", "b.", etc.), changing the spacing between plots, and much more. For us, it is indispensable for making publication-ready figures.
+mean(stalk$eye_span[stalk$food_source == 'Corn']) +
+  2 * sd(stalk$eye_span[stalk$food_source == 'Corn'] /
+           sqrt(length(stalk$eye_span[stalk$food_source == 'Corn'])))
 
-```{r}
-# FIXME
-p1 <- ggplot(BT1, aes(x = Trout, y = Proportion_Surviving)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival", title = "My Data")
-p2 <- ggplot(BT2, aes(x = Trout, y = Proportion_Surviving)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Trout", y = "Survival", title = "My Collaborator's Data")
-
-plot_grid(p1, p2, nrow = 2)
-```
-
-Considering the plot you just made, do you think that mean survivorship is significantly different in the Absent/Present treatment groups? Do you think that the two sets of data are different from one another?
-
-> There is much variability, but survival does appear to be higher in the trout absent treatment group. The SEMs don't overlap it seems. There might be a significant different between treatments. The patterns look the same across locations.
-
-First, fit a linear model to **your data** (from `BrookTrout1.csv`), in which the proportion of salmon surviving is modeled by presence or absence of trout. Print out the `summary()` of this linear model.
-
-```{r}
-# FIXME
-fm1 <- lm(Proportion_Surviving ~ Trout, BT1)
-summary(fm1)
-```
-
-How do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
-
-> At $\alpha = 0.05$, there is a significant difference between the groups with lower salmon survivorship in the presence of trout (mean difference = 0.055; P = 0.0495).
-
-Now fit the same model to your **collaborator's data** (from `BrookTrout2.csv`).
-
-```{r}
-# FIXME
-fm2 <- lm(Proportion_Surviving ~ Trout, BT2)
-summary(fm2)
-```
-
-What do you conclude about your collaborator's data?
-
-> $P = 0.054$ here. So we conclude, based on $\alpha = 0.05$, that there is not a significant difference in means.
-
-How do you feel about the results of these two studies?
-
-> They are nearly identical, but the arbitrarily chosen $\alpha$ level comes to two different conclusions.
-
-Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the aggregate data, which might look something like this table:
-
-```{r echo=FALSE}
-M <- tibble(Survival = c("Survived", "Did not survive"),
-            `Trout absent` = c(946, 3470),
-            `Trout present` = c(919, 3876))
-knitr::kable(M)
-```
-
-Why is this test not advisable in this case?
-
-> The observations (whether an individual salmon juvenile was alive or not) are not independent of one another, streams add a level of structure to the data (all salmon in a stream are more likely to have the same survival probability).
-
-## Exact confidence intervals
-
-We ultimately want to calculate exact confidence intervals for the proportion surviving in your data. First, we want to explore the adjustment for degrees of freedom (the critical *t*-value). Originally, we showed you how to calculate the approximate CI, using twice the standard error of the mean. Using 2 will result in too narrow CIs for small degrees of freedom and too wide CIs for large degrees of freedom.
-
-### Activity
-
-Make a plot of the critical value for a *t*-distribution for the 0.975 quantile (upper tail of 2.5%) where the degrees of freedom ranges from 2 to 100. First set up the vector of degrees of freedom (don't call it df, because that is the name of an R function). Then calculate the critical values. Make a data.frame and plot the results. Then add a differently colored horizontal line at the critical value for the 0.975 quantile for a standard normal distribution. Note that the critical value approaches the asymptotic limit as the degrees of freedom increases.
-
-```{r}
-# FIXME
-CVs <- tibble(dfs = seq(2, 100, by = 1),
-                  crit_vals = qt(0.975, df = dfs,
-                                 lower.tail = TRUE))
-
-CVs %>%
-  ggplot(aes(dfs, crit_vals)) +
-  geom_line() +
-  geom_hline(yintercept = qnorm(0.025, lower.tail = FALSE),
-             color = "blue") +
-  labs(x = "Degrees of Freedom", y = "Critical value (0.975)")
-```
-
-Now calculate the exact 95% confidence intervals for the two groups in your data (from `BrookTrout1.csv`). Either pull the critical value from your data.frame or just calculate anew.
-
-```{r}
-# Let's just adapt the approximate CI function from
-# Problem Set 5. We will make it a little more flexible
-# by allowing us to specify the desired interval with
-# `prob`. Default to 95% CI.
+## We can write functions to do the SEM and approximate CI
+## approx_CI returns a tibble with the lower and upper
+## bounds of the CI. Notice that the "do" function can take
+## the tibble from approx_CI and turn it into a tibble
+## with both CI bounds. This is a general way to handle
+## summarizing from functions that return multiple variables.
 SEM <- function(x) return(sd(x) / sqrt(length(x)))
 
-exact_CI <- function(x, prob = 0.95) {
-  t_crit <- qt((1 - prob) / 2,
-               df = length(x) - 1,
-               lower.tail = FALSE)
-  Upper <- mean(x) + t_crit * SEM(x)
-  Lower <- mean(x) - t_crit * SEM(x)
-  return(tibble(Lower, Mean = mean(x), Upper))
+approx_CI <- function(x) {
+  upper <- mean(x) + 2 * SEM(x)
+  lower <- mean(x) - 2 * SEM(x)
+  return(tibble(lower, upper))
 }
 
-CIs <- BT1 %>%
-  group_by(Trout) %>%
-  do(exact_CI(.$Proportion_Surviving))
-
-knitr::kable(CIs)
+stalk %>%
+  group_by(food_source) %>%
+  do(approx_CI(.$eye_span))
 ```
 
-## Working with lists
+We can simulate what we would expect assuming the means and standard deviation are representative of the population parameters. Do the following:
 
-Lists are one of the most flexible data structures in R. They can hold any combination of other types of R objects (including other lists). R functions like `lm()` return lists.^[R functions can only return a single object (unlike languages like python and MATLAB, which can return multiple objects). So everything that needs to be returned from a function is placed into a list, which gets returned.]
+1. Generate simulated data from a normal distribution matching the number of observations, mean, and standard deviation (note sd not SEM) for each group.
+2. Calculate the mean for each group and the upper and lower bounds of the confidence interval.
+3. Put these values into a `tibble`
+4. Repeat this 1000 times
+5. Calculate the proportion of times the mean for each group falls within the confidence interval
 
-Lists are indexed a little differently from vectors and matrices. List indices are indexed using double brackets: `[[1]]` extracts (or assigns) the first element. Run the following code:
 
 ```{r}
-mylist <- list()
-mylist[[3]] <- 24
-mylist
+set.seed(648273)
+niter <- 1000
+
+mu.corn <- mean(stalk$eye_span[stalk$food_source == 'Corn'])
+mu.cotton <- mean(stalk$eye_span[stalk$food_source == 'Cotton'])
+sd.corn <- sd(stalk$eye_span[stalk$food_source == 'Corn'])
+sd.cotton <- sd(stalk$eye_span[stalk$food_source == 'Cotton'])
+n.corn <- length(stalk$eye_span[stalk$food_source == 'Corn'])
+n.cotton <- length(stalk$eye_span[stalk$food_source == 'Cotton'])
+
+corn.cis <- tibble(mm = numeric(length = niter),
+                       ll = numeric(length = niter),
+                       uu = numeric(length = niter))
+cotton.cis <- tibble(mm = numeric(length = niter),
+                         ll = numeric(length = niter),
+                         uu = numeric(length = niter))
+
+for (jj in 1:niter) {
+  corn.s <- rnorm(n.corn, mu.corn, sd.corn)
+  cotton.s <- rnorm(n.cotton, mu.cotton, sd.cotton)
+
+  corn.cis[jj, ] <- c(
+    mean(corn.s),
+    mean(corn.s) - 2 * (sd(corn.s) / sqrt(n.corn)),
+    mean(corn.s) + 2 * (sd(corn.s) / sqrt(n.corn)))
+  cotton.cis[jj, ] <- c(
+    mean(cotton.s),
+    mean(cotton.s) - 2 * (sd(cotton.s) / sqrt(n.cotton)),
+    mean(cotton.s) + 2 * (sd(cotton.s) / sqrt(n.cotton)))
+}
+
+(sum(mu.corn < corn.cis$ll) + sum(mu.corn > corn.cis$uu)) / niter
+(sum(mu.cotton < cotton.cis$ll) + sum(mu.cotton > cotton.cis$uu)) / niter
 ```
 
-We first create an empty list, using the `list()` function. The second line assigns 24 to the 3rd element. When we print the list (last line), you can see that the 1st and 2nd elements are created and left as `NULL`. Managing lists can be harrowing:
+What do you conclude based on this simulation?
 
-```{r}
-mylist[[1]] <- "hello world"
-mylist[[2]] <- list(x = 12, y = "y", z = seq(1, 5, by = 0.2))
-mylist
-```
+> The true mean is within about 95% of the resampled confidence intervals.
 
-Now the 1st element has a string, the 2nd has a list (which itself contains a numeric, a string, and a vector). How would you extract the 3rd element from the `z` vector?
+Is it correct to say that there is a 95% probability that the true mean is within a 95% confidence interval? Why or why not? Think about what you just showed with your simulation.
 
-```{r}
-mylist[[2]]$z[3]
-```
+> No, it is not correct. CIs tell us about a range of values that we have some confidence in for *future* samples. This is a nuanced but very important point about confidence intervals.
 
-We will use lists in a much less convoluted way, which is what you should do until you get comfortable. For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
+## OLS Regression
+
+The file `Earwigs.csv` contains data for the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. An earwig with forceps is shown below.
+
+<div style="width:350px">
+![](https://i.imgur.com/YJ0NnSb.jpg)
+</div>
+
+The hypothesis is that earwigs living at higher densities will be more likely to have forceps, so that samples living at higher densities will have a higher proportion with forceps.
 
 ### Activity
 
-The file `mammals.xlsx` contains data for about 50 different traits. *All* 5416 species of mammals are included in the file, though none has data for all traits. We want to make some quick plots of four different traits plotted against body mass.
+Load the earwigs data:
 
-Rather than creating separate plots, we want to make them inside a loop, where we iterate through the columns of interest. This will make it easy to modify the format of the plots all at once, reducing the amount of code to keep up with. For example, change all the points to be transparent in one line rather than in four places.
-
-1. Load the data from `mammals.xlsx`.
-2. Create a column that holds the log10 transformation of `adult_body_mass_g` and one for the log10 of `basal_met_rate_m_l_o2hr`.
-3. Create a vector of strings that we will use to iterate through the columns for analysis (we used `cols_analyze`). It should contain the following strings:
-    - "ageat_eye_opening_d"
-    - "log_BMR" (or whatever you called the log10 of `basal_met_rate_m_l_o2hr`)
-    - "gestation_len_d"
-    - "litter_size"
-4. Create a vector of strings to use for the y axis labels. Make sure that the order matches the order in your vector #3.
-5. Create an empty list to hold plots: `pp <- list()` for example.
-
-This is all we need for the setup. At this point, you have the data, two vectors (one of columns names and one of y axis labels), and an empty list.
-
-```{r warning=FALSE}
+```{r}
 # FIXME
-M <- read_excel("../data/mammals.xlsx", na = "NA") %>%
-  mutate(log_Mass = log10(adult_body_mass_g),
-         log_BMR = log10(basal_met_rate_m_l_o2hr))
-
-cols_analyze <- c("ageat_eye_opening_d",
-                  "log_BMR",
-                  "gestation_len_d",
-                  "litter_size")
-
-axis_labels <- c("Age at Eye Opening",
-                 "log10 BMR",
-                 "Gestation Length",
-                 "Litter Size")
-
-pp <- list()
+EW <- read_csv("../data/Earwigs.csv")
 ```
 
-No we can work on a loop to iterate through the columns, making a plot for each column. Here is the pseudocode:
+Make a scatterplot of the proportion of earwigs with forceps vs. density.
 
-1. Create the framework for a `for` loop.
-    - We want to iterate from 1 to `length(cols_analyze)`
-2. Extract the *i*th element of the columns to analyze vector. Assign to an object.
-3. Extract the *i*th element of the y axis label.
-4. Make a bivariate plot of the column vs. log Body Mass (assign to an object). This will look a little different from ggplots you have made before, particularly the aesthetics. Because you are supplying raw strings, you need to use `aes_string`. It will look something like (`col` is the variable that holds the string with the column name):
-    - `aes_string("log_Mass", col)`
-5. Assign the plot to the *i*th element of your list.
-
-```{r warning=FALSE}
+```{r}
 # FIXME
-for (ii in 1:length(cols_analyze)) {
-  col <- cols_analyze[ii]
-  lab <- axis_labels[ii]
-  p <- ggplot(M, aes_string("log_Mass", col)) +
-    geom_point(alpha = 0.5, size = 0.5) +
-    labs(x = "log10 Body Mass (g)", y = lab) +
-    theme(axis.text = element_text(size = 10),
-          axis.title = element_text(size = 10))
-  pp[[ii]] <- p
-}
+EW %>%
+  ggplot(aes(Density, Proportion_Forceps)) +
+  geom_point() +
+  labs(x = "Population Density", y = "Proportion with Forceps")
 ```
 
-At the end of the loop you will have a list that contains 4 plots. Try printing a plot by running `pp[[1]]` at the command line. If you get warnings saying something like `Removed 4948 rows containing missing values (geom_point).`, that is just ggplot saying that there are `NA`s in the data.
+Use the following code to add an OLS regression line through the points to your plot: `+ geom_smooth(method = "lm")`. Just add that code after `geom_point()` in your call to ggplot.
 
-Now you can make a 2x2 grid of plots. The cowplot function `plot_grid()` can take a list of plots as an argument: `plotlist = ...`. Pass your list of plots, and specify 2 columns and 2 rows (check the help for `plot_grid()`).
-
-```{r warning=FALSE}
+```{r}
 # FIXME
-plot_grid(plotlist = pp, ncol = 2, nrow = 2,
-          labels = c("a", "b", "c", "d"))
+EW %>%
+  ggplot(aes(Density, Proportion_Forceps)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Population Density", y = "Proportion with Forceps")
 ```
 
-Now you can fine tune the plots:
+Use `lm()` to fit a linear model in which the proportion of earwigs with forceps is modeled by the density of earwigs. Assign the linear model to an object, and then pass that object to `summary()` as you did above.
 
-- Add labels for x and y. The y label is the string you extracted from your vector of y axis labels.
-- Make the points smaller (`size = 0.5`) and transparent
-- Change the font size on the axis labels by adding the following code to your ggplot:
-
-```
-+ theme(axis.text = element_text(size = 10),
-        axis.title = element_text(size = 10))
+```{r}
+fm <- lm(Proportion_Forceps ~ Density, data = EW)
+summary(fm)
 ```
 
-- Pass the argument `labels = c("a", "b", "c", "d")` to `plot_grid()` to add labels for each plot.
+See if you can figure out what the coefficients represent. You will find estimates for the slope and intercept of the line, their respective standard errors,^[remember that standard errors tell us about the uncertainty in parameter estimates] and a *t*-test, which tests each parameter estimate vs. 0. Try to figure out how the *t*-value is calculated (divide one thing by another).
 
-As you can see rather than sequentially editing 4 sets of code, trying to make sure they all stay in sync, we can just edit one plotting statement and change the data in each iteration.
+> The OLS line is Proportion_Forceps = 0.07 + 0.013(Density). The standard errors are 0.18 and 0.008. The *t*-statistics are the estimates divided by their SEs. Neither the intercept nor the slope is significantly different from 0.
+
+The data we gave you here is a proportion. What is another format that the data could have been in? Think about the source of the portion values.
+
+> A proportion could also be represented as a binomial (where "has forceps" is a "success").
