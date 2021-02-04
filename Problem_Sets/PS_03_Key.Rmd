@@ -19,7 +19,7 @@ theme_set(theme_cowplot())
 ```
 
 # Part 1
- 
+
 ## Tidy Data
 
 We will be using `library(tidyverse)` a lot in this course, and one thing that makes this set of packages function really well is having "tidy" data.  This will help you for future data manipulation, cleaning, visualization and analysis.
@@ -53,18 +53,18 @@ To make this data go from wide to long format, you need to use the function `piv
 ```{r, message=FALSE}
 # FIXME
 gr_long <- gr %>%
-              pivot_longer(cols = c("day_0","day_13","day_34","day_54","day_61","day_68",
-                                    "day_75","day_90","day_97", "day_103", "day_112"), 
-                           names_to ="day", 
-                           values_to ="biomass")
+  pivot_longer(cols = c("day_0","day_13","day_34","day_54","day_61","day_68",
+                        "day_75","day_90","day_97", "day_103", "day_112"), 
+               names_to ="day", 
+               values_to ="biomass")
 gr_long
 
 
 #PRO TIP:  You can also make your life easier by just specifying the column numbers!
 gr_long2 <- gr %>%
-              pivot_longer(cols = c(3:13), 
-                           names_to ="day", 
-                           values_to ="biomass")
+  pivot_longer(cols = c(3:13), 
+               names_to ="day", 
+               values_to ="biomass")
 gr_long2
 ```
 
@@ -87,7 +87,7 @@ You can see our `day` column is a `<chr>`. To be able to plot plant biomass grow
 ```{r, message=FALSE}
 # FIXME
 gr_long <- gr_long %>%
-                separate(day, into = c("text", "days"), convert = TRUE)
+  separate(day, into = c("text", "days"), convert = TRUE)
 
 #you can also remove this extraneous column using this the [] and - the column of interest
 gr_long <- gr_long[,-3]
@@ -96,8 +96,6 @@ gr_long
 ```
 
 You may notice that your new column `days` is still a character.  If so, go back and fix the code above so it is no longer a character.
-
-
 
 ## Data Counts
 
@@ -141,14 +139,12 @@ The `drop_na()` function allows you to drop rows that have `NA`s in them in orde
 ```{r}
 #FIXME
 gr_long2 <- gr_long %>%
-              drop_na()
+  drop_na()
 
 gr_long2 %>% group_by(species) %>% tally()
 ```
 
 > No, now we see we have different sample sizes per species. 
-
-
 
 
 ## Data Exploration
@@ -199,8 +195,8 @@ One very important tool you will learn from the tidyverse is how to summarize yo
 # FIXME
 
 richness <- comp %>%
-              group_by(plot_no, subplot) %>%
-              summarize(richness = length(unique(species)))
+  group_by(plot_no, subplot) %>%
+  summarize(richness = length(unique(species)))
 richness
 ```
 
@@ -231,12 +227,12 @@ Join your plot level data to your species richness data using `left_join()`.  Yo
 ```{r, message=FALSE}
 # FIXME
 richness <- richness %>%
-                  left_join(plot, by = c("plot_no", "subplot"))
+  left_join(plot, by = c("plot_no", "subplot"))
 richness
 
 #Also
 richness %>%
-    left_join(plot)
+  left_join(plot)
 ```
 
 ## More Summarizing
@@ -253,9 +249,9 @@ Calculate the mean and standard deviation for species richness for each plot. Us
 ```{r}
 # FIXME
 mean_richness_plot <- richness %>%
-                        group_by(plot_no) %>%
-                        summarize(mean = mean(richness),
-                                  sd = sd(richness))
+  group_by(plot_no) %>%
+  summarize(mean = mean(richness),
+            sd = sd(richness))
 mean_richness_plot
 ```
 
@@ -265,9 +261,9 @@ The next goal will be to plot our data to see how the rainout treatments influen
 ```{r}
 # FIXME
 mean_richness_plot <- richness %>%
-                        group_by(plot_no, rain_removal) %>%
-                        summarize(mean_rich = mean(richness),
-                                  sd_rich = sd(richness))
+  group_by(plot_no, rain_removal) %>%
+  summarize(mean_rich = mean(richness),
+            sd_rich = sd(richness))
 mean_richness_plot
 ```
 
@@ -285,26 +281,61 @@ ggplot(mean_richness_plot, aes(x = rain_removal, y = mean_rich))+
 There appears to be a pretty striking difference in species richness between the high and low rainout treatments.  But it would be helpful to plot the group means and standard deviations of species richness for each rainout treatment on top of the points already presented here.  Use your `group_by()` and `summarize()` functions to calculate the appropriate means for these groups, and then plot the points on top of the previous graph.  You should make these means and standard deviations in a different color from your points.
 
 
+# Part 3
 
+## Data cleaning the tidy way
 
+In the last problem set, you spent some time cleaning up the spider size dimorphism data using base R functions. This week, we will so some of the same operations, but use functions from the tidyverse. While it is very good to know and be able to use base R functions, the same set of operations can be accomplished using tidy functions.
 
+### Activity
 
+Start by loading the original `Size_Dimprphism.xlsx` file into an R object. Use the original version with the coding errors, not the cleaned version that you exported.
 
-<!-- ```{r} -->
-<!-- # FIXME -->
+```{r}
+## FIXME
+M <- read_excel("../data/Size_Dimorphism.xlsx")
+```
 
-<!-- mean_richness_all <- mean_richness_plot %>% -->
-<!--                         group_by(rain_removal) %>% -->
-<!--                         summarize(mean_all = mean(mean_rich), -->
-<!--                                   sd_all = sd(sd_rich)) -->
+Counting the numbers of groups is easily accomplished by using the `tally()` function of grouped data. In the next chunk, use `group_by()` to group the data by `Species` and `Sex` and then pipe this result to `tally()`
 
+```{r}
+## FIXME
+M %>% 
+  group_by(Species, Sex) %>% 
+  tally()
+```
 
-<!-- ggplot(mean_richness_plot, aes(x = rain_removal, y = mean_rich))+ -->
-<!--   geom_point(position = position_jitter(width = .05)) -->
-<!-- ``` -->
+You should be able to easily detect the mis-coded `Sex` variables and spelling errors.
 
+We will fix the `Sex` variable first. Because you currently have a mix of lower and upper case, and we want all uppercase, we can use the built-in `toupper()` function which makes a string all uppercase. There is a similar `tolower()` function. In this chunk, mutate `Sex` using `toupper()`. Overwrite your R object with the output. Then use the same `group_by() %>% tally` code your wrote above to check that you now only have `F` and `M` in the `Sex` column.
 
+```{r}
+## FIXME
+M <- M %>% 
+  mutate(Sex = toupper(Sex)) 
 
+M %>% 
+  group_by(Species, Sex) %>% 
+  tally()
+```
 
+You should now see that just two observations of `Species` are incorrect. There are a few ways to "find and replace" strings in R. The `stringr` package, which is loaded with the tidyverse has a series of functions that start with `str_` to work with strings (find, replace, slice, etc.). We will use `str_replace()` to replace the misspelled names. `str_replace()` has the following basic syntax:
 
+```{r}
+zz <- c("x_1", "x_2")
+str_replace(zz, "x", "xyz")
+```
+
+This code replaces `x` with `zyx`. In the following chunk, overwrite `Species` with a `mutate()`ed version of itself passed through `str_replace()` where you correct the spellings that are incorrect. Then use the same code as above to `tally()` the data and check that the four groups now have 50 observations each.
+
+```{r}
+## FIXME
+M <- M %>% 
+  mutate(Species = str_replace(Species, "Pardosa ramulosa", "Pardosa_ramulosa"),
+         Species = str_replace(Species, "Pardosa_ramuloso", "Pardosa_ramulosa")) 
+M %>% 
+  group_by(Species, Sex) %>% 
+  tally()
+
+```
 
