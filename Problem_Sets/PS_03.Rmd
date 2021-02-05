@@ -1,0 +1,275 @@
+---
+title: 'Problem Set 03'
+author: "Your Name Here: Group X"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    smart: no
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+```
+
+# Plant Growth Rates
+
+## Tidy Data
+
+We will be using `library(tidyverse)` a lot in this course, and one thing that makes this set of packages function really well is having "tidy" data. This will help you for future data manipulation, cleaning, visualization and analysis.
+
+### Activity
+
+What are the 3 rules that make data tidy?
+
+> 
+
+
+To practice learning how to tidy data, we will will use a dataset from Hautier, Yann et al. (2020), *Fast and furious: Early differences in growth rate drive short-term plant dominance and exclusion under eutrophication.* In this paper, the authors are trying to understand the mechanisms by which diversity is lost under fertilization (i.e., eutrophication). One way they think some species have an advantage is by having a fast early growth rate.  Let's tidy up this dataset so we can look at the trends in growth of different plant species.
+
+Read in the plant growth data `"growthrate_data.csv"`, save it as an object `gr`, and look at the data. What are the dimensions of the resulting tibble?
+
+```{r, message=FALSE}
+
+```
+
+> 
+
+This appears to be how the scientists entered their data, with columns for plot, species, and then multiple columns for the biomass at the various days they collected their measurements. Unfortunately, this data is not tidy.  Why not?
+
+> 
+
+To make this data go from wide to long format, you need to use the function `pivot_longer()`. Use this function to create a new dataset called `gr_long` that is tidy, with biomass as the value that runs for a full column.
+
+```{r, message=FALSE}
+
+```
+
+
+Now that you have tidied this data, explain why it is tidy. Hint - use the column and row descriptions to explain each of the three rules above.
+
+> 
+
+## Separating Columns
+
+The `separate()` function allows you to split columns of your data into two.
+
+### Activity
+
+You can see our `day` column is a `<chr>`, but we really only need the numeric part (i.e., removing "day_" from each. To be able to plot plant biomass growth through time, in the chunk below, pipe `gr_long` to `separate()` to split this column into two, making sure the column of integers for the day number is called `days`.
+
+```{r, message=FALSE}
+
+```
+
+Check the structure of your modified tibble. You may notice that your new column `days` is still a character.  If so, go back and fix the code above so it is no longer a character. Check the help file for `separate()`.
+
+## Data Counts
+
+Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups.
+
+### Activity
+
+In the chunk below, pipe `gr_long` to `group_by()`, grouping by species. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way.
+
+```{r}
+
+```
+
+Do you have equal sample size across all species?
+
+> 
+
+## NA's
+
+Missing data can sometimes throw off our estimates if we are not sure if data is there or not. R will code blank cells in your dataset as `NA` when you read in your data.  `NA`'s are explicit if you can see them in your dataset, and they are implicit if a row does not exist in a dataset when a data value is missing. Exploicit `NA`'s will be counted by `tally()`.
+
+### Activity
+
+Our code above indicates that we have equal sample size in our data for each species, however you may have noticed that in our initial dataset there are some `NA`'s.  Do we still have `NA`'s in our dataset? Use `View()` to investigate `gr_long` and find out.
+
+```{r}
+
+```
+
+> 
+
+The function `is.na()` returns true when a value is `NA`. By summing the number of `TRUE` `NA`'s, you can see how many there are. Below write a line of code that sums the result of `is.na()` applied to the `biomass` column.
+
+```{r}
+
+```
+
+How many `NA`'s are there?
+
+> 
+
+So based on this, do we really have equal sample size?  Why not?
+
+> 
+
+The `drop_na()` function allows you to drop rows that have `NA`s in them in order to check to see if your sample size is equal. In the chunk below, pipe `gr_long` to `drop_na()` and save it as a new dataset called `gr_long2`. Then re-tally your data to see if you have equal sample size across all species.  
+
+```{r}
+
+```
+
+>  
+
+
+## Data Exploration
+
+Let's look at this growth rate data to see if we see any differences between species.  
+
+### Activity
+
+Using your object `gr_long2`, create a plot that shows the biomass per species at each date as a scatter plot, and draw a straight line through the average of all points per species using `geom_smooth()`.  Make sure each species is differentiated by assigning the color aesthetic to `species` (inside `aes()`), which will also plot a separate line for each. Also make sure to clean up your plot by adding a little jitter, if your points are strongly overlapping.
+
+
+```{r}
+
+```
+
+Which species appears to have the fastest rate of growth (biomass change per time)? 
+
+> 
+
+Look back at the plot you just made. It appears a straight line, linear fit doesn't model the data very well. Growth rate appears to be flat for early days and then increases exponentially. In addition, the linear fit is predicting negative biomasses for early timepoints. Let's transform how our data is plotted to see if we can improve the fit. Make a new plot and add the geom `scale_y_log10()` to plot the y-axis on a log10 scale. 
+
+```{r}
+
+```
+
+Does a log transformation of biomass improve the linear fit of the model? 
+
+> 
+
+# Rainout Experiment
+
+In this next section, we will be practicing data manipulation and exploration. We will work with two files that contain data related to a rainout experiment. Changes in precipitation are commonly predicted with climate change, so rainout experiments are used to examine how different proposed future precipitation conditions (i.e., in our case high or low rain reduction) influences plant species composition and biomass.
+
+The first dataset (`"rainout_plots.csv"`) describes plot-level data. This experiment contains 8 subplots per plot. Thus these plot-level data contains plot and subplot identities, as well as only a single value per subplot for each of its variables (e.g., light availability, biomass) as these are collected at the subplot level. We will also work with a dataset that contains information about species *within* each subplot called `"rainout_plantspecies_presence.csv"`. There will be multiple observations per subplot in this dataset because the unique species in each subplot was recorded.
+
+Let's start with the plant composition data.  Read in `"rainout_plantspecies_presence.csv"` and save it to an object called `comp`. Look at the structure of this tibble.
+
+```{r, message=FALSE}
+
+```
+
+## Summarizing
+
+One very important tool you will learn from the tidyverse is how to summarize your data. We will use the `summarize()` function quite a bit in this course, so let's get some practice. One thing we might want to know about is how many unique species are in each subplot within each plot. That way we can start to make predictions about how rain exclusion influences species richness.  Using `group_by()` and `summarize()`, calculate the number of unique species per subplot within each plot in `comp`. Save the new object as `richness`, and also name the new variable `richness`.  Hint `(length(unique(<variable-of-interest>)))` will give you the number of rows that are unique within the groups you have set, which equates to the number of unique species, or richness, per subplot.
+
+### Activity
+
+```{r, message=FALSE}
+
+```
+
+## Joining
+
+One of the most common things you will do in your data cleaning and exploration stage is join datasets together. This will become especially important if you store your data as separate, smaller files. In our case, we need to join our `richness` object with our plot-level information so we can examine how richness changes with our two rainout treatments (e.g., high rain removal and low rain removal).
+
+
+### Activity
+
+Read in the plot-level data , and save it to an object called `plot_ids`.
+
+```{r, message=FALSE}
+
+```
+
+As we discussed in lecture, there are many different functions for joining in the tidyverse. We will focus on `left_join()` here because you can use this for most joining you need to do, and switch the order of the datasets you are joining depending on your need. I.e., `left_join(d1, d2)` is the same as `right_join(d2, d1)`.
+
+Join your plot level data to your species richness data using `left_join()`. You can save this as the same object that the richness was saved as previously, given this is the data you are building upon.  Try doing this in two different ways, one where you specify the columns you want to join by, and one where you don't and let `left_join()` pick the columns that automatically match. This should help you see the power of these joining functions.
+
+```{r, message=FALSE}
+
+```
+
+## More Summarizing
+
+Along with the minimum, maximum, and range, two of the simplest and most common descriptive statistics are means and standard deviations.
+
+### Activity
+
+Calculate the mean and standard deviation for species richness for each plot. Use `group_by()` and `summarize()`. Save this as a new object called `mean_richness`. 
+
+```{r}
+
+```
+
+To visualize whether there are consistent differences in richness between rainout treatments, we will plot our data. 
+
+### Activity
+
+Create a graph that shows how rain removal influences the average species richness using a scatter plot.  Color your points by plot number in the `aes()`. Add transparency and/or jitter to make sure you can see all points clearly. Because plots are a category, make sure it is being treated as a factor when you make your plot. Feel free to fix up the axis labels or choose a new color scheme if you wish.
+
+```{r}
+
+
+```
+
+With a scatterplot and this number of plots, it is difficult to see the trends per plot. Let's try a boxplot instead. Use `geom_boxplot` and  specify different colors for different plot numbers in the `aes()`.  
+
+
+```{r}
+
+
+```
+
+Notice how setting `color =` in the aesthetics causes ggplot to split the data into groups automatically and apply separate lines or boxplots to those data. This is a very powerful feature of ggplot that makes it possible to generate very complex plots very easily. In contrast, imagine doing 12 separate linear regressions, adding them one by one to the plot and keeping track of all their different colors.
+
+
+# Cleaning up the Spider Size Dimorphism data again
+
+In the last problem set, you spent some time cleaning up the spider size dimorphism data using base R functions. This week, we will so some of the same operations, but use functions from the tidyverse. While it is very good to know and be able to use base R functions, the same set of operations can be accomplished using tidy functions in pipes. This makes for more compact code that requires less deciphering of logical subsetting (all the `[]` notation).
+
+### Activity
+
+Start by loading the original `Size_Dimprphism.xlsx` file into an R object. Use the original version with the data entry errors, not the cleaned version that you exported.
+
+```{r}
+
+```
+
+Counting the numbers of groups is easily accomplished by using the `tally()` function of grouped data like you saw above. In the next chunk, use `group_by()` to group the data by `Species` and `Sex` and then pipe this result to `tally()`
+
+```{r}
+
+```
+
+You should be able to easily detect the mis-coded `Sex` variables and spelling errors in the `Species` names.
+
+We will fix the `Sex` variable first. Because you currently have a mix of lower and upper case, and we want all uppercase, we can use the built-in `toupper()` function which makes a string all uppercase. There is a similar `tolower()` function, if you happen to want all lower case.
+
+In this chunk, mutate `Sex` using `toupper()`. Overwrite your R object from above with the output. Then use the same `group_by() %>% tally` code your wrote above to check that you now only have `F` and `M` in the `Sex` column.
+
+```{r}
+
+```
+
+You should now see that just two observations of `Species` are incorrect. There are a few ways to "find and replace" strings in R. The `stringr` package, which is loaded automatically as part of the tidyverse has a series of functions that start with `str_` to work with strings (find, replace, subset, etc.).
+
+Have a look through the help files for the `stringr` package to see what all is possible.
+
+We will use `str_replace()` to replace the misspelled names. `str_replace()` has the following basic syntax:
+
+```{r}
+
+zz <- c("x_1", "x_2")
+str_replace(zz, "x", "xyz")
+
+```
+
+This code replaces `x` with `xyz`. In the following chunk, overwrite `Species` with a `mutate()`ed version of itself passed through `str_replace()` where you correct the two spellings that are incorrect (you will mutate Species twice, once for each correction). Then use the same code as above to `tally()` the data and check that the four groups now have 50 observations each.
+
+```{r}
+
+```
+
+Your data is clean. At this point in the analysis, you could export your cleaned data to a new file. Alternately, you could just have these steps at the beginning of your Rmd file with the analysis pipeline and just let me run each time your Rmd file is knitted. Either way would work, and there are benefits to both approaches. With the former, you will have a cleaned version of your data to work with (e.g., import) for later steps in the analysis. This is not ideal because it makes more files to keep track of. With the latter, you will have a full record of the steps you took to clean the data. The downside is that you need to make sure to run all the code each time you knit to be sure to have the corrected data. If you are analyzing data via a set of separate files, this might be impractical (e.g., if your 2nd analysis file needs the cleaned data).
