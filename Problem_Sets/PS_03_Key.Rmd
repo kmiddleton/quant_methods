@@ -18,7 +18,7 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
-# Part 1
+# Plant Growth Rates
 
 ## Tidy Data
 
@@ -153,7 +153,7 @@ Let's look at this growth rate data to see if we see any differences between spe
 
 ### Activity
 
-Using your object `gr_long2`, create a plot that shows the biomass per species at each date as a scatter plot, and draw a smoothing line through the average of all points per species using `geom_smooth()`.  Make sure each species is differentiated in some way. Also make sure to clean up your image if your points are strongly overlapping.
+Using your object `gr_long2`, create a plot that shows the biomass per species at each date as a scatter plot, and draw a smoothing line through the average of all points per species using `geom_smooth()`.  Make sure each species is differentiated by assigning the color aesthetic (inside `aes()` to `species`), which will also plot a separate line for each. Also make sure to clean up your image if your points are strongly overlapping.
 
 
 ```{r, message=FALSE}
@@ -163,13 +163,28 @@ ggplot(gr_long2, aes(x = days, y = biomass, color = species))+
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-Which species appears to have the fastest rate of growth (biomass change per time)?
+Which species appears to have the fastest rate of growth (biomass change per time)? 
 
-> H and Al.
+> H and Al. 
 
-# Part 2
+Look back at the plot you just made. It appears a linear fit doesn't fit the data very well. Growth rate appears to be flat for early days and then increases exponentially. In addition, the linear fit is predicting negative biomasses for early timepoints. Let's transform our data to see if we can improve the fit. Make a new plot and add the geom `scale_y_log10()` to plot the y-axis on a log10 scale. 
 
-## Data Transformation
+```{r}
+
+ggplot(gr_long2, aes(x = days, y = biomass, color = species)) +
+  geom_point(position = position_jitter(width = 1), alpha = 1/3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_y_log10()
+
+```
+
+Does a log transformation of biomass improve the linear fit of the model? 
+
+> Yes, the fit looks much more appropriate now. 
+
+
+# Rainout Experiment
+
 
 In this next part, we will be practicing data manipulation and exploration. We will work with two files that contain data related to a rainout experiment. Changes in precipitation are commonly predicted with climate change, so rainout experiments are used to examine how different proposed future precipitation conditions (i.e. in our case high or low rain reduction) influences plant species composition and biomass.  
 
@@ -198,9 +213,8 @@ richness <- comp %>%
   group_by(plot_no, subplot) %>%
   summarize(richness = length(unique(species)))
 richness
+
 ```
-
-
 
 
 ## Joining
@@ -242,48 +256,46 @@ Along with the minimum, maximum, and range, two of the simplest and most common 
 ### Activity
 
 #FIXME
-#### QUESTION HERE ABOUT SEPARATING INTO TWO DATAFRAMES - what does this mean?
 
-Calculate the mean and standard deviation for species richness for each plot. Use `group_by()` and `summarize()`. You should not have to separate the data into two `data.frame`s. Save this as a new object called `mean_richness_plot`.
+Calculate the mean and standard deviation for species richness for each plot. Use `group_by()` and `summarize()`. Save this as a new object called `mean_richness`. 
 
 ```{r}
 # FIXME
-mean_richness_plot <- richness %>%
+mean_richness <- richness %>%
   group_by(plot_no) %>%
   summarize(mean = mean(richness),
             sd = sd(richness))
-mean_richness_plot
+mean_richness
 ```
 
 
-The next goal will be to plot our data to see how the rainout treatments influence species richness.  However depending on how you grouped and summmarized in the last step, you may no longer have your treatment information.  Re-run the code above to make sure you have the information from `rain_removal` in your new object `mean_richness_plot`.
-
-```{r}
-# FIXME
-mean_richness_plot <- richness %>%
-  group_by(plot_no, rain_removal) %>%
-  summarize(mean_rich = mean(richness),
-            sd_rich = sd(richness))
-mean_richness_plot
-```
-
-## Plotting
+To visualize whether there are consistant differences in richness between rainout treatments, we will plot our data. 
 
 ### Activity
-Create a graph that shows how rain removal influences the average species richness per plot using a scatter plot.  Make sure you can see all points clearly.
+
+Create a graph that shows how rain removal influences the average species richness using a scatter plot.  Color your points by plot number in the `aes()`. Add transparency and/or jitter to make sure you can see all points clearly. Because plots are a category, make sure it is being treated as a factor when you make your plot.
 
 ```{r}
 # FIXME
-ggplot(mean_richness_plot, aes(x = rain_removal, y = mean_rich))+
-  geom_point(position = position_jitter(width = .05))
+
+ggplot(richness, aes(x = rain_removal, y = richness, color = factor(plot_no))) +
+  geom_point(position = position_jitter(width=0.2), alpha = 1/2) 
+
 ```
 
-There appears to be a pretty striking difference in species richness between the high and low rainout treatments.  But it would be helpful to plot the group means and standard deviations of species richness for each rainout treatment on top of the points already presented here.  Use your `group_by()` and `summarize()` functions to calculate the appropriate means for these groups, and then plot the points on top of the previous graph.  You should make these means and standard deviations in a different color from your points.
+With a scatterplot and this number of plots, it is difficult to see the trends per plot. Let's try a boxplot instead. Use `geom_boxplot` and  specify different colors for different plot numbers in the `aes()`.  
 
 
-# Part 3
+```{r}
+# FIXME
 
-## Data cleaning the tidy way
+ggplot(richness, aes(x = rain_removal, y = richness, color = factor(plot_no))) +
+  geom_boxplot() 
+
+```
+
+
+# Return to Spider Size Dimorphism
 
 In the last problem set, you spent some time cleaning up the spider size dimorphism data using base R functions. This week, we will so some of the same operations, but use functions from the tidyverse. While it is very good to know and be able to use base R functions, the same set of operations can be accomplished using tidy functions.
 
