@@ -125,7 +125,7 @@ y_hat <- fm_Multi$fitted.values
 
 ggplot(M, aes(x = y_hat, y = Milk_Energy)) +
   geom_point() +
-  geom_smooth(method = 'lm', se = FALSE) +
+  geom_smooth(formula = y ~ x,method = 'lm', se = FALSE) +
   ylab('Milk Energy') +
   xlab('Predicted Milk Energy') 
 ```
@@ -191,6 +191,8 @@ anova(fm_lm)
 ## How much variation is explained by group membership: $R^{2}$?
 
 $$R^{2} = \frac{\mbox{Variation accounted for by group membership}}{\mbox{Total variation}}$$
+<br />
+
 $$R^{2} = \frac{\mbox{Sum Sq Group}}{\mbox{(Sum Sq Group + Sum Sq Residuals)}}$$
 
 

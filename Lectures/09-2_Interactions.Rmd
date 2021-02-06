@@ -1,7 +1,7 @@
 ---
 title: "General(ized) Linear Models: Interactions"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -72,17 +72,6 @@ str(biomass)
 ```
 
 
-## CUT
-
-```{r}
-data("weightgain", package = "HSAUR3")
-WG <- weightgain
-str(WG)
-```
-
-
-
-
 ## Factorial data
 
 Balanced data: Equal *n* in each group
@@ -146,7 +135,7 @@ ggplot(biomass, aes(x = phosphorous,
 
 ```{r}
 biomass %>% group_by(nitrogen, phosphorous) %>%
-  summarize(mean = mean(biomass))
+  summarize(mean = mean(biomass), .groups = "drop")
 ```
 
 ## Two-way factorial ANOVA
@@ -198,11 +187,11 @@ ANOVA will suggest additivity of effects when in fact they are multiplicative
 
 ## Under the hood
 
-Numeric representations of `source` and `type`:
+Numeric representations of `nitrogen` and `phosphorous`:
 
 ```{r}
-biomass$n_num <- ifelse(biomass$nitrogen == "N+", 0, 1)
-biomass$p_num <- ifelse(biomass$phosphorous == "P+", 0, 1)
+biomass$n_num <- ifelse(biomass$nitrogen == "N-", 0, 1)
+biomass$p_num <- ifelse(biomass$phosphorous == "P-", 0, 1)
 ```
 
 Numeric representation of the interaction (multiple the other two numeric representations):
@@ -211,16 +200,21 @@ Numeric representation of the interaction (multiple the other two numeric repres
 biomass$interact <- biomass$n_num * biomass$p_num
 ```
 
-1's only for the "N" & "P" groups. 0's for all others.
+1's only for the "N+" & "P+" groups. 0's for all others.
 
 ## 4 parameters define 4 groups
 
-NOT SURE HOW TO TRANSLATE THIS TO MY EXAMPLE!
+1. $\beta_0$ = `(Intercept)` = "N-" & "P-" group mean
+1. $\beta_1$ = `n_num` = "N-" & "P+" addition
+1. $\beta_2$ = `p_num` = "N+" & "P-" addition
+1. $\beta_3$ = `interact` = #2 + #3 + "N+" & "P+" addition
 
-1. $\beta_0$ = `(Intercept)` = "Beef" & "High" group mean
-1. $\beta_1$ = `source_num` = "Cereal" & "High" addition
-1. $\beta_2$ = `type_num` = "Beef" & "Low" addition
-1. $\beta_3$ = `interact` = #2 + #3 + "Cereal" & "Low" addition
+## 4 parameters define 4 groups
+
+```{r}
+biomass %>% slice(c(1,21,41,61,81))
+```
+
 
 ## Under the hood {.smaller}
 
