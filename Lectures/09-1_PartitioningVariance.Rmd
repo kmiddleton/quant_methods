@@ -1,7 +1,7 @@
 ---
 title: "General(ized) Linear Models: Partitioning Variance"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,12 +13,13 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(readxl)
-library(GGally)
+#library(GGally)
 library(ggrepel)
-library(rgl)
+#library(rgl)
 library(knitr)
-knit_hooks$set(webgl = hook_webgl)
+#knit_hooks$set(webgl = hook_webgl)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -51,11 +52,11 @@ M <- M %>% mutate(log_Mass = log(Mass))
 ## Visualizing data
 
 ```{r webgl=TRUE, echo=FALSE}
-plot3d(M$log_Mass, M$Neocortex, M$Milk_Energy,
-       type = "s", col = "red", size = 1,
-       xlab = "log Body Mass",
-       ylab = "Percent Neocortex",
-       zlab = "Milk Energy")
+#plot3d(M$log_Mass, M$Neocortex, M$Milk_Energy,
+#       type = "s", col = "red", size = 1,
+#       xlab = "log Body Mass",
+#       ylab = "Percent Neocortex",
+#       zlab = "Milk Energy")
 ```
 
 ## Multivariate model {.smaller}
@@ -119,92 +120,37 @@ anova(fm_lm)
 - `F value`: `Mean Sq` Treatment / `Mean Sq` Residual
 - `Pr(>F)`: *P*-value for the *F*-test of that variable
 
-## Role of variation
 
-Large values of $F$ are more likely to be significant.
-
-$F$ is a ratio:
-
-$$F = \frac{\mbox{MS}_{group}}{\mbox{MS}_{error}}$$
-
-What role does within vs. between group variation have in determining $F$?
-
-
-## Intraclass Correlation Coefficient
-
-For continuously varying measurements:
-
-$$\mbox{ICC} =\frac{\sigma_{A}^{2}}{\sigma_{A}^{2}+MS_{error}}$$
-
-$$\sigma_{A}^{2}=\frac{MS_{group}-MS_{error}}{n}$$
-
-- $n$ = Number of measurements per specimen (*not the sample size*).
-
-Uses the results of the one-way ANOVA:
-
-$$\mbox{Measurement} \sim \mbox{Specimen ID}$$
-
-## Repeatability of caliper measurements
-
-<center>
-<img src="https://i.imgur.com/FRd1Apz.png" width="40%" />
-</center>
-
-## Calculation of ICC {.smaller}
-
-What is the ICC of repeated measurements of mouse bones?
-
-```{r}
-M <- read_excel("../data/G44_Morphometrics.xlsx")
-glimpse(M)
-```
-
-## Pairs of measurements
+## How much variation is explained by group membership: $R^{2}$?
 
 ```{r echo=FALSE}
-ggplot(M, aes(Len1, Len2)) +
-  geom_abline(slope = 1, intercept = 0) +
-  geom_point() +
-  xlab("Femur Length #1 (mm)") +
-  ylab("Femur Length #2 (mm)")
+anova(fm_lm)
 ```
 
-## Data processing
+- `Sum Sq`: Variability accounted for by that part of the ANOVA
+- `Mean Sq`: `Sum Sq` / `Df`
+- `F value`: `Mean Sq` Treatment / `Mean Sq` Residual
+- `Pr(>F)`: *P*-value for the *F*-test of that variable
 
-Want two columns: (1) measurement and (2) ID as a factor.
+## How much variation is explained by group membership: $R^{2}$?
 
-```{r}
-Lengths <- data.frame(Fem_Len = c(M$Len1, M$Len2),
-                      MouseID = factor(c(M$MouseID, M$MouseID)))
-Lengths <- Lengths %>% drop_na()
-glimpse(Lengths)
-```
+$$R^{2} = \frac{\mbox{Variation accounted for by group membership}}{\mbox{Total variation}}$$
+$$R^{2} = \frac{\mbox{Sum Sq Group}}{\mbox{(Sum Sq Group + Sum Sq Residuals)}}$$
 
-## ICC via ANOVA {.smaller}
+## How much variation is explained by group membership: $R^{2}$?{.smaller}
 
-```{r}
-fm <- anova(lm(Fem_Len ~ MouseID, data = Lengths))
-print(fm, digits = 5)
+```{r echo=FALSE}
+anova(fm_lm)
 ```
 
 ```{r}
-var_a <- (0.63579 - 0.00018) / 2
-var_a / (var_a + 0.00018)
+anova(fm_lm)$`Sum Sq`[1]/sum(anova(fm_lm)$`Sum Sq`)
+
+7.224492/(7.224492 + 9.415345)
 ```
 
-ICC is 0.999 for these measurements.
+## How much variation is explained by group membership: $R^{2}$?{.smaller}
 
-## Examples of Applications of Variance Component Estimation
-
-- Quantitative genetics
-    - especially heritabilities, genetic correlations etc. 
-    
-- Repeatability
-
-<center>
-<img src="https://i.imgur.com/PIcJusE.png" width="60%" />
-</center>
-
-## Quiz 08-1
-
-Watch Lecture 08-2
+```{r echo=FALSE}
+summary(fm_lm)
+```

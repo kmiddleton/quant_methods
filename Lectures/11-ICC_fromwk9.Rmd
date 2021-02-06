@@ -1,0 +1,97 @@
+---
+title: "General(ized) Linear Models: Partitioning Variance"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+
+library(readxl)
+library(ggrepel)
+
+```
+
+## Intraclass Correlation Coefficient
+
+For continuously varying measurements:
+
+$$\mbox{ICC} =\frac{\sigma_{A}^{2}}{\sigma_{A}^{2}+MS_{error}}$$
+
+$$\sigma_{A}^{2}=\frac{MS_{group}-MS_{error}}{n}$$
+
+- $n$ = Number of measurements per specimen (*not the sample size*).
+
+Uses the results of the one-way ANOVA:
+
+$$\mbox{Measurement} \sim \mbox{Specimen ID}$$
+
+## Repeatability of caliper measurements
+
+<center>
+<img src="https://i.imgur.com/FRd1Apz.png" width="40%" />
+</center>
+
+## Calculation of ICC {.smaller}
+
+What is the ICC of repeated measurements of mouse bones?
+
+```{r}
+M <- read_excel("../data/G44_Morphometrics.xlsx")
+glimpse(M)
+```
+
+## Pairs of measurements
+
+```{r echo=FALSE}
+ggplot(M, aes(Len1, Len2)) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point() +
+  xlab("Femur Length #1 (mm)") +
+  ylab("Femur Length #2 (mm)")
+```
+
+## Data processing
+
+Want two columns: (1) measurement and (2) ID as a factor.
+
+```{r}
+Lengths <- data.frame(Fem_Len = c(M$Len1, M$Len2),
+                      MouseID = factor(c(M$MouseID, M$MouseID)))
+Lengths <- Lengths %>% drop_na()
+glimpse(Lengths)
+```
+
+## ICC via ANOVA {.smaller}
+
+```{r}
+fm <- anova(lm(Fem_Len ~ MouseID, data = Lengths))
+print(fm, digits = 5)
+```
+
+```{r}
+var_a <- (0.63579 - 0.00018) / 2
+var_a / (var_a + 0.00018)
+```
+
+ICC is 0.999 for these measurements.
+
+## Examples of Applications of Variance Component Estimation
+
+- Quantitative genetics
+    - especially heritabilities, genetic correlations etc. 
+    
+- Repeatability
+
+<center>
+<img src="https://i.imgur.com/PIcJusE.png" width="60%" />
+</center>
+
+
