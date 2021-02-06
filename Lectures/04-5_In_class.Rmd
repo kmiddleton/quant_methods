@@ -12,15 +12,17 @@ bibliography: Multivariate.bib
 
 ```{r setup, echo=FALSE, message=FALSE}
 library(tidyverse)
-library(readxl)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
+
 
 ## Thinking about probabilities
 
 Why learn probability?
 
 - You could learn all the statistical analyses/tests without really understanding probability.
+
 
 ## Should the Packers have gone for 2? | 2015 NFL playoffs
 
@@ -29,6 +31,7 @@ Packers score on a hail mary touchdown to trail by 1 point at the end of the gam
 <center>
 <img src="https://i.imgur.com/OIhNSSM.jpg" width="50%" />
 </center>
+
 
 ## Should the Packers have gone for 2?
 
@@ -40,6 +43,7 @@ Extra point + overtime:
 
 - Extra point success rate (2015 only; after the extra point attempt was moved back): 1,131 of 1,199
 - Expected winning percentage in overtime (since 2001): Away team has won 110 of 242 games
+
 
 ## Should the Packers have gone for 2?
 
@@ -58,11 +62,13 @@ Extra point + overtime:
 (431/913) / ((1131 / 1199) * (110 / 242))
 ```
 
+
 ## Should the Packers have gone for 2?
 
 <center>
 <img src="https://i.imgur.com/NRceB91.png" width="100%" />
 </center>
+
 
 ## Binomial probabilities
 
@@ -71,6 +77,7 @@ About 10% of people are left handed.
 - What is the probability of exactly 0 left handed people in a *random sample* of 25?
 - What is the probability of exactly 1?
 - What is the probability of 1 *or more*?
+
 
 ## Binomial probabilities
 
@@ -82,6 +89,7 @@ Probability density functions in R: `dbinom()`, `dnorm()`, `dpois()`, etc.
 - `size` = Sample size
 - `prob` = Probability of success for each trial
 
+
 ## Binomial probabilities
 
 What is the probability of 0 left handed people in a *sample* of 25?
@@ -89,6 +97,7 @@ What is the probability of 0 left handed people in a *sample* of 25?
 ```{r eval=FALSE}
 dbinom(0, 25, prob = 0.1)
 ```
+
 
 ## Binomial probabilities
 
@@ -98,9 +107,11 @@ What is the probability of 0 left handed people in a *sample* of 25?
 dbinom(0, 25, prob = 0.1)
 ```
 
+
 ## Binomial probabilities
 
 What is the probability of exactly 1?
+
 
 ## Binomial probabilities
 
@@ -110,9 +121,11 @@ What is the probability of exactly 1?
 dbinom(1, 25, prob = 0.1)
 ```
 
+
 ## Binomial probabilities
 
 What is the probability of 1 *or more*?
+
 
 ## Binomial probabilities
 
@@ -125,6 +138,7 @@ sum(dbinom(1:25, 25, prob = 0.1))
 *"or more"* is critical here for hypothesis testing:
 
 - Probability of the observed data or any *more extreme*
+
 
 ## Binomial probabilities for Pr[left] = 0.1
 
@@ -139,6 +153,7 @@ ggplot(M, aes(Lefties, Probability)) +
 
 $n > 8$ have very low probabilities.
 
+
 ## Binomial probabilities for Pr[left] = 0.1
 
 ```{r echo=FALSE}
@@ -151,6 +166,7 @@ ggplot(M, aes(Lefties, log_Prob)) +
   scale_x_continuous(breaks = seq(0, 25, by = 5))
 ```
 
+
 ## Reached Via a Mind-Reading Device...
 
 [... Deeply Paralyzed Patients Say They Want to Live](https://www.technologyreview.com/s/603512/reached-via-a-mind-reading-device-deeply-paralyzed-patients-say-they-want-to-live/?set=603545)
@@ -158,6 +174,7 @@ ggplot(M, aes(Lefties, log_Prob)) +
 > In response to the statement "I love to live" three of the four replied yes.
 
 > To verify the four could communicate, Birbaumer's team asked patients, over the course of about 10 days of testing, to respond yes or no to statements such as "You were born in Berlin" or "Paris is the capital of Germany" by modulating their thoughts and altering the blood-flow pattern. The answers relayed through the system were consistent about 70 percent of the time, substantially better than chance. 
+
 
 ## Powerball
 
@@ -172,6 +189,7 @@ Number of winning combinations in pool 1 is the **binomial coefficient**
 
 $$\left({n\atop k}\right)=\frac{n!}{k!\left(n - k\right)!}$$
 
+
 ## Powerball
 
 1. 69 balls in one pool: Choose 5
@@ -181,6 +199,7 @@ $$\left({n\atop k}\right)=\frac{n!}{k!\left(n - k\right)!}$$
 choose(69, 5)
 choose(26, 1)
 ```
+
 
 ## Powerball
 
@@ -192,17 +211,20 @@ choose(69, 5) * choose(26, 1)
 
 What if the order had to be correct as well?
 
+
 ## Conditional probability thought experiment
 
 A coin is tossed 100 times. Gamblers can bet on the total number of heads that will be thrown. They can do so at any time before or during the game.
 
 - Imagine that you're betting before the game starts. What is your best bet?
 
+
 ## Conditional probability thought experiment
 
 Now imagine that you're betting after the coin was already tossed 10 times and came up heads all 10 times.
 
 - What is the best bet now?
+
 
 ## Breast cancer screening
 
@@ -214,6 +236,7 @@ Approximately correct numbers:
 
 What is the probability of a randomly sampled woman having breast cancer, given a positive test?
 
+
 ## Breast cancer screening
 
 $$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
@@ -222,6 +245,7 @@ $$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
 - $Pr[C] = 1/100 = 0.01$
 - $Pr[T]$ = ???
 
+
 ## Breast cancer screening
 
 $$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
@@ -229,6 +253,7 @@ $$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
 - $Pr[T|C] = 0.8$
 - $Pr[C] = 1/100 = 0.01$
 - $Pr[T] = (0.8 \times 0.01) + (0.1 \times 0.99)$
+
 
 ## Breast cancer screening
 

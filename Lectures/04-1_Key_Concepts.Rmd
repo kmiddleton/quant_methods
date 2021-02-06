@@ -11,15 +11,14 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE}
-library(tidyverse)
-library(readxl)
-library(cowplot)
 ```
+
 
 ## Assumptions of science as a way of knowing
 
 - All ways of knowing involve a set of assumptions
 - Our knowledge is conditional on these assumptions being met
+
 
 ## Definitions of statistics
 
@@ -31,6 +30,7 @@ library(cowplot)
 
 "the **explanation** of **variation** in the context of what remains **unexplained**" [@Kaplan2009-zu]
 
+
 ## Key concepts in statistics
 
 **Data**: The raw material for doing statistics are data, which come in a variety of forms.
@@ -41,6 +41,7 @@ library(cowplot)
 
 **Probability**: The tool that we will use to assess our uncertainty and gain information is probability.
 
+
 ## Statistics in the context of life sciences
 
 - Describe, measure, and compare aspects of nature from **samples**
@@ -49,11 +50,13 @@ library(cowplot)
     - *Differences* between groups
     - *Relationships* between variables or traits
 
+
 ## Samples and populations
 
 A **population** includes all the members/individuals/units of a group of interest.
 
 - A parameter is a quantity that describes a population without error (e.g., means, standard deviations, proportions). Requires measuring *every* member of that group.
+
 
 ## Samples and populations
 
@@ -63,6 +66,7 @@ A **sample** is a representative subset of a population, ideally randomly chosen
 
 *You will (usually) deal with samples.*
 
+
 ## Deviations resulting from sampling
 
 **Sampling error** is the deviation from the population parameter resulting from chance alone.
@@ -71,11 +75,13 @@ A **sample** is a representative subset of a population, ideally randomly chosen
 
 **Bias/Inaccuracy** is the *systematic departure* of an estimate from the population parameter being estimated.
 
+
 ## Goals of data collection: Low sampling error and low bias {#myImagePage}
 
 <center>
 <img src="https://i.imgur.com/eP5dSny.png" style="width: 55%"/>
 </center>
+
 
 ## Thinking about sampling error and bias
 
@@ -86,6 +92,7 @@ Consider the scale in a physician's office. The same patient is weighed 3 times 
 3. 70.1 kg
 
 True mass is 72.1 kg. Sampling error or bias?
+
 
 ## Thinking about sampling error and bias
 
@@ -99,10 +106,12 @@ True temperature is 99.3°. Sampling error or bias?
 
 *What is the real challenge here?*
 
+
 ## Testing for bias
 - Standard curves
 - Calibration
 - Simulation
+
 
 ## Randomness
 
@@ -116,6 +125,7 @@ e.g., coin flipping (fair coin)
 - We don't know what the result of a single flip will be
 - We do know what the long run probability of heads will be
 
+
 ## Random sampling
 
 Assumptions of most statistical analyses
@@ -128,12 +138,14 @@ Assumptions of most statistical analyses
 - Minimize bias
 - Allow an estimation of sampling error (an important concept)
 
+
 ## Independent and identically distributed (IID)
 
 - All observations are independent of one another
 - All observations come from the same underlying probability distribution (normal, binomial, etc.)
 
 Standard assumption of most statistical tests.
+
 
 ## Random sampling
 
@@ -144,5 +156,6 @@ Randomly select 20 trees (left) or randomly select 20 square quadrats with 0 or 
 </center>
 
 How realistic is this?
+
 
 ## References

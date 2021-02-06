@@ -12,12 +12,11 @@ bibliography: Multivariate.bib
 
 ```{r setup, echo=FALSE, message=FALSE}
 library(tidyverse)
-library(readxl)
 library(cowplot)
-library(forcats)
 library(latex2exp)
 theme_set(theme_cowplot())
 ```
+
 
 ## Distributions
 
@@ -26,22 +25,21 @@ If we flip a coin 6 times, what are the possible outcomes?
 ```{r echo=FALSE, fig.height=5}
 
 flip6 <- tibble(
- Ways = c(1, 6, 15, 20, 15, 6, 1),
- Flips = c("0 H", "1 H, 5 T", "2 H, 4 T",
-           "3 H, 3 T", "4 H, 2 T", 
-           "5 H, 1 T", "6 H")) %>% 
- mutate(Flips = fct_inorder(Flips))
+  Ways = c(1, 6, 15, 20, 15, 6, 1),
+  Flips = c("0 H", "1 H, 5 T", "2 H, 4 T",
+            "3 H, 3 T", "4 H, 2 T", 
+            "5 H, 1 T", "6 H")) %>% 
+  mutate(Flips = fct_inorder(Flips))
 
 flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
- geom_bar(stat = "Identity")
+  geom_bar(stat = "Identity")
 ```
+
 
 ## Distributions
 
 - All observations can be thought of as coming from a population that can be represented as a distribution
-
 - If I flip a coin 6 times and get HHTTHT, that is one observation in a distribution of possible outcomes.
-
 - If I catch a rodent in my swimming pool and test its endurance, that data point is one value in the larger distribution of all endurance measures for all rodents.
 
 
@@ -51,6 +49,7 @@ flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
     - Shows the number of times each measurement occurs in a sample (possibly "binned")
 1. Probability distribution:
     - A probability distribution shows the probability that measurement occurs in a sample.
+
 
 ## Frequency Distribution of Heads | 6 Flips
 
@@ -66,6 +65,7 @@ flips %>% ggplot(aes(x = Flips, y = Ways)) +
   geom_bar(stat = "Identity")
 ```
 
+
 ## Probability Distribution of Heads | 6 Flips
 
 Probability of 3 heads:
@@ -80,12 +80,14 @@ Total number of outcomes = `r sum(flips$Ways)`
 
 $$Pr[3~H] = \frac{20}{64} = 0.3125$$
 
+
 ## Probability Distribution of Heads | 6 Flips
 
 ```{r}
 flips$Ways
 flips$Ways / sum(flips$Ways)
 ```
+
 
 ## Probability Distribution of Heads | 6 Flips
 
@@ -103,6 +105,7 @@ flip6 %>% ggplot(aes(x = Flips, y = Prob)) +
   labs(y = "Probability")
 ```
 
+
 ## Probability Distribution of Heads | 6 Flips
 
 ```{r}
@@ -110,6 +113,7 @@ flip6$Ways / sum(flip6$Ways)
 dbinom(0:6, 6, 0.5)
 sum(dbinom(0:6, 6, 0.5))
 ```
+
 
 ## Frequency distributions
 
@@ -121,6 +125,7 @@ set.seed(5)
 M <- tibble(x = rnorm(n = 200, mean = 0, sd = 1))
 ```
 
+
 ## Frequency distributions: Continuous data
 
 ```{r echo=FALSE, message=FALSE}
@@ -128,6 +133,7 @@ ggplot(M, aes(x = x)) +
   geom_histogram() +
   xlim(c(-3, 3))
 ```
+
 
 ## Frequency distributions: Continuous data
 
@@ -137,6 +143,7 @@ ggplot(M, aes(x = x)) +
   geom_vline(xintercept = 1.7, color = "red") +
   xlim(c(-3, 3))
 ```
+
 
 ## Density plots: Visualizing probability distributions
 
@@ -148,6 +155,7 @@ ggplot(M, aes(x = x)) +
 
 Note `geom_density()` here instead of `geom_histogram()`. ggplot makes it easy to switch between different kinds of visualizations of the data.
 
+
 ## Density plots: Visualizing probability distributions
 
 ```{r echo=FALSE}
@@ -155,6 +163,7 @@ ggplot(M, aes(x = x)) +
   geom_density() +
   xlim(c(-3, 3))
 ```
+
 
 ## Frequency vs. probability distribution
 
@@ -166,6 +175,7 @@ ggplot(M, aes(x = x)) +
   geom_density() +
   xlim(c(-3, 3))
 ```
+
 
 ## Frequency vs. probability distribution
 
@@ -195,6 +205,7 @@ normal <- function(Y, mu = 0, sigma = 1){
 }
 ```
 
+
 ## Frequency vs. probability distribution
 
 ```{r echo=FALSE, message=FALSE}
@@ -210,6 +221,7 @@ ggplot(M, aes(x = x)) +
 
 $n = 200$ here. What about $n = 2000$? $n = 200000$?
 
+
 ## Probability distributions
 
 Distribution of variables you might encounter
@@ -218,6 +230,7 @@ Distribution of variables you might encounter
 1. Binomial: success or failure
 1. Poisson: numbers of successes per unit time or space 
 1. Other less often encountered probability distributions
+
 
 ## Normal (Gaussian)
 
@@ -229,28 +242,31 @@ ggplot(M, aes(x, y)) + geom_line() +
   labs(y = "Probability Density")
 ```
 
+
 ## Binomial
 
 ```{r echo=FALSE}
 M <- tibble(Successes = 0:10,
-                Probability = dbinom(0:10, 10, prob = 0.8))
+            Probability = dbinom(0:10, 10, prob = 0.8))
 ggplot(M, aes(Successes, Probability)) + 
   geom_bar(stat = "identity") +
   scale_x_continuous(breaks = seq(0, 10, by = 1)) +
   ggtitle(TeX("$Pr\\[success\\] = 0.8$; Trial size = $10$"))
 ```
 
+
 ## Poisson
 
 ```{r echo=FALSE}
 trials <- 20
 M <- tibble(Successes = 0:trials,
-                Probability = dpois(0:trials, lambda = 5))
+            Probability = dpois(0:trials, lambda = 5))
 ggplot(M, aes(Successes, Probability)) + 
   geom_bar(stat = "identity") +
   scale_x_continuous(breaks = seq(0, trials, by = 2)) +
   ggtitle(TeX("$\\lambda = 5$"))
 ```
+
 
 ## A miscellanea of distributions
 

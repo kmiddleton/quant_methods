@@ -11,15 +11,13 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE}
-library(tidyverse)
-library(readxl)
-library(cowplot)
-theme_set(theme_cowplot())
 ```
+
 
 ## Conditional probability
 
 The **conditional probability** of a dependent event is the probability of that event occurring given that another condition or conditions is met.
+
 
 ## Conditional probability
 
@@ -31,17 +29,20 @@ The **conditional probability** of a dependent event is the probability of that 
 *Leptopilina boulardi*
 </center>
 
+
 ## Conditional probability
 
 <center>
 <img src="https://i.imgur.com/kI2YAMH.png" width="75%" />
 </center>
 
+
 ## Conditional probability
 
 <center>
 <img src="https://i.imgur.com/S56RM5u.png" width="50%" />
 </center>
+
 
 ## Bayes' Rule
 
@@ -54,6 +55,7 @@ The conditional probability of $A$ given $B$ relies not only on the probability 
 - Predicting events given prior knowledge of the probability of those events.
 - The human brain (usually) works this way in predicting events.
 
+
 ## Bayes' Rule
 
 Suppose that you wake up one day with spots all over your face. The doctor tells you that 90% of people who have smallpox have the same symptoms as you.
@@ -62,10 +64,13 @@ Suppose that you wake up one day with spots all over your face. The doctor tells
 <img src="https://i.imgur.com/l0XzqV5.jpg" width="70%" />
 </center>
 
+
 ## Bayes' Rule
+
 <center>
 <img src="https://i.imgur.com/VCRHJoG.jpg" width="80%" />
 </center>
+
 
 ## Bayes' Rule
 
@@ -75,6 +80,7 @@ Suppose that you wake up one day with spots all over your face. The doctor tells
 
 $$Pr[M|P] = \frac{Pr[P|M] \times Pr[M]}{Pr[P]}$$
 
+
 ## Bayes' Rule
 
 $$Pr[M|P] = \frac{Pr[P|M] \times Pr[M]}{Pr[P]}$$
@@ -82,6 +88,7 @@ $$Pr[M|P] = \frac{Pr[P|M] \times Pr[M]}{Pr[P]}$$
 $$0.9 = \frac{Pr[P|M] \times (0.18 + 0.04)}{0.2}$$
 
 $$\frac{0.18}{0.22} = Pr[P|M] = 0.82$$
+
 
 ## Bayes' Rule
 
@@ -92,6 +99,7 @@ Choose a random person off the street and test them for HIV. The test is positiv
 3. 80-89%
 4. 65-79%
 5. <65%
+
 
 ## Bayes' Rule
 
@@ -107,6 +115,7 @@ Only about 13/100000 people are positive for HIV.
 
   - $P[H] = 13/100000 = 1.3 \times 10^{-4}$
 
+
 ## Bayes' Rule
 
 $$Pr[H|T] = \frac{Pr[T|H] \times Pr[H]}{Pr[T]}$$
@@ -118,6 +127,7 @@ $Pr[T]$ is the challenge.
 - Independent probabilities of positive test given HIV and positive test given *not* HIV
 
 $$\left(Pr[T|H] \times P[H]\right) + \left(Pr[T'|H'] \times 1 - P[H]\right)$$
+
 
 ## Bayes' Rule {.smaller}
 
@@ -134,12 +144,14 @@ Pr[H|T] &= \frac{Pr[T|H] \times Pr[H]}{Pr[T]} \\
   ((0.999 * 1.3e-4) + ((1 - 0.9999) * (1 - 1.3e-4)))
 ```
 
+
 ## Bayes' Rule
 
 ```{r eval=TRUE}
 ((0.999) * 1.3e-4) /
   ((0.999 * 1.3e-4) + ((1 - 0.9999) * (1 - 1.3e-4)))
 ```
+
 
 ## Bayes' Rule
 
@@ -158,6 +170,7 @@ Of the 99987 who do not:
 - 99987 * .0001 = 9.9987 test positive
 - 99987 * .9999 = 99977.0013 do not
 
+
 ## Bayes' Rule
 
 So if:
@@ -170,8 +183,10 @@ $Pr(H|T) = \frac{0.999 \times (13/100000)}{(12.987 + 9.9987) / 100000} = 0.565$
 
 Or just $12.987 / (12.987 + 9.9987)$ because the 100000s cancel out, which is the number of true positives over the total positives.
 
+
 ## Uncertainty
 
 > "In scientific research, measurements are replete with randomness. Extraneous influences contaminate the measurements despite tremendous efforts to limit their intrusion." [@Kruschke2015-rp]
+
 
 ## References

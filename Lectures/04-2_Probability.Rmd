@@ -17,11 +17,13 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
+
 ## Uncertainty & Science
 
 > Scientific knowledge is a body of statements of varying degrees of certainty—some most unsure, some nearly sure, none absolutely certain (Feynman)
 
 Probability is a way to quantify uncertainty.
+
 
 ## Why learn probability?
 
@@ -38,9 +40,11 @@ Basis of P-values
 
 - Cornerstone of null hypothesis testing
 
+
 ## Basics of probability
 
 The probability of an event is the proportion of times the event would occur if a random trial is repeated infinitely under constant conditions.
+
 
 ## Basics of probability
 
@@ -53,6 +57,7 @@ The probability of an event is the **proportion** of times the event **would** o
 - infinitely
 - constant conditions
 
+
 ## Basics of probability
 
 The probability of an event is the **proportion** of times the event **would** occur **if** a **random** trial is repeated **infinitely** under **constant conditions**.
@@ -60,6 +65,7 @@ The probability of an event is the **proportion** of times the event **would** o
 <center>
 <img src="https://i.imgur.com/WFKHq4N.png" width="100%" />
 </center>
+
 
 ## Basics of probability
 
@@ -74,6 +80,7 @@ event A occurring.”
 The range of probabilities for an event is 0 $\rightarrow$ 1
 (including 0 and 1).
 
+
 ## Addition rule | Mutually exclusive events
 
 *Mutually exclusive* events are events that are not simultaneously possible due to constraints of physics, biology, development, evolution, etc.
@@ -84,11 +91,13 @@ The range of probabilities for an event is 0 $\rightarrow$ 1
     - $Pr[H, T] = 0$
 - $Pr[A~or~B] = Pr[A] + Pr[B]$
 
+
 ## Addition rule | Mutually exclusive events
 
 On a single die roll, what is the probability of rolling *either* a 1 *or* a 2?
 
 On a single die roll, what is the probability of rolling *either* a 1, a 2, *or* a 3?
+
 
 ## Multiplication rule | Independent events
 
@@ -100,6 +109,7 @@ If events are *independent*, then their individual probabilities do not influenc
 - Successive roulette wheel spins
 - Weekly lottery drawings
 - Offspring sex
+
 
 ## Multiplication rule | Independent events
 
@@ -128,6 +138,7 @@ What is the probability of having 4 children that are all girls if $Pr[girl]=0.4
 <img src="https://i.imgur.com/DBuO6ZI.png" width="60%" />
 </center>
 
+
 ## Binomial probabilities
 
 ```{r}
@@ -137,10 +148,12 @@ dbinom(4, 4, 0.488)
 
 Imagine KM's sister really wants a boy. What is the probability her next child will be a boy?
 
+
 ## Binomial Distribution
 
 - Probability distributions are basically like counting the ways things can happen
-- In R, you can "flip a coin" using the binomial distribution. The function is `rbinom()`. Try one flip: `rbinom(1,1,0.5)`
+- In R, you can "flip a coin" using the binomial distribution. The function is `rbinom()`. Try one flip: `rbinom(1, 1, 0.5)`
+
 
 ## Binomial Distribution
 
@@ -155,6 +168,7 @@ flip1 <- tibble(
 flip1 %>% ggplot(aes(x = Flips, y = Ways)) +
   geom_bar(stat = "Identity")
 ```
+
 
 ## Binomial Distribution
 
@@ -173,6 +187,7 @@ flip2 <- tibble(
 flip2 %>% ggplot(aes(x = Flips, y = Ways)) +
   geom_bar(stat = "Identity")
 ```
+
 
 ## Binomial Distribution
 
@@ -194,6 +209,7 @@ flip3 %>% ggplot(aes(x = Flips, y = Ways)) +
   geom_bar(stat = "Identity")
 ```
 
+
 ## Binomial Distribution
 
 If we flip a coin 4 times, what are the possible outcomes?
@@ -204,7 +220,7 @@ If we flip a coin 4 times, what are the possible outcomes?
 1. TTTH, TTHT, THTT, HTTT
 1. TTTT
 
-```{r echo=FALSE, fig.height=3}
+```{r echo=FALSE, fig.height=2.75}
 flip4 <- tibble(
   Ways = c(1, 4, 6, 4, 1),
   Flips = c("4 Head", "3 Head, 1 Tail", "2 Head, 2 Tail",
@@ -215,10 +231,10 @@ flip4 %>% ggplot(aes(x = Flips, y = Ways)) +
   geom_bar(stat = "Identity")
 ```
 
+
 ## Binomial Distribution
 
 If we flip a coin 6 times, what are the possible outcomes?
-
 
 ```{r echo=FALSE, fig.height=5}
 flip6 <- tibble(
@@ -231,3 +247,4 @@ flip6 <- tibble(
 flip6 %>% ggplot(aes(x = Flips, y = Ways)) +
   geom_bar(stat = "Identity")
 ```
+
