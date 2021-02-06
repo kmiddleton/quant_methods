@@ -10,6 +10,11 @@ csl: evolution.csl
 bibliography: Multivariate.bib
 ---
 
+<!--
+Datasets
+  Stickleback_Plates.csv
+-->
+
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 # Need dev version of plotly:
 # devtools::install_github("ropensci/plotly")
@@ -23,6 +28,7 @@ library(htmltools)
 theme_set(theme_cowplot())
 ```
 
+
 ## Measures of central tendency (location)
 
 The value around which the distribution is centered
@@ -30,6 +36,7 @@ The value around which the distribution is centered
 1. Mean 
 1. Median
 1. Mode (most common value)
+
 
 ## Mean
 
@@ -41,6 +48,7 @@ The term "mean" is preferred to "average". The arithmetic mean is one kind of av
 
 - One argument: "Average" is a statistic determined by an arithmetic procedure. "Mean" is a parameter.
 
+
 ## Median
 
 The median is the central measurement of a sample (the 50th percentile and the 0.50 quantile). If $n$ is even, then the median is the mean of the two middle observations.
@@ -51,6 +59,7 @@ median(1:10)
 quantile(1:10, prob = 0.5)
 ```
 
+
 ## Mean vs. Median
 
 Number of lateral plates (plates) in threespine sticklebacks (*Gasterosteus aculeatus*) with three different *Ectodysplasin* genotypes (mm, Mm, and MM).
@@ -58,6 +67,7 @@ Number of lateral plates (plates) in threespine sticklebacks (*Gasterosteus acul
 <center>
 <img src="https://i.imgur.com/Xr68AKa.jpg" width="75%" />
 </center>
+
 
 ## Mean vs. Median
 
@@ -69,6 +79,7 @@ SticklebackPlates <- read_csv("../data/Stickleback_Plates.csv")
 glimpse(SticklebackPlates)
 ```
 
+
 ## Mean vs. Median
 
 ```{r echo=FALSE, message=FALSE}
@@ -79,6 +90,7 @@ ggplot(SticklebackPlates, aes(x = plates)) +
   ylab("Count")
 ```
 
+
 ## Mean vs. Median
 
 ```{r}
@@ -87,6 +99,7 @@ SticklebackPlates %>% group_by(genotype) %>%
             median_plate = median(plates),
             .groups = "drop")
 ```
+
 
 ## Mean is sensitive to extreme values
 
@@ -108,9 +121,12 @@ ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
   ylab("Count")
 ```
 
+
 ## When might you substitute the median for the mean? | (As a measure of central tendency)
 
+
 ## Why don't we always use the median?
+
 
 ## Frameworks for inference
 
@@ -118,6 +134,7 @@ ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
 2. Maximum likelihood
 3. Resampling
 4. Bayesian
+
 
 ## [Flying snake](https://www.youtube.com/playlist?list=PL1qTT-Q9lkEaw8eiGJOKOQjcYPIYYfvkL)
 
@@ -128,6 +145,7 @@ div(
 )
 ```
 
+
 ## [Flying snake](https://www.youtube.com/playlist?list=PL1qTT-Q9lkEaw8eiGJOKOQjcYPIYYfvkL)
 
 ```{r echo=FALSE}
@@ -136,6 +154,7 @@ div(
   embed_youtube("sYiHbQvJZi4?rel=0")
 )
 ```
+
 
 ## Inferring a mean
 
@@ -151,6 +170,7 @@ undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
 
 What is the mean undulation rate for this sample of flying snakes?
 
+
 ## Undulation rate
 
 ```{r undulation_plot, message=FALSE, echo=FALSE}
@@ -158,6 +178,7 @@ ggplot(tibble(undulation_rate), aes(undulation_rate)) +
   geom_histogram() +
   labs(x = "Undulation Rate (Hz)", y = "Count")
 ```
+
 
 ## Analytical inference of mean
 
@@ -167,6 +188,7 @@ $$\hat{Y} = \frac{\sum_{i=1}^{n}Y_i}{n}$$
 
 $$mean~undulation~rate = \frac{\sum_{i=1}^{n}undulation~rate_i}{n}$$
 
+
 ## Analytical inference of mean
 
 ```{r}
@@ -174,11 +196,13 @@ sum(undulation_rate) / length(undulation_rate)
 mean(undulation_rate)
 ```
 
+
 ## Maximum likelihood inference of mean
 
 Use `dnorm()` to calculate the relative likelihood of an observed value $Y_i$ drawn from a normal distribution given a mean ($\mu$) and standard deviation ($\sigma$).
 
 $$f\left(Y_i; \mu, \sigma\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$
+
 
 ## Standard normal distribution
 
@@ -193,6 +217,7 @@ ggplot(M, aes(x, y)) + geom_line() +
   labs(x = "Y", y = "Relative Likelihood")
 ```
 
+
 ## Calculating a likelihood
 
 *Hypothesizing that the population mean is 0 and the standard deviation is 1*, what is the likelihood of the observed values?
@@ -202,13 +227,14 @@ ggplot(M, aes(x, y)) + geom_line() +
 3. Model likelihood is the product of the individual likelihoods
 4. log-likelihood is more tractable, so calculate that
 
+
 ## Model Likelihood ($\mathcal{L}$)
 
 For a set of observations ($Y_i$) and hypothesized parameters ($\Theta$; i.e., mean and standard deviation) the model likelihood is the product of the observations' individual likelihoods:
 
-$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n} Pr\left[Y_{i}; \Theta\right]$$
 
-$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(\phi\left(Y_{i};\Theta\right)\right)$$
+$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(Pr\left[Y_{i};\Theta\right]\right)$$
 
 ## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
 
@@ -220,6 +246,7 @@ Likelihood for the first observation (`undulation_rate[1]`):
 undulation_rate[1]
 dnorm(undulation_rate[1], mean = 0, sd = 1)
 ```
+
 
 ## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
 
@@ -240,6 +267,7 @@ ggplot(M, aes(x, y)) + geom_line() +
 
 This is only the likelihood for *one* observation. We need the likelihoods for all `r length(undulation_rate)` undulation rates to get a model likelihood.
 
+
 ## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
 
 Vector of likelihoods for all values in `undulation_rate` given `mu = 0` and `sigma = 1`:
@@ -248,6 +276,7 @@ Vector of likelihoods for all values in `undulation_rate` given `mu = 0` and `si
 (rel_liks <- dnorm(undulation_rate, mean = 0, sd = 1))
 ```
 
+
 ## Calculating the log-likelihood for a single combination of $\mu$ and $\sigma$
 
 Model likelihood is the product of those likelihoods:
@@ -255,6 +284,7 @@ Model likelihood is the product of those likelihoods:
 ```{r}
 (lik <- prod(rel_liks))
 ```
+
 
 ## Likelihood to log-likelihood
 
@@ -270,6 +300,7 @@ sum(log(rel_liks))
 
 For a model in which the mean is 0 and  standard deviation is 1, the model log-likelihood is `r round(log(lik), 2)`.
 
+
 ## Higher likelihood
 
 Is there another combination of $\mu$ and $\sigma$ that gives a higher likelihood (= larger log-likelihood)?
@@ -282,6 +313,7 @@ sum(log(dnorm(undulation_rate, mean = 1, sd = 1)))
 
 This is an improvement over $\mu = 0$ and $\sigma = 1$.
 
+
 ## Calculating the log-likelihood for a _range_ of $\mu$ and $\sigma$
 
 Find the combination of $\mu$ and $\sigma$ that maximizes the log-likelihood of the model for the mean and standard deviation of undulation rates.
@@ -290,6 +322,7 @@ Ranges of possible values:
 
 1. Mean ($\mu$): $-\infty < \mu < \infty$
 2. Standard deviation ($\sigma$): $0 < \sigma < \infty$
+
 
 ## Grid approximation
 
@@ -310,6 +343,7 @@ grid_approx <- crossing(mu, sigma)
 ```{r}
 grid_approx
 ```
+
 
 ## Grid approximation
 
@@ -337,6 +371,7 @@ grid_approx
 
 - For a 100 X 100 grid, there are 10,000 calculations.
 - If there were 3 parameters, there would be 1,000,000.
+
 
 ## Visualizing the likelihood surface
 
@@ -383,6 +418,7 @@ mean(undulation_rate)
 sd(undulation_rate)
 ```
 
+
 ## Maximum likelihood via optimization
 
 *Search* for the most likely values of $\mu$ and $\sigma$ across all possible values.
@@ -390,6 +426,7 @@ sd(undulation_rate)
 ```{r echo=FALSE}
 fig
 ```
+
 
 ## Maximum likelihood via optimization
 
@@ -404,6 +441,7 @@ log_lik <- function(x, Y){
 
 We can now simultaneously optimize $\mu$ and $\sigma$, maximizing the log-likelihood.
 
+
 ## Maximum likelihood via optimization
 
 `reltol` says to stop when the improvement is $<10^{-100}$.
@@ -416,6 +454,7 @@ optim(c(0.1, 0.1), # Start at 0.1, 0.1
                      reltol = 10^-100))
 ```
 
+
 ## Maximum likelihood via optimization
 
 `glm()` fits generalized linear modules via optimization:
@@ -427,3 +466,4 @@ logLik(fm)
 ```
 
 **For a small enough tolerance, the maximum likelihood estimate equals the analytical estimate.**
+
