@@ -15,13 +15,15 @@ library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
 library(readxl)
-#library(GGally)
 library(ggrepel)
-#library(rgl)
-library(knitr)
-#knit_hooks$set(webgl = hook_webgl)
-knitr::opts_chunk$set(cache = TRUE)
+library(plotly)
 ```
+
+<!--
+Datasets
+  Milk.xlsx
+-->
+
 
 ## GLMs and Variance 
 
@@ -31,33 +33,47 @@ knitr::opts_chunk$set(cache = TRUE)
 <img src="https://i.imgur.com/E2Gu7ke.png" width="80%" />
 </center>
 
+
 ## Multiple Regression Makes a Composite Variable
 
 - Linear combination of predictor variables that is maximally correlated with outcome variable
 - How well can you predict the outcome by the set of predictor variables?
     - correlation of y with $\hat{y}$ 
     - $R^{2}$ = squared correlation coefficient of y with $\hat{y}$ 
+
     
 ## Milk Energy
 
 ```{r}
-milk <- read_excel("../data/Milk.xlsx", na = "NA")
-M <- milk %>%
+M <- read_excel("../data/Milk.xlsx", na = "NA") %>%
   select(species, kcal.per.g, mass, neocortex.perc) %>%
-  drop_na()
-names(M) <- c("Species", "Milk_Energy", "Mass", "Neocortex")
-M <- M %>% mutate(log_Mass = log(Mass))
+  drop_na() %>% 
+  rename(Species = species,
+         Milk_Energy = kcal.per.g,
+         Mass = mass,
+         Neocortex = neocortex.perc) %>%
+  mutate(log_Mass = log(Mass))
 ```
+
 
 ## Visualizing data
 
-```{r webgl=TRUE, echo=FALSE}
-#plot3d(M$log_Mass, M$Neocortex, M$Milk_Energy,
-#       type = "s", col = "red", size = 1,
-#       xlab = "log Body Mass",
-#       ylab = "Percent Neocortex",
-#       zlab = "Milk Energy")
+```{r, echo=FALSE}
+fig <- plot_ly() %>%
+  add_markers(data = M,
+              y = ~ log_Mass,
+              x = ~ Neocortex,
+              z = ~ Milk_Energy,
+              size = 1,
+              showlegend = FALSE) %>%
+  hide_colorbar() %>%
+  layout(scene = list(xaxis = list(title = 'log Mass'),
+                      yaxis = list(title = 'Neocortex'),
+                      zaxis = list(title = 'Milk Energy')))
+
+fig
 ```
+
 
 ## Multivariate model {.smaller}
 
@@ -65,6 +81,42 @@ M <- M %>% mutate(log_Mass = log(Mass))
 fm_Multi <- lm(Milk_Energy ~ Neocortex + log_Mass, data = M)
 summary(fm_Multi)
 ```
+
+
+## Visualizing multiple regression
+
+```{r, echo = FALSE, warning=FALSE}
+# https://stackoverflow.com/questions/38331198/add-regression-plane-to-3d-scatter-plot-in-plotly
+
+# Graph resolution
+graph_reso <- 0.5
+
+# Setup axis
+axis_x <- seq(min(M$Neocortex), max(M$Neocortex), by = graph_reso)
+axis_y <- seq(min(M$log_Mass), max(M$log_Mass), by = graph_reso)
+
+# Sample points
+fm_surface <- expand.grid(Neocortex = axis_x,
+                          log_Mass = axis_y,
+                          KEEP.OUT.ATTRS = FALSE)
+fm_surface$Milk_Energy <- predict.lm(fm_Multi, newdata = fm_surface)
+fm_surface <- reshape2::acast(fm_surface,
+                              log_Mass ~ Neocortex,
+                              value.var = "Milk_Energy")
+
+fig2 <- add_trace(p = fig,
+                  z = fm_surface,
+                  x = axis_x,
+                  y = axis_y,
+                  opacity = 0.25,
+                  colorscale = list(c(0, 1), c("black", "black")),
+                  type = "surface",
+                  showlegend = FALSE) %>%
+  hide_colorbar()
+
+fig2
+```
+
 
 ## $R^{2}$: Multiple Regression Makes a Composite Variable
 
@@ -77,6 +129,7 @@ ggplot(M, aes(x = y_hat, y = Milk_Energy)) +
   ylab('Milk Energy') +
   xlab('Predicted Milk Energy') 
 ```
+
 
 ## $R^{2}$: Multiple Regression Makes a Composite Variable
 
@@ -95,6 +148,7 @@ Some total variability in *Y*:
 
 $F$-statistic is the ratio of the two.
 
+
 ## Visualizing ANOVA
 
 <center>
@@ -102,6 +156,7 @@ $F$-statistic is the ratio of the two.
 </center>
 
 $$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
+
 
 ## Parts of an ANOVA table
 
@@ -132,10 +187,12 @@ anova(fm_lm)
 - `F value`: `Mean Sq` Treatment / `Mean Sq` Residual
 - `Pr(>F)`: *P*-value for the *F*-test of that variable
 
+
 ## How much variation is explained by group membership: $R^{2}$?
 
 $$R^{2} = \frac{\mbox{Variation accounted for by group membership}}{\mbox{Total variation}}$$
 $$R^{2} = \frac{\mbox{Sum Sq Group}}{\mbox{(Sum Sq Group + Sum Sq Residuals)}}$$
+
 
 ## How much variation is explained by group membership: $R^{2}$?{.smaller}
 
@@ -149,8 +206,10 @@ anova(fm_lm)$`Sum Sq`[1]/sum(anova(fm_lm)$`Sum Sq`)
 7.224492/(7.224492 + 9.415345)
 ```
 
+
 ## How much variation is explained by group membership: $R^{2}$?{.smaller}
 
 ```{r echo=FALSE}
 summary(fm_lm)
 ```
+

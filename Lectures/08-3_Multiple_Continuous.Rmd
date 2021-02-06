@@ -17,10 +17,7 @@ theme_set(theme_cowplot())
 library(readxl)
 library(GGally)
 library(ggrepel)
-library(rgl)
-library(knitr)
-knit_hooks$set(webgl = hook_webgl)
-knitr::opts_chunk$set(cache = TRUE)
+library(plotly)
 library(wesanderson)
 ```
 
@@ -173,12 +170,20 @@ glimpse(M)
 
 ## Visualizing data
 
-```{r webgl=TRUE, echo=FALSE}
-plot3d(M$Fat, M$Lactose, M$Milk_Energy,
-       type = "s", col = "red", size = 1,
-       xlab = "Fat Percent",
-       ylab = "Lactose Percent",
-       zlab = "Milk Energy")
+```{r, echo=FALSE}
+fig <- plot_ly() %>%
+  add_markers(data = M,
+              x = ~ Fat,
+              y = ~ Lactose,
+              z = ~ Milk_Energy,
+              size = 1,
+              showlegend = FALSE) %>%
+  hide_colorbar() %>%
+  layout(scene = list(xaxis = list(title = 'Fat'),
+                      yaxis = list(title = 'Lactose'),
+                      zaxis = list(title = 'Milk Energy')))
+
+fig
 ```
 
 ## Visualizing data
@@ -197,19 +202,38 @@ summary(fm)
 
 ## Visualizing multiple regression
 
-```{r webgl=TRUE, echo=FALSE}
-plot3d(M$Fat, M$Lactose, M$Milk_Energy,
-       type = "s", col = "red", size = 1,
-       xlab = "Fat Percent",
-       ylab = "Lactose Percent",
-       zlab = "Milk Energy")
-coefs <- coef(fm)
-a <- coefs["Fat"]
-b <- coefs["Lactose"]
-c <- -1
-d <- coefs["(Intercept)"]
-planes3d(a, b, c, d, alpha = 0.5)
+```{r, echo = FALSE, warning=FALSE}
+# https://stackoverflow.com/questions/38331198/add-regression-plane-to-3d-scatter-plot-in-plotly
+
+# Graph resolution
+graph_reso <- 0.5
+
+# Setup axis
+axis_x <- seq(min(M$Fat), max(M$Fat), by = graph_reso)
+axis_y <- seq(min(M$Lactose), max(M$Lactose), by = graph_reso)
+
+# Sample points
+fm_surface <- expand.grid(Fat = axis_x,
+                          Lactose = axis_y,
+                          KEEP.OUT.ATTRS = FALSE)
+fm_surface$Milk_Energy <- predict.lm(fm, newdata = fm_surface)
+fm_surface <- reshape2::acast(fm_surface,
+                              Lactose ~ Fat,
+                              value.var = "Milk_Energy")
+
+fig2 <- add_trace(p = fig,
+                  z = fm_surface,
+                  x = axis_x,
+                  y = axis_y,
+                  opacity = 0.25,
+                  colorscale = list(c(0, 1), c("black", "black")),
+                  type = "surface",
+                  showlegend = FALSE) %>%
+  hide_colorbar()
+
+fig2
 ```
+
 
 ## Estimate `Fat` coefficient
 
