@@ -1,7 +1,7 @@
 ---
-title: "General(ized) Linear Models: Multilevel Models"
+title: "GLMs: Applications of Multilevel Models"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King,  Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -11,204 +11,14 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
-library(knitr)
+library(tidyverse)
 knitr::opts_chunk$set(cache = TRUE)
 library(readxl)
-library(ggplot2)
 library(cowplot)
-library(dplyr)
-library(tidyr)
+theme_set(theme_cowplot())
 library(wesanderson)
 library(car)
 ```
-
-## Notes
-
-
-## Resources {.smaller}
-
-*Approachable*:
-
-- Bolker et al. [-@Bolker2009-ry]: Generalized linear mixed models: a practical guide for ecology and evolution
-- Zuur et al. [-@Zuur2009-be]: *Mixed Effects Models and Extensions in Ecology with R*. But takes a very old fashioned view of model selection.
-
-*Bayesian*:
-
-- McElreath [-@McElreath2015-no]: *Statistical Rethinking: A Bayesian Course with Examples in R and Stan*
-
-*MCMC*:
-
-- Hadfield [-@Hadfield2010-pp]: MCMC Methods for Multi-response Generalized Linear Mixed Models: The MCMCglmm R Package
-
-*Technical*:
-
-- Pinheiro and Bates [-@Pinheiro2000-sg]: *Mixed-effects models in S and S-PLUS*
-
-## Goals for multilevel models
-
-*Very Important*:
-
-- Understand the nature of the problems we are trying to solve
-- Understand the value in solving them
-
-*Moderately Important*:
-
-- Understand some of the technical aspects of multilevel model fitting and interpretation
-
-*Minimally Important*:
-
-- Understand the math involved
-
-## Assumptions of linear regression
-
-1. Normality (check pooled residuals)
-1. Homogeneity (check pooled residuals, transformation?)
-1. Fixed explanatory variables (plan sampling)
-1. Independence (observations often correlated)
-1. Correct model
-
-## Non-independence: The main challenge
-
-Our tests (so far) assume independence of samples.
-
-Lots of data have structure at additional levels beyond the main variable(s) of interest
-
-- Error in these levels is correlated (making the data non-independent)
-
-We need a method to model that correlation structure.
-
-## Correlated data
-
-*Explicitly* by design:
-
-- Grouping (leaves within plants within treatments within fields)
-- Repeated measurements of the same individual (time or space)
-
-*Implicitly* as a side effect:
-
-- Non-equal sample sizes, missing data
-- Non-equal within-group variance
-- Phylogenetic structure 
-- Population structure and genetic relatedness 
-
-## Some terminology
-
-*Multilevel / hierarchical / mixed / repeated measures models*
-
-- All refer to the same class of models, which contain both fixed and random variables.
-- Some will further subdivide and draw fine distinctions between models.
-
-## Some terminology
-
-*Fixed effects*:
-
-- Explanatory variables of primary interest, which would be used again if the experiment were repeated
-- Sex, treatment groups, etc.
-
-## Some terminology
-
-*Random effects*
-
-- Variables that are a "random" selection from a larger set of variables that allow for heterogeneity, correlation, phylogenetic or genetic structure, real random variation ($\epsilon$).
-- Subject, block, etc.
-- "Random" does not necessarily mean "not of interest."
-
-Also see: http://andrewgelman.com/2005/01/25/why_i_dont_use/
-
-## Fundamental idea of multilevel models
-
-Units are *grouped* at different levels.
-
-- Grouping takes different forms
-
-## General multilevel model formula
-
-$$Y = \beta_0 + \beta_1 X_1 + ... + \beta_n X_n + \mbox{Random}$$
-
-Where $\mbox{Random}$ can be:
-
-- Random noise ($\epsilon$)
-- Heterogeneity of variance
-- Nesting structure
-- Temporal correlation (autocorrelation)
-- Spatial correlation
-- Phylogenetic correlation
-- Genetic correlation
-
-## Turning flight in hummingbirds
-
-<center>
-<img src="https://i.imgur.com/Sacnb48.png" width="100%" />
-</center>
-
-## Turning flight in hummingbirds
-
-<center>
-<img src="https://i.imgur.com/Z144W14.png" width="80%" />
-</center>
-
-## Turning flight in hummingbirds
-
-<center>
-<img src="https://i.imgur.com/iFspGbe.png" width="80%" />
-</center>
-
-## Turning flight in hummingbirds
-
-<center>
-<img src="https://i.imgur.com/gWAgxud.png" width="80%" />
-</center>
-
-
-## Turning flight in hummingbirds
-
-<center>
-<img src="https://i.imgur.com/7tQutuc.png" width="55%" />
-</center>
-
-
-## Turning flight in hummingbirds
-
-<center>
-<img src="https://i.imgur.com/D0o9y6J.png" width="80%" />
-</center>
-
-## Hierarchical structure
-
-- Maneuver (hover vs. clockwise, hover vs. counterclockwise)
-    - Bird (4)
-        - Trial (5)
-            - Wingbeat (mean of 16 $\rightarrow$ 1)
-
-1. Maneuver is the variable of interest ("fixed")
-1. Birds are a representative sample of all birds ("random")
-1. Trials are repeated measures of each bird ("random")
-1. Wingbeats are the observation level
-
-## What we did
-
-1. Calculate means of 16 wingbeats for each bird for each trial
-    - Loss of information, but...
-1. Five trials per bird
-1. Multilevel ANOVA
-    - Bird and trial nested within bird as random effects
-    - Maneuver as the fixed effect
-
-Each bird gets its own mean value for a maneuver (across 5 trials). Maneuver is analyzed as the mean difference between each maneuver.
-
-## Challenges to multilevel models
-
-**Conceptual complexity**
-
-- You must know your model
-- Difficult to visualize
-- Do my results make sense?
-
-**Computational complexity**
-
-- Many methods fit by likelihood
-- MCMC can be slow, difficult to tune
-- Bayesian requires defining priors
 
 ## Fitting multilevel models
 
@@ -296,7 +106,6 @@ ggplot(Sq, aes(Month, Res1)) +
 
 - Generalized least squares $\approx$ "Weighted regression"
 - `nlme::gls()`
-- Also one solution for phylogenetic least squares (coming soon)
 
 ## Fitting a weighted regression
 
@@ -322,7 +131,7 @@ plot(fm2)
 
 ## Summary {.smaller}
 
-```{r eval=FALSE}
+```{r}
 library(car)
 Anova(fm2, type = "III")
 ```
@@ -642,11 +451,5 @@ Adapted from McElreath [-@McElreath2015-no]
 ## Can poor experimental design be saved by multilevel models?
 
 No.
-
-## No quiz
-
-Watch this lecture again for review.
-
-Watch Lecture 08-4
 
 ## References {.references}
