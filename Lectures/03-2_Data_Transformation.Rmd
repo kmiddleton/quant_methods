@@ -17,6 +17,10 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
+<!--
+Datasets
+  bats.csv
+-->
 
 ## Data Manipulation Goals -- Reminder
 
@@ -31,7 +35,6 @@ Once we have tidy data, we may need to update its format, create new variables, 
 
 
 ## Data Transformation with dplyr
-
 
 <center>
 <br />
@@ -112,6 +115,7 @@ You can use `filter()` combined with logical or Boolean operators to select vari
 
 *Boolean operators. The left circle is x, the right circle is y, and the shaded region indicates the given subset selected.*
 
+
 ## `filter()` with Boolean {.smaller}
 
 So say you want the set of male bats with mass > 15g. You can also write this with boolean operators.  
@@ -132,7 +136,6 @@ bats %>%
 ```
 
 
-
 ## `filter()` with Boolean {.smaller}
 
 Or say you want the set of bats that are adult females
@@ -146,7 +149,6 @@ bats %>%
 ## `filter()` with Boolean {.smaller}
 
 Or you want the set of bats that either have condition "NR" or "L"
-
 
 ```{r,  echo=TRUE, message=FALSE}
 bats %>% 
@@ -166,17 +168,14 @@ bats %>%
 ```
 
 
-
 ## `select()` {.smaller}
 
 If you want to select certain columns, use `select()`. For example, select the columns for sex, moonlight and mass.
-
 
 ```{r,  echo=TRUE, message=FALSE}
 bats %>% 
   select(sex, moonlight, mass)
 ```
-
 
 
 ## `mutate()` and `transmute()` {.smaller}
@@ -190,7 +189,6 @@ bats %>%
 ```
 
 -   Reminder: `bats$ratio <- bats$RFA / bats$mass` is equivalent
-
 
 
 ## `mutate()` and `transmute()` {.smaller}
@@ -216,7 +214,6 @@ There are a lot of useful functions for creating new variables out there.  Examp
 ## `summarize()`
 
 This is a very useful function. And allows you to collapse parts of tibbles into a single row (i.e. summarize your data based on specifications). So say we want to get an average mass of bats  
-
 
 ```{r,  echo=TRUE, message=FALSE}
 bats %>% 
@@ -251,12 +248,9 @@ Here are some of the many functions that can be useful with `summarize()`
 - **Counts:** `n()` - size of current group, `sum(x)` (try `sum(~is.na(x))` to make sure you don't include `NA`'s), `n_distinct(x)` - the number of unique elements
 
 
-
-
 ## Combine functions to explore data! {.smaller}
 
 Summarize by group and arrange by mass
-
 
 ```{r,  echo=TRUE, message=FALSE}
 bats %>% 
@@ -266,19 +260,13 @@ bats %>%
 ```
 
 
-
 ## Combine functions to explore data!  {.smaller}
 
 Find all groups bigger than a threshold
-
 
 ```{r,  echo=TRUE, message=FALSE}
 bats %>% 
   group_by(sex, age) %>%
   filter(mass > 15)
 ```
-
-
-
-
 

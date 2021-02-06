@@ -18,6 +18,12 @@ theme_set(theme_cowplot())
 library(nycflights13)
 ```
 
+<!--
+Datasets
+
+-->
+
+
 ## Relational Data
 
 It is good practice to maintain smaller datasets and then merge them together through code. Using multiple tables of data is called *Relational Data* because we are interested in the relations between datasets, not individual ones.
@@ -43,7 +49,6 @@ Relations are always built between pairs of tables. And to do this work we need 
 ## Flight Data
 
 We will use `library(nycflights13)`. This library contains data on flights in and out of NYC.
-
 
 ```{r, eval=FALSE, echo=TRUE, warning=FALSE, message=FALSE}
 library(nycflights13)
@@ -89,13 +94,9 @@ weather   # weather at each NYC airport each hour
 <br />
 
 - `flights` connects to `planes` via a single variable, `tailnum`.
-
 - `flights` connects to `airlines` through the `carrier` variable.
-
 - `flights` connects to `airports` in two ways: via the `origin` and `dest` variables.
-
 - `flights` connects to `weather` via `origin` (the location), and `year`, `month`, `day` and `hour` (the time).
-
 
 </div>
 
@@ -125,17 +126,13 @@ The terminology used by the tidyverse for a variable (or set of variables) that 
 <br />
 <br />
 </center>
-   
-
 
 A *primary key* that corresponds to a *foreign key* is a relation.  
-
 
 
 ## Keys  
 
 - *Surrogate Key* - sometimes datasets do not contain a primary key, so you must make one. 
-
     - `flights$tailnum` is not a primary key because the same plane appears multiple times per day at the airport. Create one using, for example, `mutate()` and `row_number()`. **This then becomes a *primary key*.**
 
 <center>
@@ -145,11 +142,9 @@ A *primary key* that corresponds to a *foreign key* is a relation.
 </center>   
 
 
-
 ## Mutating Joins {.smaller}
 
 Mutating joins combine variables from two tables. 
-
 
 ```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 flights2 <- flights %>% 
@@ -167,9 +162,8 @@ To add the full name of the airline to `flights2`, you combine `airlines` with `
 flights2 %>%
   select(-origin, -dest) %>% 
   left_join(airlines, by = "carrier")
-```  
-  
-  
+```
+
 
 ## Joins, How Do They Work? {.smaller}
 
@@ -188,9 +182,6 @@ y <- tribble(
 )
 
 ```
-
-
-
 
 <div class="columns-2">
 
@@ -223,7 +214,6 @@ Imagine you have two datasets, x (on the left) and y (on the right), and they ea
 <br />
 <br />
 </center>   
-
 
 However the only possible matches are indicated with colored dots. The resulting dataset demonstrates that in this case all variables are joined, and some observations are lost.
 
@@ -267,7 +257,6 @@ Outer joins also match observations based on key variables, but **do not** lose 
 In all cases, unmatched observations are filled with `NA`.
 
 
-
 ## Outer Joins
 
 <center>
@@ -291,8 +280,8 @@ x %>%
 
 ```
 
-## Right Join
 
+## Right Join
 
 <center>
 <img src="https://imgur.com/rC9NceI.png" width="45%" />
@@ -354,7 +343,6 @@ left_join(x, y, by = "key")
 ```
 
 
-
 ## Duplicate Keys {.smaller}
 
 - Both tables have duplicate keys. This is often an error because neither table has a unique identifier.
@@ -389,7 +377,6 @@ left_join(x, y, by = "key")
 ```
 
 
-
 ## Defining Keys in Real Life {.smaller}
 
 *Natural joins*, or `by = NULL` (the default) uses all variables that are in both tables. The `flights` and `weather` table have `year`, `month`, `day`, `hour`, and `origin` in common.
@@ -414,7 +401,6 @@ flights2 %>%
 ```
 
 You can see that both datasets had a `year` column but they had different values, so the resulting variables are `year.x` and `year.y`.
-
 
 
 ## Defining Keys in Real Life {.smaller}
@@ -488,9 +474,6 @@ Set operations work with complete rows, and compare the values of every variable
 - `union(x, y)` returns unique observations in `x` and `y`.
 - `setdiff(x, y)` returns observations in `x`, but not `y`.
 
-
-
-
 Say you have these datsets.
 
 ```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
@@ -506,6 +489,7 @@ df2 <- tribble(
 )
 ```
 
+
 ## Set Operations 
 
 ```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
@@ -514,6 +498,8 @@ intersect(df1, df2)
 union(df1, df2)  #note we get 3 rows, not 4.
 
 ```
+
+
 ## Set Operations
 
 ```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
@@ -521,6 +507,4 @@ setdiff(df1, df2)
 
 setdiff(df2, df1)
 ```
-
-
 

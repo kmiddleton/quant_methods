@@ -17,6 +17,10 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
+<!--
+Datasets
+  bats.csv
+-->
 
 
 ## Exploratory Data Analysis
@@ -65,7 +69,6 @@ Different variations, but the most standard recipe is:
 1. Dots for anything outside 1.5 X 25th and 75th percentiles
 
 
-
 ## Look at Your Data - Boxplots
 
 \scriptsize
@@ -87,7 +90,6 @@ ggplot(bats, aes(x = sex, y = mass))+
 ```
 
 
-
 ## Raw data as an alternative to boxplots
 
 Add a little jitter and transparency on the x axis to keep from overplotting.
@@ -96,6 +98,7 @@ Add a little jitter and transparency on the x axis to keep from overplotting.
 ggplot(bats, aes(x = sex, y = mass))+
   geom_point(position = position_jitter(width = 0.3), alpha = 0.5)
 ```
+
 
 ## Raw data as an alternative to boxplots
 
@@ -125,6 +128,7 @@ ggplot(bats, aes(x = sex, y = mass))+
   geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
              color = "blue")
 ```
+
 
 ## Boxplots and raw data
 
@@ -136,6 +140,7 @@ ggplot(bats, aes(x = sex, y = mass))+
              color = "blue")+
   geom_boxplot(alpha = 2/3)
 ```
+
 
 ## Boxplots and raw data
 
@@ -163,6 +168,7 @@ ggplot(bats, aes(x = condition, y = RFA))+
 
 ```
 
+
 ## Boxplots and coord flips
 
 You can also pick a different variable to group by and flip your axes.
@@ -175,7 +181,6 @@ ggplot(bats, aes(x = condition, y = RFA))+
              color = "blue")+
   coord_flip()
 ```
-
 
 
 ## Boxplots Re-ordered
@@ -211,9 +216,8 @@ ggplot(bats, aes(x = condition, y = RFA))+
   geom_point(position = position_jitter(width = 0.3), alpha = 0.5, 
              color = "blue")+
   coord_flip()
-
-
 ```
+
 
 ## Look at Your Data - Distributions {.smaller}
 
@@ -266,6 +270,7 @@ ggplot(bats)+
   
 ```
 
+
 ## Look at Your Data - Distributions {.smaller}
 
 Let's check the moonlight data
@@ -287,6 +292,7 @@ bats %>%
   arrange(moonlight)
 ```
 
+
 ## Finding suspect observations
 
 ```{r}
@@ -295,13 +301,15 @@ bats %>%
   arrange(desc(moonlight))
 ```
 
+
 ## What to do?
 
 1. Are the observations really incorrect?
     - Malfunction
 1. Was there a data entry error?
     - Check the original data sheets
-    
+
+
 ## Filter
 
 ```{r}
@@ -310,6 +318,7 @@ bats_filt <- bats %>%
 
 max(bats_filt$moonlight)
 ```
+
 
 ## Replace values
 
@@ -332,6 +341,7 @@ bats %>%
   arrange(moonlight)
 ```
 
+
 ## Doublecheck your fixes
 
 ```{r}
@@ -353,3 +363,4 @@ ggplot(bats)+
   theme(text = element_text(size=18))
   
 ```
+

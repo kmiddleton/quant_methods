@@ -41,6 +41,19 @@
     };
   </script>
 
+  <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
   <style type="text/css">@font-face {
 font-family: 'Open Sans';
 font-style: normal;
@@ -3112,73 +3125,72 @@ slide:not(.current) .plotly.html-widget{
     div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
-            code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode { white-space: pre; position: relative; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    code.sourceCode { white-space: pre-wrap; }
-    code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      {   }
-    @media screen {
-    code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-    code span.at { color: #7d9029; } /* Attribute */
-    code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #4070a0; } /* Char */
-    code span.cn { color: #880000; } /* Constant */
-    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-    code span.dt { color: #902000; } /* DataType */
-    code span.dv { color: #40a070; } /* DecVal */
-    code span.er { color: #ff0000; font-weight: bold; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #40a070; } /* Float */
-    code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
-    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-    code span.op { color: #666666; } /* Operator */
-    code span.ot { color: #007020; } /* Other */
-    code span.pp { color: #bc7a00; } /* Preprocessor */
-    code span.sc { color: #4070a0; } /* SpecialChar */
-    code span.ss { color: #bb6688; } /* SpecialString */
-    code span.st { color: #4070a0; } /* String */
-    code span.va { color: #19177c; } /* Variable */
-    code span.vs { color: #4070a0; } /* VerbatimString */
-    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+            pre > code.sourceCode { white-space: pre; position: relative; }
+            pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+            pre > code.sourceCode > span:empty { height: 1.2em; }
+            code.sourceCode > span { color: inherit; text-decoration: inherit; }
+            div.sourceCode { margin: 1em 0; }
+            pre.sourceCode { margin: 0; }
+            @media screen {
+            div.sourceCode { overflow: auto; }
+            }
+            @media print {
+            pre > code.sourceCode { white-space: pre-wrap; }
+            pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+            }
+            pre.numberSource code
+              { counter-reset: source-line 0; }
+            pre.numberSource code > span
+              { position: relative; left: -4em; counter-increment: source-line; }
+            pre.numberSource code > span > a:first-child::before
+              { content: counter(source-line);
+                position: relative; left: -1em; text-align: right; vertical-align: baseline;
+                border: none; display: inline-block;
+                -webkit-touch-callout: none; -webkit-user-select: none;
+                -khtml-user-select: none; -moz-user-select: none;
+                -ms-user-select: none; user-select: none;
+                padding: 0 4px; width: 4em;
+                color: #aaaaaa;
+              }
+            pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+            div.sourceCode
+              {   }
+            @media screen {
+            pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+            }
+            code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+            code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+            code span.at { color: #7d9029; } /* Attribute */
+            code span.bn { color: #40a070; } /* BaseN */
+            code span.bu { } /* BuiltIn */
+            code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+            code span.ch { color: #4070a0; } /* Char */
+            code span.cn { color: #880000; } /* Constant */
+            code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+            code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+            code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+            code span.dt { color: #902000; } /* DataType */
+            code span.dv { color: #40a070; } /* DecVal */
+            code span.er { color: #ff0000; font-weight: bold; } /* Error */
+            code span.ex { } /* Extension */
+            code span.fl { color: #40a070; } /* Float */
+            code span.fu { color: #06287e; } /* Function */
+            code span.im { } /* Import */
+            code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+            code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+            code span.op { color: #666666; } /* Operator */
+            code span.ot { color: #007020; } /* Other */
+            code span.pp { color: #bc7a00; } /* Preprocessor */
+            code span.sc { color: #4070a0; } /* SpecialChar */
+            code span.ss { color: #bb6688; } /* SpecialString */
+            code span.st { color: #4070a0; } /* String */
+            code span.va { color: #19177c; } /* Variable */
+            code span.vs { color: #4070a0; } /* VerbatimString */
+            code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
         
   </style>
 
-  <link href="data:text/css;charset=utf-8,%23bluefont%20%7B%0Acolor%3A%20blue%3B%0A%7D%0A%2Ereferences%20%7B%0Afont%2Dsize%3A%2060%25%3B%0Apadding%2Dleft%3A%2022px%20%3B%0Atext%2Dindent%3A%20%2D22px%20%3B%0A%7D%0A%2Ecenter%20%7B%0Adisplay%3A%20block%3B%0Amargin%2Dleft%3A%20auto%3B%0Amargin%2Dright%3A%20auto%3B%0A%7D%0Ablockquote%20%7B%0Abackground%3A%20%23f9f9f9%3B%0Aborder%2Dleft%3A%2010px%20solid%20%23ccc%3B%0Amargin%3A%201%2E5em%2010px%3B%0Apadding%3A%200%2E5em%2010px%3B%0Aquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%0A%7D%0Ap%20ul%20ol%20%7B%0Atext%2Dalign%3A%20left%3B%0Afont%2Dsize%3A%2080%25%3B%0A%7D%0Ablockquote%20p%20%7B%0Afont%2Dsize%3A%2080%25%3B%0Adisplay%3A%20inline%3B%0Atext%2Dalign%3A%20left%3B%0A%7D%0A%3Cstyle%3E%0A%2Ecol2%20%7B%0A%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%0A%2Dmoz%2Dcolumns%3A%202%20300px%3B%20%0Acolumns%3A%202%20300px%3B%20%0A%7D%0A%2Ecol3%20%7B%0A%2Dwebkit%2Dcolumns%3A%203%20100px%3B%0A%2Dmoz%2Dcolumns%3A%203%20100px%3B%0Acolumns%3A%203%20100px%3B%0A%7D%0A%3C%2Fstyle%3E%0A" rel="stylesheet" type="text/css" />
+  <link href="data:text/css,%23bluefont%20%7Bcolor%3A%20blue%3B%7D%2Ereferences%20%7Bfont%2Dsize%3A%2060%25%3Bpadding%2Dleft%3A%2022px%20%3Btext%2Dindent%3A%20%2D22px%20%3B%7D%2Ecenter%20%7Bdisplay%3A%20block%3Bmargin%2Dleft%3A%20auto%3Bmargin%2Dright%3A%20auto%3B%7Dblockquote%20%7Bbackground%3A%20%23f9f9f9%3Bborder%2Dleft%3A%2010px%20solid%20%23ccc%3Bmargin%3A%201%2E5em%2010px%3Bpadding%3A%200%2E5em%2010px%3Bquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%7Dp%20ul%20ol%20%7Btext%2Dalign%3A%20left%3Bfont%2Dsize%3A%2080%25%3B%7Dblockquote%20p%20%7Bfont%2Dsize%3A%2080%25%3Bdisplay%3A%20inline%3Btext%2Dalign%3A%20left%3B%7D%3Cstyle%3E%2Ecol2%20%7B%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%2Dmoz%2Dcolumns%3A%202%20300px%3B%20columns%3A%202%20300px%3B%20%7D%2Ecol3%20%7B%2Dwebkit%2Dcolumns%3A%203%20100px%3B%2Dmoz%2Dcolumns%3A%203%20100px%3Bcolumns%3A%203%20100px%3B%7D%3C%2Fstyle%3E" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -3194,6 +3206,11 @@ slide:not(.current) .plotly.html-widget{
       <p data-config-presenter><!-- populated from slide_config.json --></p>
           </hgroup>
   </slide>
+
+<!--
+Datasets
+  bats.csv
+-->
 
 <slide class=""><hgroup><h2>Data Manipulation Goals – Reminder</h2></hgroup><article  id="data-manipulation-goals-reminder">
 
@@ -3262,7 +3279,7 @@ bats[1:10,]</pre>
 ##  9      9 A     F     P          33.4  10          58     26.3
 ## 10     10 A     F     L          44.6  13.3        58     26.3</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  id="filter" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  class="smaller" id="filter">
 
 <p>Subsets observations based on their values. The first argument is the object to filter, and the following arguments are the expressions for how you want to filter. So say we only want to look at female bats.</p>
 
@@ -3281,9 +3298,9 @@ bats[1:10,]</pre>
 ##  8     13 A     F     L          39.7  13.8         9     23.3
 ##  9     15 A     F     L          36.5  12.5         3     24.9
 ## 10     18 A     F     L          30.5  13          10     17.2
-## # … with 77 more rows</pre>
+## # ... with 77 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  id="filter-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  class="smaller" id="filter-1">
 
 <p>Or we only want to look at male bats with a mass above 15g.</p>
 
@@ -3308,7 +3325,7 @@ bats[1:10,]</pre>
 ## 13    130 A     M     TD         46.5  17.8         7     28.1
 ## 14    160 A     M     TD         50    18.5        96     19.5</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  id="filter-2" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code></h2></hgroup><article  class="smaller" id="filter-2">
 
 <p>Remember, if we want to use the <code>%&gt;%</code> we don’t have to specify the dataframe.</p>
 
@@ -3352,7 +3369,7 @@ bats[1:10,]</pre>
 
 <p><em>Boolean operators. The left circle is x, the right circle is y, and the shaded region indicates the given subset selected.</em></p>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  id="filter-with-boolean" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  class="smaller" id="filter-with-boolean">
 
 <p>So say you want the set of male bats with mass &gt; 15g. You can also write this with boolean operators.</p>
 
@@ -3377,7 +3394,7 @@ bats[1:10,]</pre>
 ## 13    130 A     M     TD         46.5  17.8         7     28.1
 ## 14    160 A     M     TD         50    18.5        96     19.5</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  id="filter-with-boolean-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  class="smaller" id="filter-with-boolean-1">
 
 <p>Or you could get the same result by asking for bats that are not (<code>!=</code>) female.</p>
 
@@ -3402,7 +3419,7 @@ bats[1:10,]</pre>
 ## 13    130 A     M     TD         46.5  17.8         7     28.1
 ## 14    160 A     M     TD         50    18.5        96     19.5</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  id="filter-with-boolean-2" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  class="smaller" id="filter-with-boolean-2">
 
 <p>Or say you want the set of bats that are adult females</p>
 
@@ -3422,9 +3439,9 @@ bats[1:10,]</pre>
 ##  8     13 A     F     L          39.7  13.8         9     23.3
 ##  9     15 A     F     L          36.5  12.5         3     24.9
 ## 10     18 A     F     L          30.5  13          10     17.2
-## # … with 27 more rows</pre>
+## # ... with 27 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  id="filter-with-boolean-3" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>filter()</code> with Boolean</h2></hgroup><article  class="smaller" id="filter-with-boolean-3">
 
 <p>Or you want the set of bats that either have condition &ldquo;NR&rdquo; or &ldquo;L&rdquo;</p>
 
@@ -3444,9 +3461,9 @@ bats[1:10,]</pre>
 ##  8      8 A     F     L          40.2  11.5        58     26.3
 ##  9     10 A     F     L          44.6  13.3        58     26.3
 ## 10     11 A     M     NR         36.3   9.5        58     26.3
-## # … with 119 more rows</pre>
+## # ... with 119 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>arrange()</code></h2></hgroup><article  id="arrange" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>arrange()</code></h2></hgroup><article  class="smaller" id="arrange">
 
 <p>The function <code>arrange()</code> sorts by both ascending numerical and alphabetical order, but you can flip this to descending order with <code>desc()</code>.</p>
 
@@ -3470,9 +3487,9 @@ bats[1:10,]</pre>
 ##  8    123 J     F     NR         42    11.8         7     28.1
 ##  9    128 J     F     NR         41.6  12           7     28.1
 ## 10    131 J     F     NR         40.4  12           7     28.1
-## # … with 158 more rows</pre>
+## # ... with 158 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>select()</code></h2></hgroup><article  id="select" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>select()</code></h2></hgroup><article  class="smaller" id="select">
 
 <p>If you want to select certain columns, use <code>select()</code>. For example, select the columns for sex, moonlight and mass.</p>
 
@@ -3492,9 +3509,9 @@ bats[1:10,]</pre>
 ##  8 F            58  11.5
 ##  9 F            58  10  
 ## 10 F            58  13.3
-## # … with 158 more rows</pre>
+## # ... with 158 more rows</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>mutate()</code> and <code>transmute()</code></h2></hgroup><article  id="mutate-and-transmute" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>mutate()</code> and <code>transmute()</code></h2></hgroup><article  class="smaller" id="mutate-and-transmute">
 
 <p>Mutate always adds a new column at the end of the data. So say you want to know the ratio of each bat’s right forearm length (RFA) to its bodymass (mass).</p>
 
@@ -3514,13 +3531,13 @@ bats[1:10,]</pre>
 ##  8      8 A     F     L          40.2  11.5        58     26.3  3.50
 ##  9      9 A     F     P          33.4  10          58     26.3  3.34
 ## 10     10 A     F     L          44.6  13.3        58     26.3  3.35
-## # … with 158 more rows</pre>
+## # ... with 158 more rows</pre>
 
 <ul>
 <li>Reminder: <code>bats$ratio &lt;- bats$RFA / bats$mass</code> is equivalent</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2><code>mutate()</code> and <code>transmute()</code></h2></hgroup><article  id="mutate-and-transmute-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>mutate()</code> and <code>transmute()</code></h2></hgroup><article  class="smaller" id="mutate-and-transmute-1">
 
 <p>If all you care about is the new variable, use <code>transmute()</code></p>
 
@@ -3539,7 +3556,7 @@ bats[1:10,]</pre>
 ##  8  3.50
 ##  9  3.34
 ## 10  3.35
-## # … with 158 more rows</pre>
+## # ... with 158 more rows</pre>
 
 </article></slide><slide class=""><hgroup><h2>Useful Creation Functions</h2></hgroup><article  id="useful-creation-functions">
 
@@ -3565,7 +3582,7 @@ bats[1:10,]</pre>
 ##      &lt;dbl&gt;
 ## 1     11.7</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>summarize()</code> and <code>group_by()</code></h2></hgroup><article  id="summarize-and-group_by" class="smaller">
+</article></slide><slide class=""><hgroup><h2><code>summarize()</code> and <code>group_by()</code></h2></hgroup><article  class="smaller" id="summarize-and-group_by">
 
 <p>If you want to summarize by multiple groups, use <code>group_by()</code> and <code>%&gt;%</code></p>
 
@@ -3575,7 +3592,7 @@ bats[1:10,]</pre>
 
 <pre >## # A tibble: 2 x 2
 ##   sex   avg_mass
-##   &lt;chr&gt;    &lt;dbl&gt;
+## * &lt;chr&gt;    &lt;dbl&gt;
 ## 1 F         12.2
 ## 2 M         11.2</pre>
 
@@ -3602,7 +3619,7 @@ bats[1:10,]</pre>
 <li><strong>Counts:</strong> <code>n()</code> - size of current group, <code>sum(x)</code> (try <code>sum(~is.na(x))</code> to make sure you don’t include <code>NA</code>’s), <code>n_distinct(x)</code> - the number of unique elements</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Combine functions to explore data!</h2></hgroup><article  id="combine-functions-to-explore-data" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Combine functions to explore data!</h2></hgroup><article  class="smaller" id="combine-functions-to-explore-data">
 
 <p>Summarize by group and arrange by mass</p>
 
@@ -3625,7 +3642,7 @@ bats[1:10,]</pre>
 ## 8 F     A     P            10   
 ## 9 M     J     TD            9.83</pre>
 
-</article></slide><slide class=""><hgroup><h2>Combine functions to explore data!</h2></hgroup><article  id="combine-functions-to-explore-data-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Combine functions to explore data!</h2></hgroup><article  class="smaller" id="combine-functions-to-explore-data-1">
 
 <p>Find all groups bigger than a threshold</p>
 
@@ -3647,7 +3664,7 @@ bats[1:10,]</pre>
 ##  8     48 A     M     NR         46.4  20.5        81     27.3
 ##  9     49 A     F     PL         48.7  21          81     27.3
 ## 10     51 A     F     PL         51.9  27          81     27.3
-## # … with 14 more rows</pre></article></slide>
+## # ... with 14 more rows</pre></article></slide>
 
 
   <slide class="backdrop"></slide>

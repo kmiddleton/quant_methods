@@ -41,6 +41,19 @@
     };
   </script>
 
+  <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
   <style type="text/css">@font-face {
 font-family: 'Open Sans';
 font-style: normal;
@@ -3112,73 +3125,72 @@ slide:not(.current) .plotly.html-widget{
     div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
-            code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode { white-space: pre; position: relative; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    code.sourceCode { white-space: pre-wrap; }
-    code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      {   }
-    @media screen {
-    code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-    code span.at { color: #7d9029; } /* Attribute */
-    code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #4070a0; } /* Char */
-    code span.cn { color: #880000; } /* Constant */
-    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-    code span.dt { color: #902000; } /* DataType */
-    code span.dv { color: #40a070; } /* DecVal */
-    code span.er { color: #ff0000; font-weight: bold; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #40a070; } /* Float */
-    code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
-    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-    code span.op { color: #666666; } /* Operator */
-    code span.ot { color: #007020; } /* Other */
-    code span.pp { color: #bc7a00; } /* Preprocessor */
-    code span.sc { color: #4070a0; } /* SpecialChar */
-    code span.ss { color: #bb6688; } /* SpecialString */
-    code span.st { color: #4070a0; } /* String */
-    code span.va { color: #19177c; } /* Variable */
-    code span.vs { color: #4070a0; } /* VerbatimString */
-    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+            pre > code.sourceCode { white-space: pre; position: relative; }
+            pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+            pre > code.sourceCode > span:empty { height: 1.2em; }
+            code.sourceCode > span { color: inherit; text-decoration: inherit; }
+            div.sourceCode { margin: 1em 0; }
+            pre.sourceCode { margin: 0; }
+            @media screen {
+            div.sourceCode { overflow: auto; }
+            }
+            @media print {
+            pre > code.sourceCode { white-space: pre-wrap; }
+            pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+            }
+            pre.numberSource code
+              { counter-reset: source-line 0; }
+            pre.numberSource code > span
+              { position: relative; left: -4em; counter-increment: source-line; }
+            pre.numberSource code > span > a:first-child::before
+              { content: counter(source-line);
+                position: relative; left: -1em; text-align: right; vertical-align: baseline;
+                border: none; display: inline-block;
+                -webkit-touch-callout: none; -webkit-user-select: none;
+                -khtml-user-select: none; -moz-user-select: none;
+                -ms-user-select: none; user-select: none;
+                padding: 0 4px; width: 4em;
+                color: #aaaaaa;
+              }
+            pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+            div.sourceCode
+              {   }
+            @media screen {
+            pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+            }
+            code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+            code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+            code span.at { color: #7d9029; } /* Attribute */
+            code span.bn { color: #40a070; } /* BaseN */
+            code span.bu { } /* BuiltIn */
+            code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+            code span.ch { color: #4070a0; } /* Char */
+            code span.cn { color: #880000; } /* Constant */
+            code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+            code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+            code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+            code span.dt { color: #902000; } /* DataType */
+            code span.dv { color: #40a070; } /* DecVal */
+            code span.er { color: #ff0000; font-weight: bold; } /* Error */
+            code span.ex { } /* Extension */
+            code span.fl { color: #40a070; } /* Float */
+            code span.fu { color: #06287e; } /* Function */
+            code span.im { } /* Import */
+            code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+            code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+            code span.op { color: #666666; } /* Operator */
+            code span.ot { color: #007020; } /* Other */
+            code span.pp { color: #bc7a00; } /* Preprocessor */
+            code span.sc { color: #4070a0; } /* SpecialChar */
+            code span.ss { color: #bb6688; } /* SpecialString */
+            code span.st { color: #4070a0; } /* String */
+            code span.va { color: #19177c; } /* Variable */
+            code span.vs { color: #4070a0; } /* VerbatimString */
+            code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
         
   </style>
 
-  <link href="data:text/css;charset=utf-8,%23bluefont%20%7B%0Acolor%3A%20blue%3B%0A%7D%0A%2Ereferences%20%7B%0Afont%2Dsize%3A%2060%25%3B%0Apadding%2Dleft%3A%2022px%20%3B%0Atext%2Dindent%3A%20%2D22px%20%3B%0A%7D%0A%2Ecenter%20%7B%0Adisplay%3A%20block%3B%0Amargin%2Dleft%3A%20auto%3B%0Amargin%2Dright%3A%20auto%3B%0A%7D%0Ablockquote%20%7B%0Abackground%3A%20%23f9f9f9%3B%0Aborder%2Dleft%3A%2010px%20solid%20%23ccc%3B%0Amargin%3A%201%2E5em%2010px%3B%0Apadding%3A%200%2E5em%2010px%3B%0Aquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%0A%7D%0Ap%20ul%20ol%20%7B%0Atext%2Dalign%3A%20left%3B%0Afont%2Dsize%3A%2080%25%3B%0A%7D%0Ablockquote%20p%20%7B%0Afont%2Dsize%3A%2080%25%3B%0Adisplay%3A%20inline%3B%0Atext%2Dalign%3A%20left%3B%0A%7D%0A%3Cstyle%3E%0A%2Ecol2%20%7B%0A%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%0A%2Dmoz%2Dcolumns%3A%202%20300px%3B%20%0Acolumns%3A%202%20300px%3B%20%0A%7D%0A%2Ecol3%20%7B%0A%2Dwebkit%2Dcolumns%3A%203%20100px%3B%0A%2Dmoz%2Dcolumns%3A%203%20100px%3B%0Acolumns%3A%203%20100px%3B%0A%7D%0A%3C%2Fstyle%3E%0A" rel="stylesheet" type="text/css" />
+  <link href="data:text/css,%23bluefont%20%7Bcolor%3A%20blue%3B%7D%2Ereferences%20%7Bfont%2Dsize%3A%2060%25%3Bpadding%2Dleft%3A%2022px%20%3Btext%2Dindent%3A%20%2D22px%20%3B%7D%2Ecenter%20%7Bdisplay%3A%20block%3Bmargin%2Dleft%3A%20auto%3Bmargin%2Dright%3A%20auto%3B%7Dblockquote%20%7Bbackground%3A%20%23f9f9f9%3Bborder%2Dleft%3A%2010px%20solid%20%23ccc%3Bmargin%3A%201%2E5em%2010px%3Bpadding%3A%200%2E5em%2010px%3Bquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%7Dp%20ul%20ol%20%7Btext%2Dalign%3A%20left%3Bfont%2Dsize%3A%2080%25%3B%7Dblockquote%20p%20%7Bfont%2Dsize%3A%2080%25%3Bdisplay%3A%20inline%3Btext%2Dalign%3A%20left%3B%7D%3Cstyle%3E%2Ecol2%20%7B%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%2Dmoz%2Dcolumns%3A%202%20300px%3B%20columns%3A%202%20300px%3B%20%7D%2Ecol3%20%7B%2Dwebkit%2Dcolumns%3A%203%20100px%3B%2Dmoz%2Dcolumns%3A%203%20100px%3Bcolumns%3A%203%20100px%3B%7D%3C%2Fstyle%3E" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -3194,6 +3206,11 @@ slide:not(.current) .plotly.html-widget{
       <p data-config-presenter><!-- populated from slide_config.json --></p>
           </hgroup>
   </slide>
+
+<!--
+Datasets
+
+-->
 
 <slide class=""><hgroup><h2>Relational Data</h2></hgroup><article  id="relational-data">
 
@@ -3251,10 +3268,10 @@ weather   # weather at each NYC airport each hour</pre>
 <p><br /></p>
 
 <ul>
-<li><p><code>flights</code> connects to <code>planes</code> via a single variable, <code>tailnum</code>.</p></li>
-<li><p><code>flights</code> connects to <code>airlines</code> through the <code>carrier</code> variable.</p></li>
-<li><p><code>flights</code> connects to <code>airports</code> in two ways: via the <code>origin</code> and <code>dest</code> variables.</p></li>
-<li><p><code>flights</code> connects to <code>weather</code> via <code>origin</code> (the location), and <code>year</code>, <code>month</code>, <code>day</code> and <code>hour</code> (the time).</p></li>
+<li><code>flights</code> connects to <code>planes</code> via a single variable, <code>tailnum</code>.</li>
+<li><code>flights</code> connects to <code>airlines</code> through the <code>carrier</code> variable.</li>
+<li><code>flights</code> connects to <code>airports</code> in two ways: via the <code>origin</code> and <code>dest</code> variables.</li>
+<li><code>flights</code> connects to <code>weather</code> via <code>origin</code> (the location), and <code>year</code>, <code>month</code>, <code>day</code> and <code>hour</code> (the time).</li>
 </ul></div>
 
 </article></slide><slide class=""><hgroup><h2>Keys</h2></hgroup><article  id="keys">
@@ -3288,7 +3305,7 @@ weather   # weather at each NYC airport each hour</pre>
 </article></slide><slide class=""><hgroup><h2>Keys</h2></hgroup><article  id="keys-2">
 
 <ul>
-<li><p><em>Surrogate Key</em> - sometimes datasets do not contain a primary key, so you must make one.</p>
+<li><em>Surrogate Key</em> - sometimes datasets do not contain a primary key, so you must make one.
 
 <ul>
 <li><code>flights$tailnum</code> is not a primary key because the same plane appears multiple times per day at the airport. Create one using, for example, <code>mutate()</code> and <code>row_number()</code>. <strong>This then becomes a <em>primary key</em>.</strong></li>
@@ -3322,7 +3339,7 @@ flights2</pre>
 ##  8  2013     1     1     6 LGA    IAD   N829AS  EV     
 ##  9  2013     1     1     6 JFK    MCO   N593JB  B6     
 ## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA     
-## # … with 336,766 more rows</pre>
+## # ... with 336,766 more rows</pre>
 
 </article></slide><slide class=""><hgroup><h2>Mutating Joins</h2></hgroup><article  id="mutating-joins-1" class="smaller">
 
@@ -3347,7 +3364,7 @@ flights2</pre>
 ##  8  2013     1     1     6 N829AS  EV      ExpressJet Airlines Inc.
 ##  9  2013     1     1     6 N593JB  B6      JetBlue Airways         
 ## 10  2013     1     1     6 N3ALAA  AA      American Airlines Inc.  
-## # … with 336,766 more rows</pre>
+## # ... with 336,766 more rows</pre>
 
 </article></slide><slide class=""><hgroup><h2>Joins, How Do They Work?</h2></hgroup><article  id="joins-how-do-they-work" class="smaller">
 
@@ -3574,7 +3591,7 @@ flights2</pre>
 ##  8  2013     1     1     6 LGA    IAD   N829AS  EV       39.9  25.0  54.8
 ##  9  2013     1     1     6 JFK    MCO   N593JB  B6       37.9  27.0  64.3
 ## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA       39.9  25.0  54.8
-## # … with 336,766 more rows, and 7 more variables: wind_dir &lt;dbl&gt;,
+## # ... with 336,766 more rows, and 7 more variables: wind_dir &lt;dbl&gt;,
 ## #   wind_speed &lt;dbl&gt;, wind_gust &lt;dbl&gt;, precip &lt;dbl&gt;, pressure &lt;dbl&gt;,
 ## #   visib &lt;dbl&gt;, time_hour &lt;dttm&gt;</pre>
 
@@ -3588,17 +3605,17 @@ flights2</pre>
 <pre >## # A tibble: 336,776 x 16
 ##    year.x month   day  hour origin dest  tailnum carrier year.y type 
 ##     &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;
-##  1   2013     1     1     5 EWR    IAH   N14228  UA        1999 Fixe…
-##  2   2013     1     1     5 LGA    IAH   N24211  UA        1998 Fixe…
-##  3   2013     1     1     5 JFK    MIA   N619AA  AA        1990 Fixe…
-##  4   2013     1     1     5 JFK    BQN   N804JB  B6        2012 Fixe…
-##  5   2013     1     1     6 LGA    ATL   N668DN  DL        1991 Fixe…
-##  6   2013     1     1     5 EWR    ORD   N39463  UA        2012 Fixe…
-##  7   2013     1     1     6 EWR    FLL   N516JB  B6        2000 Fixe…
-##  8   2013     1     1     6 LGA    IAD   N829AS  EV        1998 Fixe…
-##  9   2013     1     1     6 JFK    MCO   N593JB  B6        2004 Fixe…
+##  1   2013     1     1     5 EWR    IAH   N14228  UA        1999 Fixe~
+##  2   2013     1     1     5 LGA    IAH   N24211  UA        1998 Fixe~
+##  3   2013     1     1     5 JFK    MIA   N619AA  AA        1990 Fixe~
+##  4   2013     1     1     5 JFK    BQN   N804JB  B6        2012 Fixe~
+##  5   2013     1     1     6 LGA    ATL   N668DN  DL        1991 Fixe~
+##  6   2013     1     1     5 EWR    ORD   N39463  UA        2012 Fixe~
+##  7   2013     1     1     6 EWR    FLL   N516JB  B6        2000 Fixe~
+##  8   2013     1     1     6 LGA    IAD   N829AS  EV        1998 Fixe~
+##  9   2013     1     1     6 JFK    MCO   N593JB  B6        2004 Fixe~
 ## 10   2013     1     1     6 LGA    ORD   N3ALAA  AA          NA &lt;NA&gt; 
-## # … with 336,766 more rows, and 6 more variables: manufacturer &lt;chr&gt;,
+## # ... with 336,766 more rows, and 6 more variables: manufacturer &lt;chr&gt;,
 ## #   model &lt;chr&gt;, engines &lt;int&gt;, seats &lt;int&gt;, speed &lt;int&gt;, engine &lt;chr&gt;</pre>
 
 <p>You can see that both datasets had a <code>year</code> column but they had different values, so the resulting variables are <code>year.x</code> and <code>year.y</code>.</p>
@@ -3613,17 +3630,17 @@ flights2</pre>
 <pre >## # A tibble: 336,776 x 15
 ##     year month   day  hour origin dest  tailnum carrier name    lat   lon   alt
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-##  1  2013     1     1     5 EWR    IAH   N14228  UA      Geor…  30.0 -95.3    97
-##  2  2013     1     1     5 LGA    IAH   N24211  UA      Geor…  30.0 -95.3    97
-##  3  2013     1     1     5 JFK    MIA   N619AA  AA      Miam…  25.8 -80.3     8
+##  1  2013     1     1     5 EWR    IAH   N14228  UA      Geor~  30.0 -95.3    97
+##  2  2013     1     1     5 LGA    IAH   N24211  UA      Geor~  30.0 -95.3    97
+##  3  2013     1     1     5 JFK    MIA   N619AA  AA      Miam~  25.8 -80.3     8
 ##  4  2013     1     1     5 JFK    BQN   N804JB  B6      &lt;NA&gt;   NA    NA      NA
-##  5  2013     1     1     6 LGA    ATL   N668DN  DL      Hart…  33.6 -84.4  1026
-##  6  2013     1     1     5 EWR    ORD   N39463  UA      Chic…  42.0 -87.9   668
-##  7  2013     1     1     6 EWR    FLL   N516JB  B6      Fort…  26.1 -80.2     9
-##  8  2013     1     1     6 LGA    IAD   N829AS  EV      Wash…  38.9 -77.5   313
-##  9  2013     1     1     6 JFK    MCO   N593JB  B6      Orla…  28.4 -81.3    96
-## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA      Chic…  42.0 -87.9   668
-## # … with 336,766 more rows, and 3 more variables: tz &lt;dbl&gt;, dst &lt;chr&gt;,
+##  5  2013     1     1     6 LGA    ATL   N668DN  DL      Hart~  33.6 -84.4  1026
+##  6  2013     1     1     5 EWR    ORD   N39463  UA      Chic~  42.0 -87.9   668
+##  7  2013     1     1     6 EWR    FLL   N516JB  B6      Fort~  26.1 -80.2     9
+##  8  2013     1     1     6 LGA    IAD   N829AS  EV      Wash~  38.9 -77.5   313
+##  9  2013     1     1     6 JFK    MCO   N593JB  B6      Orla~  28.4 -81.3    96
+## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA      Chic~  42.0 -87.9   668
+## # ... with 336,766 more rows, and 3 more variables: tz &lt;dbl&gt;, dst &lt;chr&gt;,
 ## #   tzone &lt;chr&gt;</pre>
 
 </article></slide><slide class=""><hgroup><h2>Filtering Joins</h2></hgroup><article  id="filtering-joins">
@@ -3674,7 +3691,7 @@ flights2</pre>
 ##  8  2013     1     1      558            600        -2      923
 ##  9  2013     1     1      559            559         0      702
 ## 10  2013     1     1      600            600         0      851
-## # … with 141,135 more rows</pre>
+## # ... with 141,135 more rows</pre>
 
 </article></slide><slide class=""><hgroup><h2><code>anti_join()</code></h2></hgroup><article  id="anti_join" class="smaller">
 
@@ -3699,7 +3716,7 @@ mismatch[,1:7]</pre>
 ##  8  2013     1     1      624            630        -6      840
 ##  9  2013     1     1      628            630        -2     1137
 ## 10  2013     1     1      629            630        -1      824
-## # … with 52,596 more rows</pre>
+## # ... with 52,596 more rows</pre>
 
 </article></slide><slide class=""><hgroup><h2>Set Operations</h2></hgroup><article  id="set-operations" class="smaller">
 
