@@ -13,8 +13,7 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE}
 library(tidyverse)
 library(readxl)
-library(cowplot)
-theme_set(theme_cowplot())
+
 ```
 
 
@@ -67,8 +66,6 @@ M <- read_excel("Mouse_Weaning_Data.xlsx",
 ```
 
 
-
-
 ## Important Coding Tips
 
 Use `<-` for assign.
@@ -77,18 +74,19 @@ Use `<-` for assign.
 - "Assign the object on the right to the object on the left."
 
 
-
 ## Use `str()` to get information
 
 ```{r}
 str(M)
 ```
 
+
 ## Selecting and filtering
 
 - Selecting columns
 - Filtering a subset of rows
 - Aggregating summary statistics
+
 
 ## Selecting columns: Base R
 
@@ -97,6 +95,7 @@ M$WnMass
 ```
 
 `$` returns a single column from a `data.frame`. You'll use this form most often day to day.
+
 
 ## Selecting columns: Base R
 
@@ -111,6 +110,7 @@ If either is empty, all are returned.
 
 - All rows are returned here. The space before `,` is empty.
 
+
 ## Filtering rows: Base R
 
 ```{r eval=FALSE}
@@ -120,11 +120,13 @@ M[1:5, ]   # Rows 1-5, all columns
 
 - The space after `,` is empty, so all columns are returned.
 
+
 ## Filtering rows: Base R
 
 ```{r eval=FALSE}
 M[M$BYear == 2008, ]
 ```
+
 
 ## Filtering rows: Base R
 
@@ -134,6 +136,7 @@ Use `head()` to get a peek at the first few rows. A second argument to `head()` 
 head(M[, c("MouseID", "Sex")], n = 10)
 ```
 
+
 ## Select and filter simultaneously: Base R
 
 `subset()` or `[ , ]`
@@ -141,6 +144,7 @@ head(M[, c("MouseID", "Sex")], n = 10)
 ```{r}
 subset(M, WnMass < 6)
 ```
+
 
 ## Select and filter simultaneously: Base R
 
@@ -152,6 +156,7 @@ subset(M, Sex == 1 & DamID == 1932, select = "WnMass")
 
 Use `&` for "and", and `|` for "or."
 
+
 ## Making new columns
 
 - Calculate new variables
@@ -159,6 +164,7 @@ Use `&` for "and", and `|` for "or."
 - Combine existing variables into a new variable
     - e.g., year, months, day columns into a date
 - Splitting existing variables into >1 new variables
+
 
 ## Calculate new variables: Base R
 
@@ -174,6 +180,7 @@ _Note_:
 - `log()` performs natural log.
 - `log10()` performs base-10 log.
 
+
 ## Aggregating: Base R
 
 - Mean per `DamID` of every column that is not `DamID`.
@@ -185,7 +192,6 @@ M_agr
 ```
 
 
-
 ## Writing Files
 
 - When you have a file you want to save, use `write.csv()`, or `write_csv()`, or `write.txt()`, or `write_txt()`.
@@ -194,12 +200,8 @@ M_agr
 
 - It will save to your working directory.
 
-
 ```{r eval = FALSE, warning=FALSE}
 write_csv(M_agr, "M_aggregate.csv")
 ```
 
-
 _Note_ it will always rewrite your old file if you re-run your code.
-
-

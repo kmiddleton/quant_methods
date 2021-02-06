@@ -15,6 +15,8 @@ library(tidyverse)
 library(readxl)
 library(cowplot)
 theme_set(theme_cowplot())
+library(wesanderson)
+library(viridis)
 ```
 
 ## R plotting systems
@@ -42,7 +44,7 @@ glimpse(iris)
 ## Basics of ggplot
 
 ```{r echo=TRUE, eval=FALSE}
-library("tidyverse")
+library(tidyverse)
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) + 
   geom_point() 
 ```
@@ -66,8 +68,8 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
 ## Logic of ggplot
 
 ```{r eval=FALSE}
-library("tidyverse")
-library("cowplot")  # Our preferred ggplot theme
+library(tidyverse)
+library(cowplot)  # Our preferred ggplot theme
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
   geom_point() 
 ```
@@ -75,7 +77,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
 ## Basics of ggplot
 
 ```{r echo=FALSE}
-library("ggplot2")
+library(ggplot2)
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
   geom_point() 
 ```
@@ -141,7 +143,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 ## Building plots
 
 ```{r plot_colors, echo=TRUE, eval=FALSE}
-library("wesanderson")
+library(wesanderson)
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
                  color = Species)) + 
   geom_point(size = 3) + 
@@ -159,7 +161,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 ## Building plots
 
 ```{r plot_colors_colorblind, echo=TRUE, eval=FALSE}
-library("viridis")
+library(viridis)
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
                  color = Species)) + 
   geom_point(size = 3) + 
@@ -177,7 +179,6 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 ## Building plots
 
 ```{r better_axis_labels, echo=TRUE, eval=FALSE}
-library("wesanderson")
 ggplot(iris, aes(x = Petal.Length,
                  y = Petal.Width,
                  color = Species)) + 
@@ -200,7 +201,7 @@ ggplot(iris, aes(x = Petal.Length,
 ```{r add_lm, echo=TRUE, eval=FALSE}
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) + 
   geom_point() +
-  geom_smooth(method = "lm")
+  geom_smooth(formula = y ~ x, method = "lm")
 ```
 
 - `geom_line()` add a "smooth" line (but in this case linear [`lm`])
@@ -219,7 +220,7 @@ ggplot(iris, aes(x = Petal.Length,
                  y = Petal.Width,
                  color = Species)) + 
   geom_point() +
-  geom_smooth(method = "lm")
+  geom_smooth(formula = y ~ x, method = "lm")
 ```
 
 ## Adding lines
@@ -234,7 +235,7 @@ ggplot(iris, aes(x = Petal.Length,
                  y = Petal.Width,
                  color = Species)) + 
   geom_point() +
-  geom_smooth(method = "lm") +
+  geom_smooth(formula = y ~ x, method = "lm") +
   scale_x_log10() +
   scale_y_log10()
 ```

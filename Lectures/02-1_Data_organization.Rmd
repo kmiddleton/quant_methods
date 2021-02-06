@@ -11,14 +11,7 @@ bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE}
-library(tidyverse)
-library(readxl)
-library(cowplot)
-theme_set(theme_cowplot())
 ```
-
-
-
 
 
 ## Data Organizing - File Structure
