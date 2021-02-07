@@ -161,8 +161,8 @@ summary(fm)
 If you have a significant interaction, the main effects not interpertable **without** clarification.
 
 ```{r}
-fm2 <- lm(biomass ~ phosphorous * nitrogen, data = biomass)
-anova(fm2)
+fm <- lm(biomass ~ phosphorous * nitrogen, data = biomass)
+anova(fm)
 ```
 
 
