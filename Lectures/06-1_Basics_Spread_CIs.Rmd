@@ -10,6 +10,11 @@ csl: evolution.csl
 bibliography: Multivariate.bib
 ---
 
+<!--
+Datasets
+  Stickleback_Plates.csv
+-->
+
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
@@ -20,6 +25,7 @@ undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
 
 ```
 
+
 ## Models
 
 - Comparing models will require covering a few more basics
@@ -28,10 +34,12 @@ undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
     - Deviations & sums of squares
     - Introduction to confidence intervals
 
+
 ## Measures of spread
 
 - A measure of how much variation is present in a distribution around its center
 - How widely scattered the observations are
+
 
 ## Percentiles and quantiles
 
@@ -45,6 +53,7 @@ quantile(xx, 0.84)
 quantile(xx, 0.975)
 ```
 
+
 ## Quartiles and interquartile range
 
 *Quartiles*
@@ -56,6 +65,7 @@ quantile(xx, 0.975)
 
 - Difference between the first and third quartiles
 
+
 ## Boxplots {.smaller}
 
 Different variations, but the most standard recipe is:
@@ -66,11 +76,9 @@ Different variations, but the most standard recipe is:
 4. Dots for anything outside 1.5 X 25th and 75th percentiles
 
 ```{r echo=FALSE, fig.height = 3, fig.width = 5, fig.align = 'center'}
-
 ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
   geom_boxplot() +
   geom_point(position = position_jitter(width = 0.3), alpha = 0.5)
-
 ```
 
 
@@ -90,6 +98,7 @@ $$
 
 We would like to have a single number to summarize the deviates for a sample.
 
+
 ## Sum of squares
 
 Deviates are most often squared and summed:
@@ -101,6 +110,7 @@ $$
 1. Why squared?
 1. What does the sum of squares represent?
 
+
 ## Mean deviates
 
 This is why we don't use the mean absolute deviation:
@@ -110,6 +120,7 @@ This is why we don't use the mean absolute deviation:
 </center>
 
 Absolute value wouldn't capture the greater variability in the right image.
+
 
 ## Sample variance
 
@@ -121,6 +132,7 @@ $$
 
 - Mean squared deviation of the observations from the mean.
 - Measures the dispersion of a distribution away from the sample mean.
+
 
 ## Sample standard deviation
 
@@ -134,6 +146,7 @@ $$
 
 - When sample size is not low, the sample variance ($s^2$) is an *unbiased estimator* of the population variance ($\sigma^2$), though the calculation is a little different (divide by $n$ rather than $n − 1$) See [explanation of $n$ vs. $n-1$](http://stats.stackexchange.com/q/3931/597) 
 
+
 ## Coefficient of variation
 
 Coefficient of variation represents the standard deviation as a percentage of the mean. Elephant mass has an inherently higher standard deviation than mouse mass.
@@ -144,6 +157,7 @@ $$
 
 - Can be used as a general indicator of the amount of variability in a sample.
 - Can also be used to (cautiously) compare variables that are not measured in the same units (e.g., basal metabolic rate to ear area).
+
 
 ## Coefficient of variation
 
@@ -164,6 +178,7 @@ Means are always reported with standard errors (or standard deviations).
 - **Standard deviation** quantifies scatter — how much the values vary from one another and does not change predictably as you collect more data.
 - **Standard error** of the mean quantifies how precisely you know the population mean. It takes into account both the value of $s$ and the sample size. Always decreases with larger sample size.
 
+
 ## Standard error of the sample mean
 
 ```{r}
@@ -172,8 +187,8 @@ SEM <- function(x) {sd(x) / sqrt(length(x))}
 SticklebackPlates %>% 
   group_by(genotype) %>% 
   summarise_all(SEM)
-  
 ```
+
 
 ## Raw data with summary stats
 
@@ -185,10 +200,12 @@ ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
                color = "red", size = 1)
 ```
 
+
 ## Raw data with summary stats
 
 ```{r pt_errbar2, ref.label="pt_errbar", echo=FALSE}
 ```
+
 
 ## Confidence intervals
 
@@ -196,12 +213,14 @@ ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
 
 Our calculation is based on our expectation from sampling the true population distribution repeatedly. 
 
+
 ## Confidence intervals
 
 The 95% confidence interval for a mean can be estimated by the sample mean ± 2 \times $SE_{\bar{Y}}$.
 
 - This is a reasonable approximation.
 - We'll cover the exact calculation (what you would use in press) later
+
 
 ## Confidence intervals
 
@@ -224,5 +243,6 @@ ggplot(tibble(undulation_rate), aes(undulation_rate)) +
 Mean undulation rate was `r round(y_bar, 2)` Hz ($n$ = `r length(undulation_rate)`; 95% CI = `r round(lower, 2)` - `r round(upper, 2)` Hz).
 
 </div>
+
 
 ## References

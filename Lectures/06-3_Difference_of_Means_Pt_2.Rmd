@@ -21,12 +21,17 @@ library(wesanderson)
 #remotes::install_github("rmcelreath/rethinking")
 ```
 
+<!--
+Datasets
+  HornedLizards.csv
+-->
+
+
 ## Horned lizard predation
 
 <div class="columns-2">
 
 ```{r message=FALSE, echo = FALSE, fig.width = 3.5}
-
 HL <- read_csv("../data/HornedLizards.csv")
 HL <- HL %>% drop_na()
 
@@ -42,9 +47,7 @@ HL %>%
   facet_grid(group ~ .) +
   labs(x = "Horn Length (mm)", y = "Count") +
   theme(legend.position = "none")
-
 ```
-
 
 Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "alive"]), 2)` mm
 
@@ -68,6 +71,7 @@ Are the means different?
 3. Resampling
 4. Bayesian
 
+
 ## ML Comparison
 
 *Model 1*: Data drawn from one distribution
@@ -77,6 +81,7 @@ Are the means different?
 Compare the models with a likelihood ratio (Bayes Factor):
 
 $$BF = \frac{\mathcal{L}[Model~2]}{\mathcal{L}[Model~1]}$$
+
 
 ## Data drawn from one distribution
 
@@ -90,11 +95,13 @@ $$\hat{\sigma}^2_1 = \frac{1}{n_1 + n_2}\left(\sum^{n_1}_{i=1}\left(y_{1i} - \ba
 
 where $\bar{\bar{y}}$ is the grand mean.
 
+
 ## Data drawn from one distribution
 
 Likelihood of the $y$s being drawn from the same distribution:
 
 $$\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|y\right) = \frac{1}{\left(2\pi \hat{\sigma}^2_1\right)^\left(\frac{n_1 + n_2}{2}\right)}e^{\left(-\frac{n_1 + n_2}{2}\right)}$$
+
 
 ## Data drawn from distributions with 2 different means
 
@@ -103,6 +110,7 @@ Assume equal variances but different means.
 $$\hat{\sigma}^2_2 = \frac{1}{n_1 + n_2}\left(\sum^{n_1}_{i=1}\left(y_{1i} - \bar{y}_1\right)^2 +  \sum^{n_2}_{i=1} \left(y_{2i} - \bar{y}_2\right)^2 \right)$$
 
 $$\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right) = \frac{1}{\left(2\pi \hat{\sigma}^2_2\right)^\left(\frac{n_1 + n_2}{2}\right)}e^{\left(-\frac{n_1 + n_2}{2}\right)}$$
+
 
 ## ML Comparison
 
@@ -113,7 +121,6 @@ $$\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right) = \frac{1
 Compare the models with a likelihood ratio (Bayes Factor):
 
 $$BF = \frac{\mathcal{L}[Model~2]}{\mathcal{L}[Model~1]} = \frac{\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|y\right)}{\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|y\right)} = \left(\frac{\hat{\sigma}^2_2}{\hat{\sigma}^2_1}\right)^{-\frac{n_1 + n_2}{2}}$$
-
 
 
 ## Resampled difference of means
@@ -133,6 +140,7 @@ for (ii in 2:reps) {
 }
 ```
 
+
 ## Difference of means
 
 ```{r echo=FALSE}
@@ -143,6 +151,7 @@ tibble(diffs) %>%
   labs(x = "Difference (mm)", y = "Count")
 ```
 
+
 ## What proportion of randomized differences are equal to or more extreme than the observed?
 
 ```{r}
@@ -150,6 +159,7 @@ p <- sum(diffs[1] <= diffs) / length(diffs)
 sprintf("%.5f", p)
 sprintf("%.5f", 3 / 50000)
 ```
+
 
 ## Bayesian {.smaller}
 
@@ -164,6 +174,7 @@ str(HL)
 ```
 
 `group` is converted to integers: 1 == alive, 2 == dead.
+
 
 ## Bayesian
 
@@ -200,11 +211,13 @@ fm2 <- ulam(
   iter = 1e4)
 ```
 
+
 ## Bayesian 
 
 ```{r echo=FALSE, message = FALSE}
 trankplot(fm2)
 ```
+
 
 ## Bayesian posterior distributions
 
@@ -220,6 +233,7 @@ tibble(alive, dead) %>%
   labs(x = "Horn Length (mm)", y = "Relative Likelihood")
 ```
 
+
 ## Bayesian summary
 
 ```{r message = FALSE}
@@ -228,6 +242,7 @@ HL %>% group_by(group) %>%
   summarize(horn_mean = mean(horn_length),
             horn_sem = sd(horn_length) / sqrt(length(horn_length)))
 ```
+
 
 ## Bayesian credible interval
 
@@ -248,3 +263,4 @@ tibble(d) %>%
 ```{r}
 HPDI(d, prob = 0.95)
 ```
+

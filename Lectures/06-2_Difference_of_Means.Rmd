@@ -21,11 +21,18 @@ library(wesanderson)
 #remotes::install_github("rmcelreath/rethinking")
 ```
 
+<!--
+Datasets
+  HornedLizards.csv
+-->
+
+
 ## Horned lizard predation
 
 <center>
 <img src="https://i.imgur.com/6GSiaAy.jpg" width="100%" />
 </center>
+
 
 ## Horned lizard predation
 
@@ -34,6 +41,7 @@ HL <- read_csv("../data/HornedLizards.csv")
 glimpse(HL)
 HL %>% group_by(group) %>% tally()
 ```
+
 
 ## Horned lizard predation
 
@@ -45,6 +53,7 @@ HL %>%
   labs(x = "Horn Length (mm)", y = "Count")
 ```
 
+
 ## Summarize
 
 ```{r warning = FALSE, message = FALSE}
@@ -53,6 +62,7 @@ HL %>% group_by(group) %>%
             horn_sd = sd(horn_length))
 sum(!complete.cases(HL))
 ```
+
 
 ## Summarize
 
@@ -70,6 +80,7 @@ HL %>% group_by(group) %>%
             horn_sd = sd(horn_length))
 ```
 
+
 ## Are the means different?
 
 Horn length in live horned lizards: `r round(mean(HL$horn_length[HL$group == "alive"]), 2)` mm
@@ -79,6 +90,7 @@ Horn length in dead horned lizards: `r round(mean(HL$horn_length[HL$group == "de
 Imagine you collected 100 live horned lizards and randomly assigned 50 to each of two groups. Do you think they would have the same mean horn length? How different do you think the means would be? Think about how the variability among individual horn length measurements would affect your intuition here.
 
 > The first principle is that you must not fool yourself – and you are the easiest person to fool. -Feynman
+
 
 ## How large of a difference do we expect to see from sampling error?
 
@@ -94,6 +106,7 @@ Imagine you collected 100 live horned lizards and randomly assigned 50 to each o
 - Randomly catch two groups of $n = 50$ from this population
 - How different are the groups?
 </div>
+
 
 ## How large of a difference do we expect to see from sampling error?
 
@@ -112,6 +125,7 @@ for (zz in 1:n.iter) {
 }
 ```
 
+
 ## How large of a difference do we expect to see from sampling error?
 
 <div class="columns-2">
@@ -126,6 +140,7 @@ ggplot(sim.diff, aes(x = dd)) +
 - Randomly catch two groups of $n = 50$ from this population
 - How different are they?
 </div>
+
 
 ## How large of a difference do we expect to see from sampling error?
 
@@ -147,6 +162,7 @@ Difference: `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(
 
 Are the means different?
 </div>
+
 
 ## How large of a difference do we expect to see from sampling error?
 
@@ -175,12 +191,14 @@ plot_grid(p2, p1, ncol = 2)
 Difference = `r round(mean(HL$horn_length[HL$group == "alive"]), 2) - round(mean(HL$horn_length[HL$group == "dead"]), 2)` mm
 </center>
 
+
 ## Frameworks for inference
 
 1. Analytical
 2. Maximum likelihood
 3. Resampling
 4. Bayesian
+
 
 ## Analytical: *t*-test
 
@@ -216,11 +234,13 @@ ggplot() +
 
 </div>
 
+
 ## *t*-test
 
 ```{r}
 t.test(horn_length ~ group, data = HL, var.equal = TRUE)
 ```
+
 
 ## Frameworks for inference
 

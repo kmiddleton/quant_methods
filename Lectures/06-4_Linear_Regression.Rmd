@@ -14,31 +14,10 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
-library(latex2exp)
 
-ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE){
-  n <- length(X)
-  SSy <- sum((Y - (X * b + (mean(Y) - b * mean(X)))) ^ 2)
-  if (do.labels) {
-    main <- paste(bquote(theta_1), " =", sprintf("%.2f", b), "\nSS =", 
-                  sprintf("%.2f", SSy))
-  } else {
-    main <- ""
-  }
-  if (do.plot) {
-    par(cex.lab = 2, cex.main = 2)
-    plot(X, Y, type = 'n', main = main)
-    points(mean(X), mean(Y), pch = 1, cex = 4, col = 'blue')
-    abline(a = mean(Y) - b * mean(X), b = b, col = 'blue')
-    for (i in 1:n) {
-      segments(X[i], Y[i], X[i], X[i] * b + (mean(Y) - b * mean(X)), 
-           col = 'red')
-    }
-    points(X, Y, pch = 16)
-  }
-  return(SSy)
-}
+source("ssPlot.R")
 ```
+
 
 ## Frameworks for inference
 
@@ -47,6 +26,7 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE){
 3. Resampling
 4. Bayesian
 
+
 ## For example...
 
 1. Calibration curves
@@ -54,6 +34,7 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE){
 3. Leaf area vs. Total rainfall
 
 Continuous variable vs. continuous variable
+
 
 ## Linear regression
 
@@ -68,6 +49,7 @@ $$Y = \theta_0 + \theta_1 X$$
 - How do we estimate $\theta_0$ and $\theta_1$?
 - What is "best fit"?
 
+
 ## Generate data
 
 Generate $n=30$ random data points: $X \sim \mathcal{N}(10, 1)$ and $Y = 2.3 X + \epsilon$, where $\epsilon \sim \mathcal{N}(1, 1)$:
@@ -81,11 +63,13 @@ M <- data.frame(X, Y)
 M %>% head()
 ```
 
+
 ## Generate data
 
 ```{r, echo=FALSE}
 ggplot(M, aes(X, Y)) + geom_point()
 ```
+
 
 ## Analytical solution
 
@@ -95,6 +79,7 @@ An infinite range of possible slopes ($\theta_1$)
 1. Sum of the squared deviations vary continuously.
 1. Only one value of $\theta_1$ will minimize the SS.
     - The *Ordinary Least Squares* estimate
+
 
 ## Analytical calculation of $\theta_1$
 
@@ -132,16 +117,28 @@ Few assumptions are made about *X*
 ## Minimizing Sums of Squares
 
 ```{r echo=FALSE}
-plot(X, Y, pch = 16, cex.lab = 2)
+p <- ggplot() +
+  geom_point(data = M, aes(x = X, y = Y), size = 2)
+p
 ```
 
 ## Minimizing Sums of Squares
 
 ```{r echo=FALSE}
-plot(X, Y, pch = 16, cex.lab = 2)
-points(mean(X), mean(Y), pch = 1, cex = 4, col = 'blue')
-text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
-text(9.25, 27, bquote(bar(X) == .(round(mean(X), 2))), cex = 2)
+y_bar <- paste("bar(Y)==", round(mean(Y), 2))
+x_bar <- paste("bar(X)==", round(mean(X), 2))
+
+p +
+  geom_point(data = tibble(X = mean(X), Y = mean(Y)),
+             aes(X, Y), color = "blue", size = 7, pch = 1) +
+  annotate("text", x = 9.25, y= 28 ,
+           label = y_bar,
+           parse = TRUE,
+           size = 7) +
+  annotate("text", x = 9.25, y= 27 ,
+           label = x_bar,
+           parse = TRUE,
+           size = 7)
 ```
 
 ## Minimizing Sums of Squares
@@ -149,7 +146,6 @@ text(9.25, 27, bquote(bar(X) == .(round(mean(X), 2))), cex = 2)
 ```{r echo=FALSE, results='hide'}
 # b = 0
 ssPlot(X, Y, 0)
-text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```
 
 ## Minimizing Sums of Squares
@@ -157,7 +153,6 @@ text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```{r echo=FALSE, results='hide'}
 # b = 0.5
 ssPlot(X, Y, 0.5)
-text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```
 
 ## Minimizing Sums of Squares
@@ -165,7 +160,6 @@ text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```{r echo=FALSE, results='hide'}
 # b = 1
 ssPlot(X, Y, 1)
-text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```
 
 ## Minimizing Sums of Squares
@@ -173,7 +167,6 @@ text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```{r echo=FALSE, results='hide'}
 # b = 1.5
 ssPlot(X, Y, 1.5)
-text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```
 
 ## Minimizing Sums of Squares
@@ -181,7 +174,6 @@ text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```{r echo=FALSE, results='hide'}
 # b = 2
 ssPlot(X, Y, 2)
-text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```
 
 ## Minimizing Sums of Squares
@@ -189,7 +181,6 @@ text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```{r echo=FALSE, results='hide'}
 # b = 2.1
 ssPlot(X, Y, 2.1)
-text(9.25, 28, bquote(bar(Y) == .(round(mean(Y), 2))), cex = 2)
 ```
 
 ## Minimizing Sums of Squares
@@ -221,13 +212,17 @@ minSS.SS <- SumSq$SS[which.min(SumSq$SS)]
 ## Minimizing Sums of Squares
 
 ```{r echo=FALSE}
-plot(SumSq,
-     cex.lab = 1.5,
-     type = "l", lwd = 2,
-     xlab = TeX("$\\theta_1$"),
-     ylab = "Sum of Squares")
-points(minSS.theta_1, minSS.SS, col = "red", pch = 16, cex = 1.5)
-text(-10, 250, paste("theta_1 =", minSS.theta_1, "\nSS =", round(minSS.SS, 2)),
-     pos = 4, cex = 2)
+xpos <- min(SumSq$theta_1) + 0.6 * diff(range(SumSq$theta_1))
+ypos <- min(SumSq$SS) + 0.4 * diff(range(SumSq$SS))
+
+ggplot() +
+  geom_line(data = SumSq, aes(x = theta_1, y = SS), size = 1) +
+  geom_point(data = tibble(x = minSS.theta_1, y = minSS.SS),
+             aes(x, y), color = "red", size = 4) +
+  labs(x = "theta_1", y = "Sum of Squares") +
+  annotate(geom = "text", x = xpos, y = ypos,
+           label = paste("theta_1 = ", round(minSS.theta_1, 2),
+                         "\nSS = ", round(minSS.SS, 2)),
+           size = 7)
 ```
 

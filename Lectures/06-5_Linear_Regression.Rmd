@@ -18,28 +18,7 @@ library(RcppEigen)
 library(rethinking)
 library(latex2exp)
 
-ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE){
-  n <- length(X)
-  SSy <- sum((Y - (X * b + (mean(Y) - b * mean(X)))) ^ 2)
-  if (do.labels) {
-    main <- paste("b =", sprintf("%.2f", b), "\nSS =", 
-                  sprintf("%.2f", SSy))
-  } else {
-    main <- ""
-  }
-  if (do.plot) {
-    par(cex.lab = 2, cex.main = 2)
-    plot(X, Y, type = 'n', main = main)
-    points(mean(X), mean(Y), pch = 1, cex = 4, col = 'blue')
-    abline(a = mean(Y) - b * mean(X), b = b, col = 'blue')
-    for (i in 1:n) {
-      segments(X[i], Y[i], X[i], X[i] * b + (mean(Y) - b * mean(X)), 
-           col = 'red')
-    }
-    points(X, Y, pch = 16)
-  }
-  return(SSy)
-}
+source("ssPlot.R")
 ```
 
 
@@ -55,12 +34,12 @@ Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
 M <- data.frame(X, Y)
 
 ggplot(M, aes(X, Y)) + geom_point()
-
 ```
 
 What values of $\theta_0$ and $\theta_1$ provide the best fit line through $Y$ as a function of $X$?
 
 $$Y = \theta_0 + \theta_1 X$$
+
 
 ## Frameworks for inference
 
@@ -79,11 +58,13 @@ $$Y = \theta_0 + \theta_1 X$$
 
 How would probabilities change for a different slope estimate?
 
+
 ## What is the likelihood of an observed value given a regression model? 
 
 Define a function to calculate the likelihood of an observed value $Y_i$ given the mean ($\mu$) and standard deviation ($\sigma$). Default to the standard normal distribution $\mathcal{N}(0,1)$.
 
-$$\phi\left(Y_i\right) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$
+$$Pr\left[Y_i\right] = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$
+
 
 ## Define a model
 
@@ -92,6 +73,7 @@ $$y = \bar{Y} + \theta_1 X$$
 $$\theta_1 = 0$$
 
 This is a flat line ($\theta_1 = 0$) through the mean of $Y$.
+
 
 ## Define a model
 
@@ -105,6 +87,7 @@ M <- data.frame(X, Y)
 ssPlot(X, Y, b = 0, do.labels = FALSE)
 ```
 
+
 ## Calculate the predicted values
 
 Just the mean of $Y$ repeated 30 times.
@@ -115,12 +98,14 @@ Y_hat <- rep(Y_bar, length(Y))
 Y_hat
 ```
 
+
 ## Likelihood of a predicted value of $Y$
 
-$$\phi\left(Y_i\right)=\frac{1}{\sqrt{2\pi\hat{\sigma}^2}} e^{\frac{-\left(Y_i - \mu\right)^{2}}{2\hat{\sigma}^2}}$$
+$$Pr\left[Y_i\right]=\frac{1}{\sqrt{2\pi\hat{\sigma}^2}} e^{\frac{-\left(Y_i - \mu\right)^{2}}{2\hat{\sigma}^2}}$$
 
 - $\mu =$ the predicted value $\hat{Y}_i$
 - Need the estimate of the residual variance $\left(\hat{\sigma}^2\right)$.
+
 
 ## Residual variance
 
@@ -132,6 +117,7 @@ $$s^2 = MSE = \frac{n}{n-2}\left(\hat{\sigma}^2\right)$$
 
 For non-small $n$, $s^2 \approx \left(\hat{\sigma}^2\right)$. Here ~7% difference.
 
+
 ## Calculate the estimated residual variance and standard deviation
 
 ```{r}
@@ -141,6 +127,7 @@ var_hat
 sd_hat <- sqrt(var_hat)
 sd_hat
 ```
+
 
 ## Likelihoods for observed $Y$s
 
@@ -152,13 +139,15 @@ dnorm(Y[1], mean = Y_hat[1], sd = sd_hat)
 (liks_Y <- dnorm(Y, mean = Y_hat, sd = sd_hat))
 ```
 
+
 ## Model Likelihood ($\mathcal{L}$)
 
 For a set of $Y_i$ and parameters ($\Theta$; i.e., slope and intercept) the likelihood of the model is the product of their individual probabilities:
 
-$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}\phi\left(Y_{i}; \Theta\right)$$
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}Pr\left[Y_{i}; \Theta\right]$$
 
-$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(\phi\left(Y_{i};\Theta\right)\right)$$
+$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(Pr\left[Y_{i};\Theta\right]\right)$$
+
 
 ## Model Likelihood ($\mathcal{L}$)
 
@@ -166,6 +155,7 @@ $$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\righ
 # Sum of the log-likelihoods
 sum(log(liks_Y))
 ```
+
 
 ## Likelihood from linear regression with $\theta_1 = 0$
 
@@ -175,6 +165,7 @@ Fit a linear model (`lm()`) with only an intercept (`~ 1`) and use the built-in 
 fm <- lm(Y ~ 1)
 logLik(fm)
 ```
+
 
 ## Maximizing the log-Likelihood
 
@@ -192,6 +183,7 @@ log_lik <- function(theta_1, X, Y){
   return(sum(log(liks_Y)))
 }
 ```
+
 
 ## Maximizing the log-Likelihood
 
@@ -211,18 +203,19 @@ max.ll <- lls[which.max(lls)]
 theta_1_hat <- theta_1[which.max(lls)]
 ```
 
+
 ## Maximizing the log-Likelihood
 
 ```{r echo=FALSE}
-plot(lls ~ theta_1,
-     cex.lab = 1.5,
-     type = "l", lwd = 2,
-     xlab = "Slope",
-     ylab = "log-Likelihood")
-points(theta_1_hat, max.ll, col = "red", pch = 16, cex = 1.5)
-text(-10, -60, paste("theta_1 =", theta_1_hat, "\nlogLik =", round(max.ll, 2)),
-     pos = 4, cex = 2)
+ggplot() +
+  geom_line(data = tibble(lls, theta_1), aes(y = lls, x = theta_1)) +
+  geom_point(data = tibble(x = theta_1_hat, y = max.ll), aes(x, y),
+             color = "red", size = 3) +
+  annotate(geom = "text", x = -7.5, y = -60,
+           size = 7,
+           label = paste("theta_1 =", theta_1_hat, "\nlogLik =", round(max.ll, 2)))
 ```
+
 
 ## Maximizing the log-Likelihood
 
@@ -233,6 +226,7 @@ logLik(fm)      # Use built-in function to extract log-likelihood
 ```
 
 The values are not identical, because we only calculated $\theta_1$ in increments of 0.01.
+
 
 ## Bayesian priors
 
@@ -251,6 +245,7 @@ p2 <- tibble(x = x, y = dnorm(x, 0, 10)) %>%
 plot_grid(p1, p2, ncol = 2)
 ```
 
+
 ## Bayesian {.smaller}
 
 ```{r Bayes_regression, cache=TRUE, message=FALSE}
@@ -267,11 +262,13 @@ fm <- ulam(
   chains = 4)
 ```
 
+
 ## Bayesian sampling
 
 ```{r, echo=FALSE}
 trankplot(fm)
 ```
+
 
 ## Bayesian posteriors
 
@@ -285,12 +282,14 @@ post %>%
   facet_grid(. ~ variable, scales = "free_x")
 ```
 
+
 ## Bayesian summary
 
 ```{r}
 precis(fm, digits = 4)
 coef(lm(Y ~ X, data = M))
 ```
+
 
 ## A sample of Bayesian samples
 
@@ -303,6 +302,7 @@ ggplot() +
   geom_point(data = M, aes(X, Y), color = "red", size = 2.5)
 ```
 
+
 ## Key features
 
 - Analytical solutions are fast, hand-calculable
@@ -310,6 +310,7 @@ ggplot() +
 - Analytical and maximum likelihood estimates will converge given enough precision
 - Bayesian estimates can include prior knowledge
 - Bayesian estimates will converge on ML estimates for sufficiently flat priors and/or sufficient data
+
 
 ## Key points
 
@@ -320,3 +321,4 @@ Comparison of means between groups:
 Linear relationships
 
 - Continuous predictor variables
+
