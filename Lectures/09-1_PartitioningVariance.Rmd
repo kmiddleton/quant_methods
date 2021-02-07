@@ -38,8 +38,8 @@ Datasets
 
 - Linear combination of predictor variables that is maximally correlated with outcome variable
 - How well can you predict the outcome by the set of predictor variables?
-    - correlation of y with $\hat{y}$ 
-    - $R^{2}$ = squared correlation coefficient of y with $\hat{y}$ 
+    - correlation of $y$ with $\hat{y}$ 
+    - $R^{2}$ = squared correlation coefficient of $y$ with $\hat{y}$ 
 
     
 ## Milk Energy
@@ -124,10 +124,8 @@ fig2
 y_hat <- fm_Multi$fitted.values
 
 ggplot(M, aes(x = y_hat, y = Milk_Energy)) +
-  geom_point() +
-  geom_smooth(formula = y ~ x,method = 'lm', se = FALSE) +
-  ylab('Milk Energy') +
-  xlab('Predicted Milk Energy') 
+  geom_point(size = 3) +
+  labs(y = 'Milk Energy', x = 'Predicted Milk Energy') 
 ```
 
 
@@ -141,7 +139,7 @@ summary(fm_Multi)$r.squared
 
 ## "Analysis of Variance"
 
-Some total variability in *Y*:
+Some total variability in $y$:
 
 1. Part explained by group membership
 1. Part remains unexplained ("error" or "residual")

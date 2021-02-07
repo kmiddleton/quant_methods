@@ -39,6 +39,7 @@ library(car)
 
 - Understand the math involved
 
+
 ## Assumptions of linear regression
 
 1. Normality (check pooled residuals)
@@ -46,6 +47,7 @@ library(car)
 1. Fixed explanatory variables (plan sampling)
 1. Independence (observations often correlated)
 1. Correct model
+
 
 ## Non-independence: The main challenge
 
@@ -56,6 +58,7 @@ Lots of data have structure at additional levels beyond the main variable(s) of 
 - Error in these levels is correlated (making the data non-independent)
 
 We need a method to model that correlation structure.
+
 
 ## Correlated data
 
@@ -71,6 +74,7 @@ We need a method to model that correlation structure.
 - Phylogenetic structure 
 - Population structure and genetic relatedness 
 
+
 ## Some terminology
 
 *Multilevel / hierarchical / mixed / repeated measures models*
@@ -78,12 +82,14 @@ We need a method to model that correlation structure.
 - All refer to the same class of models, which contain both fixed and random variables.
 - Some will further subdivide and draw fine distinctions between models.
 
+
 ## Some terminology
 
 *Fixed effects*:
 
 - Explanatory variables of primary interest, which would be used again if the experiment were repeated
 - Sex, treatment groups, etc.
+
 
 ## Some terminology
 
@@ -95,11 +101,13 @@ We need a method to model that correlation structure.
 
 Also see: http://andrewgelman.com/2005/01/25/why_i_dont_use/
 
+
 ## Fundamental idea of multilevel models
 
 Units are *grouped* at different levels.
 
 - Grouping takes different forms
+
 
 ## General multilevel model formula
 
@@ -115,11 +123,13 @@ Where $\mbox{Random}$ can be:
 - Phylogenetic correlation
 - Genetic correlation
 
+
 ## Turning flight in hummingbirds
 
 <center>
 <img src="https://i.imgur.com/Sacnb48.png" width="100%" />
 </center>
+
 
 ## Turning flight in hummingbirds
 
@@ -127,11 +137,13 @@ Where $\mbox{Random}$ can be:
 <img src="https://i.imgur.com/Z144W14.png" width="80%" />
 </center>
 
+
 ## Turning flight in hummingbirds
 
 <center>
 <img src="https://i.imgur.com/iFspGbe.png" width="80%" />
 </center>
+
 
 ## Turning flight in hummingbirds
 
@@ -153,6 +165,7 @@ Where $\mbox{Random}$ can be:
 <img src="https://i.imgur.com/D0o9y6J.png" width="80%" />
 </center>
 
+
 ## Hierarchical structure
 
 - Maneuver (hover vs. clockwise, hover vs. counterclockwise)
@@ -165,6 +178,7 @@ Where $\mbox{Random}$ can be:
 1. Trials are repeated measures of each bird ("random")
 1. Wingbeats are the observation level
 
+
 ## What we did
 
 1. Calculate means of 16 wingbeats for each bird for each trial
@@ -175,6 +189,7 @@ Where $\mbox{Random}$ can be:
     - Maneuver as the fixed effect
 
 Each bird gets its own mean value for a maneuver (across 5 trials). Maneuver is analyzed as the mean difference between each maneuver.
+
 
 ## Challenges to multilevel models
 
@@ -190,8 +205,8 @@ Each bird gets its own mean value for a maneuver (across 5 trials). Maneuver is 
 - MCMC can be slow, difficult to tune
 - Bayesian requires defining priors
 
+
 ## Visualization of Hierarchical Modeling
 
 http://mfviz.com/hierarchical-models/
-
 

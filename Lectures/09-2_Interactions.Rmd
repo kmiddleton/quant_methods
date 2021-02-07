@@ -16,7 +16,15 @@ library(cowplot)
 theme_set(theme_cowplot())
 library(readxl)
 library(car)
+library(paletteer)
+library(ggsci)
 ```
+
+<!--
+Datasets
+  biomass.csv
+-->
+
 
 ## Factorial designs and interactions
 
@@ -32,15 +40,11 @@ library(car)
 If you have multiple categorical variables, you should *always* do factorial designs (unless you know why you aren't).
 
 
-
 ## Factorial designs and interactions
-
 
 <center>
 <img src="https://imgur.com/tcMSr7k.png" width="100%" />
 </center>
-
-
 
 
 ## Interaction model
@@ -55,7 +59,6 @@ The value of $X_1$ varies with change in the value of $X_2$ (and vice versa - th
 ## Factorial data
 
 Biomass gain in plants fertilized with either added nitrogen or phosphorous.
-
 
 <center>
 <img src="https://imgur.com/5VY9vwE.png" width="70%" />
@@ -87,21 +90,22 @@ Balanced data is the best to work with.
 
 ```{r echo=FALSE}
 ggplot(biomass, aes(x = nitrogen, y = biomass, color = phosphorous)) +
-  geom_point(position = position_jitter(width = 0.1))
+  geom_point(position = position_jitter(width = 0.1), size = 3) +
+  scale_color_paletteer_d("ggsci::default_jco")
 ```
-
 
 
 ## Interaction plot
 
 ```{r int_plot1, eval=FALSE}
 ggplot(biomass, aes(x = nitrogen,
-               y = biomass,
-               color = phosphorous,
-               group = phosphorous)) +
-  geom_point(position = position_jitter(width = 0.1)) +
-  stat_summary(fun = mean, geom = "point", pch = 12, size = 5) +
-  stat_summary(fun = mean, geom = "line")
+                    y = biomass,
+                    color = phosphorous,
+                    group = phosphorous)) +
+  geom_point(position = position_jitter(width = 0.1), size = 3, pch = 1) +
+  stat_summary(fun = mean, geom = "point", size = 6) +
+  stat_summary(fun = mean, geom = "line", size = 1.5) +
+  scale_color_paletteer_d("ggsci::default_jco")
 ```
 
 
@@ -110,6 +114,7 @@ ggplot(biomass, aes(x = nitrogen,
 ```{r ref.label="int_plot1", echo=FALSE, eval=TRUE}
 ```
 
+
 ## Interaction plot
 
 ```{r int_plot2, echo=FALSE}
@@ -117,9 +122,10 @@ ggplot(biomass, aes(x = phosphorous,
                y = biomass,
                color = nitrogen,
                group = nitrogen)) +
-  geom_point(position = position_jitter(width = 0.1)) +
-  stat_summary(fun = mean, geom = "point", pch = 12, size = 5) +
-  stat_summary(fun = mean, geom = "line")
+  geom_point(position = position_jitter(width = 0.1), size = 3, pch = 1) +
+  stat_summary(fun = mean, geom = "point", size = 6) +
+  stat_summary(fun = mean, geom = "line", size = 1.5) +
+  scale_color_paletteer_d("ggsci::default_jco")
 ```
 
 
@@ -130,13 +136,14 @@ ggplot(biomass, aes(x = phosphorous,
 </center>
 
 
-
 ## Group means
 
 ```{r}
 biomass %>% group_by(nitrogen, phosphorous) %>%
-  summarize(mean = mean(biomass), .groups = "drop")
+  summarize(mean = mean(biomass),
+            .groups = "drop")
 ```
+
 
 ## Two-way factorial ANOVA
 
@@ -152,6 +159,7 @@ fm <- lm(biomass ~ nitrogen + phosphorous + nitrogen:phosphorous,
 ```
 
 `nitrogen:phosphorous` is the interaction term
+
 
 ## Two-way factorial ANOVA {.smaller}
 
@@ -169,14 +177,13 @@ anova(fm2)
 ```
 
 
-
 ## Interpretations
 
 ```{r ref.label="int_plot1", echo=FALSE, eval=TRUE}
 ```
 
 
-## Power to detect interactions is low (Wahlsten1990)
+## Power to detect interactions is low [@Wahlsten1990-hc]
 
 For a 2 X 2 design
 
@@ -184,6 +191,7 @@ For a 2 X 2 design
 - Power to detect the interaction is 16% 
 
 ANOVA will suggest additivity of effects when in fact they are multiplicative
+
 
 ## Under the hood
 
@@ -202,12 +210,14 @@ biomass$interact <- biomass$n_num * biomass$p_num
 
 1's only for the "N+" & "P+" groups. 0's for all others.
 
+
 ## 4 parameters define 4 groups
 
 1. $\beta_0$ = `(Intercept)` = "N-" & "P-" group mean
 1. $\beta_1$ = `n_num` = "N-" & "P+" addition
 1. $\beta_2$ = `p_num` = "N+" & "P-" addition
 1. $\beta_3$ = `interact` = #2 + #3 + "N+" & "P+" addition
+
 
 ## 4 parameters define 4 groups
 
@@ -222,6 +232,7 @@ biomass %>% slice(c(1,21,41,61,81))
 summary(lm(biomass ~ n_num + p_num + interact, data = biomass))
 ```
 
+
 ## Model matrix {.smaller}
 
 R does the factor $\rightarrow$ numeric conversion behind the scenes:
@@ -230,6 +241,7 @@ R does the factor $\rightarrow$ numeric conversion behind the scenes:
 mm <- model.matrix(biomass ~ nitrogen * phosphorous, data = biomass)
 mm[15:25,]
 ```
+
 
 ## Into the abyss...
 
@@ -244,6 +256,7 @@ Questions get complicated:
 3. What is the effect of variable 1 on y, controlling for variable 2?
 4. What is the effect of variable 2 on y, controlling for variable 1?
 
+
 ## Partitioning variance
 
 Different ways to partition variance has a cascading effect:
@@ -254,13 +267,15 @@ Different ways to partition variance has a cascading effect:
 
 Thus you should be aware of how your ANOVA table is calculated.
 
+
 ## Types of sums of squares
 
-**Type I**: "sequential", "unweighted", ordering of factors in the model matters, the R default, probably not what you want *if you have unbalanced sample sizes*
+**Type I**: "sequential", "unweighted", ordering of factors in the model matters, the R default, probably **not** what you want *if you have unbalanced sample sizes*
 
 **Type II**: main effects allowed to overlap with their interaction terms, useful if interaction is weak
 
 **Type III**: "weighted", each reported effect controls for all the others (including interactions)
+
 
 ## Types of sums of squares
 
@@ -269,6 +284,7 @@ Each type tests subtly different hypotheses.
 - I almost never test your intentions (though it is the mathematical statistician's preference)
 - I == III if the groups are balanced (ideal situation - you don't have to choose)
 - III matches the output of `summary(lm())` (so that's nice)
+
 
 ## Unbalanced groups
 
@@ -280,12 +296,14 @@ biomass_ub <- biomass %>% slice(sample(1:nrow(.), nrow(.) - 20))
 biomass_ub %>% group_by(nitrogen, phosphorous) %>% tally()
 ```
 
+
 ## ANOVA Model 1
 
 ```{r}
 fm1 <- lm(biomass ~ nitrogen * phosphorous, data = biomass_ub)
 anova(fm1)
 ```
+
 
 ## ANOVA Model 2
 
@@ -294,12 +312,14 @@ fm2 <- lm(biomass ~ phosphorous * nitrogen, data = biomass_ub)
 anova(fm2)
 ```
 
+
 ## Type III sums of squares
 
 ```{r}
 library(car)
 Anova(fm1, type = "III")
 ```
+
 
 ## Type III sums of squares
 
@@ -308,6 +328,7 @@ library(car)
 Anova(fm2, type = "III")
 ```
 
+
 ## Key points
 
 1. Check your sample sizes within groups
@@ -315,17 +336,19 @@ Anova(fm2, type = "III")
 1. Think about your sums of squares
 1. Type II or Type III is likely what you want
 
+
 ## Higher order interaction terms
 
 It is difficult enough to interpret an interaction in a 2 X 2 ANOVA model.
 
 - Higher order terms multiply and become impossible to comprehend
 
-$$Y = \beta_0 + \beta_1 Sex \times \beta_2 Wheel \times \beta_3 Linetype$$
+$$Biomass = \beta_0 + ... + \beta_k (N \times P \times  K)$$
 
-- What does a significant Sex X Wheel X Linetype interaction mean?
+- What does a significant Nitrogen X Phosphorus X Potassium interaction mean?
 
-Split your data and do two analyses unless you really must.
+Split your data and carry out two analyses unless you really must.
+
 
 ## I really want to know more about these Type III sums of squares
 
@@ -337,6 +360,8 @@ Check the Canvas resources.
 Alternatives:
 
 - Model Comparisons & Likelihood
-
 - Bayesian Analyses
+
+
+## References
 

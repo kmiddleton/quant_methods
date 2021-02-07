@@ -20,6 +20,15 @@ library(wesanderson)
 library(car)
 ```
 
+
+<!--
+Datasets
+  Squid.xlsx
+  RIKZ.xlsx
+  Ortho.xlsx
+-->
+  
+
 ## Fitting multilevel models
 
 Among the options for R packages:
@@ -28,13 +37,15 @@ Among the options for R packages:
 - `lme4`: Newer (but same authors as `nlme`), can handle more complex models with crossed random effects, pedigrees, non-Gaussian response, etc., more flexible distributions of response variables, but harder to test hypotheses
 - `MCMCglmm`, `rstan`, `rjags`: Fit Bayesian multilevel models via a variety of MCMC samplers
 
-## *Loligo forbesii*
+
+## Long-finned squid (*Loligo forbesii*)
 
 <center>
 <img src="https://i.imgur.com/0pAgSaC.jpg" width="80%" />
 </center>
 
 Seasonal patterns in testis mass in the squid *Loligo*. Testis mass predicted by dorsal mantle length, month, and DML X month.
+
 
 ## `Squid` data
 
@@ -47,6 +58,7 @@ str(Sq)
 sum(!complete.cases(Sq))
 ```
 
+
 ## Visualizing
 
 ```{r echo=FALSE}
@@ -54,6 +66,7 @@ ggplot(Sq, aes(DML, Testis_Mass)) +
   geom_point() +
   labs(x = "Dorsal Mantle Length (mm)", y = "Testis Mass (g)")
 ```
+
 
 ## Visualizing
 
@@ -63,6 +76,7 @@ ggplot(Sq, aes(DML, Testis_Mass)) +
   facet_wrap("Month", nrow = 3) +
   labs(x = "Dorsal Mantle Length (mm)", y = "Testis Mass (g)")
 ```
+
 
 ## Multiple regression
 
@@ -79,6 +93,7 @@ Sq$Res1 <- residuals(fm1)
 Sq$Fitted <- fitted.values(fm1)
 ```
 
+
 ## Residuals vs. Fitted Values
 
 ```{r echo=FALSE}
@@ -87,6 +102,7 @@ ggplot(Sq, aes(Fitted, Res1)) +
   labs(x = "Fitted Values", y = "Residuals")
 ```
 
+
 ## Residuals vs. Month
 
 ```{r echo=FALSE}
@@ -94,6 +110,7 @@ ggplot(Sq, aes(Month, Res1)) +
   geom_boxplot() +
   labs(x = "Month", y = "Residuals")
 ```
+
 
 ## Dealing with heterogeneity within groups
 
@@ -107,9 +124,10 @@ ggplot(Sq, aes(Month, Res1)) +
 - Generalized least squares $\approx$ "Weighted regression"
 - `nlme::gls()`
 
+
 ## Fitting a weighted regression
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(nlme)
 variance_struct <- varPower(form = ~ DML | Month)
 ```
@@ -123,11 +141,13 @@ fm2 <- gls(Testis_Mass ~ DML * Month, data = Sq,
            weights = variance_struct)
 ```
 
+
 ## Diagnostics
 
 ```{r}
 plot(fm2)
 ```
+
 
 ## Summary {.smaller}
 
@@ -135,6 +155,7 @@ plot(fm2)
 library(car)
 Anova(fm2, type = "III")
 ```
+
 
 ## Visualization of the model
 
@@ -150,6 +171,7 @@ ggplot(Sq, aes(DML, Res2)) +
        y = "Normalized Residual Testis Mass")
 ```
 
+
 ## Visualization of the model
 
 ```{r echo=FALSE}
@@ -160,11 +182,13 @@ ggplot(Sq, aes(Month, Res2)) +
        y = "Normalized Residual Testis Mass")
 ```
 
+
 ## Coefficients {.smaller}
 
 ```{r echo=FALSE}
 as.data.frame(coef(fm2))
 ```
+
 
 ## Nested data
 
@@ -177,6 +201,7 @@ We could just take a means of each block and use those data for ANOVA.
 - Lose all the information about variability within blocks
 - Might increase apparent variance
 
+
 ## Intertidal species richness
 
 Collected by National Institute for Coastal and Marine Management (RIKZ)
@@ -184,6 +209,7 @@ Collected by National Institute for Coastal and Marine Management (RIKZ)
 <center>
 <img src="https://i.imgur.com/4YGDggA.jpg" width="100%" />
 </center>
+
 
 ## Intertidal data
 
@@ -196,6 +222,7 @@ glimpse(RIKZ)
 - `NAP`: Height above mean tidal level
 - `Exposure`: Index composed of wave action, length of the surf zone, slope, grain size, and the depth of the anaerobic layer
 
+
 ## Preparing data
 
 Convert `Beach` to factor.
@@ -203,6 +230,7 @@ Convert `Beach` to factor.
 ```{r}
 RIKZ <- RIKZ %>% mutate(Beach = factor(Beach))
 ```
+
 
 ## Sampling structure
 
@@ -212,6 +240,7 @@ RIKZ <- RIKZ %>% mutate(Beach = factor(Beach))
 
 Sites are the level of the observation.
 
+
 ## Sampling structure
 
 ```{r}
@@ -220,6 +249,7 @@ RIKZ %>% group_by(Beach) %>% tally()
 
 5 observations at each of 9 beaches
 
+
 ## Visualizing `NAP`
 
 ```{r echo=FALSE}
@@ -227,6 +257,7 @@ ggplot(RIKZ, aes(NAP, Richness)) +
   geom_point() +
   facet_wrap("Beach", nrow = 3)
 ```
+
 
 ## Visualizing `Exposure`
 
@@ -238,12 +269,14 @@ ggplot(RIKZ, aes(Exposure, Richness)) +
 
 Each `Beach` only has 1 value of `Exposure`.
 
+
 ## Naive multiple regression model
 
 ```{r}
 fm1 <- lm(Richness ~ NAP + Beach, data = RIKZ)
 Anova(fm1, type = "III")
 ```
+
 
 ## Naive multiple regression model
 
@@ -253,6 +286,7 @@ plot(fm1, which = 1)
 
 Maybe we are not interested in knowing the exact nature of the beach effect.
 
+
 ## Multilevel model
 
 Allow a different mean richness per beach:
@@ -261,17 +295,20 @@ Allow a different mean richness per beach:
 fm2 <- lme(Richness ~ NAP, random = ~ 1 | Beach, data = RIKZ)
 ```
 
+
 ## Diagnostics
 
 ```{r}
 plot(fm2)
 ```
 
+
 ## Summary {.smaller}
 
 ```{r echo=FALSE}
 summary(fm2)
 ```
+
 
 ## Visualizing the model
 
@@ -284,7 +321,8 @@ RIKZ$Pred0 <- fitted(fm2, level = 0)
 # Within beach
 RIKZ$Pred1 <- fitted(fm2, level = 1)
 ```
- 
+
+
 ## Visualizing the model
 
 ```{r echo=FALSE}
@@ -294,6 +332,7 @@ ggplot(RIKZ, aes(NAP, Richness)) +
   geom_line(aes(y = Pred1, color = Beach)) +
   labs(x = "NAP", y = "Richness")
 ```
+
 
 ## Does the relationship differ per beach?
 
@@ -309,11 +348,13 @@ Model formula for random effects:
 
 $$\sim \mbox{Slope}~|~\mbox{Intercept}$$
 
+
 ## Summary {.smaller}
 
 ```{r}
 summary(fm3)
 ```
+
 
 ## Visualizing the model
 
@@ -327,6 +368,7 @@ RIKZ$Pred0 <- fitted(fm3, level = 0)
 RIKZ$Pred1 <- fitted(fm3, level = 1)
 ```
 
+
 ## Visualizing the model
 
 ```{r echo=FALSE}
@@ -337,11 +379,13 @@ ggplot(RIKZ, aes(NAP, Richness)) +
   labs(x = "NAP", y = "Richness")
 ```
 
+
 ## Coefficients
 
 ```{r echo=FALSE}
 coef(fm3)
 ```
+
 
 ## Longitudinal studies
 
@@ -350,6 +394,7 @@ Sequential measurements of the same individual / plot / organism, etc. will resu
 - Growth curves
 - Long-term ecological monitoring
 
+
 ## Cranial growth rates in children
 
 Distance from the sella turcica to the pterygomaxillary fissure in growing children.
@@ -357,6 +402,7 @@ Distance from the sella turcica to the pterygomaxillary fissure in growing child
 <center>
 <img src="https://i.imgur.com/N9e47BR.jpg" width="60%" />
 </center>
+
 
 ## Orthodonics data
 
@@ -367,6 +413,7 @@ O <- O %>% mutate(Subject = factor(Subject),
 glimpse(O)
 ```
 
+
 ## Orthodonics data
 
 ```{r}
@@ -375,6 +422,7 @@ range(O$Age)
 ```
 
 Potthoff, R. F. and Roy, S. N. (1964) A generalized multivariate analysis of variance model useful especially for growth curve problems. *Biometrika* 51: 313-326.
+
 
 ## Visualizing
 
@@ -385,6 +433,7 @@ ggplot(O, aes(Age, Distance)) +
   theme(axis.text = element_text(size = 9))
 ```
 
+
 ## Visualizing
 
 ```{r echo=FALSE}
@@ -393,7 +442,8 @@ ggplot(O, aes(Age, Distance, color = Subject)) +
   facet_grid(. ~ Sex)
 ```
 
-## Do boys and girls grow at different rates?
+
+## What are the growth patterns of the head in boys and girls?
 
 - Main effects of `Age` and `Sex` (like an ANCOVA model).
 - Random effects allow the `Age` by `Distance` relationship (slope) to vary for each `Subject`, which is also allowed to have its own mean.
@@ -404,6 +454,7 @@ fm2 <- lme(Distance ~ Sex + Age, random = ~ Age | Subject,
            data = O)
 ```
 
+
 ## Predicted values
 
 ```{r}
@@ -413,6 +464,7 @@ O$Pred0 <- fitted(fm2, level = 0)
 # Age within Subject
 O$Pred1 <- fitted(fm2, level = 1)
 ```
+
 
 ## Visualizing
 
@@ -426,11 +478,13 @@ ggplot(O, aes(Age, Distance)) +
   theme(legend.position = "none")
 ```
 
+
 ## Summary {.smaller}
 
 ```{r echo=FALSE}
 summary(fm2)
 ```
+
 
 ## ANOVA table
 
@@ -448,8 +502,10 @@ Adapted from McElreath [-@McElreath2015-no]
 3. *To study variation*. If research questions include variation among individuals or other groups within the data, multilevel models help, because they model variation explicitly.
 4. *To avoid averaging*. Avoid pre-average to construct variables for a regression analysis. Averaging removes variation. Multilevel models allow us to preserve the uncertainty in the original, pre-averaged values, while still using the average to make predictions.
 
+
 ## Can poor experimental design be saved by multilevel models?
 
 No.
 
-## References {.references}
+
+## References
