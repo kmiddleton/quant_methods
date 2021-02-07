@@ -124,8 +124,12 @@ fig2
 y_hat <- fm_Multi$fitted.values
 
 ggplot(M, aes(x = y_hat, y = Milk_Energy)) +
+  geom_abline(slope = 1, intercept = 0, color = "blue") +
   geom_point(size = 3) +
-  labs(y = 'Milk Energy', x = 'Predicted Milk Energy') 
+  labs(y = 'Milk Energy', x = 'Predicted Milk Energy') +
+  xlim(c(0.3, 1)) +
+  ylim(c(0.3, 1)) +
+  coord_equal()
 ```
 
 
