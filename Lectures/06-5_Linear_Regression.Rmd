@@ -211,9 +211,11 @@ ggplot() +
   geom_line(data = tibble(lls, theta_1), aes(y = lls, x = theta_1)) +
   geom_point(data = tibble(x = theta_1_hat, y = max.ll), aes(x, y),
              color = "red", size = 3) +
+  labs(y = "log Likelihood") +
   annotate(geom = "text", x = -7.5, y = -60,
            size = 7,
-           label = paste("theta_1 =", theta_1_hat, "\nlogLik =", round(max.ll, 2)))
+           label = paste("theta_1 =", theta_1_hat, "\nlogLik =",
+                         round(max.ll, 2)))
 ```
 
 
