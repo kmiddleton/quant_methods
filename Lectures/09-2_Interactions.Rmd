@@ -28,24 +28,13 @@ Datasets
 
 ## Factorial designs and interactions
 
-**Factorial designs** all combinations of treatments are included:
-
-|            | $X_1$ Group A       | $X_1$ Group B       |
-|-----------:|:----------------:|:----------------:|
-|$X_2$ Group A  | $X_1$ A, $X_2$ A | $X_1$ B, $X_1$ A |
-|$X_2$ Group B  | $X_1$ A, $X_2$ B | $X_1$ B, $X_1$ B |
+<center>
+<img src="https://imgur.com/tcMSr7k.png" width="60%" />
+</center>
 
 - Allow you to explore *interactions* (multiplicative effects)
 
 If you have multiple categorical variables, you should *always* do factorial designs (unless you know why you aren't).
-
-
-## Factorial designs and interactions
-
-<center>
-<img src="https://imgur.com/tcMSr7k.png" width="100%" />
-</center>
-
 
 ## Interaction model
 
