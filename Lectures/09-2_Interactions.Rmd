@@ -270,9 +270,9 @@ Thus you should be aware of how your ANOVA table is calculated.
 
 Each type tests subtly different hypotheses.
 
-- I almost never test your intentions (though it is the mathematical statistician's preference)
-- I == III if the groups are balanced (ideal situation - you don't have to choose)
-- III matches the output of `summary(lm())` (so that's nice)
+- Use Type I if you have balanced data
+- Type I == Type III if the groups are balanced (ideal situation - you don't have to choose)
+- Type III matches the output of `summary(lm())` (so that's nice)
 
 
 ## Unbalanced groups
