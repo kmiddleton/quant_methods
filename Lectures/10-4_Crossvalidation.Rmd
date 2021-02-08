@@ -265,6 +265,43 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
 1. ANCOVA, intercepts varying
 1. ANCOVA, slopes varying & intercepts varying
 
+```{r}
+mod1 <- lm(Energy ~ Caste, data = M)
+mod2 <- lm(Energy ~ Mass + Caste, data = M)
+mod3 <- lm(Energy ~ Mass * Caste, data = M)
+```
+
+## Fit different models to these data
+
+```{r, echo=FALSE}
+M_pred <- crossing(
+  Mass = seq(3.8, 5.3, length = 100),
+  Caste = levels(M$Caste)) %>% 
+  mutate(mod1 = predict(mod1, newdata = .),
+         mod2 = predict(mod2, newdata = .),
+         mod3 = predict(mod3, newdata = .))
+
+p <- ggplot() +
+  geom_point(data = M, aes(x = Mass, y = Energy, color = Caste), size = 4) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.position = "none") +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
+
+p1 <- p +
+  geom_line(data = M_pred, aes(x = Mass, y = mod1, color = Caste)) +
+  labs(title = "Caste only")
+
+p2 <- p +
+  geom_line(data = M_pred, aes(x = Mass, y = mod2, color = Caste)) +
+  labs(title = "Caste + Mass")
+
+p3 <- p +
+  geom_line(data = M_pred, aes(x = Mass, y = mod3, color = Caste)) +
+  labs(title = "Caste * Mass")
+
+plot_grid(p1, p2, p3, ncol = 3)
+```
 
 ## Assess models with 10-fold cross validation
 
@@ -279,14 +316,15 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
 ## 10-fold cross validation
     
 ```{r}
-set.seed(666)
+set.seed(533214)
 folds <- 10
-M$id.group <- sample(c(rep(seq(1, folds), each = 3),
+M$id_fold <- sample(c(rep(seq(1, folds), each = 3),
                        sample(seq(1, folds), 5)))
 gg <- 1:folds
-err.out <- data.frame('mod1' = numeric(length = folds),
+err_out <- data.frame('mod1' = numeric(length = folds),
                       'mod2' = numeric(length = folds),
                       'mod3' = numeric(length = folds))
+head(err_out)
 ```
 
 
@@ -294,17 +332,17 @@ err.out <- data.frame('mod1' = numeric(length = folds),
     
 ```{r}
 for(ii in gg) {
-  M_train <- M[M$id.group != ii, ]
+  M_train <- M[M$id_fold != ii, ]
   mod1 <- lm(Energy ~ Caste, data = M_train)
   mod2 <- lm(Energy ~ Mass + Caste, data = M_train)
   mod3 <- lm(Energy ~ Mass * Caste, data = M_train)
-  M_test <- M[M$id.group == ii, ]
+  M_test <- M[M$id_fold == ii, ]
   pp1 <- predict(mod1, M_test)
   pp2 <- predict(mod2, M_test)
   pp3 <- predict(mod3, M_test)
-  err.out[ii, 'mod1'] <- mean((M_test$Energy - pp1) ^ 2)
-  err.out[ii, 'mod2'] <- mean((M_test$Energy - pp2) ^ 2)
-  err.out[ii, 'mod3'] <- mean((M_test$Energy - pp3) ^ 2)
+  err_out[ii, 'mod1'] <- mean((M_test$Energy - pp1) ^ 2)
+  err_out[ii, 'mod2'] <- mean((M_test$Energy - pp2) ^ 2)
+  err_out[ii, 'mod3'] <- mean((M_test$Energy - pp3) ^ 2)
 }
 ```
 
@@ -313,17 +351,18 @@ for(ii in gg) {
 
 ```{r echo=FALSE}
 preds <- M_test %>% 
-  select(-id.group) %>% 
-  mutate(`Overall Mean` = pp1,
+  select(-id_fold) %>% 
+  mutate(`Caste only` = pp1,
          `Mass + Caste` = pp2,
          `Mass * Caste` = pp3) %>% 
-  gather(Model, value, -Caste, -Mass, -Energy)
+  pivot_longer(cols = -c(Caste, Mass, Energy),
+               names_to = "Model", values_to = "value")
 
 ggplot() +
   geom_vline(xintercept = M_test$Mass, color = "gray60",
              linetype = "dotted") +
   geom_point(data = M_train, aes(x = Mass, y = Energy, color = Caste),
-             size = 1, alpha = 0.5) +
+             size = 2) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
   theme(legend.justification = c(0, 1),
         legend.position = c(0, 1)) +
@@ -332,7 +371,7 @@ ggplot() +
   geom_point(data = M_test, aes(x = Mass, y = Energy, color = Caste),
              size = 4, pch = 16) +
   geom_point(data = preds, aes(x = Mass, y = value, color = Caste,
-                               shape = Model), size = 4) +
+                               shape = Model), size = 6) +
   scale_shape_manual(values = c(0, 1, 2))
 ```
 
@@ -340,26 +379,26 @@ ggplot() +
 ## 10-fold cross validation {.smaller}
     
 ```{r}
-err.out
+err_out
 
-colMeans(err.out)
+colMeans(err_out)
 ```
 
 
 ## 10-fold cross validation
 
 ```{r echo=FALSE}
-err.out %>%
+err_out %>%
   mutate(Fold = factor(1:folds)) %>% 
   gather(Model, MSE, -Fold) %>% 
   mutate(Model = factor(
     Model,
-    labels = c("Overall Mean", "Mass + Caste", "Mass * Caste"))) %>% 
+    labels = c("Caste only", "Mass + Caste", "Mass * Caste"))) %>% 
   ggplot(aes(Model, MSE, color = Fold)) +
-  geom_point() +
-  stat_summary(fun.y = "mean", geom = "point", color = "black",
-               size = 3)
-
+  geom_point(size = 3) +
+  labs(y = "Mean Squared Error") +
+  stat_summary(fun = "mean", geom = "point", color = "black",
+               size = 6)
 ```
 
 
