@@ -1,7 +1,7 @@
 ---
 title: "Likelihood Ratio Tests"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,9 +13,16 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(readxl)
 library(wesanderson)
 ```
+
+<!--
+Datasets
+  Molerats.csv
+-->
+
 
 ## Likelihoods and model comparison
 
@@ -24,6 +31,7 @@ We have maximized likelihoods for single models
 Now maximize likelihoods for competing models
 
 - How to explicitly compare likelihoods?
+
 
 ## Likelihood ratio tests
 
@@ -38,20 +46,23 @@ source("Shade_Distributions.R")
 shade_chisq(0.05, 1)
 ```
 
+
 ## Energy expenditure in naked mole rats
 
 <center>
 <img src="https://i.imgur.com/FMMAjpa.jpg" width="80%" />
 </center>
 
+
 ## Energy expenditure in naked mole rats
 
 ```{r echo=FALSE}
-data(MoleRats, package = "abd")
-M <- MoleRats
-M$caste <- factor(as.numeric(M$caste),
-                  labels = c("Non-worker", "Worker"))
-names(M) <- c("Caste", "Mass", "Energy")
+M <- read_csv("../data/Molerats.csv", col_types = c("cdd")) %>% 
+  rename(Caste = caste,
+         Mass = ln.mass,
+         Energy= ln.energy) %>% 
+  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+         Caste = factor(Caste))
 
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
@@ -62,6 +73,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
        y = "ln Daily Energy Expenditure (kJ)")
 ```
 
+
 ## Fit different models to these data
 
 1. Mean (overall mean, no body mass)
@@ -69,6 +81,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
 1. OLS regression (body mass only, no grouping)
 1. ANCOVA, intercepts varying
 1. ANCOVA, slopes varying & intercepts varying
+
 
 ## 1: Mean
 
@@ -89,6 +102,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
        y = "ln Daily Energy Expenditure (kJ)")
 ```
 
+
 ## 2: ANOVA
 
 ```{r}
@@ -106,6 +120,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   labs(x = "ln Body Mass (g)",
        y = "ln Daily Energy Expenditure (kJ)")
 ```
+
 
 ## 3: OLS regression
 
@@ -126,6 +141,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
        y = "ln Daily Energy Expenditure (kJ)")
 ```
 
+
 ## 4: ANCOVA, intercepts varying
 
 ```{r}
@@ -143,6 +159,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   labs(x = "ln Body Mass (g)",
        y = "ln Daily Energy Expenditure (kJ)")
 ```
+
 
 ## 5: ANCOVA, intercepts and slopes vary
 
@@ -162,11 +179,13 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
        y = "ln Daily Energy Expenditure (kJ)")
 ```
 
+
 ## 5: ANCOVA, intercepts and slopes varying {.smaller}
 
 ```{r}
 summary(fm5)
 ```
+
 
 ## Comparing likelihoods
 
@@ -178,11 +197,12 @@ Model  | *n* Estimated Parameters | log-Likelihood
 4 - ANCOVA, intercept only     | 3 | `r round(logLik(fm4), 3)`
 5 - ANCOVA, slope & intercept  | 4 | `r round(logLik(fm5), 3)`
 
+
 ## Adding predictors *can't decrease* model likelihood
 
 At worst, likelihood will be equal. It will probably go up.
 
-Add a column of [0, 1] random numbers:
+Add a column of random numbers between 0 and 1:
 
 ```{r}
 set.seed(341)
@@ -193,12 +213,14 @@ M <- M %>% mutate(Noise = runif(nrow(M), 0, 1))
 dplyr::select(M, Mass, Caste, Energy, Noise) %>% head()
 ```
 
+
 ## 6: ANCOVA 5 + Noise {.smaller}
 
 ```{r}
 fm6 <- lm(Energy ~ Mass * Caste + Noise, data = M)
 summary(fm6)
 ```
+
 
 ## Comparing likelihoods
 
@@ -210,6 +232,7 @@ Model  | *n* Parameters | log-Likelihood
 4 - ANCOVA, intercept         | 3 | `r round(logLik(fm4), 3)`
 5 - ANCOVA, intercept, slope  | 4 | `r round(logLik(fm5), 3)`
 6 - ANCOVA, intercept, slope, Noise  | 5 | `r round(logLik(fm6), 3)`
+
 
 ## Comparing models
 
@@ -224,6 +247,7 @@ Six nested models:
 
 What one(s) has/have the best support?
 
+
 ## Likelihood ratio tests
 
 - Compare *nested* models
@@ -233,6 +257,7 @@ What one(s) has/have the best support?
 - 2 * $\Delta$log-Likelihood of the two models
 - Distributed as $\chi^2$ with *df* equal to difference in number of estimated parameters
     - 1 more predictor, 1 less *df*
+
 
 ## ANOVA vs. Mean only {.smaller}
 
@@ -244,6 +269,7 @@ library(lmtest)
 lrtest(fm1, fm2)
 ```
 
+
 ## Likelihood ratio tests {.smaller}
 
 Compare sets of *nested* models. Each compared to the one above with a $\chi^2$ test. 
@@ -254,6 +280,7 @@ lrtest(fm1, fm2, fm3, fm4, fm5, fm6)
 
 `Energy ~ Mass + Caste` is not improved by adding an interaction term.
 
+
 ## "Preferred" model {.smaller}
 
 The "preferred" model is the one that is not improved by increased complexity. Interpretations based on this model:
@@ -263,9 +290,10 @@ summary(fm4)
 ```
 
 ```{r echo=FALSE}
-# Save models
+# Save models for use in lecture 10-3
 save(fm1, fm2, fm3, fm4, fm5, fm6, file = "lrtmodels.Rda")
 ```
+
 
 ## "Preferred" model {.smaller}
 
@@ -280,6 +308,3 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
        y = "ln Daily Energy Expenditure (kJ)")
 ```
 
-## Quiz 09-2
-
-Lecture 09-3

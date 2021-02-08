@@ -1,7 +1,7 @@
 ---
-title: "Model Comparison: Cross Validation"
+title: "Cross Validation"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,10 +13,16 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
-library(ggplot2)
+theme_set(theme_cowplot())
 library(latex2exp)
 library(wesanderson)
 ```
+
+<!--
+Datasets
+  Molerats.csv
+-->
+
 
 ## The Problem
 
@@ -24,13 +30,16 @@ library(wesanderson)
 - Can produce results specific to the data set (i.e., overfitting)
 - More complex models = more specific, less general
 
+
 ## Simulation
 
-- Set up a data set where we know which variables are true predictors and which are not
-- Pull outcome variable from a normal distribution
+Set up a data set where we know which variables are true predictors and which are not
+
+- Draw outcome variable from a normal distribution
     - Two groups, differ in mean value
 - Predictor 1 is the grouping variable 
 - All other predictors are randomly generated and unrelated to the outcome variable
+
 
 ## Simulation
 
@@ -51,6 +60,7 @@ xx9 <- rnorm(nobs)
 xx10 <- rnorm(nobs)
 ```
 
+
 ## Simulation
 
 Fit 3 models:
@@ -64,6 +74,7 @@ mod3 <- lm(yy ~ xx1 + xx2 + xx3 + xx4 + xx5 +
 
 - Compare fitted values to assess how well the model fits the data  
 - Remember $R^2$ = the squared correlation between the fitted and observed y values
+
 
 ## Model 1
 
@@ -79,6 +90,7 @@ data.frame('Yhat' = yy_hat1, 'Yobs' = yy) %>%
                           round(sqrt(summary(mod1)$r.squared), 2))))
 ```
 
+
 ## Model 2
 
 ```{r, echo=FALSE}
@@ -93,6 +105,7 @@ data.frame('Yhat' = yy_hat2, 'Yobs' = yy) %>%
                           round(sqrt(summary(mod2)$r.squared), 2))))
 ```
 
+
 ## Model 3
 
 ```{r, echo=FALSE}
@@ -106,6 +119,7 @@ data.frame('Yhat' = yy_hat3, 'Yobs' = yy) %>%
                           "; Correlation = ",
                           round(sqrt(summary(mod3)$r.squared), 2))))
 ```
+
 
 ## Simulation
 
@@ -129,6 +143,7 @@ y_hat_new1 <- predict.lm(object = mod1, newdata = newx)
 y_hat_new2 <- predict.lm(object = mod2, newdata = newx)
 y_hat_new3 <- predict.lm(object = mod3, newdata = newx)
 ```
+
 
 ## Model 1
 
@@ -157,6 +172,7 @@ data.frame('Yhat' = yy_hat1, 'Yobs' = yy) %>%
                           round(cor(y_hat_new1,newy), 2))))
 ```
 
+
 ## Model 2
 
 ```{r, echo=FALSE}
@@ -171,6 +187,7 @@ data.frame('Yhat' = yy_hat2, 'Yobs' = yy) %>%
        title = TeX(paste0("Correlation (new data vs. predicted values) = ",
                           round(cor(y_hat_new2,newy), 2))))
 ```
+
 
 ## Model 3
 
@@ -187,11 +204,13 @@ data.frame('Yhat' = yy_hat3, 'Yobs' = yy) %>%
                           round(cor(y_hat_new3,newy), 2))))
 ```
 
+
 ## Cross Validation
 
 > When we don't know the true model (all cases but simulation), how do we know if a model is too specific to a given data set?
 
 - Cross validation is one technique to address this question
+
 
 ## Approach
 
@@ -202,6 +221,7 @@ data.frame('Yhat' = yy_hat3, 'Yobs' = yy) %>%
 - **Which Predictors?**
 - **What Parameter Values?**
 
+
 ## Approaches
 
 - Random sub samples as test set
@@ -211,20 +231,23 @@ data.frame('Yhat' = yy_hat3, 'Yobs' = yy) %>%
 - Leave one out
     - Issue: small test set
 
+
 ## Energy expenditure in naked mole rats
 
 <center>
 <img src="https://i.imgur.com/FMMAjpa.jpg" width="80%" />
 </center>
 
+
 ## Energy expenditure in naked mole rats
 
 ```{r echo=FALSE}
-data(MoleRats, package = "abd")
-M <- MoleRats
-M$caste <- factor(as.numeric(M$caste),
-                  labels = c("Non-worker", "Worker"))
-names(M) <- c("Caste", "Mass", "Energy")
+M <- read_csv("../data/Molerats.csv", col_types = c("cdd")) %>% 
+  rename(Caste = caste,
+         Mass = ln.mass,
+         Energy= ln.energy) %>% 
+  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+         Caste = factor(Caste))
 
 ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
@@ -235,11 +258,13 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
        y = "ln Daily Energy Expenditure (kJ)")
 ```
 
+
 ## Fit different models to these data
 
 1. ANOVA (group mean, no body mass)
 1. ANCOVA, intercepts varying
 1. ANCOVA, slopes varying & intercepts varying
+
 
 ## Assess models with 10-fold cross validation
 
@@ -249,6 +274,7 @@ ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
     - **Mean squared error**
     - Correlation between predicted & observed values
     - Categorical outcome: % misclassified
+
 
 ## 10-fold cross validation
     
@@ -262,6 +288,7 @@ err.out <- data.frame('mod1' = numeric(length = folds),
                       'mod2' = numeric(length = folds),
                       'mod3' = numeric(length = folds))
 ```
+
 
 ## 10-fold cross validation
     
@@ -280,6 +307,7 @@ for(ii in gg) {
   err.out[ii, 'mod3'] <- mean((M_test$Energy - pp3) ^ 2)
 }
 ```
+
 
 ## Visualizing MSE of one "fold"
 
@@ -308,6 +336,7 @@ ggplot() +
   scale_shape_manual(values = c(0, 1, 2))
 ```
 
+
 ## 10-fold cross validation {.smaller}
     
 ```{r}
@@ -315,6 +344,7 @@ err.out
 
 colMeans(err.out)
 ```
+
 
 ## 10-fold cross validation
 
@@ -332,15 +362,12 @@ err.out %>%
 
 ```
 
+
 ## Notes & Resources
 
 - Training and Test sets must come from the same population
 - There is uncertainty in cross validation estimates
 - We've written our own code here but there are several R packages:
-
     - `cvTools` package
     - `boot` package
 
-## No Quiz
-
-No more Lectures

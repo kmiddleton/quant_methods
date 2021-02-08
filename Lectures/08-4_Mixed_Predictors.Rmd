@@ -20,6 +20,12 @@ knitr::opts_chunk$set(cache = TRUE)
 #library(rethinking)
 ```
 
+<!--
+Datasets
+  Molerats.csv
+-->
+
+
 ## Hierarchy of GLMs
 
 <center>
@@ -79,10 +85,13 @@ For now:
 ## Energy expenditure in naked mole rats
 
 ```{r echo=FALSE}
-data(MoleRats, package = "abd")
-M <- MoleRats
-M$caste <- factor(as.numeric(M$caste), labels = c("Non-worker", "Worker"))
-names(M) <- c("Caste", "Mass", "Energy")
+M <- read_csv("../data/Molerats.csv", col_types = c("cdd")) %>% 
+  rename(Caste = caste,
+         Mass = ln.mass,
+         Energy= ln.energy) %>% 
+  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+         Caste = factor(Caste))
+
 ggplot(M, aes(x = Mass, y = Energy)) +
   geom_point(size = 4) +
   labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")

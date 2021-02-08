@@ -1,7 +1,7 @@
 ---
 title: "Akaike Information Criteria"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,17 +13,24 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(readxl)
 library(lmtest)
 library(nlme)
-library(forcats)
 
 load("lrtmodels.Rda")
 ```
 
+<!--
+Datasets
+
+-->
+
+
 ## Tradeoff in model specification
 
 > "Overfitting: fitting is easy; prediction is hard. Future data will not be exactly like past data, and so any model that is unaware of this fact tends to make worse predictions than it could. So if we wish to make good predictions, we cannot judge our models simply on how well they fit our data. **Information criteria** provide estimates of predictive accuracy, rather than merely fit. So they compare models where it matters." [@McElreath2015-no]
+
 
 ## Kullback-Leibler information
 
@@ -36,6 +43,7 @@ load("lrtmodels.Rda")
 
 K-L information doesn't aid directly in model evaluation (what is the true model?)
 
+
 ## Estimation of K-L information
 
 Hirotugu Akaike ("Ah-ka-ee-kay") [-@Akaike1974-iw]
@@ -46,6 +54,7 @@ Hirotugu Akaike ("Ah-ka-ee-kay") [-@Akaike1974-iw]
 <img src="https://i.imgur.com/WLVjbKW.jpg" width="40%" />
 </center>
 
+
 ## Akaike's Information Criterion
 
 "An Information Criterion": AIC is proportional to the *relative* K-L information of a model:
@@ -55,6 +64,7 @@ $$\mbox{AIC} = -2 \log\left(\mathcal{L}(\theta | \mbox{data})\right) + 2 k$$
 where $\log\left(\mathcal{L}(\theta | \mbox{data})\right)$ is the maximized log-likelihood for the parameters $\theta$ given data.
 
 - $-2$ comes in "for historical reasons" having to do with the $\chi^2$ distribution.
+
 
 ## Calculating AIC
 
@@ -67,6 +77,7 @@ logLik(fm1)
 
 df = 2 because the mean and standard deviation are estimated.
 
+
 ## AIC
 
 - AIC is a measure of the *lack* of model fit
@@ -76,6 +87,7 @@ df = 2 because the mean and standard deviation are estimated.
 - Negative twice the log-likelihood + 2 X *number of estimated parameters*
     - Penalization of models with large number of estimated parameters, because they will always fit the observed data better
     - Parsimony as a side-effect
+
 
 ## AIC in practice
 
@@ -90,12 +102,14 @@ $$\mbox{AICc} = -2 \log\left(\mathcal{L}(\theta | \mbox{data})\right) + 2 k + \f
 - Added "parameter" $\rightarrow$ 0 as $n \rightarrow \infty$
 - Use AICc except when n/k > ~40 (see Burnham and Anderson)
 
+
 ## Comparing models with AIC (AICc)
 
 1. Fit a set of candidate models (hypotheses)
 1. Rank models according to AIC
 1. Find the model with the lowest AIC
 1. $\Delta$AIC is the value of AIC~lowest~ - AIC~model~
+
 
 ## Comparing models with AIC (AICc)
 
@@ -111,6 +125,7 @@ In practice:
 
 **This does not mean that the model you have ranked highest is a good model for the data in an absolute sense.**
 
+
 ## Akaike weights: evidence ratios
 
 Back-transforming the logged likelihoods allows us to standardize AICs:
@@ -121,6 +136,7 @@ $w$ is a rescaled AIC on a scale of 0 $\rightarrow$ 1, giving the probability of
 
 - Still conditional on the data and the models
     - Maybe a better model is not in the sample of models
+
 
 ## Working with AIC
 
@@ -139,6 +155,7 @@ AICc(fm1)
 
 Get in the habit of using AICc.
 
+
 ## AIC Tables
 
 `AICcmodavg` function `aictab` for model comparison:
@@ -147,16 +164,18 @@ Get in the habit of using AICc.
 aictab(cand.set = list(fm1, fm2, fm3, fm4, fm5, fm6))
 ```
 
+
 ## Return to some previous models
 
 Use AICc to compare:
 
 1. Maximum likelihood example
-1. Rat weight gain
+1. Biomass
 1. Limb lengths
 1. Squid size
 1. Species richness
 1. Orthodontic growth
+
 
 ## Maximum likelihood example
 
@@ -171,6 +190,7 @@ fm_1 <- lm(Y ~ X)       # Intercept and slope
 (ll_1 <- logLik(fm_1))
 ```
 
+
 ## Maximum likelihood example
 
 Likelihood ratio test:
@@ -179,6 +199,7 @@ Likelihood ratio test:
 library(lmtest)
 lrtest(fm_0, fm_1)
 ```
+
 
 ## Maximum likelihood example {.smaller}
 
@@ -189,30 +210,41 @@ aictab(cand.set = list(fm_0, fm_1),
        modnames = c("Intercept Only", "OLS"))
 ```
 
-## Rat weight gain
+
+## Nitrogen, phosphorus, and biomass
 
 ```{r}
-data("weightgain", package = "HSAUR3")
+biomass <- read_csv("../data/biomass.csv", col_types = c("cccddd")) %>% 
+  mutate(nitrogen = factor(nitrogen),
+         phosphorous = factor(phosphorous))
 
-# Source only
-fm_source <- lm(weightgain ~ source, data = weightgain)
+# Nitrogen only
+fm_N <- lm(biomass ~ nitrogen, data = biomass)
 
-# Type only
-fm_type <- lm(weightgain ~ type, data = weightgain)
+# Phosphorous only
+fm_P <- lm(biomass ~ phosphorous, data = biomass)
 
 # Additive
-fm_add <- lm(weightgain ~ source + type, data = weightgain)
+fm_N_P <- lm(biomass ~ nitrogen + phosphorous, data = biomass)
 
-# Factorial
-fm_factorial <- lm(weightgain ~ source * type, data = weightgain)
+# Factorial with interaction
+fm_NxP <- lm(biomass ~ nitrogen * phosphorous, data = biomass)
 ```
 
-## Rat weight gain
+
+## Nitrogen, phosphorus, and biomass
 
 ```{r}
-aictab(list(fm_source, fm_type, fm_add, fm_factorial),
-       modnames = c("Source", "Type", "Source + Type",
-                    "Source * Type"))
+aictab(list(fm_N, fm_P, fm_N_P, fm_NxP),
+       modnames = c("Nitrogen", "Phosphorous", "Nitrogen + Phosphorous",
+                    "Nitrogen * Phosphorous"))
+```
+
+
+## Nitrogen, phosphorus, and biomass
+
+```{r}
+car::Anova(fm_NxP, type = "III")
 ```
 
 ## Limb lengths
@@ -232,6 +264,7 @@ p2 <- ggplot(M, aes(right_limb, height)) + geom_point() +
 plot_grid(p1, p2, ncol = 2)
 ```
 
+
 ## Limb lengths
 
 ```{r}
@@ -241,6 +274,7 @@ fm_LR <- lm(height ~ left_limb + right_limb, data = M)
 # Left limb length only
 fm_L <- lm(height ~ left_limb, data = M)
 ```
+
 
 ## Limb lengths
 
@@ -252,12 +286,13 @@ Models are both well supported, but *one is worthless*.
 
 **AICc will not tell you if your model is good.**
 
+
 ## Squid size
 
 ```{r}
 library(nlme)
-S <- read_excel("../data/Squid.xlsx")
-S <- S %>% mutate(Month = factor(Month))
+S <- read_excel("../data/Squid.xlsx") %>%
+  mutate(Month = factor(Month))
 
 # Linear model with interaction term
 fm1 <- gls(Testis_Mass ~ DML * Month, data = S,
@@ -271,11 +306,13 @@ fm2 <- gls(Testis_Mass ~ DML * Month, data = S,
 
 Note: using maximum likelihood here (`ML`), rather than restricted maximum likelihood (`REML`).
 
+
 ## Squid size
 
 ```{r}
 aictab(list(fm1, fm2), modnames = c("Linear model", "Weighted"))
 ```
+
 
 ## Intertidal species richness
 
@@ -292,6 +329,7 @@ fm_mixed_2 <- lme(Richness ~ NAP, random = ~ NAP | Beach, data = RIKZ,
 
 - Switching `fm_mixed_2` to use a different optimizer, so the model will converge.
 
+
 ## Intertidal species richness
 
 ```{r}
@@ -299,12 +337,14 @@ AICc(fm_mixed_1) # random = ~ 1 | Beach
 AICc(fm_mixed_2) # random = ~ NAP | Beach
 ```
 
+
 ## Intertidal species richness
 
 ```{r}
 aictab(list(fm_mixed_1, fm_mixed_2),
        modnames = c("Random intercept", "Random int. & slope"))
 ```
+
 
 ## Orthodontic growth
 
@@ -324,12 +364,14 @@ fm2 <- lme(Distance ~ Sex + Age, random = ~ Age | Subject,
            data = O)
 ```
 
+
 ## Orthodontic growth
 
 ```{r}
 aictab(list(fm1, fm2),
        modnames = c("1 | Subject", "Age | Subject"))
 ```
+
 
 ## PS 08 Zooplankton
 
@@ -343,6 +385,7 @@ M %>%
   ggplot(aes(x = Treatment, y = Zooplankton, color = Block)) +
   geom_point()
 ```
+
 
 ## PS 08 Zooplankton
 
@@ -358,11 +401,13 @@ Model with `Block`, allows each block to have its own mean:
 fm_hier <- lm(Zooplankton ~ Treatment + Block, M)
 ```
 
+
 ## PS 08 Zooplankton
 
 ```{r}
 aictab(list(fm, fm_hier), modnames = c("Non-hierarchical", "Block"))
 ```
+
 
 ## Note about model comparison with hierarchical models
 
@@ -383,8 +428,5 @@ This is a nuanced business:
     - Describe multiple models
     - Compare Akaike weights
 
-## Quiz 09-3
-
-Lecture 09-4
 
 ## References

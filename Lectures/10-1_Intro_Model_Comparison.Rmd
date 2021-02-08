@@ -1,7 +1,7 @@
 ---
 title: "Introduction to Model Comparison"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,19 +13,15 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(ggrepel)
 ```
 
-## Readings
+<!--
+Datasets
+  
+-->
 
-- Burnham and Anderson [-@Burnham2001-wq] Kullback-Leibler information as a basis for strong inference in ecological studies. *Wildl Res* 28:111-119.
-
-## Additional resources
-
-- Anderson and Burnham [-@Anderson2002-cf]. Avoiding Pitfalls When Using Information-Theoretic Methods. *J Wildl Manage* 66:912–918.
-- Burnham & Anderson [-@Burnham2004-zr]. Multimodel Inference: Understanding AIC and BIC in Model Selection. *Sociol Methods Res* 33:261–304.
-- Burnham and Anderson [-@Burnham2002-xt]. *Model Selection and Multi-model Inference: a Practical Information Theoretic Approach*. Springer
-- Judge et al. [-@Judge1985-gl]: *The Classical Inference Approach for the General Linear Model*. John Wiley & Sons
 
 ## Underfitting and overfitting {.columns-2}
 
@@ -40,6 +36,7 @@ library(ggrepel)
 <img src="https://i.imgur.com/ilkU4eN.jpg" width="80%" />
 </center>
 
+
 ## Tradeoff in model specification
 
 **Underfitting**: Model is too simple. Doesn't describe the sample *well enough*.
@@ -52,6 +49,7 @@ library(ggrepel)
 
 We need to find a balance between *regular* and *irregular* features.
 
+
 ## Why do we make models?
 
 - Estimates of the magnitudes of parameters and/or differences between parameter estimates, *and* their relative precision
@@ -61,6 +59,7 @@ No model represents the true biological process
 
 - This is actually a good thing.
 - Which model comes *closest* to the true biological process from a *(small) set of working hypotheses*?
+
 
 ## Brain volume and (estimated) body mass in hominins
 
@@ -76,6 +75,7 @@ M <- data.frame(Species, Brain_Vol, Mass)
 M
 ```
 
+
 ## Brain volume and body mass in hominins
 
 ```{r echo=FALSE}
@@ -90,6 +90,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
+
 ## 6 increasingly complex polynomial models {.smaller}
 
 - $\mbox{Brain Vol} = \beta_0 + \beta1 \mbox{M}$
@@ -101,6 +102,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
 
 Compare *R*^2^ among them.
 
+
 ## 1: $\mbox{Brain Vol} = \beta_0 + \beta_1 \mbox{M}$
 
 ```{r}
@@ -108,6 +110,7 @@ fm1 <- lm(Brain_Vol ~ Mass, data = M)
 coef(fm1)
 summary(fm1)$r.squared
 ```
+
 
 ## 1: $\mbox{Brain Vol} = \beta_0 + \beta_1 \mbox{M}$
 
@@ -118,6 +121,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
+
 ## 2. $\mbox{Brain Vol} = \beta_0 + \beta_1 \mbox{M} + \beta_2 \mbox{M}^2$
 
 ```{r}
@@ -125,6 +129,7 @@ fm2 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2), data = M)
 coef(fm2)
 summary(fm2)$r.squared
 ```
+
 
 ## 2. $\mbox{Brain Vol} = \beta_0 + \beta_1 \mbox{M} + \beta_2 \mbox{M}^2$
 
@@ -136,6 +141,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
+
 ## 3. $\mbox{Brain Vol} = \beta_0 + ... + \beta_3 \mbox{M}^3$
 
 ```{r}
@@ -143,6 +149,7 @@ fm3 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3), data = M)
 coef(fm3)
 summary(fm3)$r.squared
 ```
+
 
 ## 3. $\mbox{Brain Vol} = \beta_0 + ... + \beta_3 \mbox{M}^3$
 
@@ -154,6 +161,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
+
 ## 4. $\mbox{Brain Vol} = \beta_0 + ... + \beta_4 \mbox{M}^4$
 
 ```{r}
@@ -162,6 +170,7 @@ fm4 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
 coef(fm4)
 summary(fm4)$r.squared
 ```
+
 
 ## 4. $\mbox{Brain Vol} = \beta_0 + ... + \beta_4 \mbox{M}^4$
 
@@ -173,6 +182,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
+
 ## 5. $\mbox{Brain Vol} = \beta_0 + ... + \beta_5 \mbox{M}^5$
 
 ```{r}
@@ -181,6 +191,7 @@ fm5 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
 coef(fm5)
 summary(fm5)$r.squared
 ```
+
 
 ## 5. $\mbox{Brain Vol} = \beta_0 + ... + \beta_5 \mbox{M}^5$
 
@@ -192,6 +203,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
+
 ## 6. $\mbox{Brain Vol} = \beta_0 + ... + \beta_6 \mbox{M}^6$
 
 ```{r}
@@ -200,6 +212,7 @@ fm6 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
 coef(fm6)
 summary(fm6)$r.squared
 ```
+
 
 ## 6. $\mbox{Brain Vol} = \beta_0 + ... + \beta_6 \mbox{M}^6$
 
@@ -212,6 +225,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
+
 ## Summary R^2^
 
 Model  | R^2^  |
@@ -222,6 +236,7 @@ Model  | R^2^  |
 4      | `r round(summary(fm4)$r.squared, 2)`
 5      | `r round(summary(fm5)$r.squared, 2)`
 6      | `r round(summary(fm6)$r.squared, 2)`
+
 
 ## Which model(s) balance under- vs. overfitting?
 
@@ -237,9 +252,11 @@ Model 6: Clearly overfit
 - Perfect *in-sample* prediction
 - Poor *out-of-sample* prediction
 
+
 ## Tradeoff in model specification
 
 > "Overfitting: fitting is easy; prediction is hard. Future data will not be exactly like past data, and so any model that is unaware of this fact tends to make worse predictions than it could. So if we wish to make good predictions, we cannot judge our models simply on how well they fit our data. **Information criteria** provide estimates of predictive accuracy, rather than merely fit. So they compare models where it matters." [@McElreath2015-no]
+
 
 ## Methods for model comparison
 
@@ -247,9 +264,6 @@ Model 6: Clearly overfit
 2. Information criteria
 3. Cross validation
 
-## Quiz 09-1
-
-Lecture 09-2
 
 ## References
 
