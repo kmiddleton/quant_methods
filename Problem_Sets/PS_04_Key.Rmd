@@ -244,6 +244,7 @@ For each of the following, generate a set of values and plot a histogram. You ma
 7. 1000 values from a uniform distribution with a minimum of 0 and maximum of 100.
 
 ```{r}
+#FIXME
 set.seed(42878979)
 
 # 1
@@ -281,6 +282,7 @@ ggplot(tibble(num = runif(1000, 0, 100)), aes(num)) +
 Create a density plot for #3 and #6 above on the same plot. First create a single data frame with both sets and a column identifying each group.
 
 ```{r}
+#FIXME
 n <- 100000
 xx.b <- tibble(id = rep(c('a', 'b'), each = n),
                value = c(rnorm(n, 5, 1), rnorm(n, 5, 5)))
@@ -297,6 +299,7 @@ ggplot(xx.b, aes(x = value, color = id, fill = id)) +
 Add a vertical line to your plot at x = 7.
 
 ```{r}
+#FIXME
 ggplot(xx.b, aes(x = value, color = id, fill = id)) +
   geom_vline(xintercept = 7) +
   geom_density(alpha = 1/5)

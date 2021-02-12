@@ -129,7 +129,9 @@ One key feature for simulating randomness in R is the `sample()` function. Imagi
 Look at the help file for `sample()` and see what the arguments below mean.
 
 ```{r}
-
+set.seed(592777)
+pp_all <- tibble(id = letters[1:26],
+                 sex = sample(c('Treatment', 'Control'), 26, replace = TRUE))
 ```
 
 Try the following:
