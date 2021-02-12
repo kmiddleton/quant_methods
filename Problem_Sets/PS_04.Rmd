@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 03'
+title: 'Problem Set 04'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -14,11 +14,13 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
+
 
 ## Combining probabilities
 
-Among a hypothetical population, blood type probabilities for all the combinations of AB antigens and RhD status:
+Among a hypothetical population, blood type probabilities for all the combinations of AB antigens and Rh status:
 
 |Type |Probability|
 |-----|-----------|
@@ -47,9 +49,9 @@ c. Type AB blood
 
 > 
 
-d. Not Type AB blood
+d. *Not* Type AB blood
 
-> 
+>
 
 e. Type A *or* type B blood
 
@@ -65,9 +67,32 @@ Elevated prostate-specific antigen (PSA) can indicate prostate cancer but can al
 
 ### Activity
 
-What is the probability that randomly tested man over 65 has prostate cancer, given that he has received a positive PSA test? Solve this however you would like.
+What is the probability that randomly tested man over 65 has prostate cancer, given that they have received a positive PSA test? Solve this problem however you would like.
+
+You are trying to find $Pr[Ca|Positive~Test]$.
+
+```{r}
+
+```
 
 
+How would you counsel a family member who had a positive test?
+
+> 
+
+How do your results change when one of the values changes? Calculate each of the following separately. If you haven't already done so, you may wish to return to the code you wrote above and assign variables that you can change:
+
+1. Only 1% of men over 65 have prostate cancer, but the other values are the same as above
+2. The true positive rate for the PSA test is 95%, but the other values are the same as above
+3. The false positive rate is 1%, but the other values are the same as above
+
+```{r}
+
+```
+
+What is your interpretation of the factors that result in the condition, given a single positive test?
+
+> 
 
 ## Random Samples
 
@@ -75,7 +100,7 @@ R has a random number generator (actually a [pseudorandom number generator](http
 
 ### Activity
 
-Without setting the seed, generate two objects named AA and BB consisting of 5 numbers from the normal distribution with a mean of 0 and a standard deviation of 1 using  `rnorm()` and print AA and BB. Run this chunk more than once. Do you get the same answer each time? 
+Without setting the seed, generate two objects named AA and BB consisting of 5 numbers drawn from a normal distribution with a mean of 0 and a standard deviation of 1 using `rnorm()` and print AA and BB. Run this chunk more than once. Do you get the same answer each time?
 
 ```{r}
 
@@ -83,7 +108,7 @@ Without setting the seed, generate two objects named AA and BB consisting of 5 n
 
 > 
 
-Now, set the seed and do the same as above. Chose any number and place it in `set.seed()`. Run this chunk more than once. Do you get the same answer each time? Are AA and BB the same?
+Now, set the seed for the random number generator, and do the same as above. Chose any integer and place it in `set.seed()`. Run this chunk more than once. Do you get the same answer each time? Are AA and BB the same?
 
 ```{r}
 
@@ -93,39 +118,41 @@ Now, set the seed and do the same as above. Chose any number and place it in `se
 
 What would happen if you set the seed, generate AA, set the seed again with the same number and then generate BB? Try this.
 
-
 ```{r}
 
 ```
 
 > 
 
-One key feature for simulating randomness in R is the `sample()` function. Imagine you had a list of potential participants for a study (e.g., the list of likely voters in the U.S.). You could use `sample()` to choose a random set. Let's try this with a set of letters representing people and we will randomly assign each a sex by sampling `c('m','f')` with replacement.
+One key feature for simulating randomness in R is the `sample()` function. Imagine you had a list of potential participants for a study (e.g., the list of likely voters in the U.S.). You could use `sample()` to choose a random set. Let's try this with a set of letters representing people and we will randomly assign each to a group by sampling `c('Treatment','Control')` *with replacement*.
 
 Look at the help file for `sample()` and see what the arguments below mean.
 
-`tibble()` is a function that makes a structure that is like a `data.frame()` but does not create factors from strings by default. You can use it wherever you would normally use `data.frame()`.
-
 ```{r}
-set.seed(592777)
-pp_all <- tibble(id = letters[1:26],
-                 sex = sample(c('m', 'f'), 26, replace = TRUE))
 
 ```
 
 Try the following:
 
-1. Get a random sample of 5 elements from the `id` column without replacement
-2. Get a random sample of 5 ids with their associated sex (hint: sample the set of row indices [1 to 26] and take only those rows)
+1. Generate a random sample of 5 elements from the `id` column without replacement
+2. Select a random sample of 5 ids with their associated sex (hint: sample the set of row indices [1 to 26] and take only those rows). Look at the help for the tidyverse function`slice_sample()` and see if you can figure out how to sclice a random set of rows using a pipe.
 
-  
 ```{r}
 
 ```
 
-One final note on `set.seed()`. Typically, you just need to set the seed once at the top of your script to anchor the random number generator. However, any time you generate random numerics or sample, you should consider whether you need to set the seed.
+How would you use `slice_sample()` to randomly select 50% of the rows without first counting the number of rows?
+
+```{r}
+
+```
+
+One final note on `set.seed()`: typically, you just need to set the seed once at the top of your script to anchor the random number generator. However, any time you generate random numbers or sample, you should consider whether you need to set the seed.
+
 
 ## Distributions
+
+We want to give you some practice generating random numbers and plotting. These activities are critical to numerical simulation, which we will do off and on throughout the course.
 
 ### Activity
 
@@ -137,12 +164,13 @@ For each of the following, generate a set of values and plot a histogram. You ma
 4. 5 values from a normal distribution with a mean of 5 and a standard deviation of 5
 5. 100 values from a normal distribution with a mean of 5 and a standard deviation of 5
 6. 100000 values from a normal distribution with a mean of 5 and a standard deviation of 5
+7. 1000 values from a uniform distribution with a minimum of 0 and maximum of 100.
 
 ```{r}
 
 ```
 
-Now create a new plot consisting of a density plot for #3 and #6 above on a single plot. First create a single data frame with both sets and a column identifying each group.
+Create a density plot for #3 and #6 above on the same plot. First create a single data frame with both sets and a column identifying each group.
 
 ```{r}
 
@@ -160,12 +188,15 @@ Consider #3 and #6 from above. What proportion of values from each set are above
 
 ```
 
-Use `pnorm()` to calculate the probability of observing a value of 7 or greater for each distribution.
+The following code uses `pnorm()` to calculate the probability of observing a value of 7 or greater for each distribution.
 
 ```{r}
-
+pnorm(7, mean = 5, sd = 1, lower.tail = FALSE)
+pnorm(7, mean = 5, sd = 5, lower.tail = FALSE)
 ```
 
-Compare the values returned by `pnorm()` to those you calculated manually above.
+Compare the values returned by `pnorm()` to those you calculated manually above:
 
 > 
+
+Although `pnorm()` (and the other `p` functions) use equations to calculate probabilities, as n gets very large, the values will asymptotically approach simply summing up observations above or below some critical value.
