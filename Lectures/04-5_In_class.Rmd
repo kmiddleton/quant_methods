@@ -266,3 +266,44 @@ $$Pr[C|T] = \frac{Pr[T|C] \times Pr[C]}{Pr[T]}$$
 ```{r}
 (0.8 * 0.01) / ((0.8 * 0.01) + (0.1 * 0.99))
 ```
+
+
+## Breast cancer screening
+
+Approximately correct numbers:
+
+1. 1 in 100 women in the age range 40-50 have breast cancer
+2. 20% with cancer have a negative mammogram (false negative)
+3. 90% without cancer have a negative mammogram (true negative)
+
+What is the probability of a randomly sampled woman having breast cancer, given a negative test?
+
+## Breast cancer screening
+
+$$Pr[C|N] = \frac{False~Negatives}{False~Negatives + True~Negatives}$$
+
+$$Pr[C|N] = \frac{Pr[N|C] \times Pr[C]}{Pr[N]}$$
+
+## Breast cancer screening
+
+- 100 women
+- 1 has cancer, 99 do not
+- How many overall will get a negative test?
+
+With cancer: 1 * 0.2 = 0.2
+
+
+Without cancer: 99 * 0.9 = 89.1
+
+
+Total negative tests: 0.2 + 89.1 = 89.3
+
+Probability of having cancer, given negative test: 
+```{r}
+0.2/89.3
+```
+
+
+
+
+
