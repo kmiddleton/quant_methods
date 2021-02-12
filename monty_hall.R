@@ -1,3 +1,4 @@
+library(tidyverse)
 set.seed(43467)
 
 n_games <- 100
@@ -17,11 +18,11 @@ games <- tibble(
 for (ii in 1:n_games) {
   # Don't switch
   games$stay[ii] <- ifelse(games$prize[ii] == games$guess[ii], 1, 0)
-  
+
   # Switch
   g <- games$guess[ii]
   p <- games$prize[ii]
-  
+
   # If you guessed right, choose randomly one of the remaining doors
   # else choose the only other possible door
   open <- ifelse(g == p,
