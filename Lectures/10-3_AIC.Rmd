@@ -59,9 +59,9 @@ Hirotugu Akaike ("Ah-ka-ee-kay") [-@Akaike1974-iw]
 
 "An Information Criterion": AIC is proportional to the *relative* K-L information of a model:
 
-$$\mbox{AIC} = -2 \log\left(\mathcal{L}(\theta | \mbox{data})\right) + 2 k$$
+$$\mbox{AIC} = -2 \log\left(\mathcal{L}[\theta | \mbox{data}]\right) + 2 k$$
 
-where $\log\left(\mathcal{L}(\theta | \mbox{data})\right)$ is the maximized log-likelihood for the parameters $\theta$ given data.
+where $\log\left((\mathcal{L}[\theta | \mbox{data}]\right)$ is the maximized log-likelihood for the parameters $\theta$ given data.
 
 - $-2$ comes in "for historical reasons" having to do with the $\chi^2$ distribution.
 
@@ -97,7 +97,7 @@ AICc adapts AIC for small samples
 
 - AICc is asymptotic with AIC for large samples but less biased for small *n*
 
-$$\mbox{AICc} = -2 \log\left(\mathcal{L}(\theta | \mbox{data})\right) + 2 k + \frac{2k(k+1)}{n - k - 1}$$
+$$\mbox{AICc} = -2 \log\left(\mathcal{L}[\theta | \mbox{data}]\right) + 2 k + \frac{2k(k+1)}{n - k - 1}$$
 
 - Added "parameter" $\rightarrow$ 0 as $n \rightarrow \infty$
 - Use AICc except when n/k > ~40 (see Burnham and Anderson)
@@ -370,42 +370,6 @@ fm2 <- lme(Distance ~ Sex + Age, random = ~ Age | Subject,
 ```{r}
 aictab(list(fm1, fm2),
        modnames = c("1 | Subject", "Age | Subject"))
-```
-
-
-## PS 08 Zooplankton
-
-```{r message = FALSE, fig.height=3}
-M <- read_csv("../data/Zooplankton.csv") %>% 
-  mutate(Treatment = factor(Treatment),
-         Treatment = fct_relevel(Treatment,
-                                 "control", "low", "high"),
-         Block = factor(Block))
-M %>% 
-  ggplot(aes(x = Treatment, y = Zooplankton, color = Block)) +
-  geom_point()
-```
-
-
-## PS 08 Zooplankton
-
-Model without `Block`, assumes all block means are equal:
-
-```{r}
-fm <- lm(Zooplankton ~ Treatment, M)
-```
-
-Model with `Block`, allows each block to have its own mean:
-
-```{r}
-fm_hier <- lm(Zooplankton ~ Treatment + Block, M)
-```
-
-
-## PS 08 Zooplankton
-
-```{r}
-aictab(list(fm, fm_hier), modnames = c("Non-hierarchical", "Block"))
 ```
 
 

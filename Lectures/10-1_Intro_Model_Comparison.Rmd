@@ -43,17 +43,17 @@ Datasets
 
 - Leads to poor prediction
 
-**Overfitting**: Model is too accurate. Describes the sample *too well*.
+**Overfitting**: Model is too accurate. Describes the specific sample *too well*.
 
 - Leads to poor prediction
 
-We need to find a balance between *regular* and *irregular* features.
+We need to find a balance between *regular* features (what we want to model) and *irregular* features (noise we want to ignore).
 
 
 ## Why do we make models?
 
 - Estimates of the magnitudes of parameters and/or differences between parameter estimates, *and* their relative precision
-- Are the estimates large enough to be used for prediction?
+- Hypothesis testings, etc.
 
 No model represents the true biological process
 
@@ -61,7 +61,7 @@ No model represents the true biological process
 - Which model comes *closest* to the true biological process from a *(small) set of working hypotheses*?
 
 
-## Brain volume and (estimated) body mass in hominins
+## Brain volume and (estimated) body mass in hominins (*Homo*)
 
 ```{r echo=FALSE}
 Species <- c("afarensis", "africanus", "habilis", "boisei",
@@ -85,8 +85,7 @@ ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   geom_text_repel(size = 4, force = 15,
                   fontface = "italic",
                   box.padding = unit(0.5, "lines"),
-                  point.padding = unit(0.5, "lines"),
-                  arrow = arrow(length = unit(0.01, 'npc'))) +
+                  point.padding = unit(0.5, "lines")) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
@@ -117,7 +116,7 @@ summary(fm1)$r.squared
 ```{r echo=FALSE}
 ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
   geom_point(size = 3) +
-  geom_smooth(method = "lm", color = "red", lwd = 1.5) +
+  geom_smooth(formula = y ~ x, method = "lm", color = "red", lwd = 1.5) +
   labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
 ```
 
@@ -255,7 +254,7 @@ Model 6: Clearly overfit
 
 ## Tradeoff in model specification
 
-> "Overfitting: fitting is easy; prediction is hard. Future data will not be exactly like past data, and so any model that is unaware of this fact tends to make worse predictions than it could. So if we wish to make good predictions, we cannot judge our models simply on how well they fit our data. **Information criteria** provide estimates of predictive accuracy, rather than merely fit. So they compare models where it matters." [@McElreath2015-no]
+> "Overfitting: **fitting is easy; prediction is hard**. Future data will not be exactly like past data, and so any model that is unaware of this fact tends to make worse predictions than it could. So if we wish to make good predictions, we cannot judge our models simply on how well they fit our data. Information criteria provide estimates of predictive accuracy, rather than merely fit. So they compare models where it matters." [@McElreath2015-no]
 
 
 ## Methods for model comparison

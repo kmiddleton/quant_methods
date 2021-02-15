@@ -191,12 +191,13 @@ summary(fm5)
 
 Model  | *n* Estimated Parameters | log-Likelihood
 -------|------:|------:
-1 - Mean only                  | 1 | `r round(logLik(fm1), 3)`
-2 - ANOVA                      | 2 | `r round(logLik(fm2), 3)`
-3 - OLS regression             | 2 | `r round(logLik(fm3), 3)`
-4 - ANCOVA, intercept only     | 3 | `r round(logLik(fm4), 3)`
-5 - ANCOVA, slope & intercept  | 4 | `r round(logLik(fm5), 3)`
+1 - Mean only                  | 2 | `r round(logLik(fm1), 3)`
+2 - ANOVA                      | 3 | `r round(logLik(fm2), 3)`
+3 - OLS regression             | 4 | `r round(logLik(fm3), 3)`
+4 - ANCOVA, intercept only     | 5 | `r round(logLik(fm4), 3)`
+5 - ANCOVA, slope & intercept  | 6 | `r round(logLik(fm5), 3)`
 
+- All models also estimate standard deviation, so 1 more parameter than coefficients.
 
 ## Adding predictors *can't decrease* model likelihood
 
@@ -226,12 +227,12 @@ summary(fm6)
 
 Model  | *n* Parameters | log-Likelihood
 -------|------:|------:
-1 - Mean only                 | 1 | `r round(logLik(fm1), 3)`
-2 - ANOVA                     | 2 | `r round(logLik(fm2), 3)`
-3 - OLS regression            | 2 | `r round(logLik(fm3), 3)`
-4 - ANCOVA, intercept         | 3 | `r round(logLik(fm4), 3)`
-5 - ANCOVA, intercept, slope  | 4 | `r round(logLik(fm5), 3)`
-6 - ANCOVA, intercept, slope, Noise  | 5 | `r round(logLik(fm6), 3)`
+1 - Mean only                 | 2 | `r round(logLik(fm1), 3)`
+2 - ANOVA                     | 3 | `r round(logLik(fm2), 3)`
+3 - OLS regression            | 4 | `r round(logLik(fm3), 3)`
+4 - ANCOVA, intercept         | 5 | `r round(logLik(fm4), 3)`
+5 - ANCOVA, intercept, slope  | 6 | `r round(logLik(fm5), 3)`
+6 - ANCOVA, intercept, slope, Noise  | 7 | `r round(logLik(fm6), 3)`
 
 
 ## Comparing models
@@ -254,7 +255,7 @@ What one(s) has/have the best support?
     - Add or remove predictors
     - Add or remove interactions
     - **Outcome variable does not change**
-- 2 * $\Delta$log-Likelihood of the two models
+- $2 \times \Delta$log-Likelihood of the two models
 - Distributed as $\chi^2$ with *df* equal to difference in number of estimated parameters
     - 1 more predictor, 1 less *df*
 
