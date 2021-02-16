@@ -1,0 +1,120 @@
+---
+title: "Progress Check 1"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(cowplot)
+theme_set(theme_cowplot())
+```
+
+
+## `runif()` vs. `dunif()`
+
+> Could you explain the difference between runif and dunif? When generating values for PS_04 they do not return the same kind of distribution even though it seems like they should both return uniform distributions of values.
+
+## Probability mass
+
+```{r, echo=FALSE}
+tibble(y = 0:6,
+       d = dbinom(y, size = 6, prob = 0.5)) %>% 
+  ggplot(aes(y, d)) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(breaks = 0:6)+
+  labs(title = "Binomial(0:6, 6, 0.5)",
+       y = "Density",
+       x = "Successes")
+```
+
+
+## Probability density
+
+```{r, echo=FALSE}
+tibble(y = seq(-5, 5, length.out = 200),
+       d = dnorm(y)) %>% 
+  ggplot(aes(y, d)) +
+  geom_line() +
+  labs(title = "Standard Normal Distribution",
+       y = "Density")
+```
+
+
+## `runif()` vs. `dunif()`
+
+```{r}
+set.seed(2389749)
+
+runif(n = 10, min = 0, max = 1)
+```
+
+1,000,000 random numbers [0, 1]
+
+```{r}
+y <- tibble(y = runif(n = 1e6, min = 0, max = 1))
+```
+
+
+## `runif()` vs. `dunif()`
+
+```{r, echo=FALSE}
+ggplot(y, aes(y)) +
+  geom_histogram(bins = 20)
+```
+
+
+## `runif()` vs. `dunif()`
+
+```{r, echo=FALSE}
+ggplot(y, aes(y)) +
+  geom_density() +
+  labs(y = "Density")
+```
+
+
+## `runif()` vs. `dunif()`
+
+```{r}
+d <- tibble(
+  y = seq(0, 1, length.out = 200),
+  d = dunif(y, min = 0, max = 1))
+head(d)
+```
+
+
+## `runif()` vs. `dunif()`
+
+```{r, echo=FALSE}
+ggplot(d, aes(y, d)) +
+  geom_line() +
+  labs(title = "min = 0, max = 1",
+       y = "Density")
+```
+
+
+## `runif()` vs. `dunif()`
+
+```{r}
+d <- tibble(
+  y = seq(0, 10, length.out = 200),
+  d = dunif(y, min = 0, max = 10))
+```
+
+What is the density in the range $0 \rightarrow 10$?
+
+
+## `runif()` vs. `dunif()`
+
+```{r, echo=FALSE}
+ggplot(d, aes(y, d)) +
+  geom_line()  +
+  labs(title = "min = 0, max = 10",
+       y = "Density")
+```
