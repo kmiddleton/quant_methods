@@ -426,10 +426,12 @@ penguins <- penguins %>%
 penguins %>% select(species, species_alpha) %>% slice_sample(n = 10)
 ```
 
+
 ## Working with aesthetics
 
 ```{r, fig.height=4}
-ggplot(penguins, aes(body_mass_g, alpha = species_alpha)) +
+ggplot(penguins, aes(body_mass_g, fill = species,
+                     alpha = species_alpha)) +
   geom_density()
 ```
 
@@ -481,7 +483,7 @@ Below the critical temperature ($not~T_c$)
 - $Pr[Female] = 0.5$
 - $Pr[Male] = 0.5$
 
-## How to collect female eggs?
+## How to *preferentially* collect female eggs?
 
 You want to collect an egg from a nest and estimate what the temperature was in that nest when sex was determined.
 
@@ -589,10 +591,6 @@ $$Pr[T_c | Female] = \frac{0.8 \cdot 0.5}{0.65} = \frac{0.40}{0.65} = 0.62$$
 
 > Can you please again explain how sensitivity and specificity are different from the true positive and true negative? What do specificity and sensitivity help us during the analysis?
 
-<center>
-<img src="https://i.imgur.com/TdyYkUY.jpg" width="80%" />
-</center>
-
 
 ## Probability & Distributions
 
@@ -611,6 +609,20 @@ From: https://doi.org/10.3389/fpubh.2017.00307
 ## Probability & Distributions
 
 > Can you provide an example of an experiment that shows the uniform distribution? It's hard for me to think of an example.
+
+- Appropriate null hypothesis 
+    - Are plants evenly spaced in a plot or are they uneven?
+    - Are sizes evenly distributed across the range or is there evidence of size classes?
+- Prior for Bayesian inference
+- Handy for simulating data evenly in some range
+
+```{r, eval=FALSE}
+x <- runif(10, 0, 10)
+y <- x * 2 + rnorm(10, 0, 1)
+```
+
+
+## Probability & Distributions
 
 > Could you explain the difference between runif and dunif? When generating values for PS_04 they do not return the same kind of distribution even though it seems like they should both return uniform distributions of values.
 
@@ -724,9 +736,16 @@ ggplot(d, aes(y, d)) +
 
 > Is pnorm probability and proportions of a normal distribution exchangeable? Like, can you use either one? Since a lot of our statistics require normally distributed data, can we just use pnorm? Is that what a t-test compares the value against?
 
-```{r, echo=FALSE, fig.height=4}
-dd <- rnorm(1000)
+```{r, echo=FALSE, fig.height=3}
+dd <- rnorm(1e4)
 hist(dd)
+abline(v = -1, col = "red")
+```
+
+
+## Probability & Distributions 
+
+```{r, echo=TRUE, fig.height=2.5}
 pnorm(-1)
 length(which(dd <= -1))/length(dd)
 ```
