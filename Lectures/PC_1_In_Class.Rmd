@@ -438,9 +438,26 @@ ggplot(penguins, aes(body_mass_g, fill = species,
 
 ## Working with aesthetics
 
+```{r, fig.height=4, message=FALSE}
+library(ggridges)
+ggplot(penguins, aes(x = body_mass_g, y = species, fill = species)) +
+  geom_density_ridges(alpha = 0.5)
+```
+
+
+## Working with aesthetics
+
 ```{r, fig.height=4}
-ggplot(penguins, aes(bill_length_mm, bill_depth_mm, color = species,
-                     size = body_mass_g)) +
+ggplot(penguins, aes(body_mass_g, color = species, fill = species)) +
+  geom_histogram(bins = 30, alpha = 0.5)
+```
+
+
+## Working with aesthetics
+
+```{r, fig.height=4}
+ggplot(penguins, aes(log_bill_length, log_bill_depth, color = species,
+                     size = log_body_mass)) +
   geom_point()
 ```
 
