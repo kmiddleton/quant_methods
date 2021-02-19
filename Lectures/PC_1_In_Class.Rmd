@@ -315,7 +315,7 @@ str(penguins)
 - Means by species, sec, and island
 
 
-## Summarizing
+## Summarizing {.smaller}
 
 ```{r}
 penguins %>% 
@@ -324,7 +324,7 @@ penguins %>%
             mean_log_bill_length = mean(log_bill_length))
 ```
 
-## What happened?
+## What happened? {.smaller}
 
 - Some `sex` coded as `NA`
 
@@ -424,6 +424,13 @@ penguins <- penguins %>%
     species == "Gentoo" ~ 0.25
   ))
 penguins %>% select(species, species_alpha) %>% slice_sample(n = 10)
+```
+
+## Working with aesthetics
+
+```{r, fig.height=4}
+ggplot(penguins, aes(body_mass_g, alpha = species_alpha)) +
+  geom_density()
 ```
 
 
@@ -713,11 +720,11 @@ ggplot(d, aes(y, d)) +
 
 
 
-## Probability & Distributions
+## Probability & Distributions 
 
 > Is pnorm probability and proportions of a normal distribution exchangeable? Like, can you use either one? Since a lot of our statistics require normally distributed data, can we just use pnorm? Is that what a t-test compares the value against?
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height=4}
 dd <- rnorm(1000)
 hist(dd)
 pnorm(-1)
