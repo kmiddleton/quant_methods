@@ -186,7 +186,7 @@ slide:not(.current) .plotly.html-widget{
 <li>Probability &amp; Distributions</li>
 </ol>
 
-</article></slide><slide class=""><hgroup><h2>Learning R</h2></hgroup><article  class="smaller" id="learning-r">
+</article></slide><slide class=""><hgroup><h2>Learning R</h2></hgroup><article  id="learning-r" class="smaller">
 
 <blockquote>
 <p>How long should this reasonably take us if this class is one of our first experiences coding?</p>
@@ -200,10 +200,10 @@ slide:not(.current) .plotly.html-widget{
 <p>Are there any resources that provide additional R practice for complete beginners that you would recommend? I’d like to get better at knowing which codes to use when (from memory), and especially how to combine codes to perform more complex operations. Googling has been super helpful so far, but a lot of the time I don’t understand the answers I find so I wind up copy+pasting code without really knowing how it works. Thanks!</p>
 </blockquote>
 
-</article></slide><slide class=""><hgroup><h2>Learning R</h2></hgroup><article  class="smaller" id="learning-r-1">
+</article></slide><slide class=""><hgroup><h2>Learning R</h2></hgroup><article  id="learning-r-1" class="smaller">
 
 <blockquote>
-<p>&ldquo;Is there a resource that puts R&rdquo;&ldquo;language&rdquo;&quot; in simple terms? To elaborate, does a resource exist that allows you to study what words go to which functions? I have trouble forming code because I simply cannot put together functional language in R. I learn to use certain verbiage in some functions, but they dont work in others, or the language is recycled, but I have no way of knowing that. I do not find the &quot;&ldquo;?sample&rdquo;&quot; help to be helpful, in that, it puts the examples in code and not in plain language.</p>
+<p>Is there a resource that puts R language in simple terms? To elaborate, does a resource exist that allows you to study what words go to which functions? I have trouble forming code because I simply cannot put together functional language in R. I learn to use certain verbiage in some functions, but they dont work in others, or the language is recycled, but I have no way of knowing that. I do not find the ?sample help to be helpful, in that, it puts the examples in code and not in plain language.</p>
 </blockquote>
 
 <blockquote>
@@ -240,7 +240,7 @@ slide:not(.current) .plotly.html-widget{
 <p>How do you transfer the traceback of your edits to github? Or do you have to start on github in order to have everything be in sync? Hopefully this question makes sense… I am sure I am not wording it right.</p>
 </blockquote>
 
-</article></slide><slide class=""><hgroup><h2>Setting the Seed</h2></hgroup><article  class="smaller" id="setting-the-seed">
+</article></slide><slide class=""><hgroup><h2>Setting the Seed</h2></hgroup><article  id="setting-the-seed" class="smaller">
 
 <blockquote>
 <p>I was also wondering how set.seed() behaves when you have to use it multiple times consecutively. For example, say you set.seed(1) to then create a vector of random numbers (AA). Then if you want to create a second vector of random numbers (BB) - if you do not set.seed() again, will R automatically start at set.seed(2)? Or does it start with a very different random/haphazard number, like set.seed(4378)?</p>
@@ -250,7 +250,7 @@ slide:not(.current) .plotly.html-widget{
 <p>what is the basis of the set.seed() function that allows you to set the seed one time and assign several functions with random variables that give you different values (though consistent each time you run) but if you set the seed again before assigning each variable and you get identical values.</p>
 </blockquote>
 
-</article></slide><slide class=""><hgroup><h2>Setting the Seed</h2></hgroup><article  class="smaller" id="setting-the-seed-1">
+</article></slide><slide class=""><hgroup><h2>Setting the Seed</h2></hgroup><article  id="setting-the-seed-1" class="smaller">
 
 <ul>
 <li>Think of <code>set.seed()</code> as telling R - &ldquo;start the random number generator here&rdquo;</li>
@@ -339,7 +339,9 @@ head(penguins)</pre>
 </ul></li>
 </ul>
 
-<p><code>pivot_longer()</code>: wide \(\rightarrow\) long <code>pivot_wider()</code>: long \(\rightarrow\) wide</p>
+<p><code>pivot_longer()</code>: wide \(\rightarrow\) long</p>
+
+<p><code>pivot_wider()</code>: long \(\rightarrow\) wide</p>
 
 </article></slide><slide class=""><hgroup><h2>You want this plot</h2></hgroup><article  id="you-want-this-plot">
 
@@ -592,10 +594,10 @@ str(penguins)</pre>
 <ul>
 <li>Means by species</li>
 <li>Means by species and sex</li>
-<li>Means by species, sec, and island</li>
+<li>Means by species, sex, and island</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Summarizing</h2></hgroup><article  class="smaller" id="summarizing">
+</article></slide><slide class=""><hgroup><h2>Summarizing</h2></hgroup><article  id="summarizing" class="smaller">
 
 <pre class = 'prettyprint lang-r'>penguins %&gt;% 
   group_by(species, sex, island) %&gt;% 
@@ -622,7 +624,7 @@ str(penguins)</pre>
 ## 12 Gentoo    male   Biscoe             3.74                 1.69
 ## 13 Gentoo    &lt;NA&gt;   Biscoe            NA                   NA</pre>
 
-</article></slide><slide class=""><hgroup><h2>What happened?</h2></hgroup><article  class="smaller" id="what-happened-1">
+</article></slide><slide class=""><hgroup><h2>What happened?</h2></hgroup><article  id="what-happened-1" class="smaller">
 
 <ul>
 <li>Some <code>sex</code> coded as <code>NA</code></li>
@@ -873,7 +875,7 @@ ggplot(penguins, aes(x = body_mass_g, y = species, fill = species)) +
 
 <center>
 
-<img src="https://i.imgur.com/huMb2sb.jpg" width="50%" />
+<img src="https://i.imgur.com/ViEcXg3.jpg" width="50%" />
 
 </center>
 
@@ -914,7 +916,7 @@ ggplot(penguins, aes(x = body_mass_g, y = species, fill = species)) +
 
 <center>
 
-<img src="https://i.imgur.com/boKDICk.jpg" width="80%" />
+<img src="https://i.imgur.com/xJQzoB5.jpg" width="100%" />
 
 </center>
 

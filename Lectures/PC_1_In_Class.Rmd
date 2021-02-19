@@ -42,7 +42,7 @@ island_data <- tibble(
 
 ## Learning R {.smaller}
 
-> "Is there a resource that puts R ""language"" in simple terms? To elaborate, does a resource exist that allows you to study what words go to which functions? I have trouble forming code because I simply cannot put together functional language in R. I learn to use certain verbiage in some functions, but they dont work in others, or the language is recycled, but I have no way of knowing that. I do not find the ""?sample"" help to be helpful, in that, it puts the examples in code and not in plain language.
+> Is there a resource that puts R language in simple terms? To elaborate, does a resource exist that allows you to study what words go to which functions? I have trouble forming code because I simply cannot put together functional language in R. I learn to use certain verbiage in some functions, but they dont work in others, or the language is recycled, but I have no way of knowing that. I do not find the ?sample help to be helpful, in that, it puts the examples in code and not in plain language.
 
 > My question is about using help files in general. I know how to access help files (?mutate) but I have a hard time understanding how to use the help file. There are often a lot of components involved and I have a hard time making sense of the instructions/info within the help files.
 
@@ -135,7 +135,9 @@ island_data
     - Cell value becomes the value for that new variable
 
 `pivot_longer()`: wide $\rightarrow$ long
+
 `pivot_wider()`: long $\rightarrow$ wide
+
 
 ## You want this plot
 
@@ -152,6 +154,7 @@ ggplot(penguins_long, aes(x = body_mass_g, y = length, color = species)) +
   scale_colour_viridis_d() +
   facet_grid(bill_measure ~ sex, scales = "free_y")
 ```
+
 
 ## You need
 
@@ -312,7 +315,7 @@ str(penguins)
 
 - Means by species
 - Means by species and sex
-- Means by species, sec, and island
+- Means by species, sex, and island
 
 
 ## Summarizing {.smaller}
@@ -323,6 +326,7 @@ penguins %>%
   summarize(mean_log_mass = mean(log_body_mass),
             mean_log_bill_length = mean(log_bill_length))
 ```
+
 
 ## What happened? {.smaller}
 
@@ -500,6 +504,7 @@ Below the critical temperature ($not~T_c$)
 - $Pr[Female] = 0.5$
 - $Pr[Male] = 0.5$
 
+
 ## How to *preferentially* collect female eggs?
 
 You want to collect an egg from a nest and estimate what the temperature was in that nest when sex was determined.
@@ -556,7 +561,7 @@ There is equal probability that a nest is above $T_c$ or below.
 ## Conditional probability
 
 <center>
-<img src="https://i.imgur.com/huMb2sb.jpg" width="50%" />
+<img src="https://i.imgur.com/ViEcXg3.jpg" width="50%" />
 </center>
 
 $Pr[Female]$ is the sum of the two paths to Female.
@@ -600,7 +605,7 @@ $$Pr[T_c | Female] = \frac{0.8 \cdot 0.5}{0.65} = \frac{0.40}{0.65} = 0.62$$
 ## Bayes' rule
 
 <center>
-<img src="https://i.imgur.com/boKDICk.jpg" width="80%" />
+<img src="https://i.imgur.com/xJQzoB5.jpg" width="100%" />
 </center>
 
 
@@ -746,7 +751,6 @@ ggplot(d, aes(y, d)) +
 ## Probability & Distributions
 
 > In 04-4 Distributions, you talk about going from frequency to probability distribution, and how you have to normalize by something, by the number of events. Could you explain again what it means to normalize and how that makes a frequency distribution into a probability distribution? I just didn't fully follow. Thanks!
-
 
 
 ## Probability & Distributions 
