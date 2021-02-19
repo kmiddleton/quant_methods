@@ -17,6 +17,117 @@ theme_set(theme_cowplot())
 ```
 
 
+## Topics for Today
+
+1. Learning R: help, syntax, resources, time?
+2. Setting the seed
+3. Tidyverse functions
+4. Data Visualization
+5. Probability & Distributions
+
+## Learning R {.smaller}
+
+> How long should this reasonably take us if this class is one of our first experiences coding?
+
+> What is the best way to learn the syntax of R? I have noticed that there are sometimes ways of doing things that generate the same output, but it can be very confusing to practice or attempt to do our exercises because I'm not consistently using the "same" way of doing a task.
+
+> Are there any resources that provide additional R practice for complete beginners that you would recommend? I'd like to get better at knowing which codes to use when (from memory), and especially how to combine codes to perform more complex operations. Googling has been super helpful so far, but a lot of the time I don't understand the answers I find so I wind up copy+pasting code without really knowing how it works. Thanks!
+
+## Learning R {.smaller}
+
+> "Is there a resource that puts R ""language"" in simple terms? To elaborate, does a resource exist that allows you to study what words go to which functions? I have trouble forming code because I simply cannot put together functional language in R. I learn to use certain verbiage in some functions, but they dont work in others, or the language is recycled, but I have no way of knowing that. I do not find the ""?sample"" help to be helpful, in that, it puts the examples in code and not in plain language.
+
+> My question is about using help files in general. I know how to access help files (?mutate) but I have a hard time understanding how to use the help file. There are often a lot of components involved and I have a hard time making sense of the instructions/info within the help files.
+
+
+## Strategies for Learning R
+
+1. Time. Practice. 
+2. Using help files
+    - ?unique
+3. Tips
+    - Make your own Help folder 
+    - Develop a system for saving resources
+    - Write pseudocode & use comments
+    - Growth mindset
+3. Extra Resources
+    - For learning R & lots of other stuff (like Git)
+    
+## Quick Git Question
+
+> How do you transfer the traceback of your edits to github? Or do you have to start on github in order to have everything be in sync? Hopefully this question makes sense... I am sure I am not wording it right.
+
+## Setting the Seed {.smaller}
+
+> I was also wondering how set.seed() behaves when you have to use it multiple times consecutively. For example, say you set.seed(1) to then create a vector of random numbers (AA). Then if you want to create a second vector of random numbers (BB) - if you do not set.seed() again, will R automatically start at set.seed(2)? Or does it start with a very different random/haphazard number, like set.seed(4378)?
+
+> what is the basis of the set.seed() function that allows you to set the seed one time and assign several functions with random variables that give you different values (though consistent each time you run) but if you set the seed again before assigning each variable and you get identical values.
+
+
+## Setting the Seed {.smaller}
+
+- Think of `set.seed()` as telling R - "start the random number generator here"
+
+```{r}
+
+set.seed(624221)
+
+sample(letters, 5)
+sample(letters, 5)
+
+set.seed(624221)
+
+sample(letters, 5)
+
+```
+
+## Tidyverse: summarize & mutate
+
+> How exactly does summarize work? I feel like I've read the documentation a bunch but still don't exactly get what R is "actually" doing.
+
+> Is there a way to ungroup something once it is grouped?
+
+> Could we discuss mutate and paste? I can't find how to add the column the second way.
+
+## Tidyverse: joins & pivots
+
+> I don't have a specific question, but I think I could use more time going over joins. I think in particular, I don't fully understand how to handle a situation with duplicate keys or when there are not unique identifiers.
+
+> I am still having issue understanding well the pivot (long and short) function.
+
+> In what situations do you use pivot_longer and pivot_wider?
+
+## Data Visualizations
+
+> So I think I understand how to apply log scale to plots well enough (or at least can refer to the notes to remind myself how to do it), but I think if I were putting this into practice for myself, I would not always understand when it is appropriate to do that. Based on what we have learned, it seems best to use if when you are trying to fit a linear model to things that are exponentially correlated? Is that correct? What are the reasons it is good to fit exponential correlations into linear models?
+
+> One thing that I tried to do in ggplot (for the density plots in problem set 04) is to set an alpha for each distribution, but I was having a hard time trying to get R to do so, even after consulting the tidyverse website. I coded 'alpha = 0.5' but I think it gave transparency to both density curves rather than just the one in front. Is there a way to assign alpha according to a factor/categorical variable? I also tried alpha = c(1, 0.5) but kept getting errors with that.
+
+## Data Visualizations
+
+> Suppose you have a data set that measured the length, width, and height of various boxes. How would you construct a boxplot with bins for these values where each L, W, and H are sorted into the same bins as different colors? Would you use colors inside of aes?
+
+## Probability & Distributions
+
+> Can we review Baye's Rule? I am confused about the variables in the equation and how to determine what goes where.
+
+> Could we please go over some more examples of using Bayes Theorem aside from medical testing? I understand how to use the formula, but still am having trouble understanding/ interpreting what it means. 
+> Can you please again explain how sensitivity and specificity are different from the true positive and true negative? What do specificity and sensitivity help us during the analysis?
+
+## Probability & Distributions
+
+> In 04-4 Distributions, you talk about going from frequency to probability distribution, and how you have to normalize by something, by the number of events. Could you explain again what it means to normalize and how that makes a frequency distribution into a probability distribution? I just didn't fully follow. Thanks!
+
+> Is pnorm probability and proportions of a normal distribution exchangeable? Like, can you use either one? Since a lot of our statistics require normally distributed data, can we just use pnorm? Is that what a t-test compares the value against?
+
+
+## Probability & Distributions
+
+> Could you explain the difference between runif and dunif? When generating values for PS_04 they do not return the same kind of distribution even though it seems like they should both return uniform distributions of values.
+
+> Can you provide an example of an experiment that shows the uniform distribution? It's hard for me to think of an example.
+
+
 ## `runif()` vs. `dunif()`
 
 > Could you explain the difference between runif and dunif? When generating values for PS_04 they do not return the same kind of distribution even though it seems like they should both return uniform distributions of values.
