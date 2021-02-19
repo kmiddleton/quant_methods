@@ -14,6 +14,13 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
+
+library(palmerpenguins)
+island_data <- tibble(
+  island = as.character(levels(penguins$island)),
+  latitude = c(-64.766667, -65.433333, -64.733333),
+  longitude = c( -64.083333, -65.5, -64.233333)
+)
 ```
 
 
@@ -52,10 +59,12 @@ theme_set(theme_cowplot())
     - Growth mindset
 3. Extra Resources
     - For learning R & lots of other stuff (like Git)
-    
+
+
 ## Quick Git Question
 
 > How do you transfer the traceback of your edits to github? Or do you have to start on github in order to have everything be in sync? Hopefully this question makes sense... I am sure I am not wording it right.
+
 
 ## Setting the Seed {.smaller}
 
@@ -78,16 +87,8 @@ sample(letters, 5)
 set.seed(624221)
 
 sample(letters, 5)
-
 ```
 
-## Tidyverse: summarize & mutate
-
-> How exactly does summarize work? I feel like I've read the documentation a bunch but still don't exactly get what R is "actually" doing.
-
-> Is there a way to ungroup something once it is grouped?
-
-> Could we discuss mutate and paste? I can't find how to add the column the second way.
 
 ## Tidyverse: joins & pivots
 
@@ -97,40 +98,515 @@ sample(letters, 5)
 
 > In what situations do you use pivot_longer and pivot_wider?
 
+
+## Pivots
+
+Shape of your data:
+
+- Wide: rows have multiple columns with values
+- Long: rows have 1 column with values
+
+
+## Wide data
+
+Most common for data entry:
+
+```{r}
+library(palmerpenguins)
+head(penguins)
+```
+
+Each row is a logical unit (e.g., sample, individual)
+
+
+## Wide data
+
+```{r}
+island_data
+```
+
+
+## Long data
+
+- Truly "tidy"
+- Usually impractical for data entry (lot of repeated values)
+- Often useful for plotting
+    - Column name becomes a value for a new variable
+    - Cell value becomes the value for that new variable
+
+`pivot_longer()`: wide $\rightarrow$ long
+`pivot_wider()`: long $\rightarrow$ wide
+
+## You want this plot
+
+```{r, echo=FALSE}
+penguins_long <- penguins %>%
+  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) %>% 
+  pivot_longer(cols = -c(species, sex, body_mass_g),
+               names_to = "bill_measure",
+               values_to = "length") %>% 
+  drop_na()
+
+ggplot(penguins_long, aes(x = body_mass_g, y = length, color = species)) +
+  geom_point(size = 3) +
+  scale_colour_viridis_d() +
+  facet_grid(bill_measure ~ sex, scales = "free_y")
+```
+
+## You need
+
+- `species`
+- `sex`
+- `body_mass_g`
+- `bill_length_mm`
+- `bill_depth_mm`
+
+Turn `bill_length_mm` and `bill_depth_mm` into a new column "bill_measure" and values to a column called "length"
+
+
+## `pivot_longer()`
+
+```{r}
+penguins_long <- penguins %>%
+  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) %>% 
+  pivot_longer(cols = c(bill_length_mm, bill_depth_mm),
+               names_to = "bill_measure",
+               values_to = "length") %>% 
+  drop_na()
+```
+
+or
+
+```{r}
+penguins_long <- penguins %>%
+  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) %>% 
+  pivot_longer(cols = -c(species, sex, body_mass_g),
+               names_to = "bill_measure",
+               values_to = "length") %>% 
+  drop_na()
+```
+
+
+## Long data
+
+```{r}
+penguins_long
+```
+
+
+## Plot
+
+```{r, eval=FALSE}
+ggplot(penguins_long, aes(x = body_mass_g, y = length, color = species)) +
+  geom_point(size = 3) +
+  scale_colour_viridis_d() +
+  facet_grid(bill_measure ~ sex, scales = "free_y")
+```
+
+
+## Plot
+
+```{r, eval=TRUE, fig.height=4}
+ggplot(penguins_long, aes(x = body_mass_g, y = length, color = species)) +
+  geom_point(size = 3) +
+  scale_colour_viridis_d() +
+  facet_grid(bill_measure ~ sex, scales = "free_y")
+```
+
+
+## Edit values
+
+```{r}
+penguins_long <- penguins_long %>% 
+  mutate(bill_measure = str_remove(bill_measure, "_mm"),
+         bill_measure = str_remove(bill_measure, "bill_"))
+
+head(penguins_long)
+```
+
+
+## `pivot_wider()`
+
+Be careful:
+
+```{r}
+penguins_long %>% 
+  pivot_wider(id_cols = c(species, sex, body_mass_g),
+              names_from = bill_measure, values_from = length)
+```
+
+
+## What happened?
+
+`species`, `sex`, and `body_mass_g` don't uniquely identify new rows
+
+```{r}
+penguins_long %>% 
+  group_by(species, sex, body_mass_g) %>% 
+  tally()
+```
+
+
+## Joining
+
+You also have data about the islands:
+
+```{r}
+island_data
+```
+
+
+## Which way to join?
+
+1. penguin data into island data
+2. island data into penguin data
+
+
+## Keys
+
+```{r}
+intersect(colnames(penguins), colnames(island_data))
+```
+
+
+## `left_join()`
+
+```{r}
+left_join(penguins, island_data)
+```
+
+
+## Tidyverse: summarize & mutate
+
+> How exactly does summarize work? I feel like I've read the documentation a bunch but still don't exactly get what R is "actually" doing.
+
+> Is there a way to ungroup something once it is grouped?
+
+> Could we discuss mutate and paste? I can't find how to add the column the second way.
+
+
+## Making new variables
+
+```{r}
+penguins <- penguins %>% 
+  mutate(log_bill_length = log10(bill_length_mm),
+         log_bill_depth = log10(bill_depth_mm))
+
+str(penguins)
+```
+
+## Making new variables
+
+```{r}
+penguins$log_body_mass <- log10(penguins$body_mass_g)
+
+str(penguins)
+```
+
+
+## `group_by()` and `summarize()`
+
+1. Split the data into some set of subgroups
+2. Apply some function(s) to create new variable(s)
+3. Recombine the sets
+
+- Means by species
+- Means by species and sex
+- Means by species, sec, and island
+
+
+## Summarizing
+
+```{r}
+penguins %>% 
+  group_by(species, sex, island) %>% 
+  summarize(mean_log_mass = mean(log_body_mass),
+            mean_log_bill_length = mean(log_bill_length))
+```
+
+## What happened?
+
+- Some `sex` coded as `NA`
+
+```{r}
+penguins %>% 
+  drop_na(sex) %>% 
+  group_by(species, sex, island) %>% 
+  summarize(mean_log_mass = mean(log_body_mass),
+            mean_log_bill_length = mean(log_bill_length))
+```
+
+
+## Ungrouping grouped data
+
+```{r}
+penguins %>% 
+  drop_na(sex) %>% 
+  group_by(species, sex, island) %>% 
+  summarize(mean_log_mass = mean(log_body_mass),
+            mean_log_bill_length = mean(log_bill_length),
+            .groups = "drop")
+```
+
+Also explicit `ungroup()` function.
+
+
 ## Data Visualizations
 
 > So I think I understand how to apply log scale to plots well enough (or at least can refer to the notes to remind myself how to do it), but I think if I were putting this into practice for myself, I would not always understand when it is appropriate to do that. Based on what we have learned, it seems best to use if when you are trying to fit a linear model to things that are exponentially correlated? Is that correct? What are the reasons it is good to fit exponential correlations into linear models?
 
 > One thing that I tried to do in ggplot (for the density plots in problem set 04) is to set an alpha for each distribution, but I was having a hard time trying to get R to do so, even after consulting the tidyverse website. I coded 'alpha = 0.5' but I think it gave transparency to both density curves rather than just the one in front. Is there a way to assign alpha according to a factor/categorical variable? I also tried alpha = c(1, 0.5) but kept getting errors with that.
 
-## Data Visualizations
 
-> Suppose you have a data set that measured the length, width, and height of various boxes. How would you construct a boxplot with bins for these values where each L, W, and H are sorted into the same bins as different colors? Would you use colors inside of aes?
+## log-log plots
+
+```{r, echo=FALSE, warning=FALSE}
+p1 <- ggplot(penguins, aes(body_mass_g, bill_length_mm)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10()
+
+p2 <- ggplot(penguins, aes(log_body_mass, log_bill_length)) +
+  geom_point()
+
+plot_grid(p1, p2, ncol = 2)
+```
+
+
+## log-log plots
+
+```{r, echo=FALSE, warning=FALSE}
+set.seed(8538476)
+D <- tibble(x = runif(100, 1, 1e3),
+            y = x ^ 3)
+p1 <- ggplot(D, aes(x, y)) +
+  geom_point(size = 2) +
+  geom_smooth(formula = y ~ x, se = FALSE, method = "lm")
+
+p2 <- ggplot(D, aes(x, y)) +
+  geom_point(size = 2) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_smooth(formula = y ~ x, se = FALSE, method = "lm")
+
+plot_grid(p1, p2, ncol = 2)
+```
+
+
+## Working with aesthetics
+
+```{r, echo=FALSE}
+penguins <- penguins %>% 
+  drop_na(body_mass_g)
+```
+
+```{r, fig.height=4}
+ggplot(penguins, aes(body_mass_g, fill = species)) +
+  geom_density()
+```
+
+
+## Working with aesthetics
+
+```{r, fig.height=4}
+ggplot(penguins, aes(body_mass_g, fill = species)) +
+  geom_density(alpha = 0.5)
+```
+
+
+## Working with aesthetics
+
+```{r, fig.height=4}
+penguins <- penguins %>% 
+  mutate(species_alpha = case_when(
+    species == "Adelie" ~ 1,
+    species == "Chinstrap" ~ 0.5,
+    species == "Gentoo" ~ 0.25
+  ))
+penguins %>% select(species, species_alpha) %>% slice_sample(n = 10)
+```
+
+
+## Working with aesthetics
+
+```{r, fig.height=4}
+ggplot(penguins, aes(bill_length_mm, bill_depth_mm, color = species,
+                     size = body_mass_g)) +
+  geom_point()
+```
+
+
+## Working with aesthetics
+
+- color
+- shape
+- size
+- linetype
+- fill
+- alpha
+- text parameters
+
+All are context-specific
+
 
 ## Probability & Distributions
 
-> Can we review Baye's Rule? I am confused about the variables in the equation and how to determine what goes where.
+> Can we review Bayes' Rule? I am confused about the variables in the equation and how to determine what goes where.
 
-> Could we please go over some more examples of using Bayes Theorem aside from medical testing? I understand how to use the formula, but still am having trouble understanding/ interpreting what it means. 
+> Could we please go over some more examples of using Bayes Theorem aside from medical testing? I understand how to use the formula, but still am having trouble understanding/ interpreting what it means.
+
+## Temperature dependent sex determination
+
+<center>
+<img src="https://i.imgur.com/GBXvrf9.jpg" width="70%" />
+</center>
+
+
+## Temperature dependent sex determination
+
+Above the critical temperature ($T_c$)
+
+- $Pr[Female] = 0.8$
+- $Pr[Male] = 0.2$
+
+Below the critical temperature ($not~T_c$)
+
+- $Pr[Female] = 0.5$
+- $Pr[Male] = 0.5$
+
+## How to collect female eggs?
+
+You want to collect an egg from a nest and estimate what the temperature was in that nest when sex was determined.
+
+- You want to preferentially collect from nests with large numbers of females
+- The temperature now is not necessarily what it was (so you can't use a thermometer)
+
+What is the probability that the nest was above $T_c$, given that you have collected a female egg?
+
+
+## Variables
+
+- $Pr[Female | T_c] = 0.8$
+- $Pr[Female | not~T_c] = 0.5$
+
+
+## Bayes' rule
+
+$$Pr[A | B] = \frac{Pr[B | A] \cdot Pr[A]}{Pr[B]}$$
+
+We want: *probability of $T_c$ given that we have observed a $Female$*
+
+$$Pr[T_c | Female]$$
+
+So:
+
+- $A$ is $T_c$
+- $B$ is $Female$
+
+
+## Bayes' rule
+
+$$Pr[T_c | Female] = \frac{Pr[Female | T_c] \cdot Pr[T_c]}{Pr[Female]}$$
+
+We have:
+
+- $Pr[Female | T_c] = 0.8$
+
+We need:
+
+- $Pr[T_c]$
+- $Pr[Female]$
+
+
+## Good distribution for $Pr[T_c]$?
+
+Without any additional information about the distribution of $T_c$ among nests:
+
+$$Pr[T_c] = 0.5$$
+
+There is equal probability that a nest is above $T_c$ or below.
+
+
+## Conditional probability
+
+<center>
+<img src="https://i.imgur.com/huMb2sb.jpg" width="50%" />
+</center>
+
+$Pr[Female]$ is the sum of the two paths to Female.
+
+
+## Bayes' rule
+
+$$Pr[T_c | Female] = \frac{Pr[Female | T_c] \cdot Pr[T_c]}{Pr[Female]}$$
+
+We have:
+
+- $Pr[Female | T_c] = 0.8$
+- $Pr[T_c] = 0.5$
+
+We need:
+
+$$Pr[Female] = Pr[Female | T_c] \cdot Pr[T_c] + $$
+$$Pr[Female | not~ T_c] \cdot Pr[not~T_c]$$
+
+
+## Bayes' rule
+
+We need:
+
+$$Pr[Female] = Pr[Female | T_c] \cdot Pr[T_c] + $$
+$$Pr[Female | not~ T_c] \cdot Pr[not~T_c]$$
+
+So:
+
+$$Pr[Female] = 0.8 \cdot 0.5 + 0.5 \cdot 0.5$$
+$$= 0.4 + 0.25$$
+$$= 0.65$$
+
+## Bayes' rule
+
+$$Pr[T_c | Female] = \frac{Pr[Female | T_c] \cdot Pr[T_c]}{Pr[Female]}$$
+
+$$Pr[T_c | Female] = \frac{0.8 \cdot 0.5}{0.65} = \frac{0.40}{0.65} = 0.62$$
+
+
+## Bayes' rule
+
+<center>
+<img src="https://i.imgur.com/boKDICk.jpg" width="80%" />
+</center>
+
+
+## Probability & Distributions
+
 > Can you please again explain how sensitivity and specificity are different from the true positive and true negative? What do specificity and sensitivity help us during the analysis?
 
-## Probability & Distributions
-
-> In 04-4 Distributions, you talk about going from frequency to probability distribution, and how you have to normalize by something, by the number of events. Could you explain again what it means to normalize and how that makes a frequency distribution into a probability distribution? I just didn't fully follow. Thanks!
-
-> Is pnorm probability and proportions of a normal distribution exchangeable? Like, can you use either one? Since a lot of our statistics require normally distributed data, can we just use pnorm? Is that what a t-test compares the value against?
+<center>
+<img src="https://i.imgur.com/TdyYkUY.jpg" width="80%" />
+</center>
 
 
 ## Probability & Distributions
 
-> Could you explain the difference between runif and dunif? When generating values for PS_04 they do not return the same kind of distribution even though it seems like they should both return uniform distributions of values.
+<center>
+<img src="https://i.imgur.com/TdyYkUY.jpg" width="60%" />
+</center>
+
+- Sensitivity = [a/(a+c)] × 100
+- Specificity = [d/(b+d)] × 100
+- Positive predictive value(PPV) = [a/(a+b)] × 100
+- Negative predictive value(NPV) = [d/(c+d)] × 100.
+
+From: https://doi.org/10.3389/fpubh.2017.00307
+
+
+## Probability & Distributions
 
 > Can you provide an example of an experiment that shows the uniform distribution? It's hard for me to think of an example.
 
-
-## `runif()` vs. `dunif()`
-
 > Could you explain the difference between runif and dunif? When generating values for PS_04 they do not return the same kind of distribution even though it seems like they should both return uniform distributions of values.
+
 
 ## Probability mass
 
@@ -229,3 +705,25 @@ ggplot(d, aes(y, d)) +
   labs(title = "min = 0, max = 10",
        y = "Density")
 ```
+
+
+## Probability & Distributions
+
+> In 04-4 Distributions, you talk about going from frequency to probability distribution, and how you have to normalize by something, by the number of events. Could you explain again what it means to normalize and how that makes a frequency distribution into a probability distribution? I just didn't fully follow. Thanks!
+
+
+
+## Probability & Distributions
+
+> Is pnorm probability and proportions of a normal distribution exchangeable? Like, can you use either one? Since a lot of our statistics require normally distributed data, can we just use pnorm? Is that what a t-test compares the value against?
+
+```{r, echo=FALSE}
+dd <- rnorm(1000)
+hist(dd)
+pnorm(-1)
+length(which(dd <= -1))/length(dd)
+```
+
+> Is this what a t-test does? 
+
+Close. Stay tuned.
