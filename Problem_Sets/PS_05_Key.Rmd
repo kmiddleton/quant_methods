@@ -14,11 +14,13 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
+
 
 ## Flow control: for loops 1
 
-For loops are one of the main methods for iterating through R objects (vectors, data.frames, etc.).^[do ... while constructions are much less common]. Study and run the following code:
+For loops are one of the main methods for iterating through R objects (vectors, tibble, data.frames, etc.).^[do ... while constructions are much less common]. Study and run the following code:
 
 ```{r}
 for (ii in 1:10) {
@@ -30,12 +32,13 @@ There are a few things to look at here:
 
 - The `for ()` part of the statement set up what will be iterated through (the sequence 1 to 10). At each iteration `ii` takes the next value and can be used within in the loop.
 - `ii` is a better choice of iterator name than `i`, because it is easier to search for later. Imagine trying to find `i` in your code.
-- `cat()` is a function ("concatenate") that you can use to print output to the screen. The statement here tells R to print each value of `ii` followed by a new line (`"\n"`).
+- `cat()` is a function ("concatenate and print") that you can use to print output to the screen. The statement here tells R to print each value of `ii` followed by a new line (`"\n"`).
 - Until you get comfortable with for loops, it's often useful to print out the values of the iterator and/or other critical data with each iteration so that you are certain of their values.
+- You can also use the function `message()` to print out counters. Try changing the code above to `message(ii)` and see how the output differs.
 
 ### Activity
 
-Write you own for loop, choosing a new variable name for the iterator, which will start at 50 and end at 60. Within the loop, print the value of the iterator and add 10.
+Write you own for loop, choosing a new variable name for the iterator, which will start at 50 and end at 60. Within the loop, print the value of the iterator plus 10.
 
 ```{r}
 # FIXME
@@ -45,6 +48,7 @@ for (jj in 50:60) {
 ```
 
 Your output should be the sequence 60 to 70.
+
 
 ## Flow control: for loops 2
 
@@ -70,6 +74,7 @@ for (ij in myvector) {
 Repeat the same loop, but iterate from 1 to the `length()` of `myvector`. Inside the loop, extract the element of `myvector` that corresponds to the value of the iterator. This construction, where the first line inside the loop extracts a value from the iterator, is much more common, because more often than not, you will need the value of the iterator later in the loop.
 
 ```{r}
+# FIXME
 for (ji in 1:length(myvector)) {
   x <- myvector[ji] ^ 2
   cat(ji, "\t", x, "\n")
@@ -93,7 +98,7 @@ add_10 <- function(x) {
 
 There are a few things to note here:
 
-- Anything within the `()` after `function` are arguments that are passed to the function. In this function, we require an argument `x`. There are mechanisms for allowing optional arguments and specifying default values. You can read about them one (see the R programming resources on Canvas).
+- Anything within the `()` after `function` are arguments that are passed to the function. In this function, we require an argument `x`. There are mechanisms for allowing optional arguments and specifying default values. You can read about them online (see the R programming resources on Canvas).
 - The variable `y` exists inside the function only. It does not move outside the function, until you explicitly say so: `return(y)`.
 - We haven't done any kind of checking to see whether the argument `x` can be added to. If we pass a character vector as `x`, we will get an error. `non-numeric argument to binary operator`. Down the road, you might consider checking the incoming argument(s).
 
@@ -131,9 +136,10 @@ mult(10:15, 3.4)
 mult(1:3, 5:10) # Think about what is going on here
 ```
 
+
 ## Sometimes I think George is not being completely honest with me
 
-You and your friend George go to dinner once a week. You agreed that you would flip George's "lucky" coin to decide who gets to choose the restaurant. Being superstitious, you always pick heads
+You and your friend George go to dinner once a week. You agreed that you would flip George's "lucky" coin to decide who gets to choose the restaurant. Being superstitious, you always pick heads.
 
 After losing several times in a row, you start to get suspicious and begin keeping track. You find that after 20 weeks, you have only chosen the restaurant 5 times.
 
@@ -198,7 +204,7 @@ What is you interpretation of the Bayes Factor for the MLE vs. the null probabil
 
 > BF = 13.7, so this is strong evidence that the coin is *not* fair.
 
-What is the probability of observing these data or anything more extreme (fewer heads)?
+What is the probability of observing these data or anything more extreme (fewer heads) if the probability of heads is 0.5?
 
 ```{r}
 # FIXME
@@ -215,4 +221,4 @@ sum(dbinom(0:7, 22, 0.5))
 
 What do you conclude about the coin now?
 
-> The evidence is not as strong that it is unfair.
+> The evidence is not as strong that it is unfair. But this outcome is still pretty unlikely.
