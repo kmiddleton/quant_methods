@@ -159,6 +159,7 @@ M_long <- M %>%
   group_by(population, id) %>% 
   summarize(max_height = max(value)) %>% 
   drop_na()
+#check that max drops NAs
 
 ggplot(M_long, aes(max_height, fill = population)) +
   geom_density(alpha = 0.25) +
