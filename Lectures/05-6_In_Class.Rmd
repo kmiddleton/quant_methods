@@ -29,6 +29,11 @@ theme_set(theme_cowplot())
 
 > When discussing prior knowledge related to Bayesian methods; is that the same as things like genomic selection where a Genomic Breeding Value is assigned based on training data sets to inform a model on how to handle the experimental data sets?
 
+
+## `read_excel()`
+
+> When I try to knit my code it does not want to complete a read_excel() command? Is this something I need to update? I worked around by making the excel file a .csv for now.
+
 ## Themes
 
 - Loops and functions
