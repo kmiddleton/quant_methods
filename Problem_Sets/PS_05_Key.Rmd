@@ -268,7 +268,7 @@ ggplot() +
 
 ## Sometimes I think George is not being completely honest with me
 
-You and your friend George go to dinner once a week. You agreed that you would flip George's "lucky" coin to decide who gets to choose the restaur.ant. Being superstitious, you always pick heads.
+You and your friend George go to dinner once a week. You agreed that you would flip George's "lucky" coin to decide who gets to choose the restaurant. Being superstitious, you always pick heads.
 
 After losing several times in a row, you start to get suspicious and begin keeping track. You find that after 20 weeks, you have only chosen the restaurant 5 times.
 
