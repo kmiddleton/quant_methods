@@ -25,7 +25,7 @@ Datasets
 
 ## Flow control: for loops, part 1
 
-For loops are one of the main methods for iterating through R objects (vectors, tibble, data.frames, etc.).^[`do ... while` constructions are much less common. In the long run, it's worth learning the `map_` family functions from tidyverse, because they allow you to efficiently do many of the same things, but their use is not at all straightforward until you have a good handle on writing your own functions.]. Study and run the following code:
+For loops are one of the main methods for iterating through R objects (vectors, tibbles, data.frames, etc.).^[`do ... while` constructions are much less common. In the long run, it's worth learning the `map_` family functions from tidyverse, because they allow you to efficiently do many of the same things, but their use is not at all straightforward until you have a good handle on writing your own functions.]. Study and run the following code:
 
 ```{r}
 for (ii in 1:10) {

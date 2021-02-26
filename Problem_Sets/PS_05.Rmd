@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 04'
+title: 'Problem Set 05'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -11,14 +11,13 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-library(tidyverse)
-library(readxl)
-library(cowplot)
+
 ```
 
-## Flow control: for loops 1
 
-For loops are one of the main methods for iterating through R objects (vectors, data.frames, etc.).^[do ... while constructions are much less common]. Study and run the following code:
+## Flow control: for loops, part 1
+
+For loops are one of the main methods for iterating through R objects (vectors, tibbles, data.frames, etc.).^[`do ... while` constructions are much less common. In the long run, it's worth learning the `map_` family functions from tidyverse, because they allow you to efficiently do many of the same things, but their use is not at all straightforward until you have a good handle on writing your own functions.]. Study and run the following code:
 
 ```{r}
 for (ii in 1:10) {
@@ -30,12 +29,13 @@ There are a few things to look at here:
 
 - The `for ()` part of the statement set up what will be iterated through (the sequence 1 to 10). At each iteration `ii` takes the next value and can be used within in the loop.
 - `ii` is a better choice of iterator name than `i`, because it is easier to search for later. Imagine trying to find `i` in your code.
-- `cat()` is a function ("concatenate") that you can use to print output to the screen. The statement here tells R to print each value of `ii` followed by a new line (`"\n"`).
+- `cat()` is a function ("concatenate and print") that you can use to print output to the screen. The statement here tells R to print each value of `ii` followed by a new line (`"\n"`).
 - Until you get comfortable with for loops, it's often useful to print out the values of the iterator and/or other critical data with each iteration so that you are certain of their values.
+- You can also use the function `message()` to print out counters. Try changing the code above to `message(ii)` and see how the output differs.
 
 ### Activity
 
-Write you own for loop, choosing a new variable name for the iterator, which will start at 50 and end at 60. Within the loop, print the value of the iterator and add 10.
+Write you own for loop, choosing a new variable name for the iterator, which will start at 50 and end at 60. Within the loop, print the value of the iterator plus 10.
 
 ```{r}
 
@@ -43,31 +43,32 @@ Write you own for loop, choosing a new variable name for the iterator, which wil
 
 Your output should be the sequence 60 to 70.
 
-## Flow control: for loops 2
 
-A common way to work with for loops is to iterate through a pre-existing R object. The for loop will take on the values starting with the first value and iterating through to the last value of the object. So far, we have used sequence by 1, but you can iterate through the values of a vector. Here you will just pass the vector name: `for (ii in myvector)`.
+## Flow control: for loops, part 2
+
+A common way to work with for loops is to iterate through a pre-existing R object. The for loop will take on the values starting with the first value and iterating through to the last value of the object. So far, we have used sequence by 1, but you can iterate through the values of a vector. Here you will just pass the vector name: `for (ii in odds)`.
 
 ### Activity
 
-Create a vector (`myvector`) that contains the sequence of the odd numbers 1 through 21.
+Create a vector (`odds`) that contains the sequence of the odd numbers 1 through 21.
 
 ```{r}
 
 ```
 
-Iterate through `myvector`, printing out the value of the iterator and the square of the iterator. Separate the values inside `cat()` with a tab (`"\t"`).
+Iterate through `odds`, printing out the value of the iterator and the square of the iterator. Separate the values inside `cat()` with a tab (`"\t"`).
 
 ```{r}
 
 ```
 
-Repeat the same loop, but iterate from 1 to the `length()` of `myvector`. Inside the loop, extract the element of `myvector` that corresponds to the value of the iterator. This construction, where the first line inside the loop extracts a value from the iterator, is much more common, because more often than not, you will need the value of the iterator later in the loop.
+Repeat the same loop, but iterate from 1 to the `length()` of `odds`. Inside the loop, extract the element of `odds` that corresponds to the value of the iterator. This construction, where the first line inside the loop extracts a value from the iterator, is much more common, because more often than not, you will need the value of the iterator later in the loop.
 
 ```{r}
 
 ```
 
-Notice here that the value of the iterator goes from 1 to 11 (the length of `myvector`).
+Notice here that the value of the iterator goes from 1 to 11 (the length of `odds`).
 
 ## Functions
 
@@ -84,7 +85,7 @@ add_10 <- function(x) {
 
 There are a few things to note here:
 
-- Anything within the `()` after `function` are arguments that are passed to the function. In this function, we require an argument `x`. There are mechanisms for allowing optional arguments and specifying default values. You can read about them one (see the R programming resources on Canvas).
+- Anything within the `()` after `function` are arguments that are passed to the function. In this function, we require an argument `x`. There are mechanisms for allowing optional arguments and specifying default values. You can read about them online (see the R programming resources on Canvas).
 - The variable `y` exists inside the function only. It does not move outside the function, until you explicitly say so: `return(y)`.
 - We haven't done any kind of checking to see whether the argument `x` can be added to. If we pass a character vector as `x`, we will get an error. `non-numeric argument to binary operator`. Down the road, you might consider checking the incoming argument(s).
 
@@ -107,15 +108,15 @@ y
 
 ### Activity
 
-Write your own function below that takes two arguments. Multiply the arguments and return the value. Try out your function to make sure that it works for both single numerics and numeric vectors.
+Write your own function below that takes two arguments. Multiply the arguments and return the value. Try out your function to make sure that it works for both single numerics and numeric vectors. What happens when the vectors are the same length? What happens when they are different lengths?
 
 ```{r}
-
 ```
+
 
 ## Sometimes I think George is not being completely honest with me
 
-You and your friend George go to dinner once a week. You agreed that you would flip George's "lucky" coin to decide who gets to choose the restaurant. Being superstitious, you always pick heads
+You and your friend George go to dinner once a week. You agreed that you would flip George's "lucky" coin to decide who gets to choose the restaurant. Being superstitious, you always pick heads.
 
 After losing several times in a row, you start to get suspicious and begin keeping track. You find that after 20 weeks, you have only chosen the restaurant 5 times.
 
@@ -133,17 +134,17 @@ Use `which.max()` to extract the value of $\theta$ that maximizes the log-likeli
 
 ```
 
-Re-plot the data and add a large, colorful point with `geom_point()` located at the MLE. The full list of colors available in R is at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf 
+Re-plot the data and add a large, colorful point with `geom_point()` located at the MLE. The full list of colors available in R is at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf
 
 ```{r}
 
 ```
 
-Under certain circumstances the ratio of two probabilities (likelihoods) can be interpreted as a test of one model compared to another. In this case we have two models, (1) the maximum likelihood estimate of the probability of heads and (2) the null model that the coin is fair ($Pr[Heads] = 0.5$). 
+Under certain circumstances the ratio of two probabilities (likelihoods) can be interpreted as a test of one model compared to another. In this case we have two models, (1) the maximum likelihood estimate of the probability of heads and (2) the null model that the coin is fair ($Pr[Heads] = 0.5$).
 
-Calculate the probabilities (not log-likelihoods) of observing 5 heads given:
+Calculate the probabilities (not on the log-scale) of observing 5 heads given:
 
-1. Your maximum likelihood estimate above. 
+1. Your maximum likelihood estimate above.
 2. The null probability of 0.5
 
 ```{r}
@@ -156,7 +157,7 @@ Now calculate the ratio of the first model to the second. This quantity is calle
 
 ```
 
-Interpretations of Bayes Factors are:^[Kass R, Raftery AE. 1995. Bayes factors. *J Am Stat Assoc* 90:773-795.] 
+Interpretations of Bayes Factors are:^[Kass R, Raftery AE. 1995. Bayes factors. *J Am Stat Assoc* 90:773-795.]
 
 1. $< 3.2$: Not worth a mention
 2. $3.2 - 10$: Substantial
@@ -167,7 +168,7 @@ What is you interpretation of the Bayes Factor for the MLE vs. the null probabil
 
 > 
 
-What is the probability of observing these data or anything more extreme (fewer heads)?
+What is the probability of observing these data or anything more extreme (fewer heads) if the probability of heads is 0.5?
 
 ```{r}
 
@@ -182,3 +183,82 @@ You win the next two coin flips and get to choose the restaurant. Update your ca
 What do you conclude about the coin now?
 
 > 
+
+
+## Adaptation to drought stress in Silver Fir
+
+The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to the mountainous regions of Europe. Csillery and colleagues carried out a very large (n > 8000 measurements) greenhouse experiment to study the genetic adaptations to drought tolerance in *Abies*. We are going to work with a part of this dataset to explore the mean and median.
+
+<div style="width:350px">
+![](https://i.imgur.com/0KwbeIe.jpg)
+</div>
+
+### Activity
+
+Load the data in the file `Silver_fir.xlsx`. Determine how missing data were coded in the file and pass the appropriate argument for NAs. The columns `family` and `block` are numeric, but should be converted to factors. Examine the resulting file with `str()` or `glimpse()`.
+
+```{r}
+
+```
+
+These data have several layers of nesting. Each seedling has a unique `id` and comes from one of 16 `population`s. Within each `population`, multiple plants come from each `block` within a `family`. 
+
+Group these data by `population`, `family`, and `block`, and then tally the number of observations in each subgroup.
+
+```{r}
+
+```
+
+About how many seedlings are at the smallest replicate `block` level of the data?
+
+> 
+
+We want to look at the distributions of maximum heights (the `ht` columns). Height was measured in three different years: `ht97mm`, `ht98mm`, `ht99mm`. However not all seedlings have measurements for all years. We want to figure out how to only take the maximum value across the three columns for each seedling (`id`).
+
+Start by selecting `population`, `id`, and the three columns that start with `ht`. For the last you can use the `starts_with()` function. You should have just 5 columns in the resulting tibble.
+
+```{r}
+
+```
+
+If you print out the first ~20 rows, you can see that there are a lot of NAs. Some seedlings have 3 measurements, some 2, some 1, and some none.
+
+Next pivot the data to long format on the three height columns (you can use `starts_with()` as above). You should then drop rows with NAs in the resulting value column.
+
+```{r}
+
+```
+
+6286 rows should remain. If you print the new tibble you will see that the first seedling ("101_6") has three measurements: 90, 120, and 125. We can group this new tibble on `population` and `id` and then summarize on the maximum (`max()`) of value to only get the largest value of height for each seedling. Do this below and then check that `id` "101_6" has a value of 125. This will confirm that your summarizing worked correctly.
+
+```{r}
+
+```
+
+3789 rows should remain now. Plot the density of the distribution of maximum height and color by population. Use `facet_wrap()` to plot each population in a separate panel. If the x axis labs collide with each other add `theme(axis.text.x = element_text(angle = 90))` to rotate the axis labels by 90 degrees.
+
+```{r}
+
+```
+
+Now summarize the maximum length by population by calculating the mean and the median. Put these values into a tibble and use `knitr::kable()` to print out the table.
+
+```{r}
+
+```
+
+Compare the mean and the median across the populations. In this sample is the mean a good estimate of the central tendency?
+
+> 
+
+Finally, let's add vertical lines to the density plot from above. To do this, we need to be able to plot data from two different tibbles into the same plot. So far, we have been using the general construction: `ggplot(D, aes(y)) + geom_density()`. You can also write this as `ggplot() + geom_density(data = D, aes(y))`. Essentially, you put the data and aesthetic into the geom. This is how you can plot data from multiple different tibbles into the same plot.
+
+- Start by copying the code above into the chunk below.
+- Modify the code to match the `ggplot() + geom_density(data = D, aes(y))` format.
+- Verify that your plot still looks correct.
+- Add two calls to `geom_vline(data = ..., aes(xintercept = ...)` to add the mean and median. Make the two vertical lines different colors.
+
+```{r}
+
+```
+
