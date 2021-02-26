@@ -1,0 +1,635 @@
+---
+title: "Unit 5 In Class Discussion"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readxl)
+library(rstan)
+library(cowplot)
+library(rethinking)
+library(plotly)
+theme_set(theme_cowplot())
+```
+
+
+## Mouse weaning data
+
+```{r warning=FALSE}
+M <- read_excel("../data/Mouse_Weaning_Data.xlsx") %>% 
+  select(MouseID, Sex, WnMass) %>% 
+  drop_na() %>% 
+  mutate(Sex_f = factor(if_else(Sex == 0, "Female", "Male")))
+str(M)
+```
+
+
+## Are the sex ratios equal?
+
+After 3 generations
+
+```{r}
+M_3 <- M %>%
+  filter(MouseID != -9) %>% 
+  filter(MouseID < 400) %>% 
+  mutate(Sex_f = factor(if_else(Sex == 0, "Female", "Male")))
+str(M_3)
+```
+
+
+## Are the sex ratios equal?
+
+```{r}
+M_3 %>% group_by(Sex_f) %>% tally()
+```
+
+
+## Model Likelihood ($\mathcal{L}$)
+
+For a set of observations ($Y_i$) and hypothesized parameters ($\Theta$) the model likelihood is the product of the observations' individual likelihoods:
+
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}Pr\left[Y_{i}; \Theta\right]$$
+
+Evaluate the likelihood function for different values of $\Theta$ to estimate $\mathcal{L}$ for different sets of $\Theta$.
+
+
+## Model Likelihood ($\mathcal{L}$)
+
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}Pr\left[Y_{i}; \Theta\right]$$
+
+$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(Pr\left[Y_{i};\Theta\right]\right)$$
+
+So we just need to sum the log-likelihoods of the observations to get the model likelihood.
+
+
+## Likelihood across the range of 0 to 1
+
+Generate a range of possible values for $\theta$:
+
+```{r}
+theta <- seq(0.001, 0.999, length = 200)
+```
+
+Calculate the probability for 91 female mice from 191 total mice for each value of $\theta$:
+
+```{r}
+pr <- dbinom(91, 191, prob = theta)
+```
+
+Convert to log-likelihoods:
+
+```{r}
+log_lik <- log(pr)
+log_liks <- tibble(theta, log_lik)
+```
+
+---
+
+```{r}
+log_liks
+```
+
+
+## Likelihood across the range of 0 to 1
+
+```{r echo=FALSE}
+log_liks %>% 
+  ggplot(aes(theta, log_lik)) +
+  geom_line(size = 1.5) +
+  labs(x = "\U03B8", y = "log-Likelihood")
+```
+
+
+## Maximum likelihood
+
+```{r echo=FALSE}
+log_liks %>% 
+  ggplot(aes(theta, log_lik)) +
+  geom_line(size = 1.5) +
+  geom_point(aes(x = theta[which.max(log_lik)], y = max(log_lik)),
+             color = "red", size = 3) +
+  labs(x = "\U03B8", y = "log-Likelihood")
+```
+
+
+## Maximum likelihood
+
+```{r}
+max(log_lik)
+theta[which.max(log_lik)]
+91 / 191
+```
+
+
+## Probability of 91 or fewer female mice
+
+Assuming $\theta = 0.5$
+
+```{r}
+sum(dbinom(0:91, 191, 0.5))
+```
+
+
+## Pr[Female] for all mice
+
+```{r}
+M %>% group_by(Sex_f) %>% tally()
+```
+
+```{r}
+pr <- dbinom(1202, 1202 + 1227, prob = theta)
+```
+
+Convert to log-likelihoods:
+
+```{r}
+log_lik <- log(pr)
+log_liks <- tibble(theta, log_lik)
+```
+
+---
+
+```{r}
+log_liks
+```
+
+
+## Likelihood across the range of 0 to 1
+
+```{r echo=FALSE}
+log_liks %>% 
+  ggplot(aes(theta, log_lik)) +
+  geom_line(size = 1.5) +
+  labs(x = "\U03B8", y = "log-Likelihood")
+```
+
+
+## Maximum likelihood
+
+```{r echo=FALSE}
+log_liks %>% 
+  ggplot(aes(theta, log_lik)) +
+  geom_line(size = 1.5) +
+  geom_point(aes(x = theta[which.max(log_lik)], y = max(log_lik)),
+             color = "red", size = 3) +
+  labs(x = "\U03B8", y = "log-Likelihood")
+```
+
+
+## Maximum likelihood
+
+```{r}
+max(log_lik)
+theta[which.max(log_lik)]
+1202 / (1202 + 1227)
+```
+
+
+## Mouse weaning data
+
+```{r warning=FALSE}
+M <- read_excel("../data/Mouse_Weaning_Data.xlsx") %>% 
+  select(MouseID, Sex, WnMass) %>% 
+  drop_na() %>% 
+  mutate(Sex_f = factor(if_else(Sex == 0, "Female", "Male")))
+str(M)
+```
+
+
+## Mouse weaning data
+
+```{r mass_plot, echo=TRUE, eval=FALSE}
+M %>% 
+  ggplot(aes(WnMass, color = Sex_f)) +
+  geom_line(stat = "density", size = 1.5) +
+  facet_grid(Sex_f ~ .) +
+  scale_color_manual(values = c("Orange", "Purple"), name = "Sex") +
+  labs(x = "Wean Mass (g)", y = "Density", title = "Weaning Mass")
+```
+
+
+## Mouse weaning data
+
+```{r mass_plot, echo=FALSE, eval=TRUE}
+```
+
+
+## What is the weaning mass of male mice?
+
+Analytical mean:
+
+```{r}
+Males <- M %>% filter(Sex_f == "Male")
+Males %>%
+  summarize(mean_mass = mean(WnMass))
+```
+
+
+## Likelihood for each observed value
+
+$$Pr\left[Y_i; \mu, \sigma\right] = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-\left(Y_i-\mu\right)^{2}}{2\sigma^{2}}}$$
+
+- For any $\mu$ and $\sigma$ we can calculate the likelihood of *that* observation
+- Some values of $\mu$ and $\sigma$ will maximize the likelihood for *that* observation
+
+What values of $\mu$ and $\sigma$ *simultaneously* maximize the likelihood for *all* the observations?
+
+
+## Model Likelihood ($\mathcal{L}$)
+
+For a set of observations ($Y_i$) and hypothesized parameters ($\Theta$, here $\mu$ and $\sigma$) the model likelihood is the product of the observations' individual likelihoods:
+
+$$\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right) = \prod_{i=1}^{n}Pr\left[Y_{i}; \Theta\right]$$
+
+$$\log\left(\mathcal{L}\left(\left\{ Y_{i}\right\} _{i=1}^{n};\Theta\right)\right) = \sum_{i=1}^{n} \log\left(Pr\left[Y_{i};\Theta\right]\right)$$
+
+
+## General ML procedure
+
+Search the parameter space of $\Theta$ (here $\mu$ and $\sigma$) for the values that maxmimize the likelihood. For each possible $\mu$ and $\sigma$:
+
+1. Calculate the likelihood for each *observation*
+2. Sum the log-likelihoods
+3. Search until log-likelihood is maximized
+
+The analytical mean *equals* the ML estimate of the mean.
+
+- Why not just use the analytical solution in all cases?
+
+
+## Searching the parameter space
+
+1. Grid approximation
+    - Slow, coarse, doesn't scale well
+2. Optimization
+    - Harder to set up
+    - General solution
+
+
+## Likelihood function
+
+```{r}
+log_lik <- function(x, Y){
+  log_liks <- dnorm(Y, mean = x[1], sd = x[2], log = TRUE)
+  return(sum(log_liks))
+}
+```
+
+- Pass a vector of `x <- c(mu, sigma)` and vector of `Y` values
+- Calculate the likelihoods (probability densities) for each `Y` given the mean and standard deviation
+- Return the sum of the logs of the likelihoods
+
+
+## Grid approximation
+
+For combinations of $\mu$ and $\sigma$, calculate the model likelihood. Pick the largest log-likelihood as the maximum likelihood estimates.
+
+Set up the grid:
+
+```{r}
+n <- 100 # How fine is the grid
+mu <- seq(5, 20, length = n) # Vector of mu
+sigma <- seq(0.1, 5, length = n) # Vector of sigma
+
+grid_approx <- crossing(mu, sigma) %>% 
+  mutate(log_lik = 0)
+```
+
+---
+
+```{r}
+grid_approx
+```
+
+
+## Grid approximation
+
+```{r grid_approx, cache=TRUE}
+for (ii in 1:nrow(grid_approx)) {
+  grid_approx[ii, "log_lik"] <- 
+    log_lik(c(grid_approx$mu[ii], grid_approx$sigma[ii]),
+            Males$WnMass)
+}
+```
+
+- Iterate through the rows ($ii$) of `grid_approx`
+- For each row, assign the model log-likelihood calculated for that `mu` and `sigma` to `log_lik`
+
+---
+
+```{r}
+head(grid_approx)
+```
+
+This approach is coarse, time consuming, and not feasible for fine grids or many parameters.
+
+- For a 100 X 100 grid, there are 10,000 calculations.
+- If there were 3 parameters, there would be 1,000,000.
+
+
+## Grid approximation
+
+```{r echo=FALSE}
+grid_approx <- do.call(
+  data.frame,
+  lapply(grid_approx,
+         function(x) replace(x, is.infinite(x), NA)))
+
+fig <- plot_ly() %>%
+  add_markers(data = grid_approx,
+              x = ~ mu,
+              y = ~ sigma,
+              z = ~ log_lik,
+              color = ~ log_lik,
+              size = 1,
+              showlegend = FALSE) %>%
+  add_markers(data = grid_approx[which.max(grid_approx$log_lik), ],
+              x = ~ mu,
+              y = ~ sigma,
+              z = ~ log_lik,
+              size = 2,
+              showlegend = FALSE) %>% 
+  hide_colorbar() %>%
+  layout(scene = list(xaxis = list(title = 'Mu'),
+                      yaxis = list(title = 'Sigma'),
+                      zaxis = list(title = 'log-Likelihood')))
+
+fig
+```
+
+
+## Grid approximation
+
+```{r echo=FALSE}
+grid_approx <- grid_approx %>% filter(log_lik >= -1e4)
+
+fig <- plot_ly() %>%
+  add_markers(data = grid_approx,
+              x = ~ mu,
+              y = ~ sigma,
+              z = ~ log_lik,
+              color = ~ log_lik,
+              size = 1,
+              showlegend = FALSE) %>%
+  add_markers(data = grid_approx[which.max(grid_approx$log_lik), ],
+              x = ~ mu,
+              y = ~ sigma,
+              z = ~ log_lik,
+              size = 2,
+              showlegend = FALSE) %>% 
+  hide_colorbar() %>%
+  layout(scene = list(xaxis = list(title = 'Mu'),
+                      yaxis = list(title = 'Sigma'),
+                      zaxis = list(title = 'log-Likelihood')))
+
+fig
+```
+
+
+## Grid approximation
+
+On this grid, the maximum likelihood estimate of $\mu$ is:
+
+```{r}
+grid_approx[which.max(grid_approx$log_lik), ]
+```
+
+The analytical estimate is:
+
+```{r}
+mean(Males$WnMass)
+```
+
+
+## Maximum likelihood via optimization
+
+`reltol` says to stop when the improvement is $<10^{-100}$.
+
+- Default tolerance is $10^{-8}$, so we will get a very precise estimate.
+
+```{r ML_optim, cache = TRUE}
+MLE <- optim(c(13, 1), # Start at mu = 13, sigma = 1
+             log_lik,
+             Y = Males$WnMass,
+             control = list(fnscale = -1,   # Find maximum
+                            reltol = 10^-100))
+```
+
+
+## Maximum likelihood via optimization
+
+```{r}
+mean(Males$WnMass)
+print(MLE)
+```
+
+
+## ML considerations
+
+- `glm()` uses an optimization routine
+- ML can get stuck in a local maximum (that isn't the global maximum)
+- Write your own custom likelihood function
+
+
+## Resampling inference of the mean {.smaller}
+
+```{r}
+set.seed(36428)
+reps <- 100000
+resampled_mean <- numeric(length = reps)
+for (i in 1:reps) {
+  resampled_mean[i] <- mean(sample(Males$WnMass,
+                                   replace = TRUE))
+}
+```
+
+Each iteration:
+
+- Resample `Males$WnMass` *with replacement*. Yields a vector equal in length to `Males$WnMass` but where each value can appear more than once.
+- Calculate the mean of this resampled vector. Assign to the *i*th position in `resampled_mean`.
+
+The mean of these means is the estimate of the population mean (via central limit theorem).
+
+
+## Resampling inference of the mean
+
+```{r echo=FALSE, message = FALSE}
+tibble(resampled_mean) %>% 
+  ggplot(aes(resampled_mean)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Resampled Mean", y = "Count") +
+  geom_vline(xintercept = mean(resampled_mean),
+             color = "red",
+             size = 1.5)
+```
+
+
+## Resampling inference of the mean
+
+```{r}
+mean(Males$WnMass)
+mean(resampled_mean)
+```
+
+
+## Bayesian inference of the mean
+
+Ranges of possible maximum likelihood values:
+
+1. $\mu$: $-\infty < \mu < \infty$
+2. $\sigma$: $0 < \sigma < \infty$
+
+Drawbacks:
+
+1. $\mu$ can't be negative (no negative masses) and probably isn't very small either (biology)
+2. $\sigma$ is also probably not huge either
+
+Can we do better? Yes, Bayesian priors.
+
+
+## Prior for the mean
+
+```{r, echo=FALSE, message=FALSE}
+Males %>% 
+  ggplot(aes(WnMass)) +
+  geom_histogram(bins = 30)
+```
+
+
+## Prior for the mean
+
+```{r, echo=FALSE, message=FALSE}
+tibble(
+  x = seq(5, 25, length = 100),
+  y = dnorm(x, mean = 14, sd = 5)) %>% 
+  ggplot(aes(x, y)) + geom_line() +
+  labs(y = "Relative Likelihood", x = "Mass")
+```
+
+
+## Bayesian MCMC sampling
+
+1. Write your own (not recommended)
+2. WinBUGS / OpenBUGS
+3. JAGS
+4. stan
+
+R, Python, MATLAB, etc. interfaces to samplers #2-4.
+
+
+## In R
+
+- `rstan`: Build your own models
+- `rethinking`: Convenience interface to `rstan`.
+- `brms` and `rstanarm`: High level model syntax
+
+
+## Bayesian model for mean $\mathcal{N}(14, 5)$
+
+```{r, echo=FALSE}
+Males_sub <- Males %>% 
+  select(WnMass) %>% 
+  as.data.frame()
+```
+
+```{r fm_sd5, cache=TRUE}
+fm_sd5 <- ulam(
+  alist(
+    WnMass ~ dnorm(mu, sigma),
+    mu ~ dnorm(14, 5),
+    sigma ~ dcauchy(0, 3)
+  ),
+  data = Males_sub
+)
+```
+
+
+## Bayesian model for mean $\mathcal{N}(14, 5)$
+
+```{r}
+mean(Males_sub$WnMass)
+precis(fm_sd5)
+```
+
+
+## Bayesian model for mean $\mathcal{N}(14, 10)$
+
+```{r fm_sd10, cache=TRUE}
+fm_sd10 <- map2stan(
+  alist(
+    WnMass ~ dnorm(mu, sigma),
+    mu ~ dnorm(14, 10),
+    sigma ~ dcauchy(0, 3)
+  ),
+  data = Males_sub
+)
+```
+
+
+## Bayesian model for mean $\mathcal{N}(14, 10)$
+
+```{r}
+mean(Males_sub$WnMass)
+precis(fm_sd10)
+```
+
+
+## Bayesian model for mean $\mathcal{N}(10, 5)$
+
+```{r fm_mu10, cache=TRUE}
+fm_mu10 <- map2stan(
+  alist(
+    WnMass ~ dnorm(mu, sigma),
+    mu ~ dnorm(10, 5),
+    sigma ~ dcauchy(0, 3)
+  ),
+  data = Males_sub
+)
+```
+
+
+## Bayesian model for mean $\mathcal{N}(10, 5)$
+
+```{r}
+mean(Males_sub$WnMass)
+nrow(Males)
+precis(fm_mu10)
+```
+
+
+## Bayesian model for mean $\mathcal{N}(14, 0.1)$
+
+```{r fm_sd0.1, cache=TRUE}
+fm_sd0.1 <- map2stan(
+  alist(
+    WnMass ~ dnorm(mu, sigma),
+    mu ~ dnorm(14, 0.1),
+    sigma ~ dcauchy(0, 3)
+  ),
+  data = Males_sub
+)
+```
+
+
+## Bayesian model for mean $\mathcal{N}(14, 0.1)$
+
+```{r}
+mean(Males_sub$WnMass)
+precis(fm_sd0.1)
+```
+
+
+## Bayes priors
+
+- How much information do you have?
+- Try different priors
+    - What is the effect?
+- Explicit model comparison
