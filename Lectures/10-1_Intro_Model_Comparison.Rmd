@@ -39,11 +39,11 @@ Datasets
 
 ## Tradeoff in model specification
 
-**Underfitting**: Model is too simple. Doesn't describe the sample *well enough*.
+**Underfitting**: Model doesn't describe the observed sample *well enough*.
 
 - Leads to poor prediction
 
-**Overfitting**: Model is too accurate. Describes the specific sample *too well*.
+**Overfitting**: Model describes the observed sample *too well*.
 
 - Leads to poor prediction
 

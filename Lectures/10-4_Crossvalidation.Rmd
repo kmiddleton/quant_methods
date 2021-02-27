@@ -271,6 +271,7 @@ mod2 <- lm(Energy ~ Mass + Caste, data = M)
 mod3 <- lm(Energy ~ Mass * Caste, data = M)
 ```
 
+
 ## Fit different models to these data
 
 ```{r, echo=FALSE}
@@ -302,6 +303,7 @@ p3 <- p +
 
 plot_grid(p1, p2, p3, ncol = 3)
 ```
+
 
 ## Assess models with 10-fold cross validation
 
