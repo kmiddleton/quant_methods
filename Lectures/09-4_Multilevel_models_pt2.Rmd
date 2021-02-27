@@ -80,7 +80,7 @@ ggplot(Sq, aes(DML, Testis_Mass)) +
 
 ## Multiple regression
 
-Testis mass modeled by `DML`, `Month`, and the `DML` X `Month` interaction:
+Testis mass modeled by `DML`, `Month`, and the `DML` by `Month` interaction:
 
 ```{r}
 fm1 <- lm(Testis_Mass ~ DML + Month + DML:Month, data = Sq)
@@ -107,7 +107,7 @@ ggplot(Sq, aes(Fitted, Res1)) +
 
 ```{r echo=FALSE}
 ggplot(Sq, aes(Month, Res1)) +
-  geom_boxplot() +
+  geom_point(position = position_jitter(width = 0.15)) +
   labs(x = "Month", y = "Residuals")
 ```
 
@@ -144,8 +144,15 @@ fm2 <- gls(Testis_Mass ~ DML * Month, data = Sq,
 
 ## Diagnostics
 
-```{r}
-plot(fm2)
+```{r echo=FALSE}
+# Same as plot(fm2)
+
+Sq$Fitted2 <- fitted.values(fm2)
+Sq$Res2 <- residuals(fm2, type = "normalized")
+
+ggplot(Sq, aes(Fitted2, Res2)) +
+  geom_point() +
+  labs(x = "Fitted Values", y = "Residuals")
 ```
 
 
@@ -176,7 +183,7 @@ ggplot(Sq, aes(DML, Res2)) +
 
 ```{r echo=FALSE}
 ggplot(Sq, aes(Month, Res2)) +
-  geom_boxplot() +
+  geom_point(position = position_jitter(width = 0.15)) +
   ylim(c(-10, 10)) +
   labs(x = "Month",
        y = "Normalized Residual Testis Mass")
@@ -404,7 +411,7 @@ Distance from the sella turcica to the pterygomaxillary fissure in growing child
 </center>
 
 
-## Orthodonics data
+## Orthodontics data
 
 ```{r}
 O <- read_excel("../data/Ortho.xlsx")
@@ -414,7 +421,7 @@ glimpse(O)
 ```
 
 
-## Orthodonics data
+## Orthodontics data
 
 ```{r}
 O %>% group_by(Sex) %>% tally()
