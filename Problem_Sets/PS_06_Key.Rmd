@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 05'
+title: 'Problem Set 06'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -15,7 +15,9 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
+theme_set(theme_cowplot())
 ```
+
 
 ## Comparing Models: Differences between group means
 
@@ -43,12 +45,13 @@ Visualize the dataset in two ways:
 
 ```{r }
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
-  geom_boxplot()
+  geom_boxplot() +
+  labs(x = "Food Source", y = "Eye Span")
 
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+  stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.05,
                color = "red", size = 0.7) +
   labs(x = "Food Source", y = "Eye Span")
 ```
@@ -59,7 +62,15 @@ Describe the distributions within each group and between groups. What do these p
 
 We will first use the analytical method to determine if the group means are significantly different. In this case, a *t*-test is most appropriate.
 
-By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*.
+By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*. You maybe want to calculate the per-food source variance.
+
+```{r}
+# FIXME
+stalk %>% 
+  group_by(food_source) %>% 
+  summarise(var_eye_span = var(eye_span))
+```
+
 
 ### Activity 2
 
@@ -71,15 +82,16 @@ myT <- t.test(eye_span ~ food_source, data = stalk)
 myT
 ```
 
-What can you conclude from these results?
+What can you conclude from these results? Does the result of this statistical test agree with your prediction above?
 
 > The hypothesis that the means for the two groups are equal is very unlikely. There is a statistically significant difference between the groups.
+
 
 ### Activity 3
 
 `t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). `lm()` is a general function that fits many many different kinds of linear models. We will talk quite a lot about linear models in the coming weeks.
 
-A *t*-test is a kind of linear model, so we can also fit the same model using `lm()`.
+A *t*-test is just a special kind of linear model (1 categorical predictor with 2 levels), so we can also fit the same model using `lm()`.
 
 1. Use the code from above, but use `lm()` in place of `t.test()`. Assign this to a new object. Note that `lm()` always assumes equal variances (there is no `var.equal` argument).
 2. Pass the object that you just created to the function `summary()`.
@@ -93,6 +105,7 @@ summary(fm)
 Compare the results of the linear model with the results of the *t*-test above. Do you recognize any of the estimates?
 
 > The `(Intercept)` term from `lm()` is equal to the mean for the Corn group. The `food_sourceCotton` estimate is the *difference* between the means for the Corn and Cotton group means.
+
 
 ### Activity 4
 
@@ -111,6 +124,7 @@ SS <- function(x, x_bar = NULL) {
 }
 ```
 
+
 #### Setup data
 
 ```{r}
@@ -122,6 +136,7 @@ x1 <- stalk$eye_span[stalk$food_source == "Corn"]
 x2 <- stalk$eye_span[stalk$food_source == "Cotton"]
 ```
 
+
 #### Data drawn from two separate distributions
 
 Assume equal variances but different means.
@@ -129,6 +144,8 @@ Assume equal variances but different means.
 $$\hat{\sigma}^2_2 = \frac{1}{n_1 + n_2}\left(\sum^{n_1}_{i=1}\left(y_{1i} - \bar{y}_1\right)^2 +  \sum^{n_2}_{i=1} \left(y_{2i} - \bar{y}_2\right)^2 \right)$$
 
 $$\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|x\right) = \frac{1}{\left(2\pi \hat{\sigma}^2_2\right)^\left(\frac{n_1 + n_2}{2}\right)}e^{\left(-\frac{n_1 + n_2}{2}\right)}$$
+
+Translated into R:
 
 ```{r}
 s_hat_2 <- (1 / (n1 + n2)) * (SS(x1) + SS(x2))
@@ -145,11 +162,14 @@ where $\bar{\bar{y}}$ is the grand mean.
 
 $$\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|x\right) = \frac{1}{\left(2\pi \hat{\sigma}^2_1\right)^\left(\frac{n_1 + n_2}{2}\right)}e^{\left(-\frac{n_1 + n_2}{2}\right)}$$
 
+Translated into R:
+
 ```{r}
 s_hat_1 <- (1 / (n1 + n2)) * (SS(x1, mean(x)) + SS(x2, mean(x)))
 L_1 <- 1 / ((2 * pi * s_hat_1) ^ ((n1 + n2) / 2)) * exp(-((n1 + n2) / 2))
 log(L_1)
 ```
+
 
 #### Likelihood ratio (Bayes Factor)
 
@@ -158,6 +178,8 @@ The equation for Bayes Factor can be calculated in two ways:
 $$BF = \frac{\mathcal{L}(Model~2)}{\mathcal{L}(Model~1)} = \left(\frac{\hat{\sigma}^2_2}{\hat{\sigma}^2_1}\right)^{-\frac{n_1 + n_2}{2}}$$
 
 Use the calculations we have given you above to calculate the Bayes Factor for model 2 (the data come from distributions with different means) vs. model 1 (the data come from a single distribution with one mean).
+
+You can either use the ratio of the likelihoods or the ratio of variances from the equation above.
 
 ```{r}
 # FIXME
@@ -171,11 +193,13 @@ What do you conclude based on the Bayes Factor comparison?
 
 We have actually violated one of the assumptions of the likelihood calculations that we did. What is it?
 
-> The variances are likely *not* equal.
+> The variances are likely *not* equal. The variance is 16x higher in the cotton group than in the corn group.
+
 
 ## Confidence intervals
 
 We will use the same data to explore confidence intervals.
+
 
 ### Activity
 
@@ -228,6 +252,9 @@ We can simulate what we would expect assuming the means and standard deviation a
 
 
 ```{r}
+# FIXME
+# Note: need to use list() below to assign to a row of a tibble.
+
 set.seed(648273)
 niter <- 1000
 
@@ -239,21 +266,21 @@ n.corn <- length(stalk$eye_span[stalk$food_source == 'Corn'])
 n.cotton <- length(stalk$eye_span[stalk$food_source == 'Cotton'])
 
 corn.cis <- tibble(mm = numeric(length = niter),
-                       ll = numeric(length = niter),
-                       uu = numeric(length = niter))
+                   ll = numeric(length = niter),
+                   uu = numeric(length = niter))
 cotton.cis <- tibble(mm = numeric(length = niter),
-                         ll = numeric(length = niter),
-                         uu = numeric(length = niter))
+                     ll = numeric(length = niter),
+                     uu = numeric(length = niter))
 
 for (jj in 1:niter) {
   corn.s <- rnorm(n.corn, mu.corn, sd.corn)
   cotton.s <- rnorm(n.cotton, mu.cotton, sd.cotton)
 
-  corn.cis[jj, ] <- c(
+  corn.cis[jj, ] <- list(
     mean(corn.s),
     mean(corn.s) - 2 * (sd(corn.s) / sqrt(n.corn)),
     mean(corn.s) + 2 * (sd(corn.s) / sqrt(n.corn)))
-  cotton.cis[jj, ] <- c(
+  cotton.cis[jj, ] <- list(
     mean(cotton.s),
     mean(cotton.s) - 2 * (sd(cotton.s) / sqrt(n.cotton)),
     mean(cotton.s) + 2 * (sd(cotton.s) / sqrt(n.cotton)))
@@ -271,6 +298,7 @@ Is it correct to say that there is a 95% probability that the true mean is withi
 
 > No, it is not correct. CIs tell us about a range of values that we have some confidence in for *future* samples. This is a nuanced but very important point about confidence intervals.
 
+
 ## OLS Regression
 
 The file `Earwigs.csv` contains data for the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. An earwig with forceps is shown below.
@@ -280,6 +308,7 @@ The file `Earwigs.csv` contains data for the proportion of earwigs in a sample t
 </div>
 
 The hypothesis is that earwigs living at higher densities will be more likely to have forceps, so that samples living at higher densities will have a higher proportion with forceps.
+
 
 ### Activity
 
@@ -307,7 +336,7 @@ Use the following code to add an OLS regression line through the points to your 
 EW %>%
   ggplot(aes(Density, Proportion_Forceps)) +
   geom_point() +
-  geom_smooth(method = "lm") +
+  geom_smooth(formula = y ~ x, method = "lm") +
   labs(x = "Population Density", y = "Proportion with Forceps")
 ```
 
