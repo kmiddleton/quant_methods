@@ -15,7 +15,7 @@ library(tidyverse)
 library(cowplot)
 library(rethinking)
 theme_set(theme_cowplot())
-source("Shade_Distributions.R")
+source("https://gist.githubusercontent.com/kmiddleton/93c6a5a76270a0170fdfc6387780261e/raw/c35cbc0e7aef99a5f819da34de36168b53a8bbe5/Shade_Distributions.R")
 ```
 
 

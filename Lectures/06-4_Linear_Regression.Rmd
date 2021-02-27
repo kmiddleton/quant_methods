@@ -15,7 +15,7 @@ library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
 
-source("ssPlot.R")
+source("https://gist.githubusercontent.com/kmiddleton/869e0bbd7c4321e918a2270d5fecc27a/raw/fd77c17aed279728db38a4b7008fac89f0c5ed5f/ssPlot.R")
 ```
 
 
