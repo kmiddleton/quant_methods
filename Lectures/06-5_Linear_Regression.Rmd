@@ -18,7 +18,7 @@ library(RcppEigen)
 library(rethinking)
 library(latex2exp)
 
-source("https://gist.githubusercontent.com/kmiddleton/869e0bbd7c4321e918a2270d5fecc27a/raw/fd77c17aed279728db38a4b7008fac89f0c5ed5f/ssPlot.R")
+source("https://raw.githubusercontent.com/kmiddleton/quant_methods/master/Lectures/ssPlot.R")
 ```
 
 
