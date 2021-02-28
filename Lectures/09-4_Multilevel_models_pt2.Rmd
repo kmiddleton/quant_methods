@@ -446,7 +446,8 @@ ggplot(O, aes(Age, Distance)) +
 ```{r echo=FALSE}
 ggplot(O, aes(Age, Distance, color = Subject)) +
   geom_line() +
-  facet_grid(. ~ Sex)
+  facet_grid(. ~ Sex) +
+  theme(legend.position = "none")
 ```
 
 
@@ -478,8 +479,8 @@ O$Pred1 <- fitted(fm2, level = 1)
 ```{r echo=FALSE}
 ggplot(O, aes(Age, Distance)) +
   geom_point(aes(color = Subject)) +
-  geom_line(aes(y = Pred0), lwd = 2) +
   geom_line(aes(y = Pred1, color = Subject)) +
+  geom_line(aes(y = Pred0), lwd = 2) +
   labs(x = "Age", y = "Distance") +
   facet_grid(. ~ Sex) +
   theme(legend.position = "none")
