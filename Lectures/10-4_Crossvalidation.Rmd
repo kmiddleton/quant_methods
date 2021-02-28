@@ -76,7 +76,7 @@ mod3 <- lm(yy ~ xx1 + xx2 + xx3 + xx4 + xx5 +
 - Remember $R^2$ = the squared correlation between the fitted and observed y values
 
 
-## Model 1
+## Model 1: xx1 only
 
 ```{r, echo=FALSE}
 yy_hat1 <- mod1$fitted.values
@@ -91,7 +91,7 @@ data.frame('Yhat' = yy_hat1, 'Yobs' = yy) %>%
 ```
 
 
-## Model 2
+## Model 2: xx1 ... xx5
 
 ```{r, echo=FALSE}
 yy_hat2 <- mod2$fitted.values
@@ -106,7 +106,7 @@ data.frame('Yhat' = yy_hat2, 'Yobs' = yy) %>%
 ```
 
 
-## Model 3
+## Model 3: xx1 ... xx10
 
 ```{r, echo=FALSE}
 yy_hat3 <- mod3$fitted.values
@@ -145,7 +145,7 @@ y_hat_new3 <- predict.lm(object = mod3, newdata = newx)
 ```
 
 
-## Model 1
+## Model 1: xx1 only
 
 ```{r, echo=FALSE}
 miny <- min(c(newy, yy))
@@ -173,7 +173,7 @@ data.frame('Yhat' = yy_hat1, 'Yobs' = yy) %>%
 ```
 
 
-## Model 2
+## Model 2: xx1 ... xx5
 
 ```{r, echo=FALSE}
 data.frame('Yhat' = yy_hat2, 'Yobs' = yy) %>%
@@ -189,7 +189,7 @@ data.frame('Yhat' = yy_hat2, 'Yobs' = yy) %>%
 ```
 
 
-## Model 3
+## Model 3: xx1 ... xx10
 
 ```{r, echo=FALSE}
 data.frame('Yhat' = yy_hat3, 'Yobs' = yy) %>%
