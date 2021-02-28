@@ -14,7 +14,7 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
-source("Shade_Distributions.R")
+source("https://raw.githubusercontent.com/kmiddleton/quant_methods/master/Lectures/Shade_Distributions.R")
 
 options(pillar.sigfig = 4)
 ```

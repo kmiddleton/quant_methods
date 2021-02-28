@@ -61,7 +61,7 @@ Hirotugu Akaike ("Ah-ka-ee-kay") [-@Akaike1974-iw]
 
 $$\mbox{AIC} = -2 \log\left(\mathcal{L}[\theta | \mbox{data}]\right) + 2 k$$
 
-where $\log\left((\mathcal{L}[\theta | \mbox{data}]\right)$ is the maximized log-likelihood for the parameters $\theta$ given data.
+where $\log\left(\mathcal{L}[\theta | \mbox{data}]\right)$ is the maximized log-likelihood for the parameters $\theta$ given data.
 
 - $-2$ comes in "for historical reasons" having to do with the $\chi^2$ distribution.
 
@@ -73,6 +73,7 @@ log-likelihood for the intercept only (overall mean) model for the naked mole ra
 ```{r}
 logLik(fm1)
 -2 * as.numeric(logLik(fm1)) + 2 * 2
+AIC(fm1)
 ```
 
 df = 2 because the mean and standard deviation are estimated.
@@ -171,7 +172,6 @@ Use AICc to compare:
 
 1. Maximum likelihood example
 1. Biomass
-1. Limb lengths
 1. Squid size
 1. Species richness
 1. Orthodontic growth
@@ -246,45 +246,6 @@ aictab(list(fm_N, fm_P, fm_N_P, fm_NxP),
 ```{r}
 car::Anova(fm_NxP, type = "III")
 ```
-
-## Limb lengths
-
-```{r message = FALSE}
-M <- read_csv("../data/Limb_Lengths.csv")
-```
-
-```{r echo=FALSE}
-# FIXME
-p1 <- ggplot(M, aes(left_limb, height)) + geom_point() +
-  labs(x = "Limb Length (cm)", y = "Height (cm)") +
-  ggtitle("Left Limb")
-p2 <- ggplot(M, aes(right_limb, height)) + geom_point() +
-  labs(x = "Limb Length (cm)", y = "Height (cm)") +
-  ggtitle("Right Limb")
-plot_grid(p1, p2, ncol = 2)
-```
-
-
-## Limb lengths
-
-```{r}
-# Left and right limb length
-fm_LR <- lm(height ~ left_limb + right_limb, data = M)
-
-# Left limb length only
-fm_L <- lm(height ~ left_limb, data = M)
-```
-
-
-## Limb lengths
-
-```{r}
-aictab(list(fm_L, fm_LR), modnames = c("Left", "Left & Right"))
-```
-
-Models are both well supported, but *one is worthless*.
-
-**AICc will not tell you if your model is good.**
 
 
 ## Squid size

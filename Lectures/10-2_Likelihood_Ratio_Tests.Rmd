@@ -41,9 +41,10 @@ Now maximize likelihoods for competing models
 - Asymptotic assumptions
 - $\chi^2$ distribution
 
-```{r echo=FALSE, fig.height = 2.5, fig.width = 4}
+```{r echo=FALSE, fig.height = 2.5, fig.width = 6}
 source("Shade_Distributions.R")
-shade_chisq(0.05, 1)
+shade_chisq(0.05, 1) +
+  labs(title = "df = 1")
 ```
 
 
