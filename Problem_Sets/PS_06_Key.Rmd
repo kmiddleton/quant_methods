@@ -18,6 +18,11 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
+<!--
+Datasets
+  Stalkies.csv
+  Earwigs.csv
+-->
 
 ## Comparing Models: Differences between group means
 
@@ -31,17 +36,18 @@ The `Stalkies.csv` data file contains data for an experiment in which male stalk
 
 ### Activity 1
 
-Load the `Stalkies.csv` file.
+Load the `Stalkies.csv` file and examine the columns of data it contains.
 
 ```{r}
 # FIXME
 stalk <- read_csv("../data/Stalkies.csv")
+str(stalk)
 ```
 
 Visualize the dataset in two ways:
 
 1. Make a boxplot showing each food type on the x axis.
-2. Plot the raw data (points) for the two groups. For the points, include jitter and transparency. Include means and standard errors plotted in a different color. Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate. Change the axis labels to what you would expect on a publication ready figure.
+2. Plot the raw data (points) for the two groups. For the points, include jitter and transparency. Include means and standard errors plotted in a different color (the code in Lecture 06-1 might help you). Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate. Change the axis labels to what you would expect on a publication ready figure.
 
 ```{r }
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
@@ -60,6 +66,7 @@ Describe the distributions within each group and between groups. What do these p
 
 > The mean eye span is higher for flies reared on corn than on cotton. The variance also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups.
 
+
 We will first use the analytical method to determine if the group means are significantly different. In this case, a *t*-test is most appropriate.
 
 By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*. You maybe want to calculate the per-food source variance.
@@ -70,9 +77,6 @@ stalk %>%
   group_by(food_source) %>% 
   summarise(var_eye_span = var(eye_span))
 ```
-
-
-### Activity 2
 
 Perform a *t*-test using the formula method to specify the groups to test (follow the example in lecture if you need to). Print the results.
 
@@ -87,8 +91,6 @@ What can you conclude from these results? Does the result of this statistical te
 > The hypothesis that the means for the two groups are equal is very unlikely. There is a statistically significant difference between the groups.
 
 
-### Activity 3
-
 `t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). `lm()` is a general function that fits many many different kinds of linear models. We will talk quite a lot about linear models in the coming weeks.
 
 A *t*-test is just a special kind of linear model (1 categorical predictor with 2 levels), so we can also fit the same model using `lm()`.
@@ -102,9 +104,9 @@ fm <- lm(eye_span ~ food_source, data = stalk)
 summary(fm)
 ```
 
-Compare the results of the linear model with the results of the *t*-test above. Do you recognize any of the estimates?
+Compare the results of the linear model with the results of the *t*-test above. Do you recognize any of the estimates? Can you figure out the relationship between the t-statistic and the F-statistic from the `lm()` summary?
 
-> The `(Intercept)` term from `lm()` is equal to the mean for the Corn group. The `food_sourceCotton` estimate is the *difference* between the means for the Corn and Cotton group means.
+> The `(Intercept)` term from `lm()` is equal to the mean for the Corn group. The `food_sourceCotton` estimate is the *difference* between the means for the Corn and Cotton group means. $F = t^2$.
 
 
 ### Activity 4
@@ -114,13 +116,14 @@ In lecture, we gave the equations for calculating the Bayes Factor (likelihood r
 For now, we will give you most of the steps along the way. Study carefully, so that you understand what every block of code is doing.
 
 ```{r}
-# Function to calculate sum of squares of a vector
+# Function to calculate sum of squares of a vector. Optionally the mean
+# of x cn be provided. If not, the mean is calculated within the function.
 SS <- function(x, x_bar = NULL) {
   # If x_bar is not provided, use the mean of x
   if (is.null(x_bar)) x_bar <- mean(x, na.rm = TRUE)
 
   # Return sum of squares
-  return(sum((x - x_bar) ^ 2))
+  return(sum((x - x_bar) ^ 2, na.rm = TRUE))
 }
 ```
 
@@ -153,6 +156,7 @@ s_hat_2 <- (1 / (n1 + n2)) * (SS(x1) + SS(x2))
 L_2 <- 1 / (2 * pi * s_hat_2) ^ ((n1 + n2) / 2) * exp(-(n1 + n2) / 2)
 log(L_2)
 ```
+
 
 #### All observations come from the same distribution
 
@@ -189,7 +193,7 @@ L_2 / L_1
 
 What do you conclude based on the Bayes Factor comparison?
 
-> There is overwhelming support for the two mean model.
+> There is overwhelming support for the two mean model. This is pretty apparent from the plot.
 
 We have actually violated one of the assumptions of the likelihood calculations that we did. What is it?
 
@@ -225,21 +229,19 @@ mean(stalk$eye_span[stalk$food_source == 'Corn']) +
 
 ## We can write functions to do the SEM and approximate CI
 ## approx_CI returns a tibble with the lower and upper
-## bounds of the CI. Notice that the "do" function can take
-## the tibble from approx_CI and turn it into a tibble
-## with both CI bounds. This is a general way to handle
-## summarizing from functions that return multiple variables.
+## bounds of the CI. Note the use of group_modify() to 
+## apply approx_CI() to each group.
 SEM <- function(x) return(sd(x) / sqrt(length(x)))
 
-approx_CI <- function(x) {
+approx_CI <- function(x, ...) {
   upper <- mean(x) + 2 * SEM(x)
   lower <- mean(x) - 2 * SEM(x)
   return(tibble(lower, upper))
 }
 
-stalk %>%
-  group_by(food_source) %>%
-  do(approx_CI(.$eye_span))
+stalk %>% 
+  group_by(food_source) %>% 
+  group_modify(~ approx_CI(.x$eye_span))
 ```
 
 We can simulate what we would expect assuming the means and standard deviation are representative of the population parameters. Do the following:
