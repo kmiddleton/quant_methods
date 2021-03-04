@@ -109,7 +109,7 @@ Compare the results of the linear model with the results of the *t*-test above. 
 > The `(Intercept)` term from `lm()` is equal to the mean for the Corn group. The `food_sourceCotton` estimate is the *difference* between the means for the Corn and Cotton group means. $F = t^2$.
 
 
-### Activity 4
+### Activity 2
 
 In lecture, we gave the equations for calculating the Bayes Factor (likelihood ratio) to compare two models. This type of comparison is applicable in situations when you have model likelihoods available and gives you an estimate of the relative support of one model compared to the another. In the future, we will use variations of this test to compare models.
 
@@ -244,7 +244,13 @@ stalk %>%
   group_modify(~ approx_CI(.x$eye_span))
 ```
 
-We can simulate what we would expect assuming the means and standard deviation are representative of the population parameters. Do the following:
+We can simulate what we would expect for a confidence interval if we set the true mean and standard deviation for our population. Knowing these true values allows us to draw random data from a true underlying distribution. 
+
+For this simulation, we could assume our estimated means and standard deviations are representative of the population parameters. For any empirical dataset, will you ever know the true mean and standard deviation?
+
+> No. It will always be an estimate. You expect it to get closer to the truth the higher the sample size but it is still an estimate.
+
+Let's set up our simulation. Do the following:
 
 1. Generate simulated data from a normal distribution matching the number of observations, mean, and standard deviation (note sd not SEM) for each group.
 2. Calculate the mean for each group and the upper and lower bounds of the confidence interval.
