@@ -101,6 +101,7 @@ SS <- function(x, x_bar = NULL) {
 #### Setup data
 
 ```{r}
+# Change stalk below to whatever you called the Stalkies.csv data
 n1 <- nrow(stalk[stalk$food_source == "Corn", ])
 n2 <- nrow(stalk[stalk$food_source == "Cotton", ])
 
