@@ -16,12 +16,20 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
+
+## Miscellaneous
+
+- Progress check
+- If you can't knit your problem set
+
+
 ## Theta (or Beta)
 
 > From the 4th slide in 06-4 lecture, is theta0 the intercept and theta1 the slope? I just want to confirm I understood that correctly.
 
 $$Y = \theta_0 + \theta_1 X$$
 $$Y = \beta_0 + \beta_1 X$$
+
 
 ## Confidence Intervals
 
@@ -31,6 +39,7 @@ $$Y = \beta_0 + \beta_1 X$$
 ## Maximum Likelihood vs. Bayesian
 
 > I think I'm confused on the difference between ML and Bayesian frameworks.  From lecture 05-5, I thought it was that ML asks what is the probability of observing the data we have (the Ys) given some parameters (e.g., values of theta that we assign and 'test' out).  And that Bayesian asks what is the probability of a certain set of parameters (thetas) given the data that we observed (the Ys).  However, in some of the other lecture videos (e.g., 06-5), when working with the ML frameworks, it is stated that "we're trying to figure out the likelihood of our parameters".  That sounds like the Bayesian approach to me, so I think I'm confused on what the difference is between these two frameworks.  
+
 
 ## Maximum Likelihood vs. Bayesian
 
@@ -66,6 +75,7 @@ $$s^2 = MSE = \frac{n}{n-2}\left(\hat{\sigma}^2\right)$$
 
 For non-small $n$, $s^2 \approx \left(\hat{\sigma}^2\right)$. Here ~7% difference.
 
+
 ## Maximum Likelihood vs. REML
 
 > How does restricted maximum likelihood differ from maximum likelihood?
@@ -78,7 +88,7 @@ For non-small $n$, $s^2 \approx \left(\hat{\sigma}^2\right)$. Here ~7% differenc
 
 ## Maximum Likelihood vs. REML
 
-- If we only care about the parameter estimates, then biased estimate of $s^2$ is not a problem.
+- If we only care about the parameter estimates, then biased estimate of $\hat{\sigma}^2$ is not a problem.
     - If we are interested in variance then it is a problem.
     - Estimating intraclass correlation, heritability, etc.
 - If we want to compare models fit with likelihood, then we need to use ML, not REML
