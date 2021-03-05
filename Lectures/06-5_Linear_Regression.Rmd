@@ -14,7 +14,6 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
-library(RcppEigen)
 library(rethinking)
 library(latex2exp)
 
