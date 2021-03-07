@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 06'
+title: 'Problem Set 07'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -17,7 +17,15 @@ library(readxl)
 library(cowplot)
 
 library(knitr)
+theme_set(theme_cowplot())
 ```
+
+<!--
+Datasets
+  BrookTrout1.csv
+  BrookTrout2.csv
+  mammals.xlsx
+-->
 
 ```{r echo=FALSE, eval=FALSE}
 # Generate data for question 1.
@@ -29,11 +37,11 @@ M1 <- tibble(
                            rnorm(n, 0.242, 0.07)),
   Trout = factor(rep(c("Absent", "Present"), each = n))
 )
-write_csv(M1, path = "../data/BrookTrout1.csv")
+write_csv(M1, file = "../data/BrookTrout1.csv")
 
 ggplot(M1, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Trout", y = "Survival", title = "BrookTrout1")
@@ -52,7 +60,7 @@ write_csv(M2, path = "../data/BrookTrout2.csv")
 
 ggplot(M2, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Trout", y = "Survival", title = "BrookTrout2")
@@ -79,7 +87,7 @@ BT1 <- read_csv("../data/BrookTrout1.csv")
 BT2 <- read_csv("../data/BrookTrout2.csv")
 ```
 
-Make a plot of each data set using the same ggplot code you used to visualized the stalk-eyed fly data in Problem Set 5. Plot the raw data (points) for the two groups (trout `Absent` and `Present`). For the points, include jitter and transparency. Include means and standard errors plotted in a different color.
+Make a plot of each data set using the same ggplot code you used to visualized the stalk-eyed fly data in the previous problem set. Plot the raw data (points) for the two groups (trout `Absent` and `Present`). For the points, include jitter and transparency. Include means and standard errors plotted in a different color.
 
 Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plot 2). Then use the `plot_grid()` function in the `cowplot` package to stack the two plots on top of one another. You code for the last step will look something like: `plot_grid(p1, p2, nrow = 2)`. If you used `ncol = 2` instead, you would get plots side by side.
 
@@ -89,13 +97,13 @@ Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plo
 # FIXME
 p1 <- ggplot(BT1, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Trout", y = "Survival", title = "My Data")
 p2 <- ggplot(BT2, aes(x = Trout, y = Proportion_Surviving)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Trout", y = "Survival", title = "My Collaborator's Data")
@@ -135,7 +143,7 @@ How do you feel about the results of these two studies?
 
 > They are nearly identical, but the arbitrarily chosen $\alpha$ level comes to two different conclusions.
 
-Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the aggregate data, which might look something like this table:
+Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data, which might look something like this table:
 
 ```{r echo=FALSE}
 M <- tibble(Survival = c("Survived", "Did not survive"),
@@ -146,7 +154,8 @@ knitr::kable(M)
 
 Why is this test not advisable in this case?
 
-> The observations (whether an individual salmon juvenile was alive or not) are not independent of one another, streams add a level of structure to the data (all salmon in a stream are more likely to have the same survival probability).
+> The observations (whether an individual salmon juvenile was alive or not) are not independent of one another, streams add a level of structure to the data (all salmon in a stream are more likely to have the same survival probability). Later in the course, we will cover multilevel and logistic regression, which is another way to (correctly) model survival, accounting for possible different survival rates in both streams.
+
 
 ## Exact confidence intervals
 
@@ -174,7 +183,7 @@ Now calculate the exact 95% confidence intervals for the two groups in your data
 
 ```{r}
 # Let's just adapt the approximate CI function from
-# Problem Set 5. We will make it a little more flexible
+# Problem Set 6. We will make it a little more flexible
 # by allowing us to specify the desired interval with
 # `prob`. Default to 95% CI.
 SEM <- function(x) return(sd(x) / sqrt(length(x)))
@@ -223,6 +232,7 @@ mylist[[2]]$z[3]
 
 We will use lists in a much less convoluted way, which is what you should do until you get comfortable. For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
 
+
 ### Activity
 
 The file `mammals.xlsx` contains data for about 50 different traits. *All* 5416 species of mammals are included in the file, though none has data for all traits. We want to make some quick plots of four different traits plotted against body mass.
@@ -232,10 +242,10 @@ Rather than creating separate plots, we want to make them inside a loop, where w
 1. Load the data from `mammals.xlsx`.
 2. Create a column that holds the log10 transformation of `adult_body_mass_g` and one for the log10 of `basal_met_rate_m_l_o2hr`.
 3. Create a vector of strings that we will use to iterate through the columns for analysis (we used `cols_analyze`). It should contain the following strings:
-    - "ageat_eye_opening_d"
-    - "log_BMR" (or whatever you called the log10 of `basal_met_rate_m_l_o2hr`)
-    - "gestation_len_d"
-    - "litter_size"
+    - `ageat_eye_opening_d`
+    - `log_BMR1 (or whatever you called the log10 of `basal_met_rate_m_l_o2hr`)
+    - `gestation_len_d`
+    - `litter_size`
 4. Create a vector of strings to use for the y axis labels. Make sure that the order matches the order in your vector #3.
 5. Create an empty list to hold plots: `pp <- list()` for example.
 
