@@ -10,6 +10,11 @@ csl: evolution.csl
 bibliography: Multivariate.bib
 ---
 
+<!--
+Datasets
+  mammals.txt
+-->
+
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
@@ -18,6 +23,7 @@ source("https://raw.githubusercontent.com/kmiddleton/quant_methods/master/Lectur
 
 options(pillar.sigfig = 4)
 ```
+
 
 ## Hypotheses
 
@@ -85,6 +91,7 @@ shade_t(0.005, 10,tail = "both") +
 
 </center>
 
+
 ## Maximum Likelihood
 
 - Likelihood ratios
@@ -92,6 +99,7 @@ shade_t(0.005, 10,tail = "both") +
     - Follow a $\chi^2$ Distribution (*df* = difference in number of estimated parameters)
 
 *Stay Tuned for Model Comparisons*
+
 
 ## Bayesian Inference
 
