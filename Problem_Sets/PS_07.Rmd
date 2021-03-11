@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 06'
+title: 'Problem Set 07'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -11,11 +11,16 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-# Add other libraries here
 
-library(tidyverse)
-library(knitr)
 ```
+
+<!--
+Datasets
+  BrookTrout1.csv
+  BrookTrout2.csv
+  mammals.xlsx
+-->
+
 
 ## Brook trout
 
@@ -34,7 +39,7 @@ Load each of the files into R.
 
 ```
 
-Make a plot of each data set using the same ggplot code you used to visualized the stalk-eyed fly data in Problem Set 5. Plot the raw data (points) for the two groups (trout `Absent` and `Present`). For the points, include jitter and transparency. Include means and standard errors plotted in a different color.
+Make a plot of each data set using the same ggplot code you used to visualized the stalk-eyed fly data in the previous problem set. Plot the raw data (points) for the two groups (trout `Absent` and `Present`). For the points, include jitter and transparency. Include means and standard errors plotted in a different color.
 
 Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plot 2). Then use the `plot_grid()` function in the `cowplot` package to stack the two plots on top of one another. You code for the last step will look something like: `plot_grid(p1, p2, nrow = 2)`. If you used `ncol = 2` instead, you would get plots side by side.
 
@@ -46,7 +51,7 @@ Assign each plot to an R object (we like to use `p1` and `p2` for plot 1 and plo
 
 Considering the plot you just made, do you think that mean survivorship is significantly different in the Absent/Present treatment groups? Do you think that the two sets of data are different from one another?
 
->
+> 
 
 First, fit a linear model to **your data** (from `BrookTrout1.csv`), in which the proportion of salmon surviving is modeled by presence or absence of trout. Print out the `summary()` of this linear model.
 
@@ -54,9 +59,11 @@ First, fit a linear model to **your data** (from `BrookTrout1.csv`), in which th
 
 ```
 
-How do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
+Note that, although these data are proportions (and thus bounded by 0 and 1), the observed values are normally distributed enough within in group to analyze with a regular linear model. If the values are clumped either close to 0 or to 0, then a different model is likely needed. For example, if you are trying to analyze student exam scores, you often run into problems because they are often heavily skewed and often run up against 1. Technically, it is the residuals that need to be normally distributed, but if the predictors are not normal then often the residuals won't be either.
 
->
+All that being said, how do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
+
+> 
 
 Now fit the same model to your **collaborator's data** (from `BrookTrout2.csv`).
 
@@ -66,24 +73,25 @@ Now fit the same model to your **collaborator's data** (from `BrookTrout2.csv`).
 
 What do you conclude about your collaborator's data?
 
->
+> 
 
 How do you feel about the results of these two studies?
 
->
+> 
 
-Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the aggregate data, which might look something like this table:
+Because you have data on individual-level survival of salmon, you might be tempted to use a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data, which might look something like this table:
 
 ```{r echo=FALSE}
-M <- tibble(Survival = c("Survived", "Did not survive"),
-                `Trout absent` = c(946, 3470),
-                `Trout present` = c(919, 3876))
+M <- tibble::tibble(Survival = c("Survived", "Did not survive"),
+            `Trout absent` = c(946, 3470),
+            `Trout present` = c(919, 3876))
 knitr::kable(M)
 ```
 
 Why is this test not advisable in this case?
 
->
+> 
+
 
 ## Exact confidence intervals
 
@@ -91,17 +99,18 @@ We ultimately want to calculate exact confidence intervals for the proportion su
 
 ### Activity
 
-Make a plot of the critical value for a *t*-distribution for the 0.975 quantile (upper tail of 2.5%) where the degrees of freedom ranges from 2 to 100. First set up the vector of degrees of freedom (don't call it df, because that is the name of an R function). Then calculate the critical values. Make a data.frame and plot the results. Then add a differently colored horizontal line at the critical value for the 0.975 quantile for a standard normal distribution. Note that the critical value approaches the asymptotic limit as the degrees of freedom increases.
+Make a plot of the critical value for a *t*-distribution for the 0.975 quantile (upper tail of 2.5%) where the degrees of freedom ranges from 2 to 100. First set up the vector of degrees of freedom (don't call it df, because that is the name of an R function: the density of an *F*-distribution). Then calculate the critical values. Make a tibble and plot the results. Then add a differently colored horizontal line at the critical value for the 0.975 quantile for a standard normal distribution. Note that the critical value approaches the asymptotic limit as the degrees of freedom increases.
 
 ```{r}
 
 ```
 
-Now calculate the exact 95% confidence intervals for the two groups in your data (from `BrookTrout1.csv`). Either pull the critical value from your data.frame or just calculate anew.
+Now calculate the exact 95% confidence intervals for the two groups in your data (from `BrookTrout1.csv`). Either pull the critical value from your tibble or just calculate anew.
 
 ```{r}
 
 ```
+
 
 ## Working with lists
 
@@ -126,10 +135,12 @@ mylist
 Now the 1st element has a string, the 2nd has a list (which itself contains a numeric, a string, and a vector). How would you extract the 3rd element from the `z` vector?
 
 ```{r}
-mylist[[2]]$z[3]
+
 ```
 
-We will use lists in a much less convoluted way, which is what you should do until you get comfortable. For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
+We will use lists in a much less convoluted way, which is what you should do until you get comfortable (once you are comfortable with lists, their immense flexibility makes them a great way to pass collections of different kinds of data around among code).
+
+For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
 
 ### Activity
 
@@ -140,10 +151,10 @@ Rather than creating separate plots, we want to make them inside a loop, where w
 1. Load the data from `mammals.xlsx`.
 2. Create a column that holds the log10 transformation of `adult_body_mass_g` and one for the log10 of `basal_met_rate_m_l_o2hr`.
 3. Create a vector of strings that we will use to iterate through the columns for analysis (we used `cols_analyze`). It should contain the following strings:
-    - "ageat_eye_opening_d"
-    - "log_BMR" (or whatever you called the log10 of `basal_met_rate_m_l_o2hr`)
-    - "gestation_len_d"
-    - "litter_size"
+    - `ageat_eye_opening_d`
+    - `log_BMR1 (or whatever you called the log10 of `basal_met_rate_m_l_o2hr`)
+    - `gestation_len_d`
+    - `litter_size`
 4. Create a vector of strings to use for the y axis labels. Make sure that the order matches the order in your vector #3.
 5. Create an empty list to hold plots: `pp <- list()` for example.
 
@@ -153,7 +164,7 @@ This is all we need for the setup. At this point, you have the data, two vectors
 
 ```
 
-No we can work on a loop to iterate through the columns, making a plot for each column. Here is the pseudocode:
+No we can work on a loop to iterate through the columns, making a plot for each column. Here is the pseudocode (https://blog.usejournal.com/how-to-write-pseudocode-a-beginners-guide-29956242698):
 
 1. Create the framework for a `for` loop.
     - We want to iterate from 1 to `length(cols_analyze)`

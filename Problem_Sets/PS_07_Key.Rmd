@@ -230,10 +230,11 @@ mylist
 Now the 1st element has a string, the 2nd has a list (which itself contains a numeric, a string, and a vector). How would you extract the 3rd element from the `z` vector?
 
 ```{r}
+# FIXME
 mylist[[2]]$z[3]
 ```
 
-We will use lists in a much less convoluted way, which is what you should do until you get comfortable (once you are comfortable with lists, their immense flexibility makes them a great way to pass collections of different kinds of data aroound among code).
+We will use lists in a much less convoluted way, which is what you should do until you get comfortable (once you are comfortable with lists, their immense flexibility makes them a great way to pass collections of different kinds of data around among code).
 
 For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
 
