@@ -123,9 +123,11 @@ fm1 <- lm(Proportion_Surviving ~ Trout, BT1)
 summary(fm1)
 ```
 
-How do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
+Note that, although these data are proportions (and thus bounded by 0 and 1), the observed values are normally distributed enough within in group to analyze with a regular linear model. If the values are clumped either close to 0 or to 0, then a different model is likely needed. For example, if you are trying to analyze student exam scores, you often run into problems because they are often heavily skewed and often run up against 1. Technically, it is the residuals that need to be normally distributed, but if the predictors are not normal then often the residuals won't be either.
 
-> At $\alpha = 0.05$, there is a significant difference between the groups with lower salmon survivorship in the presence of trout (mean difference = 0.055; P = 0.0495).
+All that being said, how do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
+
+> At $\alpha = 0.05$, there is a significant difference between the groups with lower salmon survivorship in the presence of trout (mean difference = 0.055 or 5.5%; P = 0.0495).
 
 Now fit the same model to your **collaborator's data** (from `BrookTrout2.csv`).
 
@@ -141,9 +143,9 @@ What do you conclude about your collaborator's data?
 
 How do you feel about the results of these two studies?
 
-> They are nearly identical, but the arbitrarily chosen $\alpha$ level comes to two different conclusions.
+> They are nearly identical (5.5% vs. 5.3% difference in survivorship), but the arbitrarily chosen $\alpha$ level leads you to two different conclusions.
 
-Because you have data on individual-level survival of salmon, you might be tempted to do a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data, which might look something like this table:
+Because you have data on individual-level survival of salmon, you might be tempted to use a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data, which might look something like this table:
 
 ```{r echo=FALSE}
 M <- tibble(Survival = c("Survived", "Did not survive"),
@@ -163,13 +165,13 @@ We ultimately want to calculate exact confidence intervals for the proportion su
 
 ### Activity
 
-Make a plot of the critical value for a *t*-distribution for the 0.975 quantile (upper tail of 2.5%) where the degrees of freedom ranges from 2 to 100. First set up the vector of degrees of freedom (don't call it df, because that is the name of an R function). Then calculate the critical values. Make a data.frame and plot the results. Then add a differently colored horizontal line at the critical value for the 0.975 quantile for a standard normal distribution. Note that the critical value approaches the asymptotic limit as the degrees of freedom increases.
+Make a plot of the critical value for a *t*-distribution for the 0.975 quantile (upper tail of 2.5%) where the degrees of freedom ranges from 2 to 100. First set up the vector of degrees of freedom (don't call it df, because that is the name of an R function: the density of an *F*-distribution). Then calculate the critical values. Make a tibble and plot the results. Then add a differently colored horizontal line at the critical value for the 0.975 quantile for a standard normal distribution. Note that the critical value approaches the asymptotic limit as the degrees of freedom increases.
 
 ```{r}
 # FIXME
 CVs <- tibble(dfs = seq(2, 100, by = 1),
-                  crit_vals = qt(0.975, df = dfs,
-                                 lower.tail = TRUE))
+              crit_vals = qt(0.975, df = dfs,
+                             lower.tail = TRUE))
 
 CVs %>%
   ggplot(aes(dfs, crit_vals)) +
@@ -179,7 +181,7 @@ CVs %>%
   labs(x = "Degrees of Freedom", y = "Critical value (0.975)")
 ```
 
-Now calculate the exact 95% confidence intervals for the two groups in your data (from `BrookTrout1.csv`). Either pull the critical value from your data.frame or just calculate anew.
+Now calculate the exact 95% confidence intervals for the two groups in your data (from `BrookTrout1.csv`). Either pull the critical value from your tibble or just calculate anew.
 
 ```{r}
 # Let's just adapt the approximate CI function from
@@ -197,12 +199,13 @@ exact_CI <- function(x, prob = 0.95) {
   return(tibble(Lower, Mean = mean(x), Upper))
 }
 
-CIs <- BT1 %>%
-  group_by(Trout) %>%
-  do(exact_CI(.$Proportion_Surviving))
+CIs <- BT1 %>% 
+  group_by(Trout) %>% 
+  group_modify(~ exact_CI(.x$Proportion_Surviving))
 
 knitr::kable(CIs)
 ```
+
 
 ## Working with lists
 
@@ -230,8 +233,9 @@ Now the 1st element has a string, the 2nd has a list (which itself contains a nu
 mylist[[2]]$z[3]
 ```
 
-We will use lists in a much less convoluted way, which is what you should do until you get comfortable. For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
+We will use lists in a much less convoluted way, which is what you should do until you get comfortable (once you are comfortable with lists, their immense flexibility makes them a great way to pass collections of different kinds of data aroound among code).
 
+For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
 
 ### Activity
 
@@ -270,7 +274,7 @@ axis_labels <- c("Age at Eye Opening",
 pp <- list()
 ```
 
-No we can work on a loop to iterate through the columns, making a plot for each column. Here is the pseudocode:
+No we can work on a loop to iterate through the columns, making a plot for each column. Here is the pseudocode (https://blog.usejournal.com/how-to-write-pseudocode-a-beginners-guide-29956242698):
 
 1. Create the framework for a `for` loop.
     - We want to iterate from 1 to `length(cols_analyze)`
@@ -301,7 +305,8 @@ Now you can make a 2x2 grid of plots. The cowplot function `plot_grid()` can tak
 ```{r warning=FALSE}
 # FIXME
 plot_grid(plotlist = pp, ncol = 2, nrow = 2,
-          labels = c("a", "b", "c", "d"))
+          labels = c("a", "b", "c", "d"),
+          label_size = 8)
 ```
 
 Now you can fine tune the plots:
