@@ -59,7 +59,7 @@ First, fit a linear model to **your data** (from `BrookTrout1.csv`), in which th
 
 ```
 
-Note that, although these data are proportions (and thus bounded by 0 and 1), the observed values are normally distributed enough within in group to analyze with a regular linear model. If the values are clumped either close to 0 or to 0, then a different model is likely needed. For example, if you are trying to analyze student exam scores, you often run into problems because they are often heavily skewed and often run up against 1. Technically, it is the residuals that need to be normally distributed, but if the predictors are not normal then often the residuals won't be either.
+Note that, although these data are proportions (and thus bounded by 0 and 1), the observed values are normally distributed enough within in group to analyze with a regular linear model. If the values are clumped either close to 0 or to 1, then a different model is likely needed. For example, if you are trying to analyze student exam scores, you often run into problems because they are often heavily skewed and often run up against 1. Technically, it is the residuals that need to be normally distributed, but if the predictors are not normal then often the residuals won't be either.
 
 All that being said, how do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
 

@@ -123,7 +123,7 @@ fm1 <- lm(Proportion_Surviving ~ Trout, BT1)
 summary(fm1)
 ```
 
-Note that, although these data are proportions (and thus bounded by 0 and 1), the observed values are normally distributed enough within in group to analyze with a regular linear model. If the values are clumped either close to 0 or to 0, then a different model is likely needed. For example, if you are trying to analyze student exam scores, you often run into problems because they are often heavily skewed and often run up against 1. Technically, it is the residuals that need to be normally distributed, but if the predictors are not normal then often the residuals won't be either.
+Note that, although these data are proportions (and thus bounded by 0 and 1), the observed values are normally distributed enough within in group to analyze with a regular linear model. If the values are clumped either close to 0 or to 1, then a different model is likely needed. For example, if you are trying to analyze student exam scores, you often run into problems because they are often heavily skewed and often run up against 1. Technically, it is the residuals that need to be normally distributed, but if the predictors are not normal then often the residuals won't be either.
 
 All that being said, how do you interpret the output of the linear model? Is there is significant difference in mean survival between the groups? Choose the $\alpha$-level you feel is appropriate.
 
@@ -148,9 +148,9 @@ How do you feel about the results of these two studies?
 Because you have data on individual-level survival of salmon, you might be tempted to use a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data, which might look something like this table:
 
 ```{r echo=FALSE}
-M <- tibble(Survival = c("Survived", "Did not survive"),
-            `Trout absent` = c(946, 3470),
-            `Trout present` = c(919, 3876))
+M <- tibble::tibble(Survival = c("Survived", "Did not survive"),
+                    `Trout absent` = c(946, 3470),
+                    `Trout present` = c(919, 3876))
 knitr::kable(M)
 ```
 
