@@ -31,7 +31,7 @@ shade_t <- function(q, df, tail = "both") {
                   y = dt(x, df))
   p <- ggplot(M, aes(x, y)) +
     geom_line() +
-    labs(x = TeX("$t$"), y = "Relative Likelihood")
+    labs(x = TeX("$t$-statistic"), y = "Relative Likelihood")
   lower <- geom_ribbon(data = subset(M, x < crit),
                        aes(ymax = y), ymin = 0,
                        fill = "red", alpha = 0.5)
@@ -85,6 +85,6 @@ shade_chisq <- function(q, df) {
                 aes(ymax = y), ymin = 0,
                 fill = "red", alpha = 0.5) +
     ylim(c(0, 1.1 * max(M$y))) +
-    labs(x = TeX("$\\chi^2"), y = "Relative Likelihood")
+    labs(x = TeX("$\\chi^2$"), y = "Relative Likelihood")
   return(p)
 }

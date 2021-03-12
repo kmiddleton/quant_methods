@@ -1,0 +1,86 @@
+---
+title: "Unit 7: In ClassDiscussion"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+---
+
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+theme_set(theme_cowplot())
+source("https://raw.githubusercontent.com/kmiddleton/quant_methods/master/Lectures/Shade_Distributions.R")
+```
+
+
+## Quiz 6-1
+
+
+## Quiz 7-4
+
+- n = 25
+- Mean: 98.524
+- Standard deviation: 0.68
+
+```{r}
+n <- 25
+y_bar <- 98.524
+y_sd <- 0.68
+```
+
+
+## Standard Error of the Mean
+
+$$SEM = \frac{\sigma}{\sqrt{n}}$$
+
+```{r}
+(SEM <- y_sd / sqrt(n))
+```
+
+
+## Test the sample mean vs. null hypothesized value of 98.6
+
+$$t = \frac{\theta_1 - \theta_{null}}{SE_{\theta_1}}$$
+
+```{r}
+(t_stat <- (y_bar - 98.6) / SEM)
+```
+
+
+## Compare the t-statistic to the critical value ...
+
+```{r}
+(t_crit <- qt(p = 0.025, df = n - 1, lower.tail = TRUE))
+t_stat
+```
+
+Is `t_stat` more extreme than `t_crit`?
+
+
+## Compare the t-statistic to the critical value ...
+
+```{r, fig.height=4}
+shade_t(0.025, n - 1) +
+  geom_vline(xintercept = t_stat, color = "goldenrod", size = 1)
+```
+
+
+## 95% CI
+
+```{r}
+y_bar - qt(p = 0.025, df = n - 1, lower.tail = FALSE) * SEM
+y_bar + qt(p = 0.025, df = n - 1, lower.tail = FALSE) * SEM
+```
+
+
+## How to figure out how many degrees of freedom?
+
+How many parameters have you estimated?
+
+- n - 1 (mean for one group)
+- n - 2 (mean for 2 groups; slope and intercept)
+- n - k (means for k groups)
