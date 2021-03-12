@@ -22,12 +22,14 @@ shade_normal <- function(q, tail = "both", mean = 0, sd = 1) {
 shade_t <- function(q, df, tail = "both") {
   require(tidyverse, quietly = TRUE)
   require(cowplot)
+  theme_set(theme_cowplot())
   if (!require(latex2exp, quietly = TRUE)) {
     stop("Please install the package 'latex2exp':\n\tinstall.packages('latex2exp')")
   }
 
   crit <- qt(q, df)
-  M <- tibble(x = seq(-4, 4, length = 200),
+  M <- tibble(x = seq(crit * 1.5, -1 * crit * 1.5,
+                      length = 200),
                   y = dt(x, df))
   p <- ggplot(M, aes(x, y)) +
     geom_line() +
