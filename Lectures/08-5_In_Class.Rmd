@@ -24,46 +24,6 @@ library(rethinking)
 ```
 
 
-## Bayesian MCMC
-
-1. Simultaneous inference of all parameters
-    - Metropolis-Hastings Algorithm
-    - Hamiltonian Monte Carlo (stan)
-    - Very efficient, but when one parameter gets stuck, all are impacteds
-2. On parameter at a time
-    - Gibbs Sampling (BUGS, JAGS)
-    - Inefficient, autocorrelation
-
-
-## Bad MCMC Sampling
-
-<center>
-<img src="https://i.imgur.com/oNZxNtB.png" width="100%" />
-</center>
-
-
-## Warnings
-
-<center>
-<img src="https://i.imgur.com/hIv2hwu.png" width="100%" />
-</center>
-
-
-## Adjust Data or Priors
-
-- Mean-center or standardize data
-- Adjust the model specification
-$$\mathcal{N}(10, 1) = 10 + \mathcal{N}(0, 1)$$
-- Think about different/narrower priors (what is reasonable?)
-
-
-## Better MCMC Sampling
-
-<center>
-<img src="https://i.imgur.com/Fqq3fVa.png" width="100%" />
-</center>
-
-
 ## Plotting skills
 
 <div class="columns-2">
