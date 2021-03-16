@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 07'
+title: 'Problem Set 08'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -16,78 +16,88 @@ library(tidyverse)
 library(readxl)
 library(cowplot)
 
-library(knitr)
+theme_set(theme_cowplot())
 ```
+
+<!--
+Datasets
+  Limb_Lengths.csv
+  Heart_Transplants.xlsx
+  Birds.xlsx
+-->
 
 ## Variation Within and Between Groups
 
 In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`, as well as some `apply` relatives in the `tidyverse` that take some of the difficulty from apply functions across R structures.
 
-Let's start with `apply()`. `apply()` is part of a family of base-R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
+Let's start with `apply()`. `apply()` is part of a family of base-R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame`/`tibble` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
 
 ```{r}
-ap.test <- tibble(x1 = seq(1, 10),
+ap_test <- tibble(x1 = seq(1, 10),
                   x2 = rep(5, 10),
                   x3 = seq(20, 65, length.out = 10))
 
-# Built in R funtions
-(max.ap.row <- apply(ap.test, 1, max))
+# Built in R functions
+(max_ap_row <- apply(ap_test, MARGIN = 1, max))
 
-(max.ap.col <- apply(ap.test, 2, max))
+(max_ap_col <- apply(ap_test, MARGIN = 2, max))
 
-(mean.ap.row <- apply(ap.test, 1, mean)) # == rowMeans()
+(mean_ap_row <- apply(ap_test, MARGIN = 1, mean)) # == rowMeans()
 
-(mean.ap.col <- apply(ap.test, 2, mean)) # == colMeans()
+(mean_ap_col <- apply(ap_test, MARGIN = 2, mean)) # == colMeans()
 
 # Anonymous function in the apply().
-(ss <- apply(ap.test, 1, function(x) (x[1] * x[2]) / x[3]))
+(ss <- apply(ap_test, MARGIN = 1, function(x) (x[1] * x[2]) / x[3]))
 ```
 
 The `tidyverse` has a family of `map` and `pmap` functions that alleviate some of the difficulty in programming with apply, especially when you are trying to pass multiple values to a function (as in the last example above with `x[1]`, `x[2]`, and `x[3]`). `map()` and relatives (e.g., `map_dbl()` which converts the returned values to a numeric vector [whereas `map()` by default returns a list]) are not as useful to us right now. We will instead focus on the `map2` functions that operate across `data.frame`s or `tibble`s.
 
 `pmap()` (for "parallel" `map`) passes the entire row of a `data.frame` to a function. By default, it returns a list. However, `pmap_dbl()` expects a numeric vector to be returned from the function, and `pmap_dfr()` expects a `data.frame`.
 
-We will use our example `ap.test` from above.
+We will use our example `ap_test` from above.
 
 ```{r}
 # Convert anonymous function into a standalone function 
 myfun <- function(x1, x2, x3) (x1 * x2) / x3
 
-pmap_dbl(ap.test, myfun) # Note that this is the same as above
+pmap_dbl(ap_test, myfun) # Note that this is the same as above
 ```
 
 One nice thing about `pmap` is that it will figure out the correct order for passing variables to the function. If we reorder the columns, they are still correctly interpreted by the function. Doing the same would give the wrong answer for `apply()`.
 
 ```{r}
-ap.test.reorder <- ap.test[, c(3, 2, 1)]
-pmap_dbl(ap.test.reorder, myfun) # Note that this is the same as above
+ap_test_reorder <- ap_test[, c(3, 2, 1)]
+pmap_dbl(ap_test_reorder, myfun) # Note that this is the same as above
 ```
 
 Another nice feature of `pmap()` is that it offers some protection from passing the wrong column names to the function. The following code would fail, because the function expects "x1", "x2", and "x3".
 
 ```{r, eval=FALSE}
-names(ap.test.rename) <- c("y1", "y2", "y3")
-pmap_dbl(ap.test.rename, myfun) # Fails with an error
+# Rename columns
+ap_test_rename <- ap_test %>% 
+  rename(y1 = x1, y2 = x2, y3 = x3)
+pmap_dbl(ap_test_rename, myfun) # Fails with an error
 ```
 
 `pmap()` will work with anonymous functions, just like `apply`. This can be handy if your function is quick and/or you want to just append the calculated value onto the existing object.
 
 ```{r}
-pmap_dbl(ap.test, function(x1, x2, x3) (x1 * x2) / x3)
+pmap_dbl(ap_test, function(x1, x2, x3) (x1 * x2) / x3)
 
 # Note the . below in pmap_dbl, to indicate ap.test should be passed to
 # the function
-ap.test <- ap.test %>% 
+ap_test <- ap_test %>% 
   mutate(x4 = pmap_dbl(., function(x1, x2, x3) (x1 * x2) / x3))
 
-ap.test
+ap_test
 ```
+
 
 ### Activity
 
-Now let's try our simulation. We will simulate two groups that have different means (the true means are different) but change the variance and see how F is affected. Here is the pseudocode:
+Now let's try our simulation. We will simulate two groups that have different means (the true means are different) but change the variance and see how *F* is affected. Here is the pseudocode:
 
-1) Write a function called `getF`. (hint: try getting this to work for one set of values before making it a function)
+1) Write a function called `getF`. (Hint: try getting this to work for one set of values before making it a function)
 
     - Pass the function the following: mean for group 1 (`mu1`), mean for group 2 (`mu2`), a single standard deviation for both groups (`sd_both`), a single number of observations in the groups (`nobs`).
     - Inside the function, create a `data.frame` with two columns: `y` and `x`. `x` is the group id (repeat 1 and 2 each for the number of observations). `y` is the outcome. Pull values for the number of observations from a normal distribution with the mean for each group, the standard deviation. Fit a linear model and then ANOVA using `anova(lm())` and assign this to an object named `aa`.
@@ -116,9 +126,10 @@ getF(mu1 = 0, mu2 = 1, sd_both = 1, nobs = 100)
 2) Set up a `data.frame()` or `tibble()` with our inputs for the simulation. In the first column, place the values of the standard deviations we will use. We will try the values from 1 to 5, stepping by 0.25. In the second column, place the mean for group 1 for all rows. In the third column, place the mean for group 2 for all rows. In the fourth column, place the number of observations (we will use 100).
 
 ```{r}
+# FIXME
 # Step 2
 sds <- seq(1, 5, by = 0.25)
-sims <- data.frame(
+sims <- tibble(
   sd_both = sds,
   mu1 = rep(0, length = length(sds)),
   mu2 = rep(1, length = length(sds)),
@@ -129,6 +140,7 @@ sims <- data.frame(
 3) Use `pmap_dbl()` to apply the function you wrote to your data frame to get an F-value for each set of parameters. You can then assign these F-values to be a new column in your `data.frame`. Be careful not to have any extra column names other than the ones that `getF()` is expecting.
 
 ```{r}
+# FIXME
 # Step 3
 Fs <- pmap_dbl(sims, getF)
 sims$Fs <- Fs
@@ -137,6 +149,7 @@ sims$Fs <- Fs
 4) Plot the $F$-statistic vs. the standard deviation. Add a horizontal line at the critical value for an $\alpha$ of 0.05.
 
 ```{r}
+# FIXME
 # Step 4
 fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
 
@@ -148,6 +161,7 @@ ggplot(sims, aes(x = sds, y = Fs)) +
 5) There is some noise because we are only performing the ANOVA for one data set for each standard deviation. Make a copy of your function (call it `getF2`) and add a loop inside the function to generate a data set and perform an ANOVA 100 times. Keep the F-value for each, and return the mean F-value. Then plot as above.
 
 ```{r}
+# FIXME
 # Step 5
 
 getF2 <- function(mu1, mu2, sd_both, nobs) {
@@ -195,6 +209,7 @@ What do you think is the lower limit of $F$ (i.e., if you increased the standard
 
 > $F$ asymptotes at 0.
 
+
 ## Predicting height from limb lengths
 
 ```{r}
@@ -211,6 +226,7 @@ M <- data.frame(height, left_limb, right_limb)
 ```
 
 We should be able to predict someone's height from the lengths of their limbs. The file `Limb_Lengths.csv` contains data for 100 heights and associated left and right limb lengths. We know that limb length is about 40-50% of total height, but we can develop a linear model for prediction.
+
 
 ### Activity
 
@@ -267,6 +283,7 @@ Do these models make more sense?
 
 > Yes, for each limb length is a significant predictor of height. This result is what we expect to see.
 
+
 ## Heart Transplant Survivorship
 
 The data in `Heart_Transplants.xlsx` contains data on survivorship (in days; `Survival_Days`) for three groups of heart transplant patients. Patients were groups by the severity of the mismatch between donor and recipient (`Mismatch_Degree`): `Low`, `Medium`, and `High`. A low mismatch means a *good* match.
@@ -298,9 +315,10 @@ M <- M %>%
 There are only 39 observations total, so we may as well plot the raw data. Modify the code from the last two problem sets for plotting the points with the group means and standard errors.
 
 ```{r}
+#FIXME
 ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Mismatch Degree", y = "Survival (days)")
@@ -351,6 +369,7 @@ What does removing the intercept term from an ANOVA linear model do?
 
 > It forces R to estimate separate means for each group separately. This can be a useful technique.
 
+
 ## Bird abundance
 
 The file `Birds.xlsx` contains data from Vuilleumier, F. (1970) Insular Biogeography in Continental Regions. I. The Northern Andes of South America. *American Naturalist* 104:373-388.
@@ -375,11 +394,11 @@ Start by loading the data and plotting histograms of the variables. You can make
 ```{r message=FALSE}
 # FIXME
 M <- read_excel("../data/Birds.xlsx")
-ggplot(M, aes(x = N_Species)) + geom_histogram()
-ggplot(M, aes(x = Area)) + geom_histogram()
-ggplot(M, aes(x = Elevation)) + geom_histogram()
-ggplot(M, aes(x = Dist_to_Ecuador)) + geom_histogram()
-ggplot(M, aes(x = Dist_to_Island)) + geom_histogram()
+ggplot(M, aes(x = N_Species)) + geom_histogram(bins = 30)
+ggplot(M, aes(x = Area)) + geom_histogram(bins = 30)
+ggplot(M, aes(x = Elevation)) + geom_histogram(bins = 30)
+ggplot(M, aes(x = Dist_to_Ecuador)) + geom_histogram(bins = 30)
+ggplot(M, aes(x = Dist_to_Island)) + geom_histogram(bins = 30)
 ```
 
 Describe any patterns you see in the raw data.
