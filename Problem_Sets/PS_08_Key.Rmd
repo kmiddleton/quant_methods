@@ -357,6 +357,7 @@ What do the results of this linear model show?
 Fit another linear model just like the one above, but remove the intercept term by including `- 1` in the model: `lm(... ~ ... - 1)`. Compare the `summary()` of this model to the group means for each `Mismatch_Degree` (using `group_by()` and `summarize()`).
 
 ```{r}
+# FIXME
 fm2 <- lm(log_Survival ~ Mismatch_Degree - 1, data = M)
 anova(fm2)
 summary(fm2)

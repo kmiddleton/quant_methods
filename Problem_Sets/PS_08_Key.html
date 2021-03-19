@@ -242,7 +242,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Problem Set 08</h1>
 <h4 class="author">Your Name Here: Group X</h4>
-<h4 class="date">Last updated: 2021-03-16</h4>
+<h4 class="date">Last updated: 2021-03-19</h4>
 
 </div>
 
@@ -635,7 +635,8 @@ anova(fm)</code></pre>
 <p>Log-transformed survival (days) is not significantly different in the the three groups.</p>
 </blockquote>
 <p>Fit another linear model just like the one above, but remove the intercept term by including <code>- 1</code> in the model: <code>lm(... ~ ... - 1)</code>. Compare the <code>summary()</code> of this model to the group means for each <code>Mismatch_Degree</code> (using <code>group_by()</code> and <code>summarize()</code>).</p>
-<pre class="r"><code>fm2 &lt;- lm(log_Survival ~ Mismatch_Degree - 1, data = M)
+<pre class="r"><code># FIXME
+fm2 &lt;- lm(log_Survival ~ Mismatch_Degree - 1, data = M)
 anova(fm2)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
