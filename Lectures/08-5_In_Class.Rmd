@@ -24,31 +24,6 @@ library(rethinking)
 ```
 
 
-## Plotting skills
-
-<div class="columns-2">
-
-<center>
-<br />
-<br />
-<img src="https://socviz.co/assets/dv-cover-pupress.jpg" width="75%" />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-</center>
-
-*Data Visualization: A Practical Introduction*
-
-- Kieran Healy
-- http://socviz.co/
-
-Edward Tufte: https://www.edwardtufte.com/
-
-</div>
-
 ## Multiple regression
 
 ```{r, fig.height = 4, echo=FALSE}
