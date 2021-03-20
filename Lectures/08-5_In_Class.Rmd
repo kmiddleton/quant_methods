@@ -35,6 +35,7 @@ names(M) <- c("Species", "Milk_Energy", "Fat", "Lactose")
 ggscatmat(M, columns = 2:4)
 ```
 
+
 ## Multiple regression {.smaller}
 
 ```{r}
@@ -42,7 +43,8 @@ fm <- lm(Milk_Energy ~ Fat + Lactose, data = M)
 summary(fm)
 ```
 
-## Relationshps between variables
+
+## Relationships between variables
 
 <div class="columns-2">
 
@@ -67,6 +69,7 @@ How much variation does X1 alone explain in Y?
 
 </div>
 
+
 ## Estimate `Fat` coefficient
 
 1. Use `Lactose` to predict `Fat`, which will take the effect of `Lactose` out of the model when we predict `Milk_Energy`
@@ -77,6 +80,7 @@ fm_Lact <- lm(Fat ~ Lactose, data = M)
 M$resid_Lact <- residuals(fm_Lact)
 head(M)
 ```
+
 
 ## Estimate `Fat` coefficient
 
@@ -96,6 +100,7 @@ print(
                       label.buffer = unit(50, "mm"))
 )
 ```
+
 
 ## Estimate `Fat` coefficient
 
@@ -120,12 +125,14 @@ print(
   )
 ```
 
+
 ## Estimate `Fat` coefficient
 
 ```{r}
 coef(lm(Milk_Energy ~ resid_Lact, data = M))
 coef(fm)
 ```
+
 
 ## Estimate `Lactose` coefficient
 
@@ -136,6 +143,7 @@ coef(fm)
 fm_Fat <- lm(Lactose ~ Fat, data = M)
 M$resid_Fat <- residuals(fm_Fat)
 ```
+
 
 ## Estimate `Lactose` coefficient
 
@@ -148,6 +156,7 @@ L_v_F <- ggplot(M, aes(Fat, Lactose, label = Species)) +
 print(L_v_F +
         geom_text_repel(size = 3, force = 15))
 ```
+
 
 ## Estimate `Lactose` coefficient
 
@@ -168,6 +177,7 @@ print(milk_res_fat +
         geom_text_repel(size = 3, force = 15))
 ```
 
+
 ## Estimate `Lactose` coefficient
 
 ```{r}
@@ -175,11 +185,13 @@ coef(lm(Milk_Energy ~ resid_Fat, data = M))
 coef(fm)
 ```
 
+
 ## Compare
 
 ```{r echo=FALSE}
 plot_grid(F_v_L, L_v_F, ncol = 2)
 ```
+
 
 ## Compare
 
@@ -187,6 +199,7 @@ plot_grid(F_v_L, L_v_F, ncol = 2)
 plot_grid(milk_res_lact, milk_res_fat, ncol = 2)
 coef(fm)
 ```
+
 
 ## Relationshps between variables
 
@@ -219,6 +232,7 @@ How much variation does X1 alone explain in Y?
 
 </div>
 
+
 ## Statistical control
 
 $$\frac{Variation~in~Y~explained~by~X1}{Total~Variation~in~Y}$$
@@ -247,6 +261,7 @@ With categorical variables, a balanced design produced uncorrelated (orthogonal)
 
 </div>
 
+
 ## Statistical control
 
 <div class="columns-2">
@@ -270,6 +285,7 @@ ggplot(yy, aes(LightLevel, SoilType)) +
 
 </div>
 
+
 ## Statistical control
 
 <div class="columns-2">
@@ -292,6 +308,7 @@ ggplot(yy, aes(LightLevel, SoilType)) +
 ```
 
 </div>
+
 
 ## Statistical control
 
@@ -320,6 +337,7 @@ Another method:
     - Residuals ~ X1
 
 </div>
+
 
 ## Want to know more?
 
