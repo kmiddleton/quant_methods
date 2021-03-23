@@ -1,0 +1,211 @@
+---
+title: "Repeatability"
+subtitle: "Quantitative Methods in Life Sciences"
+author: "Elizabeth King, Kevin Middleton, and Lauren Sullivan"
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+theme_set(theme_cowplot())
+library(readxl)
+library(ggrepel)
+```
+
+<!--
+Datasets
+  GatorObs.xlsx
+-->
+
+## Repeatability of measurements
+
+Parsing real variation vs. measurement error
+
+How good are my observations?
+
+1. Discrete measurements: **interrater reliability**
+1. Continuous measurements: **intraclass correlation coefficient**
+
+
+## Interrater reliability
+
+How well do observers agree on an observation or categorization?
+
+- Different observers (should be randomized and blinded)
+- Same observer on different occasions (should be randomized and blinded; hours/days/weeks apart)
+
+Measured by Cohen's $\kappa$. See Fleiss [-@Fleiss1971-pa] for details.
+
+- Fleiss's method generalizes Cohen's method to more than two observers (but works fine for only two).
+
+
+## Scoring archosaur suture morphology
+
+<center>
+<img src="https://i.imgur.com/y9SByTR.png" width="80%" />
+</center>
+
+From Bailleul et al. [-@Bailleul2016-tk]
+
+
+## Characters {.smaller}
+
+```{r}
+M <- read_excel("../data/GatorObs.xlsx")
+M %>% filter(Specimen == "MOR-OST-1645")
+```
+
+
+## Data wrangling
+
+Extract observations as numeric vectors:
+
+```{r}
+Obs1 <- M %>% 
+  select(-Specimen) %>% 
+  filter(Observer == 1) %>%
+  as.matrix() %>% 
+  as.numeric()
+Obs2 <- M %>% 
+  select(-Specimen) %>% 
+  filter(Observer == 2) %>%
+  as.matrix() %>% 
+  as.numeric()
+```
+
+
+## Data wrangling
+
+Extract observations as numeric vectors:
+
+```{r}
+Obs1[1:20]
+Obs2[1:20]
+```
+
+
+## Calculating IRR with `CohenKappa()`
+
+```{r warning=FALSE}
+library(DescTools)
+CohenKappa(Obs1, Obs2, conf.level = 0.95)
+```
+
+Arbitrary categorizations:
+
+- Over 0.75 = excellent
+- Between 0.75 and 0.4 = good to fair
+- Less than 0.4 = poor
+
+
+## Additional diagnostics
+
+```{r}
+cor.test(Obs1, Obs2, method = "spearman", exact = FALSE)
+sum(Obs1 != Obs2) / length(Obs1) # Percent disagreement
+```
+
+
+## Intraclass Correlation Coefficient
+
+For continuously varying measurements:
+
+$$\mbox{ICC} =\frac{\sigma_{A}^{2}}{\sigma_{A}^{2}+MS_{error}}$$
+
+$$\sigma_{A}^{2}=\frac{MS_{group}-MS_{error}}{n}$$
+
+- $n$ = Number of measurements per specimen (*not the sample size*).
+
+Uses the results of the linear model (ANOVA):
+
+$$\mbox{Measurement} \sim \mbox{Specimen ID}$$
+
+
+## Repeatability of caliper measurements
+
+<center>
+<img src="https://i.imgur.com/FRd1Apz.png" width="40%" />
+</center>
+
+
+## Calculation of ICC {.smaller}
+
+What is the ICC of repeated measurements of mouse bones?
+
+```{r}
+M <- read_excel("../data/G44_Morphometrics.xlsx")
+glimpse(M)
+```
+
+
+## Pairs of measurements
+
+```{r echo=FALSE}
+ggplot(M, aes(Len1, Len2)) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point() +
+  xlab("Femur Length #1 (mm)") +
+  ylab("Femur Length #2 (mm)")
+```
+
+
+## Data processing
+
+Want two columns: (1) measurement and (2) ID as a factor.
+
+```{r}
+Lengths <- data.frame(Fem_Len = c(M$Len1, M$Len2),
+                      MouseID = factor(c(M$MouseID, M$MouseID)))
+Lengths <- Lengths %>% drop_na()
+glimpse(Lengths)
+```
+
+
+## ICC via ANOVA
+
+```{r}
+fm <- aov(Fem_Len ~ MouseID, data = Lengths)
+print(summary(fm), digits = 5)
+```
+
+```{r}
+var_a <- (0.63579 - 0.00018) / 2
+var_a / (var_a + 0.00018)
+```
+
+ICC is 0.999 for these measurements.
+
+
+## With `ICCest()`
+
+```{r iccest, eval=FALSE}
+library(ICC)
+ICCest(MouseID,
+       Fem_Len,
+       data = Lengths,
+       alpha = 0.05,
+       CI.type = "Smith")
+```
+
+
+## With `ICCest()`
+
+```{r ref.label="iccest", echo=FALSE}
+```
+
+
+## Additional utility functions in `ICC` package
+
+`Nest()`: Given a predicted ICC and *k* measures per individual/group, this function will calculate the *N* individuals/groups required to obtain a desired confidence interval
+
+`effort()`: Given a fixed researcher effort (e.g., total number of assays able to be run), this function plots the optimum *k* measurements per individual to use in order to obtain the smallest confidence interval at an expected intraclass correlation coefficient (ICC) estimate.
+
+
+## References
+
