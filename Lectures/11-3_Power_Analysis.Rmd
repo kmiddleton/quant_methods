@@ -1,5 +1,5 @@
 ---
-title: "Experimental Design: Power I"
+title: "Power Analysis"
 subtitle: "Quantitative Methods in Life Sciences"
 author: "Elizabeth King, Kevin Middleton, and Lauren Sullivan"
 output:
@@ -38,7 +38,8 @@ Type II error probability depends on:
 
 ## Power
 
-- Given a true effect, the probability that a random sample will lead to a rejection of H~0~ (The proportion of times you DO NOT make mistake #2)
+- Given a true effect, the probability that a random sample will lead to a rejection of H~0~
+    - The proportion of times you **DO NOT** make a Type II error
 - Dependent on how different the truth is from the null hypothesis
 - Inversely related to type II errors
     - High power $\rightarrow$ low type II errors
@@ -54,8 +55,8 @@ If we can estimate effect size *before we do the study*, we can estimate the pow
 - Use previous information
     - Your own pilot studies
     - Other similar studies
-- Determine how big a difference we want to be able to detect
-    - A difference less than *X* is not biologically meaningful
+- Determine how big a difference we *wan*t to be able to detect
+    - How small of a difference is not biologically meaningful?
 
 
 ## Effect size
@@ -83,12 +84,12 @@ $$t=\frac{\bar{Y}_{1}-\bar{Y}_{2}}{SE_{Y_{1}-Y_{2}}}$$
 ## Example calculation of effect size
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-M <- read_excel("../data/Mouse_Weaning_Data.xlsx", na = "NA")
-M <- M %>% mutate(Sex = ifelse(Sex == 0, "Female", "Male"))
-M$Sex <- factor(M$Sex)
-M_subs <- M %>% select(Sex, WnMass)
-M_subs <- M_subs %>% filter(complete.cases(.))
-ggplot(M_subs, aes(x = WnMass)) +
+M <- read_excel("../data/Mouse_Weaning_Data.xlsx", na = "NA") %>%
+  mutate(Sex = ifelse(Sex == 0, "Female", "Male"),
+         Sex = factor(Sex)) %>% 
+  select(Sex, WnMass) %>% 
+  drop_na()
+ggplot(M, aes(x = WnMass)) +
   geom_histogram(bins=30) +
   facet_grid(Sex ~ .)
 ```
@@ -118,8 +119,8 @@ $$ d = \frac{\bar{Y_F} - \bar{Y_M}}{s_{\mbox{pooled}}} $$
 
 ```{r}
 library(DescTools)
-Females <- M_subs$WnMass[M_subs$Sex == "Female"]
-Males <- M_subs$WnMass[M_subs$Sex == "Male"]
+Females <- M %>% filter(Sex == "Female") %>% pull(WnMass)
+Males <- M %>% filter(Sex == "Male") %>% pull(WnMass)
 CohenD(Females, Males)
 ```
 
@@ -138,9 +139,9 @@ EtaSq(fm)
 
 ## Power analysis is used for planning
 
-1. What sample size do I need?
-1. What is my power?
-1. How large of a difference can I detect?
+1. What sample size do I need for some level of power?
+1. What is my power for some sample size?
+1. How large of a difference can I detect for some power and sample size?
 
 How much power is enough power? Some say 0.8.
 
@@ -161,6 +162,7 @@ Hoenig and Heisey [-@Hoenig2001-hz]:
     - `pwr.anova.test()`
     - `pwr.r.test()`
 1. Do it yourself. For all but the simplest experimental designs, this is the only option.
+    - Simulate data across a range of sample sizes and effect sizes.
 
 
 ## Commonalities
@@ -257,7 +259,7 @@ for (i in 1:nrow(power_t)) {
 ggplot(power_t, aes(d, power, color = factor(n))) +
   geom_hline(yintercept = 0.8, color = "darkblue") +
   geom_line(size = 2) +
-  geom_point(aes(x = 0.6, y = 0.8), color = "red") +
+  geom_point(aes(x = 0.6, y = 0.8), color = "red", size = 3) +
   ylim(c(0, 1)) +
   scale_color_discrete(name = "n") +
   theme(legend.justification = c(1, 0), legend.position = c(1, 0))
