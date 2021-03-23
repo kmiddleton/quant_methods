@@ -1,0 +1,842 @@
+---
+title: "Multiple Testing"
+subtitle: "Quantitative Methods in Life Sciences"
+author: "Elizabeth King, Kevin Middleton, and Lauren Sullivan"
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(wesanderson)
+library(multcomp)
+library(readxl)
+library(knitr)
+library(pander)
+library(qvalue)
+
+theme_set(theme_cowplot())
+knitr::opts_chunk$set(cache = FALSE)
+options(scipen = 999)
+```
+
+<!--
+Datasets
+
+-->
+
+## Significance Testing Mistakes 
+
+Mistake #1: Concluding there IS an effect when there IS NOT actually an effect. 
+```{r}
+set.seed(10)
+nn <- 10
+group1.mean <- 6
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg <- c(rep('a',nn), rep('b',nn))
+summary(lm(yy ~ gg))$coefficients
+```
+
+This is a Type I error = A false positive = A false discovery
+
+
+## Significance Testing Mistakes
+
+Mistake #2: Concluding there IS NOT an effect when there IS actually an effect. 
+
+```{r}
+set.seed(93)
+nn <- 10
+group1.mean <- 5
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
+gg <- c(rep('a', nn), rep('b', nn))
+summary(lm(yy ~ gg))$coefficients
+```
+
+This is a Type II error = False Negative
+
+
+## Types of errors and statistical power
+
+|               | Reject H~0~    | Fail to reject H~0~   |
+|--------------:|:--------------:|:---------------------:|
+|H~0~ is true   | Type I error   | *Correct*             |
+|H~0~ is false  | *Correct*      | Type II error         |
+
+Type I error occurs when:
+
+- *P* is small by *random chance*, given that $\alpha$ is chosen ahead of the test
+
+Type II error probability depends on:
+
+- The value of $\alpha$
+- How "wrong" H~0~ is
+
+
+## Problems of Multiplicity
+
+If you set a Type I error rate ($\alpha$) of 0.05 for any one test and then perform more than one such test on related data:
+
+- The overall Type I error rate for all your tests together (familywise) is greater than 0.05
+- You will be more likely than 5% to erroneously reject a _true_ null hypothesis.
+- You will claim a significant effect when one does not exist.
+
+
+## Problems of Multiplicity
+
+``` {r}
+set.seed(3210)
+nn <- 10
+group1.mean <- 6
+group2.mean <- 6
+niter <- 1000
+ps<-data.frame('p1' = numeric(length = niter),
+               'p2' = numeric(length = niter))
+
+for(ii in 1:niter) {
+  yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+  yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+  gg <- c(rep('a',nn), rep('b',nn))
+  ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
+  ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
+}
+```
+
+
+## Problems of Multiplicity
+
+What is the probability of a false positive for yy1?
+
+```{r}
+cbind(ps[c(8, 12), ], c("FP", "x"))
+mean(ps[, 'p1'] < 0.05)
+```
+
+
+## Problems of Multiplicity
+
+What is the probability of a false positive for yy2?
+
+```{r}
+cbind(ps[c(8, 12),], c("x", "FP"))
+mean(ps[, 'p2'] < 0.05)
+```
+
+
+## Problems of Multiplicity
+
+What is the probability of a false positive for yy1 or yy2?
+
+```{r}
+cbind(ps[c(8, 12, 13), ], c("FP", "FP", "x"))
+length(which(ps[, 'p1'] < 0.05 | ps[, 'p2'] < 0.05)) / niter
+```
+
+The overall error rate = the family-wise error rate (FWER).
+
+
+## Post hoc tests for ANOVA
+
+Significant ANOVA (*P* = 0.004) only says that at least one mean is different.
+
+Many options are available for post hoc (unplanned) comparisons:
+
+- Scheffé test
+- Duncan's multiple range test
+- Fisher's least significant difference test
+- Newman-Keuls test
+- Tukey-Kramer test (Tukey's Honestly Significant
+Difference)
+
+We'll use the Tukey-Kramer test (only one you need to know right now)
+
+
+## Tukey-Kramer test
+
+- Assumes that we have already performed an ANOVA and rejected the null hypothesis
+    - If the overall ANOVA is not significant, then a post hoc test makes no sense.
+- The familywise error rate (FWER) with a Tukey-Kramer test is no larger than $\alpha$.
+    - FWER is the overall probability of a Type I error
+- Tukey-Kramer test makes all the same assumptions as ANOVA.
+    - Defaults to all pairwise combinations of levels
+
+
+## Tukey-Kramer test: `multcomp` library {.smaller}
+
+- Alternative but less general: `TukeyHSD()` in R
+    - Only takes an object from `aov()`
+
+```{r echo=FALSE, message=FALSE}
+JL <- read_csv("../data/JetLag.csv") %>% 
+  mutate(Treatment = factor(Treatment))
+fm_lm <- lm(Shift ~ Treatment, data = JL)
+```
+
+```{r}
+tukey <- glht(fm_lm, linfct = mcp(Treatment = "Tukey"))
+summary(tukey)
+```
+
+
+## Selective Set of Comparisons {.smaller}
+
+```{r}
+post_hoc <- glht(fm_lm,
+                 mcp(Treatment = c("eyes - control = 0",
+                                   "knee - control = 0")))
+summary(post_hoc)
+```
+
+
+## Problems of Multiplicity
+
+Beyond multiple testing in a single "test":
+
+- What about multiple tests in one experiment? 
+- What about multiple tests in one thesis?
+
+
+## Problems of Multiplicity
+
+Rules for when and how to account for multiple comparisons are not clear-cut, nor has any single method emerged as best under all conditions:
+
+- Philosophical issues
+    - Bayesians don't need accounting: Gelman et al. [-@Gelman2012-xe]
+- Mathematical issues
+    - Simultaneous corrections for thousands of tests
+
+
+## Reproducibility
+
+Reasons why studies are not able to be replicated [@Bretz2010-cy]
+
+1. There is an effect, but it's in the opposite direction that you thought.
+2. There is an effect in the direction that you think, but the magnitude is smaller than reported
+3. There is no effect despite having previously found one
+
+Usually we think of the inability to reproduce an experiment as resulting from poor experimental design or errors in data collection.
+
+- Failing to account multiplicity of tests is also likely.
+
+
+## Familywise Error Rate (FWER)
+
+FWER is the probability that at least one test will reject a true null hypothesis, i.e., committing *at least one* type I error.
+
+FWER is also sometimes termed
+
+- Familywise Error (FEW)
+- Experiment-wide error rate
+- Experiment-wise error rate
+
+We will use $\alpha$ = 0.05 throughout, but the general principles apply to any $\alpha$ (0.1, 0.05, 0.01, 0.001, etc.).
+
+
+## Calculating FWER
+
+For a family of $k$ tests, where $\alpha$ is the error rate for a single test:
+
+$$\mbox{FWER} = 1-(1-\alpha)^k$$
+
+For example, if you perform $k = 20$ tests and judge them all at $\alpha = 0.05$, then there is a 64% chance committing a type I error.
+
+Note that:
+
+$$\lim_{k \to \infty} (1 - \alpha)^k = 0$$
+
+And thus
+
+$$\lim_{k \to \infty} \mbox{FWER} = 1$$
+
+
+## Calculating FWER
+
+```{r}
+alpha <- 0.05
+(1 - alpha) ^ 20
+(1 - alpha) ^ 200
+(1 - alpha) ^ 2000
+```
+
+
+## Probability of a Type I Error ($\alpha = 0.05$)
+
+```{r FWER_table, echo=FALSE}
+calcFWER <- function(k, alpha){
+  return(round(1 - (1 - alpha) ^ k, 3))
+}
+k <- c(1, 2, 3, 5, 10, 20, 50, 100)
+FWER <- calcFWER(k, 0.05)
+error_rates <- data.frame(k, FWER)
+```
+
+```{r FWER_table_print, echo=FALSE, results='asis'}
+panderOptions("digits", 2)
+pander(error_rates)
+```
+
+
+## Probability of a Type I Error | from among a set of $k$ total tests
+
+```{r FWER_figure, echo=FALSE, fig.width=8}
+k <- seq(1, 200, by = 1)
+alpha <- c(0.05, 0.01, 0.001)
+FWERs <- crossing(k, alpha) %>%
+  mutate(FWER = pmap_dbl(.l = ., .f = calcFWER),
+         alpha = factor(alpha))
+
+ggplot(FWERs, aes(x = k, y = FWER, color = alpha)) +
+  geom_hline(yintercept = 1, color = "red") +
+  geom_path(lwd = 2) +
+  ylab("Familywise Error Rate") +
+  xlab("k Tests") +
+  scale_color_manual(values = wes_palette("Moonrise3"),
+                     name = "Alpha",
+                     breaks = c("0.05", "0.01", "0.001"))
+```
+
+
+## Distribution of *P* values 
+
+*P* values resulting from chance alone have a uniform distribution
+
+```{r, null_P, echo=FALSE, message=FALSE, cache=TRUE}
+set.seed(3210)
+nn <- 10
+group1.mean <- 6
+group2.mean <- 6
+niter <- 10000
+ps <- data.frame('p1' = numeric(length = niter),
+                 'p2' = numeric(length = niter))
+
+for(ii in 1:niter) {
+  yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+  yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+  gg <- c(rep('a',nn), rep('b',nn))
+  ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
+  ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
+}
+
+ggplot(ps, aes(x = p1)) +
+  geom_histogram(bins = 20) +
+  labs(x = "P value")
+```
+
+
+## Example *P* values to work with | Turning kinematics in hummingbirds
+
+```{r}
+Ps <- read_excel("../data/P_values.xlsx")
+glimpse(Ps)
+range(Ps$P)
+```
+
+203 *P* values. Range: 10^-16^ to 0.992
+
+
+## Example *P* values to work with | Turning kinematics in hummingbirds
+
+```{r, echo=FALSE}
+ggplot(Ps, aes(P)) + geom_histogram(bins = 20)
+```
+
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+    - Not an option 
+2. Common sense
+3. Bonferroni correction
+4. Sequential Bonferroni procedure
+5. Permutation Test
+6. False Discovery Rate
+7. _Positive_ False Discovery Rate
+
+
+## "Common sense"
+
+$203 \times 0.05 = 10.15$ expected significant results. 
+
+```{r}
+sum(Ps$P < 0.05)
+```
+
+We have 62. So maybe only consider the smallest 10?
+
+- Extremely conservative
+    
+This is also subjective (which *P* values to trust?). We can do better.
+
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+2. <s>Common sense</s>
+3. Bonferroni correction
+4. Sequential Bonferroni procedure
+5. False Discovery Rate
+6. _Positive_ False Discovery Rate
+
+
+## History
+
+Duncan, Scheffé, and Tukey were responsible for the modernization of multiple comparison procedures.
+
+- Duncan [-@Duncan1955-ry; -@Duncan1957-dc]: a variety of "multiple range tests"
+- Tukey [-@Tukey1949-ge]: most responsible for getting MCPs into much more general use (honestly significantly differences)
+- Scheffé [-@Scheffe1953-bx]: connected multiple comparisons procedures to general linear hypothesis tests. Method for comparing all contrasts in an ANOVA.
+
+
+## Modern history
+
+The widespread emergence of RNA microarrays and "gene chips" (which can involve >10,000 simultaneous comparisons) as well as "genomic data" more broadly (sequential tests of 10^5^-10^7^ SNPs) focused biostatisticians on the problem.
+
+- Storey and Tibshirani [-@Storey2003-mz]
+- van der Laan et al. [-@Van_der_Laan2004-in]
+- Dudoit and van der Laan [-@Dudoit2008-tx]
+
+
+## Goals of multiple comparisons procedures
+
+1. Reduce the risk of rejecting true null hypotheses
+    - i.e., not commit too many Type I errors
+1. Still be able to detect real effects if they exist
+    - i.e., not commit too many Type II errors
+    - Keep power (1 - Type II error rate) as high as possible.  Detect all "real" effects.
+    - Reduce the risk of rejecting true null hypotheses
+
+Type I and Type II errors will trade-off.
+
+
+## General procedure
+
+1. Complete an entire "family" of tests
+    - A set of tests on related data
+    - A single publication
+    - A single thesis
+    - All of science?
+1. Collect the resulting *P* values into a single vector or `data.frame`.
+1. Perform a multiple comparisons procedure (directly adjust or calculate new $\alpha$ level)
+1. Assess significance of your tests *as a whole*
+
+
+## Bonferroni correction
+
+- Dates to Fisher [-@Fisher1935-hw]
+- Define an adjusted alpha level of $\alpha/k$ where $k$ is the number of tests. Use that adjusted $\alpha_{adj}$ to decide if a test is statistically significant.
+- Simplest and most conservative method
+    - Relies on the Bonferroni inequality and results in control of FWER at $\alpha$
+- Can result in excessive false negatives (i.e., too many Type II errors)
+
+$$\alpha_{adj} = \frac{\alpha}{k}$$
+
+
+## Distribution of *P* values
+
+```{r echo=FALSE, message = FALSE}
+ggplot(Ps, aes(P)) + geom_histogram(bins = 20)
+```
+
+We have disproportionately more nominally significant tests. Otherwise relatively uniform.
+
+
+## Sort *P* values
+
+It will be easier to follow the procedures if the rows are sorted smallest to largest:
+
+```{r}
+Ps <- Ps %>% arrange(P)
+head(Ps)
+```
+
+
+## Bonferroni correction
+
+Adjusted $\alpha$ level for significance is $\alpha / k$:
+
+```{r}
+(alpha_adj <- 0.05 / nrow(Ps))
+```
+
+Judging any *P* values < 0.00024 as significant will control the FWER at $\alpha = 0.05$.
+
+
+## Bonferroni correction
+
+```{r}
+Ps$Bonf <- Ps$P < alpha_adj
+sum(Ps$Bonf)
+```
+
+Only 33 of the original 62 significant test remain significant.
+
+
+## Bonferroni correction
+
+```{r}
+Ps %>% slice(30:37)
+```
+
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+2. <s>Common sense</s>
+3. <s>Bonferroni correction</s>
+    - Excessively conservative, and we can do better
+4. Sequential Bonferroni procedure
+5. False Discovery Rate
+6. _Positive_ False Discovery Rate
+
+
+## Sequential Bonferroni
+
+Controls FWER as well as Bonferroni but is more permissive
+
+- Introduced by Holm [-@Holm1979-ip] - "Holm procedure"
+- Also see Rice [-@Rice1989-wz] for discussion
+
+All the methods from here on rely on a sorted list of *P* values.
+
+
+## Sequential Bonferroni
+
+- Sort the *P* values from smallest ($p_1$) to largest ($p_k$)
+- Start with the smallest ($i = 1$), and evaluate the inequality:
+
+$$p_i \leq \frac{\alpha}{k - i + 1}$$
+
+- If the inequality is *true*, call that test significant
+- No difference from the the Bonferroni correction yet.
+    - Step 1 equals Bonferroni correction
+
+
+## Sequential Bonferroni
+
+- Repeat for $i = 2, 3, 4, \dots$, up to $i = k$.
+- At each step, the test value increases:
+
+```{r}
+0.05 / 203
+0.05 / 202
+```
+
+The last observed *P* value is compared to $\alpha$.
+
+
+## Sequential Bonferroni
+
+If the inequality is *ever* false:
+
+- Stop.
+- Fail to reject that test.
+- Fail to reject all remaining tests (because the list is sorted)
+
+This and standard Bonferroni are "step-up" methods (start at the smallest and work up).
+
+
+## R's `p.adjust()` function
+
+`p.adjust()` can do some multiple comparisons procedures, given a vector of *P*.
+
+```{r}
+Ps$Bonf <- p.adjust(Ps$P, "bonferroni") < 0.05 # Bonferroni
+Ps$Seq_Bonf <- p.adjust(Ps$P, "holm") < 0.05   # Sequential Bonferroni
+sum(Ps$Seq_Bonf)
+```
+
+Only 33 of the original 62 significant tests remain.
+
+
+## Sequential Bonferroni
+
+```{r}
+Ps %>% slice(30:37)
+```
+
+Here, Bonferroni and sequential Bonferroni are equal.
+
+
+## Permutation Test: Randomization to the Rescue
+
+Procedure:
+
+  - Shuffle the data
+  - Perform your set of tests
+  - Get the lowest p-value across all tests
+  - Repeat many, many times
+  - Calculate the threshold for which there is a 5% chance of observing one false positive across all tests (FWER)
+
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+    - Not an option 
+2. <s>Common sense</s>
+3. <s>Bonferroni correction</s>
+4. Sequential Bonferroni procedure
+5. Permutation Test
+6. False Discovery Rate
+7. _Positive_ False Discovery Rate
+
+
+```{r echo=FALSE, message=FALSE}
+Ps <- read_excel("../data/P_values.xlsx")
+```
+
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+2. <s>Common sense</s>
+3. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
+4. Sequential Bonferroni procedure
+    - Generally more permissive than Bonferroni. Provides control of FWER at $\alpha$.
+5. Permutation Test
+6. False Discovery Rate
+7. _Positive_ False Discovery Rate
+
+
+## FWER vs. False discovery rate
+
+Controlling FWER is appropriate when you want to guard against **any** false positives (Bonferroni and sequential Bonferroni).
+
+- When might this be appropriate?
+
+In many cases we can live with a certain number of false positives.
+
+If so, the more relevant quantity to control is the false discovery rate (FDR).
+
+
+## False discovery rate
+
+Proposed by Benjamini and Hochberg [-@Benjamini1995-cw].
+
+- Also see Curran-Everett (2000).
+
+Controls FDR (i.e., rate of Type I errors), rather than FWER
+
+$$\mbox{FDR} = \frac{\mbox{n False Positives}}{\mbox{n All Positives}}$$
+
+e.g., I'm OK with 5% false positives *among the tests I judge as significant*.
+
+Note: False Positive Rate = $\frac{\mbox{n False Positives}}{\mbox{n All Tests}}$
+
+
+## False discovery rate
+
+- Sort the *P* values from largest ($p_k$) to smallest ($p_1$)
+- Starting at the *largest* *P* value ($p_k$), calculate the critical significance level ($d_k^*$) for that *P* value:
+
+$$d_k^* = q^* \frac{k}{k}$$
+
+Where $q^*$ is the desired false discovery rate (e.g., 0.05).
+
+- If $p_k \leq d_k^*$, then reject the null hypothesis for this and all remaining tests.
+    - 1st comparison is vs. $q^*$
+    - Rarely will the largest *P* value be less than $q^*$.
+
+
+## False discovery rate
+
+- Move to the 2nd largest *P* value and calculate the critical significance level
+
+$$d_k^* = q^* \frac{k - 1}{k}$$
+
+- 2nd test vs. $q^* \times 202/203 = 0.04975$
+- Continue until $p_k \leq d_k^*$ then call that and all remaining tests (smaller *P* values) significant.
+    - Last test vs. $q^* \times 1/203 = 0.00025$ (Bonferroni)
+
+"Step-down" method
+
+
+## False discovery rate
+
+```{r}
+Ps$FDR <- p.adjust(Ps$P, "fdr") < 0.05
+sum(Ps$FDR)
+```
+
+44 of the original 62 significant tests remain.
+
+
+## False discovery rate {.smaller}
+
+```{r}
+Ps %>% slice(32:47)
+```
+
+
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+2. <s>Common sense</s>
+3. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
+4. Sequential Bonferroni procedure
+    - Generally more permissive than Bonferroni. Provides control of FWER at $\alpha$.
+5. Permutation Test
+6. False Discovery Rate
+7. _Positive_ False Discovery Rate
+
+
+## Positive false discovery rate
+
+- First method to deal with actual distribution of *P* values from the study in question.
+    - This is a major advance.
+- "Positive" refers to the fact that positive findings have occurred (rejection of null hypotheses).
+- But which of these apparent positive findings are actually false (i.e., which are most likely Type I errors)?
+
+
+## Positive false discovery rate (pFDR)
+
+- Is an extension of Benjamini and Hochberg's [-@Benjamini1995-cw] FDR procedure
+- Described in:
+    - Storey [-@Storey2002-mz]
+    - Storey and Tibshirani [-@Storey2003-mz]
+    - Storey et al. [-@Storey2004-fr]
+
+
+## Goals of pFDR
+
+Seek a balance between false positives and true positives
+
+- Assume that we are doing an experiment because we expect some non-zero number of true positives.
+    - Otherwise, why would we bother doing the experiment?
+- We will accept a pFDR of 0.05 or 0.10, meaning that 5% or 10% of the tests we call true (nominally statistically significant) are actually false.
+
+
+## Positive false discovery rate
+
+Estimate $\pi_0$ (ratio of true null tests to total tests) *from the distribution of P values*
+
+- Other multiple comparison procedures assume that $\pi_0 = 1$.
+
+
+$$\pi_0 = \frac{\mbox{n True Null Tests}}{\mbox{n Total Tests}}$$
+
+- FDR = pFDR when $\pi_0 = 1$
+- More powerful than Bonferroni, sequential Bonferroni or FDR approaches
+    - But the underlying assumptions of FDR and pFDR differ from Bonferroni and sequential Bonferroni
+
+
+## pFDR and the `qvalue` package
+
+pFDR is implemented in `qvalue`. Installation is a little different, because it is not in CRAN.
+
+```{r eval = FALSE}
+source("https://bioconductor.org/biocLite.R")
+biocLite("qvalue")
+library(qvalue)
+```
+
+
+## $\pi_0 = 1$
+
+```{r echo=FALSE, message = FALSE}
+ggplot(Ps, aes(P)) +
+  geom_histogram(aes(y = ..density..), fill = "gray", bins = 20) +
+  geom_hline(yintercept = 1, color = "blue")
+```
+
+If all H~0~ are true, you expect all bars to fall on the blue line.
+
+
+## Estimation of $\pi_0$
+
+- True non-null *P* values will fall nearest 0 (in the first bin: 0 - 0.05).
+- Remaining *P* values will be uniformly distributed 0.05 - 1.00.
+- Height of the uniform portion of the distribution estimates $\pi_0$
+    - $\pi_0$ falls in the range 0 to 1, where 1 equal FDR.
+    - Follow the math in Storey & Tibshirani [-@Storey2003-mz] if you wish
+
+
+## The $q$ value
+
+$q$ is the the minimum FDR that can be attained when calling *that test significant*
+
+- Each *P* value is associated with a $q$ value
+- A *P* value associated with a $q$ value of 0.05 means that 5% of *P* values lower are expected to be false positives
+    - In other words, consider a *P* value with an associated $q$ value of 0.05. That *P* value and those lower than it should have a false positive rate of 0.05.
+
+
+## pFDR in practice
+
+- Look at the distribution of your *P* values.
+    - The first bin should be largest (you have positive results)
+    - If the distribution is completely flat, you can't use pFDR
+    - If the distribution looks like a normal curve, is skewed to the right, or has peaks near 0 and 1, then $\pi_0$ estimation will probably fail. Fall back to FDR or sequential Bonferroni.
+
+
+## pFDR in practice
+
+- For large numbers of *P* values (hundreds?, thousands?), the default settings in the qvalue package work fine:
+    - `lambda = seq(0, 0.90, 0.05)`
+    - `pi0.method = "smoother"`
+    - This estimates $\pi_0$ across a sequence of tuning parameters (lambda) using a smoother to determine the optimal $\pi_0$
+    - If the smoother method fails, try `pi0.method = "bootstrap"` and/or `pdfr = TRUE`
+
+
+## pFDR in practice
+
+Just pass a vector of *P* values to `qvalue()`:
+
+```{r}
+qobj <- qvalue(Ps$P)
+```
+
+Explicitly:
+
+```{r eval = FALSE}
+qobj <- qvalue(Ps$P, fdr.level = 0.05, pi0.method = "smoother")
+```
+
+
+## pFDR in practice
+
+```{r}
+summary(qobj)
+```
+
+
+## Visualizing $\pi_0 = `r round(qobj$pi0, 3)`$
+
+```{r echo=FALSE}
+ggplot(Ps, aes(P)) +
+  geom_histogram(aes(y = ..density..), fill = "gray", bins = 20) +
+  geom_hline(yintercept = 1, color = "blue") +
+  geom_hline(yintercept = qobj$pi0, color = "red")
+```
+
+Blue: All H~0~ are true. Red: Only 32% of H~0~ are true.
+
+
+## Calculating an adjusted $\alpha$ level
+
+```{r}
+max(qobj$pvalues[qobj$qvalues <= 0.05])
+```
+
+- *Translation*: Find the largest *P* value in `qobj` which has an associated $q$ value less than or equal to 0.05.
+    - So, if you use 0.03957791 as the $\alpha$ level across all of your *P* values in this example, then you will be controlling the FDR at 0.05.
+
+Include unadjusted *P* values and adjust $\alpha$. Discuss results with respect to adjusted $\alpha$.
+
+
+## Writing about pFDR
+
+> After completing our statistical analyses, a positive false discovery rate (pFDR) analysis was used to control the false discovery rate at 0.05. Our pFDR analysis used the "smoother" option in the R package `qvalue`. We determined that an adjusted $\alpha$ level of 0.040 controlled experiment-wide false discovery at 5% for our 203 statistical tests, and subsequent inferences (Tables 1-3 in the electronic supplementary materials) use this adjusted $\alpha$ level. All tables present raw (unadjusted) *P* values.
+
+
+## Empirical estimate of FDR
+
+How could you estimate the expected number of false positives for a given dataset?
+
+
+## References
