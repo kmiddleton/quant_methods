@@ -63,6 +63,14 @@ is a general equation that can be used to test any null hypothesized parameter e
 </center>
 
 
+## GLMs with 1 normally distributed outcome variable | a.k.a., "General Linear Models"
+
+1. Continuous ~ $\ge$ 1 Continuous:  **OLS, correlation (Pearson r), multiple correlation (R)**
+1. Continuous ~ $\ge$ 1 Categorical: **ANOVA, *t*-test**
+1. Continuous ~ 1 Continuous + 1 Categorical: **ANCOVA**
+1. Continuous ~ $\ge$ 1 Continuous + $\ge$ 1 Categorical: **Multiple regression**
+
+
 ## What makes a model "linear"? When is a model non-linear?
 
 Linear models:
