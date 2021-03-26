@@ -22,15 +22,24 @@ theme_set(theme_cowplot())
 - PS 8 review
     - Removing the intercept in a linear model
     - Output tables, F and t stats, getting results
-- Map of analyses - arbitrary stars significance
+- Common names for analyses - arbitrary stars significance
 - Connection between intervals, significance testing, critical values, etc
 - What makes a model "linear"? When is a model non-linear?
 - Lists, data.frames, and tibbles, and tables in loops
-    - Loops
-    - Functions
-    - Debugging code
-    - Map functions
+    - Loops, functions, debugging code
+    - Mapping functions
 - Publication ready figures
+
+
+## Tests of arbitrary slopes and intercepts
+
+$$t = \frac{\beta - \beta_{null}}{\mbox{SE}_{\beta}}$$
+
+is a general equation that can be used to test any null hypothesized parameter estimate.
+
+- $\theta$ is the parameter estimate
+- $\theta_{null}$ is the null hypothesized value
+    - often and by default $\theta_{null} = 0$
 
 
 ## What makes a model "linear"? When is a model non-linear?
@@ -40,6 +49,8 @@ Linear models:
 - Response modeled by a combination of predictors where predictors are not in the exponents
 
 $$y = \beta_ + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k$$
+
+Interactions models (unit 9)
 
 $$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1 x_2 + ... + \beta_k x_k$$
 
@@ -61,32 +72,37 @@ ggplot(D, aes(x, y)) +
 
 ## Transformations
 
+All are linear models:
+
+- Least squares regression
+- *t*-tests, ANOVA, etc.
 - Polynomials
 - Roots
 - Logarithms
 - Generalized linear models (logistic, Poisson regression)
 
-All linear models.
-
 
 ## Non-linear models
 
-- Anything that is not linear
-- Usually: predictors in the exponents
+- Models that are not "linear models"
+- Usually:
+    - Predictors in the exponents
+    - *e^x^*
 
-$$y = \beta_0 + \beta_1^{x}$$
+Logistic growth:
 
-Can be linearized:
+$$f(x) = \frac{\beta_{max}}{1 + e^{-\beta_{rate}(x - \beta_{mid})}}$$
 
-$$\log(y) = \log{\beta_0} + \log(x) \beta_1$$
+Additive logistic growth: 
 
-## Non-linear models
+$$f(age) = \frac{a_1}{1 + e^{(-b_1 (age - c_1))}} + \frac{f - a_1}{1 + e^{(-b_2 (age - c_2))}}$$
 
-Gompertz Growth:
+
+## Gompertz Growth Curve
 
 $$f(t)=a\mathrm{e}^{-b\mathrm{e}^{-ct}}$$
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height=3}
 set.seed(2364283)
 
 n <- 20
@@ -105,27 +121,58 @@ ggplot() +
   geom_line(data = p, aes(x = x, y = pred), color = "blue")
 ```
 
+- No analytical solution (can't use `lm()`)
+- Need to use maximum likelihood or Bayesian approach
+- Can be very challenging to fit.
+
+
+## Programming
+
+Lists, data.frames, and tibbles, and tables in loops
+
+- Loops
+- Functions
+- Debugging code
+- Map functions
+
+Approaches:
+
+- Start small, build up
+- Stepwise additions, one change at a time
+- Sanity check every step
+
+
+## What is the expected distribution of P-values when there is no effect?
+
+- Simulate data with no difference
+- Extract P-value from summary
+- Repeat many times
+- Plot
+
+
 ## Publication ready figures
 
 What you have been learning:
 
 - `ggplot()`
-- "Theming": color, point or line size, text size, etc.
+- Theming: color, point and line size, text size, etc.
 - Combining plots
     - `cowplot` package: `plot_grid()`
     - `patchwork` package: https://patchwork.data-imaginist.com/
-- `ggpubr`: https://github.com/erikgahner/awesome-ggplot2
-- Big list of ggplot extensions: https://github.com/erikgahner/awesome-ggplot2
-http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/
+- [ggpubr](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/)
+- [sjPlot](https://strengejacke.github.io/sjPlot/)
+- [Big list of ggplot extensions](https://github.com/erikgahner/awesome-ggplot2)
 
 
 ## General plan
 
-- Basic plot looks OK interactively
+- Basic plot looks OK in RStudio
 - Determine the output size you want
     - Measure 1 or 2 column figure in the journal
-- Save plot (`last_plot()` is the most recent plot) as PDF
-    - `ggsave()`
-    - `save_plot()`
+- Save plot as PDF (`last_plot()` is the most recent plot)
+    - `ggsave()` with `width =` and `height =`
+    - `save_plot()` with `base_height =` and `base_width = `
 - Open in PDF viewer
-- Start iteratively changing elements in the theme
+- Start changing elements in the theme iteratively
+    - Define a theme
+
