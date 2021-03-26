@@ -30,6 +30,20 @@ theme_set(theme_cowplot())
     - Mapping functions
 - Publication ready figures
 
+---
+
+<img src="https://i.imgur.com/P8034XE.jpg" width="100%" />
+
+
+---
+
+<img src="https://i.imgur.com/38J8BwL.jpg" width="100%" />
+
+
+---
+
+<img src="https://i.imgur.com/oIqWNJg.jpg" width="100%" />
+
 
 ## Tests of arbitrary slopes and intercepts
 
@@ -37,9 +51,16 @@ $$t = \frac{\beta - \beta_{null}}{\mbox{SE}_{\beta}}$$
 
 is a general equation that can be used to test any null hypothesized parameter estimate.
 
-- $\theta$ is the parameter estimate
-- $\theta_{null}$ is the null hypothesized value
-    - often and by default $\theta_{null} = 0$
+- $\beta$ is the parameter estimate
+- $\beta_{null}$ is the null hypothesized value
+    - often and by default $\beta_{null} = 0$
+
+
+## Hierarchy of GLMs
+
+<center>
+<img src="https://i.imgur.com/sdx4fMz.png" width="100%" />
+</center>
 
 
 ## What makes a model "linear"? When is a model non-linear?
