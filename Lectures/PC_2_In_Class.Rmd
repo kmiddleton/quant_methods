@@ -1,0 +1,131 @@
+---
+title: "Progress Check 2"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 7
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(cowplot)
+theme_set(theme_cowplot())
+```
+
+
+## Topics for Today
+
+- PS 8 review
+    - Removing the intercept in a linear model
+    - Output tables, F and t stats, getting results
+- Map of analyses - arbitrary stars significance
+- Connection between intervals, significance testing, critical values, etc
+- What makes a model "linear"? When is a model non-linear?
+- Lists, data.frames, and tibbles, and tables in loops
+    - Loops
+    - Functions
+    - Debugging code
+    - Map functions
+- Publication ready figures
+
+
+## What makes a model "linear"? When is a model non-linear?
+
+Linear models:
+
+- Response modeled by a combination of predictors where predictors are not in the exponents
+
+$$y = \beta_ + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k$$
+
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1 x_2 + ... + \beta_k x_k$$
+
+
+## Curved "linear" models? Yes.
+
+$$y = \beta_0 + \beta_1 x^2$$
+
+```{r, echo=FALSE}
+set.seed(3947239)
+D <- tibble(x = runif(20, 0, 10),
+            y = 2 + x^2 + rnorm(10, 0, 4))
+ggplot(D, aes(x, y)) +
+  geom_point() +
+  geom_smooth(formula=y ~ poly(x, 2, raw = TRUE), method = "lm",
+              se = FALSE)
+```
+
+
+## Transformations
+
+- Polynomials
+- Roots
+- Logarithms
+- Generalized linear models (logistic, Poisson regression)
+
+All linear models.
+
+
+## Non-linear models
+
+- Anything that is not linear
+- Usually: predictors in the exponents
+
+$$y = \beta_0 + \beta_1^{x}$$
+
+Can be linearized:
+
+$$\log(y) = \log{\beta_0} + \log(x) \beta_1$$
+
+## Non-linear models
+
+Gompertz Growth:
+
+$$f(t)=a\mathrm{e}^{-b\mathrm{e}^{-ct}}$$
+
+```{r, echo=FALSE}
+set.seed(2364283)
+
+n <- 20
+a <- 20
+b <- 0.5
+c <- 10
+
+D <- tibble(x = runif(n, 1, 20),
+            y = a * exp(-1 * exp(-b * (x - c))) + rnorm(n, 0, 0.5)) %>% 
+  mutate(y = abs(y))
+p <- tibble(x = seq(2.5, 20, length.out = 200),
+            pred = 0.45 + 19.23 * exp(-1 * exp(-0.58 * (x - 10.11))))
+
+ggplot() +
+  geom_point(data = D, aes(x = x, y = y)) +
+  geom_line(data = p, aes(x = x, y = pred), color = "blue")
+```
+
+## Publication ready figures
+
+What you have been learning:
+
+- `ggplot()`
+- "Theming": color, point or line size, text size, etc.
+- Combining plots
+    - `cowplot` package: `plot_grid()`
+    - `patchwork` package: https://patchwork.data-imaginist.com/
+- `ggpubr`: https://github.com/erikgahner/awesome-ggplot2
+- Big list of ggplot extensions: https://github.com/erikgahner/awesome-ggplot2
+http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/
+
+
+## General plan
+
+- Basic plot looks OK interactively
+- Determine the output size you want
+    - Measure 1 or 2 column figure in the journal
+- Save plot (`last_plot()` is the most recent plot) as PDF
+    - `ggsave()`
+    - `save_plot()`
+- Open in PDF viewer
+- Start iteratively changing elements in the theme
