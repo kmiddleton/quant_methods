@@ -71,7 +71,7 @@ Linear models:
 
 $$y = \beta_ + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k$$
 
-Interactions models (unit 9)
+- Interactions models (unit 9)
 
 $$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1 x_2 + ... + \beta_k x_k$$
 
@@ -108,7 +108,7 @@ All are linear models:
 - Models that are not "linear models"
 - Usually:
     - Predictors in the exponents
-    - *e^x^*
+    - Asymptotic
 
 Logistic growth:
 
