@@ -352,37 +352,19 @@ ggplot(Ps, aes(P)) + geom_histogram(bins = 20)
 
 1. <s>Do nothing</s>
     - Not an option 
-2. Common sense
-3. Bonferroni correction
-4. Sequential Bonferroni procedure
-5. Permutation Test
-6. False Discovery Rate
-7. _Positive_ False Discovery Rate
-
-
-## "Common sense"
-
-$203 \times 0.05 = 10.15$ expected significant results. 
-
-```{r}
-sum(Ps$P < 0.05)
-```
-
-We have 62. So maybe only consider the smallest 10?
-
-- Extremely conservative
-    
-This is also subjective (which *P* values to trust?). We can do better.
+2. Bonferroni correction
+3. Sequential Bonferroni procedure
+4. False Discovery Rate
+5. _Positive_ False Discovery Rate
 
 
 ## A menu of MCPs
 
 1. <s>Do nothing</s>
-2. <s>Common sense</s>
-3. Bonferroni correction
-4. Sequential Bonferroni procedure
-5. False Discovery Rate
-6. _Positive_ False Discovery Rate
+2. Bonferroni correction
+3. Sequential Bonferroni procedure
+4. False Discovery Rate
+5. _Positive_ False Discovery Rate
 
 
 ## History
@@ -488,12 +470,11 @@ Ps %>% slice(30:37)
 ## A menu of MCPs
 
 1. <s>Do nothing</s>
-2. <s>Common sense</s>
-3. <s>Bonferroni correction</s>
+2. <s>Bonferroni correction</s>
     - Excessively conservative, and we can do better
-4. Sequential Bonferroni procedure
-5. False Discovery Rate
-6. _Positive_ False Discovery Rate
+3. Sequential Bonferroni procedure
+4. False Discovery Rate
+5. _Positive_ False Discovery Rate
 
 
 ## Sequential Bonferroni
@@ -564,44 +545,13 @@ Ps %>% slice(30:37)
 Here, Bonferroni and sequential Bonferroni are equal.
 
 
-## Permutation Test: Randomization to the Rescue
-
-Procedure:
-
-  - Shuffle the data
-  - Perform your set of tests
-  - Get the lowest p-value across all tests
-  - Repeat many, many times
-  - Calculate the threshold for which there is a 5% chance of observing one false positive across all tests (FWER)
-
-
 ## A menu of MCPs
 
 1. <s>Do nothing</s>
-    - Not an option 
-2. <s>Common sense</s>
-3. <s>Bonferroni correction</s>
-4. Sequential Bonferroni procedure
-5. Permutation Test
-6. False Discovery Rate
-7. _Positive_ False Discovery Rate
-
-
-```{r echo=FALSE, message=FALSE}
-Ps <- read_excel("../data/P_values.xlsx")
-```
-
-
-## A menu of MCPs
-
-1. <s>Do nothing</s>
-2. <s>Common sense</s>
-3. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
-4. Sequential Bonferroni procedure
-    - Generally more permissive than Bonferroni. Provides control of FWER at $\alpha$.
-5. Permutation Test
-6. False Discovery Rate
-7. _Positive_ False Discovery Rate
+2. <s>Bonferroni correction</s>
+3. Sequential Bonferroni procedure
+4. False Discovery Rate
+5. _Positive_ False Discovery Rate
 
 
 ## FWER vs. False discovery rate
@@ -677,13 +627,11 @@ Ps %>% slice(32:47)
 ## A menu of MCPs
 
 1. <s>Do nothing</s>
-2. <s>Common sense</s>
-3. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
-4. Sequential Bonferroni procedure
+2. <s>Bonferroni correction</s> (excessively conservative, and we can do better)
+3. Sequential Bonferroni procedure
     - Generally more permissive than Bonferroni. Provides control of FWER at $\alpha$.
-5. Permutation Test
-6. False Discovery Rate
-7. _Positive_ False Discovery Rate
+4. False Discovery Rate
+5. _Positive_ False Discovery Rate
 
 
 ## Positive false discovery rate
@@ -768,19 +716,21 @@ $q$ is the the minimum FDR that can be attained when calling *that test signific
 
 ## pFDR in practice
 
-- Look at the distribution of your *P* values.
-    - The first bin should be largest (you have positive results)
-    - If the distribution is completely flat, you can't use pFDR
-    - If the distribution looks like a normal curve, is skewed to the right, or has peaks near 0 and 1, then $\pi_0$ estimation will probably fail. Fall back to FDR or sequential Bonferroni.
+Look at the distribution of your *P* values.
+
+- The first bin should be largest (you have positive results)
+- If the distribution is completely flat, you can't use pFDR
+- If the distribution looks like a normal curve, is skewed to the right, or has peaks near 0 and 1, then $\pi_0$ estimation will probably fail. Fall back to FDR or sequential Bonferroni.
 
 
 ## pFDR in practice
 
-- For large numbers of *P* values (hundreds?, thousands?), the default settings in the qvalue package work fine:
-    - `lambda = seq(0, 0.90, 0.05)`
-    - `pi0.method = "smoother"`
-    - This estimates $\pi_0$ across a sequence of tuning parameters (lambda) using a smoother to determine the optimal $\pi_0$
-    - If the smoother method fails, try `pi0.method = "bootstrap"` and/or `pdfr = TRUE`
+For large numbers of *P* values (hundreds?, thousands?), the default settings in the qvalue package work fine:
+
+- `lambda = seq(0, 0.90, 0.05)`
+- `pi0.method = "smoother"`
+- This estimates $\pi_0$ across a sequence of tuning parameters (lambda) using a smoother to determine the optimal $\pi_0$
+- If the smoother method fails, try `pi0.method = "bootstrap"` and/or `pdfr = TRUE`
 
 
 ## pFDR in practice
