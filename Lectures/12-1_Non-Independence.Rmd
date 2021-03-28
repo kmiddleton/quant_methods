@@ -17,14 +17,9 @@ library(tidyverse)
 library(cowplot)
 library(readxl)
 
-library(wesanderson)
-library(ape)
-library(phytools)
 library(ggtree)
-library(foreach)
-library(reshape2)
-library(geiger)
-library(latex2exp)
+library(ape)
+library(wesanderson)
 library(nlme)
 library(AICcmodavg)
 
@@ -32,10 +27,10 @@ theme_set(theme_cowplot())
 ```
 
 
-## IID is often violated
+## Independence
 
 - Observations are independent if the value or occurrence of one *does not* influence any others
-- Standard assumption of most statistical tests
+- Standard assumption of most statistical tests (Independent and Identically Distributed)
 - In biological situations, independence assumption is often violated
 
 <center>
@@ -45,19 +40,19 @@ theme_set(theme_cowplot())
 
 ## When is independence assumption violated?
   
-- When there is a hierarchical structure to the data
-    - e.g., several samples at each site 
-- Shared ancestry
+1. Repeat sampling over time of the same location, individual, or other experimental unit
+2. When there is a hierarchical structure to the data
+    - e.g., several samples at each site (block design) 
+3. Spatial relationships    
+4. Shared ancestry
     - Phylogenetic relatedness (between populations/species)
     - Genetic relatedness (between individuals within populations/species)
-- Spatial relationships    
-- Repeat sampling over time
-- ...
-  
-  
+5. Other
+
+
 ## Why is non-independence a problem?
 
-Does higher altitude drive the evolution of higher levels of hemoglobin?
+Hemoglobin levels in six species of rodents
 
 ```{r echo=FALSE, fig.width=7, fig.height=4}
 ex.dat <- data.frame(Altitude = c(0, 1400, 2500, 3500, 4500, 6000),
@@ -70,7 +65,7 @@ ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin)) +
 
 ## Why is non-independence a problem?
 
-Does higher altitude drive the evolution of higher levels of hemoglobin?
+Hemoglobin levels in six species of rodents
 
 ```{r echo=FALSE, fig.width=7, fig.height=4}
 ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin, color = Clade)) +
@@ -93,13 +88,6 @@ ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin, color = Clade)) +
 
 <center>
 <img src="https://i.imgur.com/FeMvrT7.png" width="90%" />
-</center>
-
-
-## Best case for this example
-
-<center>
-<img src="https://i.imgur.com/kAf09JX.png" width="90%" />
 </center>
 
 
@@ -152,27 +140,73 @@ ggplot(pop, aes(x = as.factor(genotype), y = phenotype,
 ```
 
 
-## Trees and tree thinking
+## Repeated sampling
+
+Review 09-3 and 09-4
+
+- Squid growth
+- Orthodontic growth
+- Yearly climate data 
+
+```{r, echo=FALSE, message=FALSE, fig.height=3}
+CB <- read_csv("../data/cherry_blossoms.csv")
+
+CB %>% 
+  select(year, doy, temp) %>% 
+  rename(`Day of 1st\nBlossom` = doy,
+         `March Temp.\nEstimate` = temp) %>% 
+  pivot_longer(cols = -year, names_to = "Variable", values_to = "Value") %>% 
+  drop_na() %>% 
+  ggplot(aes(x = year, y = Value)) +
+  geom_point(size = 1) +
+  facet_grid(Variable ~ ., scales = "free_y") +
+  geom_smooth(formula = y ~ poly(x, 20), method = "lm", se = FALSE)
+```
+
+
+## Hierarchical structure
+
+Review 09-3 and 09-4
+
+- Nested levels of observations
+- Turning hummingbirds
+- Intertidal species richness
+
+
+## Spatial relationships
+
+Irregular sampling along the Missouri River
+
+```{r, echo=FALSE, message=FALSE}
+library(ggmap)
+
+pts <- data.frame(
+  lat = c(39.1689, 39.2067, 39.3253, 39.2243, 38.9808,
+          38.6383, 38.7021, 38.59, 38.7305, 38.9712, 38.589),
+  lon = c(-94.1315, -93.7299, -93.2362, -92.8503, -92.7525,
+          -92.2117, -91.7358, -91.9528, -92.3607, -92.5674, -92.1808)
+)
+sbbox <- make_bbox(lon = pts$lon, lat = pts$lat, f = 0.2)
+
+sq_map <- get_map(location = sbbox, maptype = "toner-background")
+
+ggmap(sq_map) + 
+  geom_point(data = pts, mapping = aes(x = lon, y = lat),
+             color = "red") +
+  labs(x = "Longitude", y = "Latitude")
+```
+
+
+## Shared Ancestry
 
 - As soon as you have comparative data, you must consider the relationships among your taxa
     - No longer an option (30+ years of methods)
-- Not concerned in this class with making the tree(s)
-
-You have a tree and data
-  - What do I do now?
-
-## Where does your tree come from?
-
-- Published trees
-    - As is
-    - Pruned down from published trees
-- Constructed from multiple trees
-- Including tree uncertainty
-    - Compare effect of different taxon placements
+- Not concerned with making the tree(s)
 
 <center>
 *Trees are hypotheses of relationships. You have hypotheses resting on hypotheses.*
 </center>
+
 
 ## Is body size associated with home range area in mammals?
 
@@ -181,6 +215,7 @@ Data from Garland et al. [-@Garland1992-bf]
 - Body mass (km)
 - Home range area (km^2^)
 - "49lbr" data
+
 
 ## Home range vs. body mass
 
@@ -194,6 +229,7 @@ ggplot(lbr, aes(log_Mass, log_Home_Range)) +
   labs(x = "log Body Mass", y = "log Home Range")
 ```
 
+
 ## Home range vs. body mass
 
 ```{r echo=FALSE}
@@ -204,6 +240,7 @@ ggplot(lbr, aes(log_Mass, log_Home_Range, color = Clade)) +
   scale_color_manual(values = wes_palette("Moonrise2"))
 ```
 
+
 ## Home range vs. body mass
 
 ```{r echo=FALSE}
@@ -211,6 +248,7 @@ ggtree(tree, ladderize = FALSE) +
   geom_tiplab(size = 3) +
   geom_treescale()
 ```
+
 
 ## Home range vs. body mass
 
@@ -222,347 +260,18 @@ ggtree(tree2, aes(color = group), ladderize = FALSE) +
   scale_color_manual(values = wes_palette("Moonrise2"))
 ```
 
+
 ## Why phylogenetic comparative methods?
 
 1. Meet the assumptions of standard statistical tests
     - Any test you can do using "standard" methods has a phylogenetically informed counterpart.
     - What is your evolutionary model?
-2. Ask and answer nuanced evolutionary questions
+2. Ask and answer interesting evolutionary questions
     - Trait evolution (continuous or categorical)
     - Trait co-evolution
     - Rates of evolution (identify nodes when rates shift significantly)
     - What is your evolutionary model?
 
-## Branch lengths $\approx$ evolutionary model
-
-"Real" branch lengths:
-
-- Divergence dates (e.g., fossil calibrated)
-- Genetic or character distance (relative)
-
-Arbitrary branch lengths:
-
-- All = 1
-- Pagel's ultrametric transformation (1992): total height = deepest nesting
-
-Either can be transformed.
-
-## Divergence dated
-
-```{r echo=FALSE}
-ggtree(tree, ladderize = FALSE) +
-  geom_tiplab(size = 3) +
-  geom_treescale()
-```
-
-## All = 1
-
-```{r echo=FALSE}
-tree_1 <- tree
-tree_1$edge.length <- rep(1, times = length(tree_1$edge.length))
-ggtree(tree_1, ladderize = FALSE) +
-  geom_tiplab(size = 3) +
-  geom_treescale()
-```
-
-## Square-root divergence time
-
-```{r echo=FALSE}
-tree_sqrt <- tree
-tree_sqrt$edge.length <- sqrt(tree_sqrt$edge.length)
-ggtree(tree_sqrt, ladderize = FALSE) +
-  geom_tiplab(size = 3) +
-  geom_treescale()
-```
-
-## Models of evolution
-
-- Brownian motion
-- Ornstein-Uhlenbeck (OU)
-- Variable rates (ACDC)
-- Pagel's $\lambda$
-
-**These models are all accomplished via branch length transformations.**
-
-## Brownian motion
-
-- The default, null underlying model for evolution
-- Simplest, most parsimonious model of drift
-- No selection
-- At each step, a trait value is randomly altered based on a normal distribution (mean usually 0) with some variance.
-
-## Brownian motion
-
-Simulate 100 Brownian motion random walks with a length of 100 steps.
-
-```{r}
-set.seed(3)
-nsim <- 100  # Number of simulations
-t <- 0:100   # Time
-s2 <- 0.01   # Variance
-
-X <- foreach(i = 1:nsim, .combine = rbind) %do%
-  c(0, cumsum(rnorm(n = length(t) - 1, sd = sqrt(s2))))
-```
-
-## Brownian motion
-
-```{r echo=FALSE}
-lims <- range(X)
-M_one <- data.frame(t = 1:ncol(X),
-                    x = as.numeric(X[1, ]))
-ggplot(M_one, aes(t, x)) + geom_line() +
-  ylim(lims) +
-  labs(x = "Time (generations)", y = "Phenotype")
-```
-
-## Brownian motion
-
-```{r echo=FALSE}
-M <- as.data.frame(t(X))
-M$t <- 1:ncol(X)
-M_long <- melt(M, id = "t")
-ggplot() +
-  geom_line(data = M_long, aes(t, value, group = variable),
-            alpha = 0.25) +
-  geom_line(data = M_one, aes(t, x), color = "red", size = 2) +
-  ylim(lims) +
-  labs(x = "Time (generations)", y = "Phenotype")
-```
-
-## Brownian motion
-
-```{r long_BM_sim, echo=FALSE, cache=TRUE}
-set.seed(3)
-nsim <- 500
-t <- 0:1000
-s2 <- 0.01
-
-X <- foreach(i = 1:nsim, .combine = rbind) %do%
-  c(0, cumsum(rnorm(n = length(t) - 1, sd = sqrt(s2))))
-
-lims <- range(X)
-M_one <- data.frame(t = 1:ncol(X),
-                    x = as.numeric(X[1, ]))
-
-M <- as.data.frame(t(X))
-M$t <- 1:ncol(X)
-M_long <- melt(M, id = "t")
-ggplot() +
-  geom_line(data = M_long, aes(t, value, group = variable),
-            alpha = 0.25) +
-  geom_line(data = M_one, aes(t, x), color = "red", size = 2) +
-  ylim(lims) +
-  labs(x = "Time (generations)", y = "Phenotype")
-```
-
-## Brownian motion
-
-```{r echo=FALSE}
-x <- as.numeric(t(M[nrow(M), 1:(ncol(M) - 1)]))
-ggplot(data.frame(x), aes(x)) +
-  geom_histogram(bins = 30) +
-  labs(x = "Phenotype", y = "Count")
-```
-
-## Ornstein-Uhlenbeck model
-
-- Based on Ornstein & Uhlenbeck [-@Uhlenbeck1930-xx]
-- Brownian motion doesn't allow for adaptive evolution (drift only)
-- Simplest model for an evolutionary process with selection (deterministic + stochastic)
-
-> The OU model describes the motion of a species in the phenotypic space whereby the species moves randomly within the space, but is influenced by a central tendency such that large deviations from the central optimum receive a stronger force back toward the optimum [@Blomberg2003-jk]
-
-## Ornstein-Uhlenbeck model (OU)
-
-$$dX(t) = \alpha[\theta - X(t)]dt + \sigma dB(t)$$
-
-- Change in trait X at time *t* is a function of selection $\alpha[\theta - X(t)]dt$ and drift $\sigma dB(t)$
-    - $\alpha$ = strength of selection
-    - $\theta$ = optimum
-    - $\sigma$ = magnitude of drift
-- $\alpha$ and one or more local optima ($\theta_1$, $\theta_2$, etc.) can be estimates
-- Models compared with likelihood ratio tests, AIC, etc.
-
-## Ornstein-Uhlenbeck model (OU)
-
-Key readings:
-
-- Martins E, Hansen TF [-@Hansen1996-ad] Phylogenies and the comparative method: A general approach to incorporating phylogenetic information into the analysis of interspecific data. *Am Nat* 149:646-667.
-- Blomberg SP, Garland T Jr, Ives AR [-@Blomberg2003-jk] Testing for phylogenetic signal in comparative data: Behavioral traits are more labile. *Evolution* 57:717-745.
-- Butler M, King A [-@Butler2004-ey] Phylogenetic comparative analysis: a modeling approach for adaptive evolution. *Am Nat* 164:683-695.
-
-## OU evolution along a tree
-
-```{r}
-library(phytools)
-set.seed(331)
-tree <- pbtree(n = 15, scale = 10)
-```
-
-## OU evolution along a tree
-
-```{r echo=FALSE}
-ggtree(tree, ladderize = FALSE) +
-  geom_tiplab(size = 3)
-```
-
-## OU evolution along a tree
-
-$$dX(t) = \alpha[\theta - X(t)]dt + \sigma dB(t)$$
-
-```{r}
-x <- fastBM(tree,
-            a = 0,           # Ancestral state at the root node
-            theta = 3,       # Optimum
-            alpha = 0.2,     # Strength of selection
-            s2 = 0.1,      # Variance of the BM process
-            internal = TRUE) # Return states for internal nodes
-```
-
-## OU evolution along a tree
-
-```{r echo=FALSE}
-phenogram(tree, x, spread.labels = TRUE, spread.cost = c(1, 0.01),
-          main = "scale = 10, alpha = 0.2, s2 = 0.1")
-```
-
-## OU evolution along a tree
-
-```{r echo=FALSE}
-set.seed(331)
-tree <- pbtree(n = 15, scale = 100)
-x <- fastBM(tree,
-            a = 0,           # Ancestral state at the root node
-            theta = 3,       # Character state optimum
-            alpha = 0.2,     # Strength of selection
-            s2 = 0.1,      # Variance of the BM process
-            internal = TRUE) # Return states for internal nodes
-phenogram(tree, x, spread.labels = TRUE, spread.cost = c(1, 0.01),
-          main = "scale = 100, alpha = 0.2, s2 = 0.1")
-```
-
-## OU evolution along a tree
-
-```{r echo=FALSE}
-set.seed(331)
-tree <- pbtree(n = 15, scale = 10)
-x <- fastBM(tree,
-            a = 0,           # Ancestral state at the root node
-            theta = 3,       # Character state optimum
-            alpha = 0.5,     # Strength of selection
-            s2 = 0.1,      # Variance of the BM process
-            internal = TRUE) # Return states for internal nodes
-phenogram(tree, x, spread.labels = TRUE, spread.cost = c(1, 0.01),
-          main = "scale = 10, alpha = 0.5, s2 = 0.1")
-```
-
-## OU evolution along a tree
-
-```{r echo=FALSE}
-set.seed(331)
-tree <- pbtree(n = 15, scale = 10)
-x <- fastBM(tree,
-            a = 0,           # Ancestral state at the root node
-            theta = 3,       # Character state optimum
-            alpha = 0.2,     # Strength of selection
-            s2 = 0.5,      # Variance of the BM process
-            internal = TRUE) # Return states for internal nodes
-phenogram(tree, x, spread.labels = TRUE, spread.cost = c(1, 0.01),
-          main = "scale = 10, alpha = 0.2, s2 = 0.5")
-```
-
-## Estimating an OU model
-
-Rather than simulating data, estimate the values for $\alpha$ and $\theta$.
-
-1. Given a tree and data (body mass in Caribbean anoles)
-2. What model of evolution best fits the data?
-    - Brownian motion
-    - OU model with a single, clade-wide optimum
-    - OU model with three body size optima (S/M/L)
-    - OU model with four optima (including an ancestral size)
-    - OU model based on multiple colonization events
-
-## Estimating an OU model
-
-Evolution toward two local optima:
-
-<center>
-<img src="https://i.imgur.com/8Iwp6A4.png" width="50%" />
-</center>
-
-## Estimating an OU model
-
-<center>
-<img src="https://i.imgur.com/qfuAvQ5.png" width="100%" />
-</center>
-
-## Estimating an OU model
-
-<center>
-<img src="https://i.imgur.com/vUwTJ2Z.png" width="100%" />
-</center>
-
-## Estimating an OU model
-
-<center>
-<img src="https://i.imgur.com/OFcpiST.png" width="75%" />
-</center>
-
-$\theta_{small} = `r round(exp(-1.4), 2)`$ mm head length.
-
-## ACDC
-
-- Evolution that either increases or decreases in rate over time.
-    - Adaptive radiations followed by phenotypic stasis
-    - Proposed by Blomberg et al. [-@Blomberg2003-jk]
-- "Early burst" model of Harmon et al. [-@Harmon2010-gl]
-- Didn't really ever catch on as much as OU.
-
-## Models of evolution $\approx$ branch length transformations
-
-Pagel's $\lambda$: how well does the tree fit the predicted covariance among the trait values
-
-- $1$ = Brownian motion
-- $>1$ = nodes pulled toward the tips (stronger covariance than expected by BM)
-- $<1$ = nodes pulled toward the root (weaker covariance than expected by BM; more common)
-
-$$\lim_{d\to0} = \mbox{"Star phylogeny"}$$
-
-## Pagel's $\lambda$ branch scaling
-
-```{r echo=FALSE}
-set.seed(10)
-tree <- pbtree(n = 30, b = 2)
-ggtree(tree, ladderize = FALSE) +
-  geom_tiplab(size = 3) +
-  ggtitle(TeX("Original Branch Lengths ($\\lambda = 1$)"))
-```
-
-## Pagel's $\lambda$ branch scaling
-
-```{r echo=FALSE}
-ggtree(rescale(tree, "lambda", 0.5), ladderize = FALSE) +
-  geom_tiplab(size = 3) +
-  ggtitle(TeX("$\\lambda = 0.5$"))
-```
-
-## Pagel's $\lambda$ branch scaling
-
-```{r echo=FALSE}
-ggtree(rescale(tree, "lambda", 0.1), ladderize = FALSE) +
-  geom_tiplab(size = 3) +
-  ggtitle(TeX("$\\lambda = 0.1$"))
-```
-
-## Pagel's $\lambda$ branch scaling
-
-```{r echo=FALSE}
-ggtree(rescale(tree, "lambda", 0.001), ladderize = FALSE) +
-  geom_tiplab(size = 3) +
-  ggtitle(TeX("$\\lambda = 0.001$"))
-```
 
 ## Home range vs. body mass
 
@@ -624,7 +333,7 @@ summary(fm1)
 
 ```{r echo=FALSE}
 fm1 <- gls(log_Home_Range ~ log_Mass, data = lbr,
-           correlation = corBrownian(phy = tree))
+           correlation = corBrownian(phy = tree, form = ~ Species))
 summary(fm1)
 ```
 
@@ -632,7 +341,7 @@ summary(fm1)
 
 ```{r}
 fm2 <- gls(log_Home_Range ~ log_Mass + Clade , data = lbr,
-           correlation = corBrownian(phy = tree))
+           correlation = corBrownian(phy = tree, form = ~ Species))
 summary(fm2)
 ```
 
@@ -640,107 +349,27 @@ summary(fm2)
 
 ```{r}
 fm3 <- gls(log_Home_Range ~ log_Mass * Clade , data = lbr,
-           correlation = corBrownian(phy = tree))
+           correlation = corBrownian(phy = tree, form = ~ Species))
 summary(fm3)
 ```
 
-## Model 4: Mass, OU {.smaller}
-
-Estimating OU parameter alpha often fails (`Error in corFactor.corStruct(object)`)
-
-- Brute-force optimization of OU alpha parameter
-- Maximize the log-likelihood for a range of models with different values of alpha.
-
-```{r}
-myOU <- function(alpha, dat, tree){
-  fm <- gls(log_Home_Range ~ log_Mass, data = dat, 
-            correlation = corMartins(alpha, tree, fixed = TRUE))
-  return(as.numeric(fm$logLik))
-}
-
-alpha <- optimize(f = myOU, interval = c(0, 2), 
-                  dat = lbr, tree = tree, maximum = TRUE)
-alpha
-```
-
-## Model 4: Mass, OU
-
-Fit a model with the alpha parameter fixed at the optimized value:
-
-```{r}
-ou_mod <- corMartins(value = alpha$maximum,
-                     phy = tree, fixed = TRUE)
-fm4 <- gls(log_Home_Range ~ log_Mass, data = lbr,
-           correlation = ou_mod)
-```
-
-## Model 4: Mass, OU {.smaller}
-
-```{r echo=FALSE}
-summary(fm4)
-```
 
 ## Model comparison with AICc
 
-Models 5 and 6 ANCOVA with OU. Models 7-9, estimate Pagel's $\lambda$.
-
 ```{r echo=FALSE}
-myOU <- function(alpha, dat, tree){
-  fm <- gls(log_Home_Range ~ log_Mass + Clade, data = dat, 
-            correlation = corMartins(alpha, tree, fixed = TRUE))
-  return(as.numeric(fm$logLik))
-}
-
-alpha <- optimize(f = myOU, interval = c(0, 2), 
-                  dat = lbr, tree = tree, maximum = TRUE)
-ou_mod <- corMartins(value = alpha$maximum,
-                     phy = tree, fixed = TRUE)
-fm5 <- gls(log_Home_Range ~ log_Mass + Clade, data = lbr,
-           correlation = ou_mod)
-
-myOU <- function(alpha, dat, tree){
-  fm <- gls(log_Home_Range ~ log_Mass * Clade, data = dat, 
-            correlation = corMartins(alpha, tree, fixed = TRUE))
-  return(as.numeric(fm$logLik))
-}
-
-alpha <- optimize(f = myOU, interval = c(0, 2), 
-                  dat = lbr, tree = tree, maximum = TRUE)
-ou_mod <- corMartins(value = alpha$maximum,
-                     phy = tree, fixed = TRUE)
-fm6 <- gls(log_Home_Range ~ log_Mass * Clade, data = lbr,
-           correlation = ou_mod)
-
-fm7 <- gls(log_Home_Range ~ log_Mass, data = lbr,
-           correlation = corPagel(1, phy = tree))
-fm8 <- gls(log_Home_Range ~ log_Mass + Clade, data = lbr,
-           correlation = corPagel(1, phy = tree))
-fm9 <- gls(log_Home_Range ~ log_Mass * Clade, data = lbr,
-           correlation = corPagel(1, phy = tree))
-
-mods <- matrix(NA, nrow = 3, ncol = 3)
-row.names(mods) <- c("Brownian Motion", "Stabilizing Selection (OU)", "Pagel's $\\lambda$")
+mods <- matrix(NA, nrow = 1, ncol = 3)
+row.names(mods) <- c("Brownian Motion")
 colnames(mods) <- c("Mass", "Mass + Clade", "Mass * Clade")
 mods[1, 1] <- AICc(fm1)
 mods[1, 2] <- AICc(fm2)
 mods[1, 3] <- AICc(fm3)
-mods[2, 1] <- AICc(fm4)
-mods[2, 2] <- AICc(fm5)
-mods[2, 3] <- AICc(fm6)
-mods[3, 1] <- AICc(fm7)
-mods[3, 2] <- AICc(fm8)
-mods[3, 3] <- AICc(fm9)
 kable(round(mods, 1))
 ```
 
-## Best performing model {.smaller}
+Additive model is preferred (but all are pretty similar)
 
-OU model:
-
-$$Home~Range \sim Mass + Clade$$
-
-```{r echo=FALSE}
-summary(fm5)
+```{r, echo=FALSE}
+coef(fm2)
 ```
 
 
@@ -753,11 +382,13 @@ When modeled correctly, non-independence between samples can be very useful:
 - Estimate the variance within families/lines (groups) versus between families/lines
 - Modern methods can consider complex pedigrees or relatedness estimated directly from genomic data
 
+
 ## Heritability and genetic correlation
 
 <center>
-<img src="https://i.imgur.com/AquXKrw.jpg" width="65%" />
+<img src="https://i.imgur.com/AquXKrw.jpg" width="55%" />
 </center>
+
 
 ## Load pedigree
 
@@ -769,6 +400,7 @@ data(BTped)
 str(BTped)
 ```
 
+
 ## Look at part of pedigree
 
 ```{r echo=FALSE}
@@ -776,6 +408,7 @@ Nped <- BTped[which(apply(BTped, 1, function(x) {
   any(x == "R187920" | x == "R187921")})), ]
 Nped
 ```
+
 
 ## Plot part of pedigree
 
@@ -787,6 +420,7 @@ ped <- pedigree(id = Nped$animal,
 plot(ped)
 ```
 
+
 ## Genetic distance
 
 ```{r echo=FALSE}
@@ -794,12 +428,14 @@ Aped <- 2 * kinship2::kinship(Nped[, 1], Nped[, 2], Nped[, 3])
 Aped[1:6,1:6]
 ```
 
+
 ## Data
 
 ```{r}
 data(BTdata)
 head(BTdata)
 ```
+
 
 ## Heritability of tarsus length
 
@@ -822,17 +458,20 @@ save(fm1, file = "../data/BT_herit.Rda")
 load("../data/BT_herit.Rda")
 ```
 
+
 ## Fixed effects
 
 ```{r}
 plot(fm1$Sol)
 ```
 
+
 ## Random effects
 
 ```{r}
 plot(fm1$VCV)
 ```
+
 
 ## Heritability
 
@@ -847,12 +486,14 @@ h2 <- fm1$VCV[, "animal"] /
 plot(h2)
 ```
 
+
 ## Heritability
 
 ```{r}
 median(h2)
 HPDinterval(h2)
 ```
+
 
 ## Genetic correlation
 
@@ -876,6 +517,7 @@ save(fm2, file = "../data/BT_genetic_correlation.Rda")
 load("../data/BT_genetic_correlation.Rda")
 ```
 
+
 ## Genetic correlation
 
 ```{r}
@@ -888,12 +530,14 @@ Genet_Corr <- fm2$VCV[ , "traittarsus:traitback.animal"] /
 plot(Genet_Corr)
 ```
 
+
 ## Genetic correlation
 
 ```{r}
 median(Genet_Corr)
 HPDinterval(Genet_Corr)
 ```
+
 
 ## Kinship and GWAS
 
@@ -905,6 +549,7 @@ Typical data:
   - Phenotypes
   - Hundreds to thousands of individuals
   - That's **a lot** of tests! (speed matters)
+
 
 ## Kinship and GWAS
 
@@ -919,6 +564,7 @@ Fixed effects:
   - *W* is a covariate (or more than one) with $\beta$ as the coefficient(s)
   - *G* is the genotype with $\gamma$ as the coefficient
 
+
 ## Kinship and GWAS
 
 The typical model is a Linear Mixed Model (LMM) with fixed and random effects.
@@ -930,6 +576,7 @@ Random effects:
   - *g* is a vector of polygenic effects scaled according to relatedness between individuals
   - *e* is the error term
 
+
 ## Kinship Matrix
 
 Kinship matrix can be 
@@ -937,11 +584,13 @@ Kinship matrix can be
   - Estimated from a pedigree
   - Estimated from the genomic data
 
+
 ## Mice on Meth
 
 <center>
 <img src="https://i.imgur.com/kaeCImN.jpg" width="85%" />
 </center>
+
 
 ## Mice on Meth
 
