@@ -15,18 +15,20 @@ library(cowplot)
 library(smatr)
 library(factoextra)
 library(readxl)
-library(rgl)
+library(plotly)
 library(GGally)
 library(pls)
 library(knitr)
-knit_hooks$set(webgl = hook_webgl)
-knitr::opts_chunk$set(cache = TRUE)
+
+theme_set(theme_cowplot())
 ```
+
 
 ## Resources
 
 - Everitt and Hothorn [-@Everitt2011-eu] *An Introduction to Applied Multivariate Analysis with R*. Springer.
 - Tabachnick and Fidell [-@Tabachnick2013-yo]: *Using Multivariate Statistics*. Pearson.
+
 
 ## Motivation: the curse of dimensionality
 
@@ -40,6 +42,7 @@ You have too many variables
 
 Your number of variables approaches your number of observations.
 
+
 ## What is a composite variable?
 
 > A linear combination of variables
@@ -49,6 +52,7 @@ Multiple Regression Makes a Composite Variable
 - Linear combination of predictor variables that is maximally correlated with outcome variable
 - $y = {\beta_1}X_1 + {\beta_2}X_2 + {\beta_3}X_3$
 - $\hat{y}$  is a composite variable
+
 
 ## Multiple regression makes a composite variable
 
@@ -63,15 +67,25 @@ names(M) <- c("Species", "Milk_Energy", "Fat", "Lactose")
 ggscatmat(M)
 ```
 
+
 ## Milk investment across mammalian species
 
 ```{r webgl=TRUE, echo=FALSE}
-plot3d(M$Lactose, M$Fat, M$Milk_Energy,
-       type = "s", col = "red", size = 1,
-       xlab = "Lactose",
-       ylab = "Fat",
-       zlab = "Milk Energy")
+fig <- plot_ly() %>%
+  add_markers(data = M,
+              x = ~ Fat,
+              y = ~ Lactose,
+              z = ~ Milk_Energy,
+              size = 1,
+              showlegend = FALSE) %>%
+  hide_colorbar() %>%
+  layout(scene = list(xaxis = list(title = 'Fat'),
+                      yaxis = list(title = 'Lactose'),
+                      zaxis = list(title = 'Milk Energy')))
+
+fig
 ```
+
 
 ## Principal components analysis
 
@@ -83,13 +97,13 @@ plot3d(M$Lactose, M$Fat, M$Milk_Energy,
 
 No predictor or outcome variable. Think of it as a one sided equation.
 
-## Principal components
 
-*Principal components:*
+## Principal components
 
 - Sequential linear combinations of the original variables 
 - The resulting composite variables *are uncorrelated with one another*
 - The first few usually account for *most* of the variation in the original data
+
 
 ## Principal components
 
@@ -98,11 +112,13 @@ For *q* variables, you get *q* PCs
 - First encompasses the maximum variance
 - Each in turn maximizes remaining variance while remaining uncorrelated
 
+
 ## Milk investment 
 
 ```{r echo=FALSE}
 ggplot(M, aes(Fat, Lactose)) + geom_point() + coord_fixed()
 ```
+
 
 ## Milk investment 
 
@@ -120,6 +136,7 @@ minpt <- data.frame(x1 = M$Fat[themin], x2 = M$Lactose[themin])
 maxpt <- data.frame(x1 = M$Fat[themax], x2 = M$Lactose[themax])
 ```
 
+
 ## Milk investment 
 
 Green = Low Fat, High Lactose
@@ -136,6 +153,7 @@ p <- ggplot(M, aes(Fat, Lactose)) + geom_point() +
 print(p)
 ```
 
+
 ## Major axis == PC1
 
 Green = Low Fat, High Lactose
@@ -149,6 +167,7 @@ MA_plot <- p +
               size = 1.5)
 print(MA_plot)
 ```
+
 
 ## Minor axis == PC2
 
@@ -165,6 +184,7 @@ raw_plot <- MA_plot +
 print(raw_plot)
 ```
 
+
 ## Plotting PCs
 
 - Rotation of the axes of multivariate data 
@@ -172,7 +192,6 @@ print(raw_plot)
 Green = Low Fat, High Lactose
 
 Blue = High Fat, Low Lactose
-
 
 ```{r echo=FALSE}
 z <- prcomp(~ Fat + Lactose, data = M, center = TRUE, scale. = TRUE)
@@ -192,6 +211,7 @@ pc_plot <- ggplot(PC, aes(pc1, pc2)) +
 print(pc_plot)
 ```
 
+
 ## Comparing PCs
 
 Green = Low Fat, High Lactose
@@ -201,6 +221,7 @@ Blue = High Fat, Low Lactose
 ```{r echo=FALSE}
 plot_grid(raw_plot, pc_plot, ncol = 2)
 ```
+
 
 ## Principal components
 
@@ -214,6 +235,7 @@ z <- prcomp(~ Fat + Lactose, data = M, center = TRUE, scale. = TRUE)
 - Centered to a mean of 0
 - Scaled to standard deviation of 1
 
+
 ## More PCA options
 
 Packages:
@@ -223,6 +245,7 @@ Packages:
 
 We will use the built-in `prcomp()`.
 
+
 ## `prcomp` objects {.smaller}
 
 ```{r}
@@ -231,6 +254,7 @@ str(z)
 
 `x` is a matrix of the the principal components
 
+
 ## Proportion of variance (eigenvalues)
 
 ```{r}
@@ -238,6 +262,7 @@ summary(z)
 ```
 
 PC1 explains 97% of the variance in the data.
+
 
 ## Loadings (eigenvectors)
 
@@ -251,6 +276,7 @@ print(z)
 - `Fat` loads positively on PC1 and negatively on PC2
 - Magnitudes are more informative with more than 2 variables
 
+
 ## Extracting PC scores
 
 ```{r}
@@ -258,6 +284,7 @@ PC <- data.frame(pc1 = z$x[, 1],
                  pc2 = z$x[, 2])
 PC
 ```
+
 
 ## Extracting PC scores
 
@@ -283,11 +310,13 @@ print(pc_plot)
 
 ```
 
+
 ## Visualizing loadings with `biplot()`
 
 ```{r}
 biplot(z)
 ```
+
 
 ## Use `factoextra` for more handy functions
 
@@ -300,6 +329,7 @@ library(factoextra)
 
 http://www.sthda.com/english/wiki/factoextra-r-package-quick-multivariate-data-analysis-pca-ca-mca-and-visualization-r-software-and-data-mining
 
+
 ## Extracting eigenvalues
 
 ```{r}
@@ -308,11 +338,13 @@ get_eig(z)
 
 Eigenvalues are variances. Default R `print()` method returns standard deviations.
 
+
 ## Screeplot
 
 ```{r}
 fviz_eig(z, addlabels = TRUE)
 ```
+
 
 ## Biplot
 
@@ -320,11 +352,13 @@ fviz_eig(z, addlabels = TRUE)
 fviz_pca_var(z) + coord_fixed()
 ```
 
+
 ## Plot of PC scores
 
 ```{r}
 fviz_pca_ind(z, geom = "text")
 ```
+
 
 ## Milk investment: PCA approach {.smaller}
 
@@ -360,6 +394,7 @@ names(M) <- c("Litter_Size", "Adult_Mass",
 M <- M %>% drop_na()
 ```
 
+
 ## Mammal life history
 
 `~ .` means all columns
@@ -371,11 +406,13 @@ z <- prcomp(~ .,
             scale. = TRUE)
 ```
 
+
 ## Mammal life history
 
 ```{r}
 get_eig(z)
 ```
+
 
 ## Mammal life history
 
@@ -383,11 +420,13 @@ get_eig(z)
 print(z)
 ```
 
+
 ## Mammal life history
 
 ```{r}
 fviz_eig(z, addlabels = TRUE)
 ```
+
 
 ## Mammal life history
 
@@ -395,17 +434,20 @@ fviz_eig(z, addlabels = TRUE)
 fviz_pca_var(z) + coord_fixed()
 ```
 
+
 ## Mammal life history
 
 ```{r}
 fviz_pca_var(z, axes = c(2, 3)) + coord_fixed()
 ```
 
+
 ## Trilobites
 
 <center>
 <img src="https://i.imgur.com/yndz5O9.gif" width="50%" />
 </center>
+
 
 ## Trilobites
 
@@ -431,6 +473,7 @@ p3 <- ggplot(M, aes(Glabella_Length, Glabella_Width)) +
 plot_grid(p1, p2, p3, ncol = 3)
 ```
 
+
 ## Trilobites
 
 ```{r}
@@ -440,6 +483,7 @@ z <- prcomp(~ .,
             center = TRUE)
 ```
 
+
 ## Trilobites
 
 ```{r trilobite_z2}
@@ -447,6 +491,7 @@ summary(z)
 ```
 
 - PC1 accounts for about 93% of the variance
+
 
 ## Trilobites
 
@@ -456,6 +501,7 @@ print(z)
 
 - PC1 is overall size (all load positively)
 - PC2 is dominated by the negative correlation between body length and glabella width
+
 
 ## Sample size and other concerns
 
@@ -470,6 +516,7 @@ All data:
 - Numeric (continuous)
 - No missing values
 
+
 ## Best case
 
 - A small number of variables that can be used as surrogates for the larger set without too much loss of information
@@ -481,6 +528,7 @@ PC1:
 - For morphological data:
     - Can often be a proxy for "size"
     - Remaining PCs are "shape"
+
 
 ## Drawbacks
 
