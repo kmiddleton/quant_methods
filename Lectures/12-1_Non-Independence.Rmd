@@ -1,0 +1,599 @@
+---
+title: "Non-independence: Introduction"
+subtitle: "Quantitative Methods in Life Sciences"
+author: "Elizabeth King, Kevin Middleton, and Lauren Sullivan"
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+knitr::opts_chunk$set(cache = TRUE)
+library(tidyverse)
+library(cowplot)
+library(readxl)
+
+library(ggtree)
+library(ape)
+library(wesanderson)
+library(nlme)
+library(AICcmodavg)
+
+theme_set(theme_cowplot())
+```
+
+
+## Independence
+
+- Observations are independent if the value or occurrence of one *does not* influence any others
+- Standard assumption of most statistical tests (Independent and Identically Distributed)
+- In biological situations, independence assumption is often violated
+
+<center>
+<img src="https://i.imgur.com/2NrNYHZ.png" width="60%" />
+</center>
+
+
+## When is independence assumption violated?
+  
+1. Repeat sampling over time of the same location, individual, or other experimental unit
+2. When there is a hierarchical structure to the data
+    - e.g., several samples at each site (block design) 
+3. Spatial relationships    
+4. Shared ancestry
+    - Phylogenetic relatedness (between populations/species)
+    - Genetic relatedness (between individuals within populations/species)
+5. Other
+
+
+## Why is non-independence a problem?
+
+Hemoglobin levels in six species of rodents
+
+```{r echo=FALSE, fig.width=7, fig.height=4}
+ex.dat <- data.frame(Altitude = c(0, 1400, 2500, 3500, 4500, 6000),
+                     Hemoglobin = c(9, 15, 11, 21, 16, 20),
+                     Clade = rep(c('Low', 'High'),each = 3)) 
+ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin)) +
+  geom_point(size = 6)
+```
+
+
+## Why is non-independence a problem?
+
+Hemoglobin levels in six species of rodents
+
+```{r echo=FALSE, fig.width=7, fig.height=4}
+ggplot(ex.dat, aes(x = Altitude, y = Hemoglobin, color = Clade)) +
+  geom_point(size = 6) +
+  scale_color_manual(values = c("blue", "red")) +
+  theme(legend.position = c(0.82, 0.17))
+```
+
+
+## Why is non-independence a problem?
+
+**Pseudoreplication**: artificially inflated sample size lead to unfounded confidence
+
+<center>
+<img src="https://i.imgur.com/2AzYFXF.png" width="90%" />
+</center>
+
+
+## Conventional statistics assume
+
+<center>
+<img src="https://i.imgur.com/FeMvrT7.png" width="90%" />
+</center>
+
+
+## Genotype-Phenotype Relationships
+
+Is a given genotype associated with a phenotype of interest?
+
+- Consider two populations with ancestry differences
+- Not accounting for ancestry differences can lead to spurious associations
+- Population structure & relatedness are issues for all genetic association studies
+    
+## Genotype-Phenotype Relationships
+
+Is a given genotype associated with a phenotype of interest?
+
+```{r echo=FALSE, fig.width=6, fig.height=4}
+set.seed(23141)
+
+pop <- data.frame('population' = rep(c('A', 'B'), each = 20), 
+                  'genotype' = c(c(rep(0, 14), rep(1, 6)),
+                                 c(rep(0, 3), rep(1, 17))),
+                  'phenotype' = c(rnorm(20, 5), rnorm(20, 3)))
+
+ggplot(pop, aes(x = as.factor(genotype), y = phenotype)) +
+  geom_point(position = position_jitter(0.05), alpha = 0.8) +
+  labs(x = 'Genotype', y = "Phenotype") +
+  stat_summary(fun = mean, geom = "point", size = 5,
+               color = "grey60") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar",
+               width = 0.05,
+               color = "grey60", size = 1)
+```
+
+
+## Genotype-Phenotype Relationships
+
+An effect of both 1) different allele frequency in two pops, and 2) different average trait value in two pops
+
+```{r echo=FALSE, fig.width=7, fig.height=4}
+ggplot(pop, aes(x = as.factor(genotype), y = phenotype,
+                color = population)) +
+  geom_point(position = position_jitter(0.05), alpha = 0.8) +
+  labs(x = 'Genotype', y = "Phenotype") +
+  stat_summary(fun = mean, geom = "point", size = 5,
+               color = "grey60") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar",
+               width = 0.05,
+               color = "grey60", size = 1) +
+  scale_color_manual(values = c("orange", "purple"))
+```
+
+
+## Repeated sampling
+
+Review 09-3 and 09-4
+
+- Squid growth
+- Orthodontic growth
+- Yearly climate data 
+
+```{r, echo=FALSE, message=FALSE, fig.height=3}
+CB <- read_csv("../data/cherry_blossoms.csv")
+
+CB %>% 
+  select(year, doy, temp) %>% 
+  rename(`Day of 1st\nBlossom` = doy,
+         `March Temp.\nEstimate` = temp) %>% 
+  pivot_longer(cols = -year, names_to = "Variable", values_to = "Value") %>% 
+  drop_na() %>% 
+  ggplot(aes(x = year, y = Value)) +
+  geom_point(size = 1) +
+  facet_grid(Variable ~ ., scales = "free_y") +
+  geom_smooth(formula = y ~ poly(x, 20), method = "lm", se = FALSE)
+```
+
+
+## Hierarchical structure
+
+Review 09-3 and 09-4
+
+- Nested levels of observations
+- Turning hummingbirds
+- Intertidal species richness
+
+
+## Spatial relationships
+
+Irregular sampling along the Missouri River
+
+```{r, echo=FALSE, message=FALSE}
+library(ggmap)
+
+pts <- data.frame(
+  lat = c(39.1689, 39.2067, 39.3253, 39.2243, 38.9808,
+          38.6383, 38.7021, 38.59, 38.7305, 38.9712, 38.589),
+  lon = c(-94.1315, -93.7299, -93.2362, -92.8503, -92.7525,
+          -92.2117, -91.7358, -91.9528, -92.3607, -92.5674, -92.1808)
+)
+sbbox <- make_bbox(lon = pts$lon, lat = pts$lat, f = 0.2)
+
+sq_map <- get_map(location = sbbox, maptype = "toner-background")
+
+ggmap(sq_map) + 
+  geom_point(data = pts, mapping = aes(x = lon, y = lat),
+             color = "red") +
+  labs(x = "Longitude", y = "Latitude")
+```
+
+
+## Shared Ancestry
+
+- As soon as you have comparative data, you must consider the relationships among your taxa
+    - No longer an option (30+ years of methods)
+- Not concerned with making the tree(s)
+
+<center>
+*Trees are hypotheses of relationships. You have hypotheses resting on hypotheses.*
+</center>
+
+
+## Is body size associated with home range area in mammals?
+
+Data from Garland et al. [-@Garland1992-bf]
+
+- Body mass (km)
+- Home range area (km^2^)
+- "49lbr" data
+
+
+## Home range vs. body mass
+
+```{r echo=FALSE}
+tree <- read.nexus("../data/49LBR70.PDI.nex")
+lbr <- read_excel("../data/49LBR.xlsx")
+lbr$Clade <- relevel(as.factor(lbr$Clade), ref = "Ungulates")
+
+ggplot(lbr, aes(log_Mass, log_Home_Range)) +
+  geom_point(size = 3) +
+  labs(x = "log Body Mass", y = "log Home Range")
+```
+
+
+## Home range vs. body mass
+
+```{r echo=FALSE}
+ggplot(lbr, aes(log_Mass, log_Home_Range, color = Clade)) +
+  geom_point(size = 3) +
+  labs(x = "log Body Mass", y = "log Home Range") +
+  theme(legend.position = c(0.85, 0.2)) +
+  scale_color_manual(values = wes_palette("Moonrise2"))
+```
+
+
+## Home range vs. body mass
+
+```{r echo=FALSE}
+ggtree(tree, ladderize = FALSE) +
+  geom_tiplab(size = 3) +
+  geom_treescale()
+```
+
+
+## Home range vs. body mass
+
+```{r echo=FALSE}
+tree2 <- groupClade(tree, .node = 51)
+ggtree(tree2, aes(color = group), ladderize = FALSE) +
+  geom_tiplab(size = 3) +
+  geom_treescale() +
+  scale_color_manual(values = wes_palette("Moonrise2"))
+```
+
+
+## Why phylogenetic comparative methods?
+
+1. Meet the assumptions of standard statistical tests
+    - Any test you can do using "standard" methods has a phylogenetically informed counterpart.
+    - What is your evolutionary model?
+2. Ask and answer interesting evolutionary questions
+    - Trait evolution (continuous or categorical)
+    - Trait co-evolution
+    - Rates of evolution (identify nodes when rates shift significantly)
+    - What is your evolutionary model?
+
+
+## Home range vs. body mass
+
+```{r echo=FALSE}
+tree <- read.nexus("../data/49LBR70.PDI.nex")
+lbr <- read_excel("../data/49LBR.xlsx") %>% 
+  as.data.frame()
+lbr$Clade <- relevel(as.factor(lbr$Clade), ref = "Ungulates")
+row.names(lbr) <- lbr$Species
+
+# Clean up tree
+tree$tip.label <- gsub("\\.", "", tree$tip.label)
+tree$tip.label <- gsub("\\:", "", tree$tip.label)
+```
+
+```{r echo=FALSE}
+tree2 <- groupClade(tree, .node = 51)
+ggtree(tree2, aes(color = group), ladderize = FALSE) +
+  geom_tiplab(size = 3) +
+  geom_treescale() +
+  scale_color_manual(values = wes_palette("Moonrise2"))
+```
+
+## Home range vs. body mass
+
+```{r echo=FALSE}
+ggplot(lbr, aes(log_Mass, log_Home_Range, color = Clade)) +
+  geom_point(size = 3) +
+  labs(x = "log Body Mass", y = "log Home Range") +
+  theme(legend.position = c(0.85, 0.2)) +
+  scale_color_manual(values = wes_palette("Moonrise2"))
+```
+
+## Working with `nlme::gls()`
+
+- We used `gls()` to fit the squid model, allowing correlated variance on a per-month basis
+- Phylogenetically based correlation variation is a similar issue
+- Choose a phylogenetic correlation structure
+
+## Phylogenetic correlation structures
+
+See ?`corClasses`
+
+- `corBrownian`: BM model of correlation
+- `corPagel`: Pagel's $\lambda$
+- `corMartins`: OU model originally proposed by Martins and Hansen [-@Martins1997-yv]
+- `corBlomberg`: ACDC model of Blomberg et al. [-@Blomberg2003-jk]
+
+## Model 1: Mass, BM
+
+```{r eval=FALSE}
+library(nlme)
+fm1 <- gls(log_Home_Range ~ log_Mass, data = lbr,
+           correlation = corBrownian(phy = tree))
+summary(fm1)
+```
+
+## Model 1: Mass, BM {.smaller}
+
+```{r echo=FALSE}
+fm1 <- gls(log_Home_Range ~ log_Mass, data = lbr,
+           correlation = corBrownian(phy = tree, form = ~ Species))
+summary(fm1)
+```
+
+## Model 2: Mass + Clade, BM {.smaller}
+
+```{r}
+fm2 <- gls(log_Home_Range ~ log_Mass + Clade , data = lbr,
+           correlation = corBrownian(phy = tree, form = ~ Species))
+summary(fm2)
+```
+
+## Model 3: Mass * Clade, BM {.smaller}
+
+```{r}
+fm3 <- gls(log_Home_Range ~ log_Mass * Clade , data = lbr,
+           correlation = corBrownian(phy = tree, form = ~ Species))
+summary(fm3)
+```
+
+
+## Model comparison with AICc
+
+```{r echo=FALSE}
+mods <- matrix(NA, nrow = 1, ncol = 3)
+row.names(mods) <- c("Brownian Motion")
+colnames(mods) <- c("Mass", "Mass + Clade", "Mass * Clade")
+mods[1, 1] <- AICc(fm1)
+mods[1, 2] <- AICc(fm2)
+mods[1, 3] <- AICc(fm3)
+kable(round(mods, 1))
+```
+
+Additive model is preferred (but all are pretty similar)
+
+```{r, echo=FALSE}
+coef(fm2)
+```
+
+
+## Kinship (non-independence) as a tool
+
+When modeled correctly, non-independence between samples can be very useful:
+
+- Forms the basis for how we estimate heritabilities, genetic correlations, etc.
+- Very similar in concept to repeatability
+- Estimate the variance within families/lines (groups) versus between families/lines
+- Modern methods can consider complex pedigrees or relatedness estimated directly from genomic data
+
+
+## Heritability and genetic correlation
+
+<center>
+<img src="https://i.imgur.com/AquXKrw.jpg" width="55%" />
+</center>
+
+
+## Load pedigree
+
+```{r, message=FALSE}
+library(MCMCglmm)
+library(kinship2)
+
+data(BTped)
+str(BTped)
+```
+
+
+## Look at part of pedigree
+
+```{r echo=FALSE}
+Nped <- BTped[which(apply(BTped, 1, function(x) {
+  any(x == "R187920" | x == "R187921")})), ]
+Nped
+```
+
+
+## Plot part of pedigree
+
+```{r warning=FALSE, echo=FALSE}
+ped <- pedigree(id = Nped$animal,
+                dadid = Nped$sire,
+                momid = Nped$dam,
+                sex = c(2, 1, rep(3, nrow(Nped) - 2)))
+plot(ped)
+```
+
+
+## Genetic distance
+
+```{r echo=FALSE}
+Aped <- 2 * kinship2::kinship(Nped[, 1], Nped[, 2], Nped[, 3])
+Aped[1:6,1:6]
+```
+
+
+## Data
+
+```{r}
+data(BTdata)
+head(BTdata)
+```
+
+
+## Heritability of tarsus length
+
+```{r, eval = FALSE}
+prior <- list(R = list(V = 0.002, n = 2),
+              G = list(G1 = list(V = 0.002, n = 2)))
+
+fm1 <- MCMCglmm(
+  fixed = tarsus ~ 1,
+  random = ~ animal,
+  prior = prior,
+  family = c("gaussian"),
+  nitt = 60000, burnin = 10000, thin = 25,
+  data = BTdata, pedigree = BTped,
+  verbose = FALSE)
+save(fm1, file = "../data/BT_herit.Rda")
+```
+
+```{r echo=FALSE}
+load("../data/BT_herit.Rda")
+```
+
+
+## Fixed effects
+
+```{r}
+plot(fm1$Sol)
+```
+
+
+## Random effects
+
+```{r}
+plot(fm1$VCV)
+```
+
+
+## Heritability
+
+$$h^2 = \frac{V_a}{V_a + V_r}$$
+
+```{r}
+h2 <- fm1$VCV[, "animal"] / 
+  (fm1$VCV[, "animal"] + fm1$VCV[, "units"])
+```
+
+```{r echo=FALSE, fig.height=3}
+plot(h2)
+```
+
+
+## Heritability
+
+```{r}
+median(h2)
+HPDinterval(h2)
+```
+
+
+## Genetic correlation
+
+```{r eval=FALSE}
+prior <- list(R = list(V = diag(2) * 1.001, n = 2),
+              G = list(G1 = list(V = diag(2)  * 1.001, n = 2)))
+
+fm2 <- MCMCglmm(
+  fixed = cbind(back, tarsus) ~ trait,
+  random = ~ us(trait):animal,
+  rcov = ~ us(trait):units,
+  prior = prior,
+  family = c("gaussian", "gaussian"),
+  nitt = 60000, burnin = 10000, thin = 25,
+  data = BTdata, pedigree = BTped,
+  verbose = FALSE)
+save(fm2, file = "../data/BT_genetic_correlation.Rda")
+```
+
+```{r echo=FALSE}
+load("../data/BT_genetic_correlation.Rda")
+```
+
+
+## Genetic correlation
+
+```{r}
+Genet_Corr <- fm2$VCV[ , "traittarsus:traitback.animal"] /
+  sqrt(fm2$VCV[ , "traittarsus:traittarsus.animal"] *
+         fm2$VCV[ , "traitback:traitback.animal"])
+```
+
+```{r echo=FALSE}
+plot(Genet_Corr)
+```
+
+
+## Genetic correlation
+
+```{r}
+median(Genet_Corr)
+HPDinterval(Genet_Corr)
+```
+
+
+## Kinship and GWAS
+
+When individuals are related in different ways, correcting for kinship is critical to avoid spurious associations. This is necessary even when not including close relatives (e.g., siblings, cousins, etc.)
+
+Typical data:
+
+  - Hundreds of thousands to millions of SNPs
+  - Phenotypes
+  - Hundreds to thousands of individuals
+  - That's **a lot** of tests! (speed matters)
+
+
+## Kinship and GWAS
+
+The typical model is a Linear Mixed Model (LMM) with fixed and random effects.
+
+$$Y = W\beta + G\gamma + g + e$$
+  
+*Y* is the phenotype
+
+Fixed effects:
+
+  - *W* is a covariate (or more than one) with $\beta$ as the coefficient(s)
+  - *G* is the genotype with $\gamma$ as the coefficient
+
+
+## Kinship and GWAS
+
+The typical model is a Linear Mixed Model (LMM) with fixed and random effects.
+
+$$Y = W\beta + G\gamma + g + e$$
+  
+Random effects:
+
+  - *g* is a vector of polygenic effects scaled according to relatedness between individuals
+  - *e* is the error term
+
+
+## Kinship Matrix
+
+Kinship matrix can be 
+  
+  - Estimated from a pedigree
+  - Estimated from the genomic data
+
+
+## Mice on Meth
+
+<center>
+<img src="https://i.imgur.com/kaeCImN.jpg" width="85%" />
+</center>
+
+
+## Mice on Meth
+
+<center>
+<img src="https://i.imgur.com/Rst1DwD.jpg" width="90%" />
+</center>
