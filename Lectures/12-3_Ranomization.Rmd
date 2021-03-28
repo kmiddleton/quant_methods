@@ -1,0 +1,312 @@
+---
+title: "Distribution Free Methods: Introduction"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+theme_set(theme_cowplot())
+library(readxl)
+library(wesanderson)
+library(knitr)
+
+```
+
+
+## Distribution Free Methods
+
+Distribution free methods do not assume the data are drawn from any specific probability distribution. *Important: distribution-free, not assumption-free (e.g., IID).*
+
+  - Randomization 
+      - Shuffle data set in some way
+    
+  - Resampling
+      - Sample from data set in some way
+        - Jackknife
+        - Bootstrap
+
+## Why distribution free methods?      
+  
+  - Real data often does not follow standard distributions
+  - Very flexible
+  - Uses only information from your data set
+      - Good & Bad
+  - Standard errors can not always be calculated for all parameters
+  
+## Resampling
+
+  - Primarily a method for parameter estimation and interval estimation
+  - Sample from the data to estimate the variability in the parameter estimate
+  - **Assumption:** Observed distribution is representative of the true distribution
+  - Need to empirically show the method works for each type of application using simulation
+
+## Randomization
+
+  - Primarily a method for hypothesis testing
+  - More directly asks: What is the probability of observing a result as extreme or more than my observed result? 
+  
+  **Assumption:** Under the null hypothesis, observations are random draws from a common population
+
+## Hypothesis testing by randomization
+
+<center>
+<img src="https://i.imgur.com/OOYvufC.jpg" width="55%" />
+</center>
+
+## Hypothesis testing by randomization
+
+Mandible lengths of female and male jackals from the Natural History Museum (London).
+
+```{r}
+M <- read_excel("../data/Jackals.xlsx")
+glimpse(M)
+M <- M %>% mutate(Sex = factor(Sex)) %>% as.data.frame()
+```
+
+## Randomization tests
+
+```{r echo=FALSE, message=FALSE}
+ggplot(M, aes(Mandible)) +
+  geom_histogram(bins = 30) +
+  facet_grid(Sex ~ .) +
+  labs(x = "Mandible Length (mm)", y = "Count")
+```
+
+## Randomization tests
+
+We'd like to do a *t*-test to compare group means.
+
+But:
+
+1. Assumes random sampling
+2. Assumes equal group variances
+3. Assumes normal distribution within groups
+
+## Randomization procedure
+
+1. Decide on a test statistic
+1. Calculate the test statistic for the *observed* data
+1. Randomly shuffle the observations
+1. Calculate the test statistic for that group
+1. Repeat thousands of times
+1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+
+When test assumptions are met, the results will match asymptotic procedures. When the assumptions are not met, the results will be valid.
+
+## Decide on a test statistic
+
+1. Mean difference
+2. *t*: *t*-test, linear model parameter estimate (slope, intercept)
+3. *F*: ANOVA-like
+4. $\chi^2$
+5. Any metric of your choice (P-value, Fst, heterozygosity, LOD score, etc.)
+
+## Calculate the test statistic for the observed data
+
+Observed difference in mean value for females vs. males:
+
+```{r}
+(obs <- mean(M$Mandible[M$Sex == "F"]) -
+   mean(M$Mandible[M$Sex == "M"]))
+```
+
+## Randomly reassign, recalculate, repeat
+
+```{r, echo=FALSE, fig.height=4}
+
+add_mean <- function(D) {
+  F_mean <- D %>% filter(Sex == "F") %>% 
+    summarize(bar = mean(Mandible)) %>% pull()
+  M_mean <- D %>% filter(Sex == "M") %>% 
+    summarize(bar = mean(Mandible)) %>% pull()
+  st <- paste("F =", F_mean, "\nM =", M_mean)
+  return(st)
+}
+
+M.set <- M %>%
+  mutate("Original"= M$Sex)
+
+
+ggplot(M.set, aes(x = Sex, y = Mandible, color = Original)) +
+  geom_point(position = position_jitter(width = 0.05),
+             alpha = 1 / 2, size = 2) +
+    annotate("text", x = 1.5, y = 115, label = add_mean(M.set))
+
+
+```
+
+## Randomly reassign, recalculate, repeat
+
+Shuffle Sex
+
+```{r echo=FALSE, fig.height=4}
+set.seed(23784)
+
+M.shuffle <- M.set %>%
+  mutate("Sex"= sample(M$Sex))
+
+ggplot(M.shuffle, aes(x = Sex, y = Mandible, color = Original)) +
+  geom_point(position = position_jitter(width = 0.05),
+             alpha = 1 / 2, size = 2) +
+  annotate("text", x = 1.5, y = 115, label = add_mean(M.shuffle))
+
+```
+
+## Randomly reassign, recalculate, repeat
+
+Repeat N times
+
+```{r echo=FALSE, fig.height=4}
+
+M.shuffle <- M.set %>%
+  mutate("Sex"= sample(M$Sex))
+
+ggplot(M.shuffle, aes(x = Sex, y = Mandible, color = Original)) +
+  geom_point(position = position_jitter(width = 0.05),
+             alpha = 1 / 2, size = 2) +
+  annotate("text", x = 1.5, y = 115, label = add_mean(M.shuffle))
+```
+
+
+## Randomly reassign, recalculate, repeat
+
+```{r mc_mean}
+# Set random number seed
+set.seed(10)
+
+nreps <- 1e4
+diffs <- numeric(length = nreps)
+diffs[1] <- obs
+for (ii in 2:nreps) {
+  Rand_Sex <- sample(M$Sex)
+  diffs[ii] <- mean(M$Mandible[Rand_Sex == "F"]) -
+    mean(M$Mandible[Rand_Sex == "M"])
+}
+```
+
+## Visualize the results
+
+```{r ex_1, eval=FALSE, message=FALSE}
+ggplot(data.frame(diffs), aes(diffs)) +
+  geom_histogram(bins = 25) +
+  geom_vline(xintercept = diffs[1], color = "red") +
+  labs(x = "Difference", y = "Count")
+```
+
+Histogram of the randomized differences, vertical red line to mark the observed value.
+
+## Visualize the results
+
+```{r echo=FALSE, ref.label="ex_1", message=FALSE}
+```
+
+## Proportion of randomized differences more extreme than the observed
+
+```{r}
+mean(diffs <= diffs[1])
+```
+
+Mean of `diffs` where the value is *less than or equal to* the observed mean difference.
+
+Empirically determined *P*-value is `r round(mean(diffs <= diffs[1]), 4)`.
+
+## Example: Age predicted by coloration in lion noses
+
+<center>
+<img src="https://i.imgur.com/beEXTFK.jpg" width="40%" />
+<img src="https://i.imgur.com/5kXcaVu.jpg" width="42%" />
+</center>
+
+## Age predicted by coloration in lion noses
+
+```{r echo=FALSE}
+data("LionNoses", package = "abd")
+ggplot(LionNoses, aes(proportion.black, age)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, formula = y~x) +
+  labs(x = "Proportion of Nose that is Black", y = "Age (y)")
+```
+
+## Age predicted by nose coloration {.smaller}
+
+```{r}
+fm <- lm(age ~ proportion.black, data = LionNoses)
+summary(fm)
+```
+
+## Age predicted by nose coloration
+
+```{r echo=FALSE, message=FALSE}
+
+set.seed(481769)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- summary(fm)$coefficients[2, 3]
+
+for (ii in 2:nreps) {
+  Rand_Age <- sample(LionNoses$age)
+  fm_rand <- lm(Rand_Age ~ proportion.black, data = LionNoses)
+  t_stats[ii] <- summary(fm_rand)$coefficients[2, 3]
+}
+
+ggplot(data.frame(t_stats), aes(t_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1], color = "red") +
+  labs(x = "t statistics", y = "Count")
+```
+
+## Age predicted by nose coloration
+
+```{r}
+2 * mean(t_stats >= t_stats[1])
+```
+
+Note sign of the inequality: how often does the randomized age data give a *larger* *t* statistic than the observed?
+
+Why 2 x 10^-4^?
+
+
+## Empirical *P* vs. Iterations {.smaller}
+
+What is the minimal detectable *P* for *n* iterations?
+
+```{r echo=FALSE}
+logspace <- function(d1, d2, n) exp(log(10) * seq(d1, d2,
+                                                  length.out = n))
+steps <- 20
+reps_list <- floor(logspace(1, 6.1, n = steps))
+reps_ex <- data.frame(nreps = reps_list)
+reps_ex$min_P <- 2 * (1 / reps_ex$nreps)
+kable(reps_ex[seq(2, nrow(reps_ex), by = 2),])
+```
+
+## Non-parametric tests
+
+Non-parametric tests often used when data do not meet the assumptions of a traditional (parametric) test:
+
+- One-sample *t*-test $\rightarrow$ Sign test, Wilcoxon test
+- Two-sample *t*-test $\rightarrow$ Mann-Whitney test
+- ANOVA $\rightarrow$ Kruskal-Wallis
+
+Small sample size, non-normality, unequal variances
+
+**Dramatically lower power compared to a parametric test**
+
+## Randomization as an alternative
+
+For all practical cases, randomization is a better alternative
+
+- Increased power
+- No reliance on asymptotic properties of tests
+- More relaxed assumptions
+
+
+## References
