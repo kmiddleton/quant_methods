@@ -27,7 +27,7 @@ theme_set(theme_cowplot())
 ```
 
 
-## Independence
+## Independence {.smaller}
 
 - Observations are independent if the value or occurrence of one *does not* influence any others
 - Standard assumption of most statistical tests (Independent and Identically Distributed)
@@ -38,7 +38,7 @@ theme_set(theme_cowplot())
 </center>
 
 
-## When is independence assumption violated?
+## When is the independence assumption violated?
   
 1. Repeat sampling over time of the same location, individual, or other experimental unit
 2. When there is a hierarchical structure to the data
@@ -538,62 +538,4 @@ median(Genet_Corr)
 HPDinterval(Genet_Corr)
 ```
 
-
-## Kinship and GWAS
-
-When individuals are related in different ways, correcting for kinship is critical to avoid spurious associations. This is necessary even when not including close relatives (e.g., siblings, cousins, etc.)
-
-Typical data:
-
-  - Hundreds of thousands to millions of SNPs
-  - Phenotypes
-  - Hundreds to thousands of individuals
-  - That's **a lot** of tests! (speed matters)
-
-
-## Kinship and GWAS
-
-The typical model is a Linear Mixed Model (LMM) with fixed and random effects.
-
-$$Y = W\beta + G\gamma + g + e$$
-  
-*Y* is the phenotype
-
-Fixed effects:
-
-  - *W* is a covariate (or more than one) with $\beta$ as the coefficient(s)
-  - *G* is the genotype with $\gamma$ as the coefficient
-
-
-## Kinship and GWAS
-
-The typical model is a Linear Mixed Model (LMM) with fixed and random effects.
-
-$$Y = W\beta + G\gamma + g + e$$
-  
-Random effects:
-
-  - *g* is a vector of polygenic effects scaled according to relatedness between individuals
-  - *e* is the error term
-
-
-## Kinship Matrix
-
-Kinship matrix can be 
-  
-  - Estimated from a pedigree
-  - Estimated from the genomic data
-
-
-## Mice on Meth
-
-<center>
-<img src="https://i.imgur.com/kaeCImN.jpg" width="85%" />
-</center>
-
-
-## Mice on Meth
-
-<center>
-<img src="https://i.imgur.com/Rst1DwD.jpg" width="90%" />
-</center>
+## References
