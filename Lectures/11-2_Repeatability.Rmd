@@ -33,6 +33,17 @@ How good are my observations?
 1. Discrete measurements: **interrater reliability**
 1. Continuous measurements: **intraclass correlation coefficient**
 
+## Visualizing ANOVA
+
+<center>
+<img src="https://i.imgur.com/dNF4ph0.png" width="100%" />
+</center>
+
+<br />
+<br />
+
+$$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
+
 
 ## Interrater reliability
 
@@ -128,68 +139,63 @@ Uses the results of the linear model (ANOVA):
 $$\mbox{Measurement} \sim \mbox{Specimen ID}$$
 
 
-## Repeatability of caliper measurements
+## Repeatability of lipid levels in the same sample
 
 <center>
-<img src="https://i.imgur.com/FRd1Apz.png" width="40%" />
+<img src="https://imgur.com/6nkJATA.png" width="30%" />
 </center>
 
 
 ## Calculation of ICC {.smaller}
 
-What is the ICC of repeated measurements of mouse bones?
+What is the ICC of repeated measurements of lipid levels in fruit flies?
 
-```{r}
-M <- read_excel("../data/G44_Morphometrics.xlsx")
+```{r message = FALSE}
+M <- read_csv("../data/macromol_optim.csv") %>% 
+  mutate(replicate = rep(paste0("rep",c(1,2)),439),
+         Line = factor(Line))
 glimpse(M)
+
 ```
 
 
 ## Pairs of measurements
 
 ```{r echo=FALSE}
-ggplot(M, aes(Len1, Len2)) +
+wideM <- M %>%
+  select(replicate,Line,Lipid.per.Fly) %>%
+  pivot_wider(names_from = replicate, values_from = Lipid.per.Fly)
+
+ggplot(wideM, aes(rep1, rep2)) +
   geom_abline(slope = 1, intercept = 0) +
   geom_point() +
-  xlab("Femur Length #1 (mm)") +
-  ylab("Femur Length #2 (mm)")
-```
-
-
-## Data processing
-
-Want two columns: (1) measurement and (2) ID as a factor.
-
-```{r}
-Lengths <- data.frame(Fem_Len = c(M$Len1, M$Len2),
-                      MouseID = factor(c(M$MouseID, M$MouseID)))
-Lengths <- Lengths %>% drop_na()
-glimpse(Lengths)
+  xlab("Lipid Level #1") +
+  ylab("Lipid Level #2")
 ```
 
 
 ## ICC via ANOVA
 
 ```{r}
-fm <- aov(Fem_Len ~ MouseID, data = Lengths)
+fm <- aov(Lipid.per.Fly ~ Line, data = M)
 print(summary(fm), digits = 5)
 ```
 
 ```{r}
-var_a <- (0.63579 - 0.00018) / 2
-var_a / (var_a + 0.00018)
+var_a <- (0.39597 - 0.10035) / 2
+var_a / (var_a + 0.10035)
 ```
 
-ICC is 0.999 for these measurements.
+ICC is 0.60 for these measurements.
 
 
 ## With `ICCest()`
 
 ```{r iccest, eval=FALSE}
 library(ICC)
-ICCest(MouseID,
-       Fem_Len,
-       data = Lengths,
+ICCest(Line,
+       Lipid.per.Fly,
+       data = M,
        alpha = 0.05,
        CI.type = "Smith")
 ```

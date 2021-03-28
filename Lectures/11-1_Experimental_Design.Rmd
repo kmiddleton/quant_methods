@@ -13,6 +13,7 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+library(GGally)
 library(readxl)
 theme_set(theme_cowplot())
 ```
@@ -52,7 +53,7 @@ theme_set(theme_cowplot())
 - What data will I collect?
 - Do I have sufficient experimental power?
 - How will I analyze the data?
-    - What will the results tell me? Consider all the possibilities.
+    - What questions can and cannot be answered by my dataset? Consider all the possibilities.
 
 What other data can I collect at the same time that might be useful at some unknown time in the future?
 
@@ -99,6 +100,65 @@ Think about:
 - Measurements of genetically related units or related species
 
 Some (all?) issues can be addressed statistically.
+
+
+## Recognize limitations: what question can I really answer?
+
+- Leaf area at one high rainfall and one low rainfall site (10 plots per site)
+
+<center>
+<img src="https://i.imgur.com/IT3QIvi.png" width="65%" />
+</center>
+
+
+## Recognize limitations: what question can I really answer? 
+
+<div class="columns-2">
+
+```{r echo = FALSE, fig.height = 4, fig.width = 4}
+set.seed(6239)
+LA <- tibble("LeafArea"= c(rnorm(10,4,1),rnorm(10,7,1)),
+             "Rainfall" = rep(c("Low","High"),each=10))
+
+ggplot(LA, aes(Rainfall, LeafArea)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Rainfall", y = "Leaf Area")
+
+```
+
+What else might differ between these two individual sites besides rainfall?
+
+</div>
+## Recognize limitations: what question can I really answer?
+
+  - Any two groups are expected to differ for any number of reasons.
+    - Replication within these groups will just reveal this difference, not show causality
+  - You need replication at the level of your variable of interest 
+
+## Recognize limitations: what question can I really answer?
+
+Marmots across altitudes & temperatures
+
+```{r echo=FALSE}
+set.seed(188)
+
+tt <- signif(runif(30, 8, 28), digits = 3)
+aa <- round(-500 * tt + rnorm(30, 17000, 500))
+
+mm <- signif(-1.5 * tt + 0.001 * aa + 150 + rnorm(30, 0, 6))
+
+MM <- data.frame("MarmotID" = paste0("M", seq(1, 30)),
+                 "Altitude" = aa, 
+                 "Temperature" = tt, 
+                 "MetabolicRate" = mm)
+
+ggscatmat(MM, columns = 2:4)
+
+```
+
 
 
 ## References
