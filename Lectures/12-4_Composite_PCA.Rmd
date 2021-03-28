@@ -1,6 +1,6 @@
 ---
-title: "Composite Variables: Introduction and PCA"
-author: 'Special Topics: Multivariate Statistics'
+title: "Composite Variables 1: Introduction and PCA"
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 7
@@ -12,6 +12,7 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 library(smatr)
 library(factoextra)
 library(readxl)
@@ -22,12 +23,6 @@ library(knitr)
 
 theme_set(theme_cowplot())
 ```
-
-
-## Resources
-
-- Everitt and Hothorn [-@Everitt2011-eu] *An Introduction to Applied Multivariate Analysis with R*. Springer.
-- Tabachnick and Fidell [-@Tabachnick2013-yo]: *Using Multivariate Statistics*. Pearson.
 
 
 ## Motivation: the curse of dimensionality
@@ -236,16 +231,6 @@ z <- prcomp(~ Fat + Lactose, data = M, center = TRUE, scale. = TRUE)
 - Scaled to standard deviation of 1
 
 
-## More PCA options
-
-Packages:
-
-- `ade4`: https://cran.r-project.org/web/packages/ade4/index.html
-- `FactoMineR`: https://cran.r-project.org/web/packages/FactoMineR/index.html
-
-We will use the built-in `prcomp()`.
-
-
 ## `prcomp` objects {.smaller}
 
 ```{r}
@@ -311,55 +296,6 @@ print(pc_plot)
 ```
 
 
-## Visualizing loadings with `biplot()`
-
-```{r}
-biplot(z)
-```
-
-
-## Use `factoextra` for more handy functions
-
-```{r eval=FALSE}
-install.packages("devtools")
-library(devtools)
-install_github("kassambara/factoextra")
-library(factoextra)
-```
-
-http://www.sthda.com/english/wiki/factoextra-r-package-quick-multivariate-data-analysis-pca-ca-mca-and-visualization-r-software-and-data-mining
-
-
-## Extracting eigenvalues
-
-```{r}
-get_eig(z)
-```
-
-Eigenvalues are variances. Default R `print()` method returns standard deviations.
-
-
-## Screeplot
-
-```{r}
-fviz_eig(z, addlabels = TRUE)
-```
-
-
-## Biplot
-
-```{r}
-fviz_pca_var(z) + coord_fixed()
-```
-
-
-## Plot of PC scores
-
-```{r}
-fviz_pca_ind(z, geom = "text")
-```
-
-
 ## Milk investment: PCA approach {.smaller}
 
 1. Do fat and lactose together predict milk energy?
@@ -406,12 +342,24 @@ z <- prcomp(~ .,
             scale. = TRUE)
 ```
 
+## Use `factoextra` for more handy functions
+
+```{r eval=FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("kassambara/factoextra")
+library(factoextra)
+```
+
+http://www.sthda.com/english/wiki/factoextra-r-package-quick-multivariate-data-analysis-pca-ca-mca-and-visualization-r-software-and-data-mining
 
 ## Mammal life history
 
 ```{r}
 get_eig(z)
 ```
+
+Eigenvalues are variances. Default R `print()` method returns standard deviations.
 
 
 ## Mammal life history
@@ -430,78 +378,16 @@ fviz_eig(z, addlabels = TRUE)
 
 ## Mammal life history
 
-```{r}
+```{r message=FALSE}
 fviz_pca_var(z) + coord_fixed()
 ```
 
 
 ## Mammal life history
 
-```{r}
+```{r message = FALSE}
 fviz_pca_var(z, axes = c(2, 3)) + coord_fixed()
 ```
-
-
-## Trilobites
-
-<center>
-<img src="https://i.imgur.com/yndz5O9.gif" width="50%" />
-</center>
-
-
-## Trilobites
-
-```{r}
-M <- read_excel("../data/Trilobites.xlsx")
-M
-```
-
-```{r, echo=FALSE}
-M <- M %>% select(-Genus)
-```
-
-
-## Trilobites
-
-```{r echo=FALSE}
-p1 <- ggplot(M, aes(Body_Length, Glabella_Length)) +
-  geom_point()
-p2 <- ggplot(M, aes(Body_Length, Glabella_Width)) +
-  geom_point()
-p3 <- ggplot(M, aes(Glabella_Length, Glabella_Width)) +
-  geom_point()
-plot_grid(p1, p2, p3, ncol = 3)
-```
-
-
-## Trilobites
-
-```{r}
-z <- prcomp(~ .,
-            data = M,
-            scale. = TRUE,
-            center = TRUE)
-```
-
-
-## Trilobites
-
-```{r trilobite_z2}
-summary(z)
-```
-
-- PC1 accounts for about 93% of the variance
-
-
-## Trilobites
-
-```{r echo=FALSE}
-print(z)
-```
-
-- PC1 is overall size (all load positively)
-- PC2 is dominated by the negative correlation between body length and glabella width
-
 
 ## Sample size and other concerns
 
