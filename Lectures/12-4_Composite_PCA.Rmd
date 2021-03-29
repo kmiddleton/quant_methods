@@ -12,7 +12,6 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
-theme_set(theme_cowplot())
 library(smatr)
 library(factoextra)
 library(readxl)
