@@ -1,5 +1,5 @@
 ---
-title: "Non-independence: Introduction"
+title: "Accounting for Non-independence"
 subtitle: "Quantitative Methods in Life Sciences"
 author: "Elizabeth King, Kevin Middleton, and Lauren Sullivan"
 output:
@@ -40,7 +40,7 @@ theme_set(theme_cowplot())
 
 ## When is the independence assumption violated?
   
-1. Repeat sampling over time of the same location, individual, or other experimental unit
+1. Repeat sampling over time of the same location, individual, or other experimental unit (e.g., time series)
 2. When there is a hierarchical structure to the data
     - e.g., several samples at each site (block design) 
 3. Spatial relationships    
@@ -101,8 +101,6 @@ Is a given genotype associated with a phenotype of interest?
     
 ## Genotype-Phenotype Relationships
 
-Is a given genotype associated with a phenotype of interest?
-
 ```{r echo=FALSE, fig.width=6, fig.height=4}
 set.seed(23141)
 
@@ -111,6 +109,7 @@ pop <- data.frame('population' = rep(c('A', 'B'), each = 20),
                                  c(rep(0, 3), rep(1, 17))),
                   'phenotype' = c(rnorm(20, 5), rnorm(20, 3)))
 
+set.seed(23497823)
 ggplot(pop, aes(x = as.factor(genotype), y = phenotype)) +
   geom_point(position = position_jitter(0.05), alpha = 0.8) +
   labs(x = 'Genotype', y = "Phenotype") +
@@ -121,12 +120,13 @@ ggplot(pop, aes(x = as.factor(genotype), y = phenotype)) +
                color = "grey60", size = 1)
 ```
 
+Is a given genotype associated with a phenotype of interest?
+
 
 ## Genotype-Phenotype Relationships
 
-An effect of both 1) different allele frequency in two pops, and 2) different average trait value in two pops
-
 ```{r echo=FALSE, fig.width=7, fig.height=4}
+set.seed(23497823)
 ggplot(pop, aes(x = as.factor(genotype), y = phenotype,
                 color = population)) +
   geom_point(position = position_jitter(0.05), alpha = 0.8) +
@@ -138,6 +138,8 @@ ggplot(pop, aes(x = as.factor(genotype), y = phenotype,
                color = "grey60", size = 1) +
   scale_color_manual(values = c("orange", "purple"))
 ```
+
+An effect of both 1) different allele frequency in two pops, and 2) different average trait value in two pops
 
 
 ## Repeated sampling
@@ -173,6 +175,16 @@ Review 09-3 and 09-4
 - Intertidal species richness
 
 
+## Similarities between spatial, phylogenetic, and pedigree analyses
+
+- Pairwise "distance" between observations represented by a matrix
+- Sometimes
+    - Variance-covariance matrix
+    - Normalized to maximum distance
+- Weights the regression by how closely "related" the observed values are
+    - Accounts for expectation that spatial or genetic close relatives will be more similar than expected by chance
+
+
 ## Spatial relationships
 
 Irregular sampling along the Missouri River
@@ -194,6 +206,16 @@ ggmap(sq_map) +
   geom_point(data = pts, mapping = aes(x = lon, y = lat),
              color = "red") +
   labs(x = "Longitude", y = "Latitude")
+```
+
+
+## Spatial relationships
+
+
+```{r, echo=FALSE}
+library(geodist)
+M <- geodist(pts, measure = "geodesic") / 1000
+print(M, digits = 1)
 ```
 
 
@@ -288,16 +310,6 @@ tree$tip.label <- gsub("\\:", "", tree$tip.label)
 ```
 
 ```{r echo=FALSE}
-tree2 <- groupClade(tree, .node = 51)
-ggtree(tree2, aes(color = group), ladderize = FALSE) +
-  geom_tiplab(size = 3) +
-  geom_treescale() +
-  scale_color_manual(values = wes_palette("Moonrise2"))
-```
-
-## Home range vs. body mass
-
-```{r echo=FALSE}
 ggplot(lbr, aes(log_Mass, log_Home_Range, color = Clade)) +
   geom_point(size = 3) +
   labs(x = "log Body Mass", y = "log Home Range") +
@@ -305,20 +317,23 @@ ggplot(lbr, aes(log_Mass, log_Home_Range, color = Clade)) +
   scale_color_manual(values = wes_palette("Moonrise2"))
 ```
 
+
 ## Working with `nlme::gls()`
 
 - We used `gls()` to fit the squid model, allowing correlated variance on a per-month basis
 - Phylogenetically based correlation variation is a similar issue
 - Choose a phylogenetic correlation structure
 
+
 ## Phylogenetic correlation structures
 
 See ?`corClasses`
 
-- `corBrownian`: BM model of correlation
-- `corPagel`: Pagel's $\lambda$
-- `corMartins`: OU model originally proposed by Martins and Hansen [-@Martins1997-yv]
-- `corBlomberg`: ACDC model of Blomberg et al. [-@Blomberg2003-jk]
+- `corBrownian`: Brownian motion model of evoltion
+- `corPagel`: Pagel's $\lambda$ branch length transformation
+- `corMartins`: Stabilizing selection evolutinary model originally proposed by Martins and Hansen [-@Martins1997-yv]
+- `corBlomberg`: Accelerating-Decelerating evolutionary model of Blomberg et al. [-@Blomberg2003-jk]
+
 
 ## Model 1: Mass, BM
 
@@ -329,6 +344,7 @@ fm1 <- gls(log_Home_Range ~ log_Mass, data = lbr,
 summary(fm1)
 ```
 
+
 ## Model 1: Mass, BM {.smaller}
 
 ```{r echo=FALSE}
@@ -337,6 +353,7 @@ fm1 <- gls(log_Home_Range ~ log_Mass, data = lbr,
 summary(fm1)
 ```
 
+
 ## Model 2: Mass + Clade, BM {.smaller}
 
 ```{r}
@@ -344,6 +361,7 @@ fm2 <- gls(log_Home_Range ~ log_Mass + Clade , data = lbr,
            correlation = corBrownian(phy = tree, form = ~ Species))
 summary(fm2)
 ```
+
 
 ## Model 3: Mass * Clade, BM {.smaller}
 
@@ -368,7 +386,7 @@ kable(round(mods, 1))
 
 Additive model is preferred (but all are pretty similar)
 
-```{r, echo=FALSE}
+```{r}
 coef(fm2)
 ```
 
