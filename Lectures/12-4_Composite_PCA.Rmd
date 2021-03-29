@@ -18,7 +18,6 @@ library(factoextra)
 library(readxl)
 library(plotly)
 library(GGally)
-library(pls)
 library(knitr)
 
 theme_set(theme_cowplot())
@@ -319,15 +318,18 @@ summary(fm_Multi)
 ## Mammal life history
 
 ```{r}
-M <- read_excel("../data/mammals.xlsx", na = "NA")
-M <- M %>% select(litter_size,
-                  adult_body_mass_g,
-                  neonate_body_mass_g,
-                  max_longevity_m,
-                  sexual_maturity_age_d)
-names(M) <- c("Litter_Size", "Adult_Mass",
-              "Neonate_Mass", "Longevity", "Maturity_Age")
-M <- M %>% drop_na()
+M <- read_excel("../data/mammals.xlsx", na = "NA") %>%
+  dplyr::select(litter_size,
+                adult_body_mass_g,
+                neonate_body_mass_g,
+                max_longevity_m,
+                sexual_maturity_age_d) %>% 
+  rename(Litter_Size = litter_size,
+         Adult_Mass = adult_body_mass_g,
+         Neonate_Mass = neonate_body_mass_g,
+         Longevity = max_longevity_m,
+         Maturity_Age = sexual_maturity_age_d) %>% 
+  drop_na()
 ```
 
 
@@ -342,16 +344,19 @@ z <- prcomp(~ .,
             scale. = TRUE)
 ```
 
+Centering and $Z$-scaling are important.
+
+- Should be the default but are not.
+
+
 ## Use `factoextra` for more handy functions
 
 ```{r eval=FALSE}
-install.packages("devtools")
-library(devtools)
-install_github("kassambara/factoextra")
+remotes::install_github("kassambara/factoextra")
 library(factoextra)
 ```
 
-http://www.sthda.com/english/wiki/factoextra-r-package-quick-multivariate-data-analysis-pca-ca-mca-and-visualization-r-software-and-data-mining
+[factoextra](http://www.sthda.com/english/wiki/factoextra-r-package-quick-multivariate-data-analysis-pca-ca-mca-and-visualization-r-software-and-data-mining) has several convenience functions for working with PCA.
 
 ## Mammal life history
 
@@ -379,14 +384,14 @@ fviz_eig(z, addlabels = TRUE)
 ## Mammal life history
 
 ```{r message=FALSE}
-fviz_pca_var(z) + coord_fixed()
+fviz_pca_var(z)
 ```
 
 
 ## Mammal life history
 
 ```{r message = FALSE}
-fviz_pca_var(z, axes = c(2, 3)) + coord_fixed()
+fviz_pca_var(z, axes = c(2, 3))
 ```
 
 ## Sample size and other concerns
@@ -420,7 +425,5 @@ PC1:
 
 1. Lose the original variable identity
     - Interpretation can be a challenge
-1. If centered and scaled (advised), you lose the original scale
+2. If centered and scaled (advised), you lose the original scale
 
-
-## References {.references}
