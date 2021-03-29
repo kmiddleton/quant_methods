@@ -136,7 +136,7 @@ MANOVA creates a composite variable from the set of outcome variables and asks w
 
   - Predict the composite from the group membership
 
-DFA & Logistic Regression: *q* Categorical ~ *p* Categorical
+DFA & Logistic Regression: *q* Categorical ~ *p* Continuous and/or *r* Categorical
 
 DFA and Logistic Regression create a composite variable from the set of predictor variables and asks which variables best predict group membership.
 
