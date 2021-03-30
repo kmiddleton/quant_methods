@@ -5,6 +5,8 @@ author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
+csl: evolution.csl
+bibliography: Multivariate.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -307,6 +309,15 @@ ggplot(M2, aes(x = avg_salinity,
   xlab("Salinity") 
   
 ```
+
+
+## Tibetan skulls
+
+Morant [-@Morant1923-co] published data on 32 skulls from Tibet
+
+<center>
+<img src="https://i.imgur.com/a4DpQbL.png" width="70%" />
+</center>
 
 
 ## Tibetan skulls

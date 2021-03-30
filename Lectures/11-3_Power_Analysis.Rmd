@@ -150,7 +150,7 @@ How much power is enough power? Some say 0.8.
 
 Hoenig and Heisey [-@Hoenig2001-hz]:
 
-> "There is a large literature advicating that power calculation be made whenever one performs a statistical test of a hypothesis and one obtains a statitically nonsignificant result. ... This approach, which appears in various forms, is fundamentally flawed."
+> "There is a large literature advocating that power calculation be made whenever one performs a statistical test of a hypothesis and one obtains a statistically nonsignificant result. ... This approach, which appears in various forms, is fundamentally flawed."
 
 - "Observed power" (power of an observed *P* value from a post-hoc power analysis) is mathematically tied to the *P* value.
 

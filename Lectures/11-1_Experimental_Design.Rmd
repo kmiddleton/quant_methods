@@ -74,7 +74,7 @@ Can we really expect samples to be completely independent?
 
 Reviewer:
 
-> The authors are studying the osteohistological correlates of flight mode, yet the three adequately sampled species are completely confounded with both flight style and wing shape, becuase flight style and wing shape are uniquely associated with one another. Thus it is impossible to disentangle the role of one from the other.
+> The authors are studying the osteohistological correlates of flight mode, yet the three adequately sampled species are completely confounded with both flight style and wing shape, because flight style and wing shape are uniquely associated with one another. Thus it is impossible to disentangle the role of one from the other.
 
 
 ## Beware of batch effects
