@@ -178,6 +178,8 @@ library(Rmpfr)
 alpha <- 0.05
 1 - ((1 - alpha) ^ 20)
 1 - ((1 - alpha) ^ 100)
+
+options(scipen=0)
 mpfr(1 - mpfr(((1 - alpha) ^ 1000), 128),128)
 
 ```
