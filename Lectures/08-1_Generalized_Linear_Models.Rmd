@@ -23,6 +23,7 @@ theme_set(theme_cowplot())
 <img src="https://i.imgur.com/GsL12KL.jpg" width="90%" />
 </center>
 
+
 ## Prediction
 
 > Outcome: Juvenile Survival <br />
@@ -31,6 +32,7 @@ theme_set(theme_cowplot())
 <center>
 <img src="https://i.imgur.com/iUhj5fp.png" width="75%" />
 </center>
+
 
 ## Prediction
 
@@ -58,6 +60,7 @@ Possible predictors:
 
 </div>
 
+
 ## Prediction
 
 > Outcome: Juvenile Survival
@@ -78,6 +81,7 @@ Possible predictors:
     - Masking
     - **Addressed by active analysis & visualization**
 
+
 ## *Generalized* linear models
 
 - A flexible regression method for prediction of *outcome* variables by zero (mean only), one, or more *predictors*
@@ -87,11 +91,13 @@ Possible predictors:
 
 **All of the rest of this class will concern linear models in one way or another.**
 
+
 ## What we want to avoid
 
 <center>
 <img src="https://i.imgur.com/tVpUUwY.png" width="80%" />
 </center>
+
 
 ## What we want to encourage
 
@@ -104,6 +110,7 @@ Possible predictors:
 <img src="https://i.imgur.com/mLP3Qj3.png" width="100%" />
 </center>
 
+
 ## *Generalized* linear models
 
 $$\mbox{Outcome variable(s)} \sim \mbox{Predictor variable(s)} + \mbox{Error}$$
@@ -114,6 +121,7 @@ Distribution of the outcome variable(s) can be:
 1. Binomial
 1. Poisson
 1. Lots and lots of others
+
 
 ## General equation form of GLMs
 
@@ -126,6 +134,7 @@ $Y$ follows some distribution (e.g., normal or binomial)
 - $\beta_0$ is the intercept term (optional), the value when all other $\beta_k = 0$.
 - Relationship between $Y$ and $X$s is linearized by a *link function*.
 
+
 ## GLMs with 1 normally distributed outcome variable | a.k.a., "General Linear Models"
 
 1. Continuous ~ $\ge$ 1 Continuous:  **OLS, correlation (Pearson r), multiple correlation (R)**
@@ -133,11 +142,13 @@ $Y$ follows some distribution (e.g., normal or binomial)
 1. Continuous ~ 1 Continuous + 1 Categorical: **ANCOVA**
 1. Continuous ~ $\ge$ 1 Continuous + $\ge$ 1 Categorical: **Multiple regression**
 
+
 ## GLMs with >1 normally distributed outcome variables | a.k.a., "General Linear Models"
 
 1. Continuous ~ Continuous: **Canonical correlation**
 1. Continuous ~ Categorical: **MANOVA**
 1. Continuous ~ Categorical + Continuous: **MANCOVA, Hotelling's T^2^**
+
 
 ## Hierarchy of GLMs
 

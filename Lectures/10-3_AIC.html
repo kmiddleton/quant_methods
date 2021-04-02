@@ -159,7 +159,7 @@ slide:not(.current) .plotly.html-widget{
         
   </style>
 
-  <link rel="stylesheet" href="data:text/css,%23bluefont%20%7B%0Acolor%3A%20blue%3B%0A%7D%0A%2Ereferences%20%7B%0Afont%2Dsize%3A%2060%25%3B%0Apadding%2Dleft%3A%2022px%20%3B%0Atext%2Dindent%3A%20%2D22px%20%3B%0A%7D%0A%2Ecenter%20%7B%0Adisplay%3A%20block%3B%0Amargin%2Dleft%3A%20auto%3B%0Amargin%2Dright%3A%20auto%3B%0A%7D%0Ablockquote%20%7B%0Abackground%3A%20%23f9f9f9%3B%0Aborder%2Dleft%3A%2010px%20solid%20%23ccc%3B%0Amargin%3A%201%2E5em%2010px%3B%0Apadding%3A%200%2E5em%2010px%3B%0Aquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%0A%7D%0Ap%20ul%20ol%20%7B%0Atext%2Dalign%3A%20left%3B%0Afont%2Dsize%3A%2080%25%3B%0A%7D%0Ablockquote%20p%20%7B%0Afont%2Dsize%3A%2080%25%3B%0Adisplay%3A%20inline%3B%0Atext%2Dalign%3A%20left%3B%0A%7D%0A%3Cstyle%3E%0A%2Ecol2%20%7B%0A%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%0A%2Dmoz%2Dcolumns%3A%202%20300px%3B%20%0Acolumns%3A%202%20300px%3B%20%0A%7D%0A%2Ecol3%20%7B%0A%2Dwebkit%2Dcolumns%3A%203%20100px%3B%0A%2Dmoz%2Dcolumns%3A%203%20100px%3B%0Acolumns%3A%203%20100px%3B%0A%7D%0A%3C%2Fstyle%3E%0A" type="text/css" />
+  <link rel="stylesheet" href="data:text/css,%23bluefont%20%7B%0Acolor%3A%20blue%3B%0A%7D%0A%2Ereferences%20%7B%0Afont%2Dsize%3A%2050%25%3B%0Apadding%2Dleft%3A%2022px%20%3B%0Atext%2Dindent%3A%20%2D22px%20%3B%0A%7D%0A%2Ecenter%20%7B%0Adisplay%3A%20block%3B%0Amargin%2Dleft%3A%20auto%3B%0Amargin%2Dright%3A%20auto%3B%0A%7D%0Ablockquote%20%7B%0Abackground%3A%20%23f9f9f9%3B%0Aborder%2Dleft%3A%2010px%20solid%20%23ccc%3B%0Amargin%3A%201%2E5em%2010px%3B%0Apadding%3A%200%2E5em%2010px%3B%0Aquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%0A%7D%0Ap%20ul%20ol%20%7B%0Atext%2Dalign%3A%20left%3B%0Afont%2Dsize%3A%2080%25%3B%0A%7D%0Ablockquote%20p%20%7B%0Afont%2Dsize%3A%2080%25%3B%0Adisplay%3A%20inline%3B%0Atext%2Dalign%3A%20left%3B%0A%7D%0A%3Cstyle%3E%0A%2Ecol2%20%7B%0A%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%0A%2Dmoz%2Dcolumns%3A%202%20300px%3B%20%0Acolumns%3A%202%20300px%3B%20%0A%7D%0A%2Ecol3%20%7B%0A%2Dwebkit%2Dcolumns%3A%203%20100px%3B%0A%2Dmoz%2Dcolumns%3A%203%20100px%3B%0Acolumns%3A%203%20100px%3B%0A%7D%0A%3C%2Fstyle%3E%0A" type="text/css" />
 
 </head>
 
@@ -178,7 +178,10 @@ slide:not(.current) .plotly.html-widget{
 
 <!--
 Datasets
-
+  biomass.csv
+  Squid.xlsx
+  RIKZ.xlsx
+  Ortho.xlsx
 -->
 
 <slide class=""><hgroup><h2>Tradeoff in model specification</h2></hgroup><article  id="tradeoff-in-model-specification">
@@ -409,7 +412,7 @@ lrtest(fm_0, fm_1)</pre>
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
 
-</article></slide><slide class=""><hgroup><h2>Maximum likelihood example</h2></hgroup><article  id="maximum-likelihood-example-2" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Maximum likelihood example</h2></hgroup><article  class="smaller" id="maximum-likelihood-example-2">
 
 <pre class = 'prettyprint lang-r'>AICc(fm_0) # Intercept only</pre>
 
@@ -596,13 +599,13 @@ fm2 &lt;- lme(Distance ~ Sex + Age, random = ~ Age | Subject,
 </ul></li>
 </ol>
 
-</article></slide><slide class=""><hgroup><h2>References</h2></hgroup><article  id="references" class="unnumbered">
+</article></slide><slide class=""><hgroup><h2>References</h2></hgroup><article  class="unnumbered" id="references">
 
-<div id="refs" class="references csl-bib-body">
-<div id="ref-Akaike1974-iw" class="csl-entry">
+<div class="references csl-bib-body" id="refs">
+<div class="csl-entry" id="ref-Akaike1974-iw">
 <p>Akaike, H. 1974. A New Look at the Statistical Model Identification. <em>IEEE Trans. Automat. Contr.</em> AC-19:716–723.</p></div>
 
-<div id="ref-McElreath2015-no" class="csl-entry">
+<div class="csl-entry" id="ref-McElreath2015-no">
 <p>McElreath, R. 2015. <em><span class="nocase">
 Statistical Rethinking: A Bayesian Course with Examples in <span>
 R</span> and Stan</span></em>. Chapman; Hall/CRC, Boca Raton, FL.</p></div></div></article></slide>

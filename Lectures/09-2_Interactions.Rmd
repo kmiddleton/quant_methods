@@ -20,6 +20,7 @@ library(paletteer)
 library(ggsci)
 ```
 
+
 <!--
 Datasets
   biomass.csv
@@ -156,9 +157,10 @@ fm <- lm(biomass ~ nitrogen + phosphorous + nitrogen:phosphorous,
 summary(fm)
 ```
 
+
 ## ANOVA table
 
-If you have a significant interaction, the main effects not interpertable **without** clarification.
+If you have a significant interaction, the main effects not interpretable **without** clarification.
 
 ```{r}
 fm <- lm(biomass ~ phosphorous * nitrogen, data = biomass)

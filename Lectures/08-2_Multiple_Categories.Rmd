@@ -26,11 +26,13 @@ source("Shade_Distributions.R")
 <img src="https://i.imgur.com/sdx4fMz.png" width="100%" />
 </center>
 
+
 ## Problem
 
 <center>
 <img src="https://i.imgur.com/GsL12KL.jpg" width="90%" />
 </center>
+
 
 ## Prediction
 
@@ -58,6 +60,7 @@ Possible predictors:
 
 </div>
 
+
 ## Prediction with categorical variables
 
 We have done prediction with only two groups (levels)
@@ -71,6 +74,7 @@ Now predict with three or more groups
 - Is *at least* one mean different?
 
 - Then, *which* mean(s) is/are different
+
 
 ## Does bright light treatment alleviate jet lag symptoms?
 
@@ -93,6 +97,7 @@ Now predict with three or more groups
 
 </div>
 
+
 ## ANOVA
 
 A more general version of a two-sample *t*-test for *k* groups:
@@ -104,6 +109,7 @@ One-way ANOVA: a single categorical variable
 
 - We will generalize to more variables later
 
+
 ## "Analysis of Variance"
 
 Some total variability in *Y*:
@@ -112,6 +118,7 @@ Some total variability in *Y*:
 1. Part remains unexplained ("error" or "residual")
 
 $F$-statistic is the ratio of the two.
+
 
 ## Assumptions of ANOVA
 
@@ -123,6 +130,7 @@ $F$-statistic is the ratio of the two.
 - Central limit theorem!
 - Equal sample sizes helps with violations of equal variances
 - ANOVA is the *Maximum Likelihood Solution* given these assumptions
+
 
 ## Does bright light treatment alleviate jet lag symptoms?
 
@@ -161,6 +169,7 @@ ggplot(JL, aes(x = Treatment, y = Shift)) +
   ylab("Shift in Circadian Rhythm (h)")
 ```
 
+
 ## Compare group means and standard deviations
 
 ```{r}
@@ -168,6 +177,7 @@ JL %>% group_by(Treatment) %>%
   summarise(mean(Shift), sd(Shift),
             .groups = "drop")
 ```
+
 
 ## Compare group means and standard errors
 
@@ -183,12 +193,14 @@ ggplot(JL, aes(x = Treatment, y = Shift)) +
 
 ```
 
+
 ## ANOVA as a Linear Model {.smaller}
 
 ```{r}
 fm_lm <- lm(Shift ~ Treatment, data = JL)
 summary(fm_lm)
 ```
+
 
 ## Parameter estimates
 
@@ -206,6 +218,7 @@ summary(fm_lm)
 
 *t*-tests and *P* values are suggestive of significant differences, but we need to look at the overall ANOVA first.
 
+
 ## ANOVA table from a Linear Model
 
 ```{r}
@@ -219,6 +232,7 @@ It is possible to have a significant parameter estimate and a non-significant ov
 - Nothing more to do.
 - No post hoc test
 
+
 ## Visualizing ANOVA
 
 <center>
@@ -229,6 +243,7 @@ It is possible to have a significant parameter estimate and a non-significant ov
 <br />
 
 $$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
+
 
 ## Model Matrix
 
@@ -249,6 +264,7 @@ rownames(mm) <- seq(1, nrow(mm))
 mm
 ```
 
+
 ## *F* distribution
 
 Two different degrees of freedom:
@@ -267,6 +283,7 @@ shade_F(0.05, df1 = 2, df2 = 19, vline = 7.28) +
   geom_vline(xintercept = 7.28, color = "blue")
 ```
 
+
 ## Parts of an ANOVA table
 
 ```{r echo=FALSE}
@@ -277,6 +294,7 @@ anova(fm_lm)
 - `Mean Sq`: `Sum Sq` / `Df`
 - `F value`: `Mean Sq` Treatment / `Mean Sq` Residual
 - `Pr(>F)`: *P*-value for the *F*-test of that variable
+
 
 ## Role of variation
 
@@ -300,6 +318,7 @@ What role does within vs. between group variation have in determining $F$?
 
 *Stay tuned for multiple comparisons*
 
+
 ## Post hoc tests for ANOVA
 
 Significant ANOVA (*P* = 0.004) only says that at least one mean is different.
@@ -315,6 +334,7 @@ Difference)
 
 We'll use the Tukey-Kramer test (only one you need to know right now)
 
+
 ## Tukey-Kramer test
 
 - Assumes that we have already performed an ANOVA and rejected the null hypothesis
@@ -323,6 +343,7 @@ We'll use the Tukey-Kramer test (only one you need to know right now)
 - FWER is the overall probability of a Type I error
 - Tukey-Kramer test makes all the same assumptions as ANOVA.
 - Defaults to all pairwise combinations of levels
+
 
 ## Tukey-Kramer test: `multcomp` library {.smaller}
 
@@ -333,6 +354,7 @@ We'll use the Tukey-Kramer test (only one you need to know right now)
 tukey <- glht(fm_lm, linfct = mcp(Treatment = "Tukey"))
 summary(tukey)
 ```
+
 
 ## Selective Set of Comparisons {.smaller}
 

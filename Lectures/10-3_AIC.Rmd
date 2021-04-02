@@ -21,9 +21,13 @@ library(nlme)
 load("lrtmodels.Rda")
 ```
 
+
 <!--
 Datasets
-
+  biomass.csv
+  Squid.xlsx
+  RIKZ.xlsx
+  Ortho.xlsx
 -->
 
 
