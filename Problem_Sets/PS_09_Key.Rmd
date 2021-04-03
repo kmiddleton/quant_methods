@@ -24,9 +24,11 @@ library(epiDisplay)
 library(knitr)
 ```
 
+
 ## Calcium concentration in bird plasma
 
 The file `Bird_Plasma.xlsx` contains factorial data on blood plasma calcium concentration (`Calcium`, mg / 100 mL) in male and female birds (`Sex`) each of which was treated or not with a hormone (`Treatment`).
+
 
 ### Activity
 
@@ -321,6 +323,6 @@ Anova(fm, type = "III")
 logistic.display(fm)
 ```
 
-From these results, what can you conclude about a $\chi^2$ test and logistic regressin in this case?
+From these results, what can you conclude about a $\chi^2$ test and logistic regression in this case?
 
 > They are equivalent in this situation.
