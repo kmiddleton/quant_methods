@@ -1,7 +1,7 @@
 ---
-title: "Model Comparison: In Class"
+title: "Unit 9: In Class Discussion"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -13,27 +13,74 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
-library(knitr)
-knitr::opts_chunk$set(cache = TRUE)
+library(wesanderson)
+
+theme_set(theme_cowplot())
 ```
 
-## Review Project 
 
-- Approval Due 04/19
-    - Note: *Approval*, not proposal (don't wait until the last minute)
-- Project Due 05/17
+## $R^2$ and $P$
 
-## Review Project
+> What is the relationship between the p-value and R squared? Say the p-value is really small, but so is the R-squared value, what does that mean? Also, is there a typical way that sample size effect the R-squared value (i.e., does larger sample size tend to make smaller R-squared values)?
 
-- Perform a "peer review" of a published article
-    - Pre-prints are ok
-- Article must:
-    - Use substantial statistical/quantitative methods
-    - Be in your broad area of expertise
-- Focus on the statistical / analytical aspects
 
-## Guidelines for Reviews
+## *Arabidopsis* growth
 
-- Follow the [Proc B Guidelines for Reviewers](http://rspb.royalsocietypublishing.org/for-reviewers)
-    - Focus on the statistical guidelines.  
-- You may consider the scope of the journal in which the article is published instead of Proc B
+We measured above ground biomass of plants after six weeks of growth in each of two treatment groups (n = 1000 per group). The means were 10.31 g (SEM = 0.001) for the control group and 10.42 (SEM = 0.002) for the fertilizer treatment group. A paired t-test showed highly significant difference of treatment ($t_{1998}$ = 52.4, P << 0.0001).
+
+
+## Review Quiz 09-2
+
+
+## Means and Intercepts
+
+> I was getting confused in the lecture videos where when we allow for a random intercept effect it was stated that "we're allowing for each group to have a different mean, or intercept".  Maybe this is just a wording issue for me, but does that mean that we allow the groups to have different means and different intercepts, and in the graphs we see the effect on different intercepts more quickly?  The mean and the intercept are not the *same* values for each group though, correct?  But in building a model that allows for random intercept, it inherently is accompanied by the allowance of different means for each group?
+
+
+## Intercepts as group means
+
+```{r}
+M <- read_csv("../data/Molerats.csv", col_types = c("cdd")) %>% 
+  rename(Caste = caste,
+         Mass = ln.mass,
+         Energy = ln.energy) %>% 
+  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker") %>% 
+           factor())
+```
+
+
+## ANOVA
+
+```{r}
+fm <- lm(Energy ~ Caste - 1, data = M)
+```
+
+```{r echo=FALSE}
+M <- M %>% mutate(pred2 = predict(fm))
+ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred2, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.justification = c(0, 1), legend.position = c(0.05, 0.95)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
+## Intercepts as group means
+
+```{r}
+coef(fm)
+
+M %>% 
+  group_by(Caste) %>% 
+  summarize(`Mean Energy Expenditure` = mean(Energy),
+            .groups = "drop")
+```
+
+
+## Thinking about coefficients
+
+1. Categorical predictors
+    - Group means or offsets from the `(Intercept)`
+2. Continuous predictors
+    - slopes measuring the change in the outcome resulting from a  unit increase in the predictor.
