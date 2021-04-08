@@ -15,15 +15,21 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
-library(forcats)
 library(car)
 library(nlme)
-library(GGally)
-library(epiDisplay)
-
 library(knitr)
+library(sjPlot)
+library(multcomp)
+
+theme_set(theme_cowplot())
 ```
 
+<!--
+Datasets
+  Bird_Plasma.xlsx
+  Zooplankton.csv
+  richness.txt
+-->
 
 ## Calcium concentration in bird plasma
 
@@ -49,6 +55,10 @@ Use `group_by()` and `tally()` to determine the sample size in each of the group
 M %>% group_by(Treatment, Sex) %>% tally()
 ```
 
+Is this a balanced factorial design?
+
+> Yes, all combinations of `Sex` and `Treatment` are present and all groups have n = 5.
+
 Create interaction plots of the calcium concentration data. Use the code from lecture as a template. Make two plots, one with `Treatment` on the x axis and one with `Sex` on the x axis. Use `plot_grid()` to place them side by side
 
 ```{r}
@@ -58,22 +68,22 @@ p1  <- ggplot(M, aes(x = Sex,
               color = Treatment,
               group = Treatment)) +
   geom_point(position = position_jitter(width = 0.1)) +
-  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
-  stat_summary(fun.y = mean, geom = "line")
+  stat_summary(fun = mean, geom = "point", pch = 5, size = 5) +
+  stat_summary(fun = mean, geom = "line")
 
 p2 <- ggplot(M, aes(x = Treatment,
               y = Calcium,
               color = Sex,
               group = Sex)) +
   geom_point(position = position_jitter(width = 0.1)) +
-  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
-  stat_summary(fun.y = mean, geom = "line")
-plot_grid(p1, p2, ncol = 2)
+  stat_summary(fun = mean, geom = "point", pch = 5, size = 5) +
+  stat_summary(fun = mean, geom = "line")
+cowplot::plot_grid(p1, p2, ncol = 2)
 ```
 
 What do you learn from these plots?
 
-> Hormone almost certainly has a strong positive effect -- the lines are very far apart in the first plot. Sexes appear not to differ that much, because the elevations of the lines in the second plot are very similar. Both sexes appear to response in the same direction with the same magnitude.
+> Hormone almost certainly has a strong positive effect -- the lines are very far apart in the first plot. Sexes appear not to differ that much, because the elevations of the lines in the second plot are very similar. Both sexes appear to respond in the same direction and with the same magnitude.
 
 Fit a factorial linear model (both main effects and the interaction term) and save the result to an R object.
 
@@ -82,6 +92,17 @@ Fit a factorial linear model (both main effects and the interaction term) and sa
 fm <- lm(Calcium ~ Sex * Treatment, data = M)
 ```
 
+Using the `summary()` function, determine the R^2^ for the linear model.
+
+```{r}
+# FIXME
+summary(fm)
+```
+
+How much of the variance in calcium level can be explained by the predictors?
+
+> About 83% of the variance in calcium level is explained by Sex, Treatment, and the Sex by Treatment interaction. 17% of the variance remains unexplained.
+
 Using the `Anova()` function in the `car` package, calculate an ANOVA table with type III sums of squares. You might have to install `car` first.
 
 ```{r}
@@ -89,26 +110,52 @@ Using the `Anova()` function in the `car` package, calculate an ANOVA table with
 Anova(fm, type = "III")
 ```
 
-Describe the results of the analysis.
+The package [`sjPlot`](https://strengejacke.github.io/sjPlot/index.html) has lots of useful functions for making tables and plotting regression results. You will probably need to install this package before you use it.
 
-> To determine the relative roles of sex and hormone treatment on blood plasma calcium concentration, we used a 2 X 2 factorial design (*n* = 5 in each group). Factorial ANOVA with the interaction between sex and hormone treatment was analyzed using type III sums of squares. We found a significant effect of hormone treatmen (*F*~1,16~ = 41; *P* < 0.001). Sexes did not differ after controlling for other effects (*P* = 0.33), including the interaction (*P* = 0.62).
+Spend a few minutes looking at the documentation/examples online. An alternative is the [gtsummary](http://www.danieldsjoberg.com/gtsummary/) package.
+
+Use the `tab_model()` function from `sjPlot` to crate a publication-style ANOVA table for the model. There are a lot of options for this function. Start with the defaults and change it as you see fit. Include whatever regression information you want.
+
+```{r, echo=FALSE}
+# FIXME
+tab_model(fm,
+          string.ci = "95% CI",
+          digits.p = 2)
+```
+
+
+Describe the results of the analysis, writing a brief paragraph describing the goal of the analysis, what analysis was carried out, and the results. This is similar to how you would write part of an abstract.
+
+> To determine the relative roles of sex and hormone treatment on blood plasma calcium concentration, we used a 2 X 2 factorial design (*n* = 5 in each group). Factorial ANOVA with the interaction between sex and hormone treatment was analyzed using type III sums of squares. We found a significant effect of hormone treatmen (*F*~1,16~ = 41; *P* < 0.001; R^2^ = 0.83). Sexes did not differ after controlling for other effects (*P* = 0.33), including the interaction (*P* = 0.62).
+
 
 ## Effect of predation on zooplankton
 
-The file `Zooplankton.csv` contains data on the concentration of zooplankton in three predator treatment groups (control, low, and high). Each of the three treatments were measured in five replicate blocks.
+The file `Zooplankton.csv` contains data on the concentration of zooplankton in three predator treatment groups (control, low, and high levels of predators in an enclosure). Each of the three treatments were measured in five replicate blocks.
 
 ### Activity
 
-Read in the data and convert both Treatment and Block into factors. It is especially important to make sure that Block is a factor, because Blocks are coded 1-5. We need to make sure that R converts them to a model matrix (0's and 1's).
+Read in the data and convert both Treatment and Block into factors. It is especially important to make sure that Block is a factor, because Blocks are coded 1-5. We need to make sure that R converts them to a model matrix (0's and 1's) rather than using them as numeric 1 to 5, because the numbering is arbitrary ("exchangeable" in statistical terminology).
 
 ```{r, message = FALSE}
 # FIXME
-M <- read_csv("../data/Zooplankton.csv") %>%
+M <- read_csv("../data/Zooplankton.csv", col_types = "cdd") %>%
   mutate(Treatment = factor(Treatment),
          Block = factor(Block))
 ```
 
-Make two plots, one in which Treatment is on the x axis and Block is encoded by color, and the second in which Block is on the x axis and Treatment is encoded by color. Notice how you learn different things about the data from each of these plots.
+Print the data to confirm that each treatment was present in each block.
+
+```{r}
+# FIXME
+M
+```
+
+This is a very good experimental design, because a multilevel model will allow each block to have it's own intercept and assess the difference(s) among treatments as a deviation from the block mean.
+
+An alternative experimental design would be if the researcher had used 15 different plots and randomly assigned them to one of the three treatments. This would also work, but the multilevel "block" model is more powerful.
+
+Make two plots, one in which Treatment is on the x-axis and Block is encoded by color, and the second in which Block is on the x-axis and Treatment is encoded by color.
 
 ```{r}
 # FIXME
@@ -120,65 +167,134 @@ M %>%
   geom_point()
 ```
 
-We want to test for significant differences in Treatment while accounting for the replicated blocks. We can fit this model in two different ways:
+Notice how you learn different things about the data from each of these plots.
 
-1. `lm()` and `anova()` with an additive model including Treatment and Block
-2. `lme()` from the `nlme` package with Block as a random effect
-
-Fit both of these models
-
-```{r}
-fm_lm <- lm(Zooplankton ~ Treatment + Block, M)
-anova(fm_lm)
-
-fm_lme <- lme(Zooplankton ~ Treatment,
-              random = ~ 1 | Block, M)
-anova(fm_lme)
-```
-
-Compare the output of the two models.
-
-> The models are identical. There is a significant effect of Treatment (at least one mean is different), but there doesn't appear to be much difference between blocks.
-
-
-## Testing a new drug
-
-We will use data on the effects of a drug on fever, blood pressure, and pain. There are two treatments here: the drug, and a placebo as a control. We want to ask if the drug affects fever, blood pressure, or pain and conversely whether we can predict drug treatment from the change in symptoms.
-
-### Activity
-
-First read in the data (`Drug_test.xlsx`) and make `Treatment` a factor. You will need to make "Placebo" as the base level of the factor.
-
-```{r}
-M <- read_excel("../data/Drug_test.xlsx") %>%
-  mutate(Treatment = factor(Treatment),
-         Treatment = fct_relevel(Treatment, "Placebo"))
-str(M)
-```
-
-Use `ggscatmat()` to visualize the relationships between our predictors: `Fever`, `BP`, and `Pain`. Color your points by treatment.
-
-```{r}
-ggscatmat(M, 1:3, color = "Treatment")
-```
-
-Are there any concerning patterns in the data?
-
-> No, looks fine.
-
-Fit a generalized linear model using `glm()`, predicting `Treatment` from `Fever`, `BP`, and `Pain`. Specify `family` as binomial to perform a logistic regression.
-
-Use 1) `summary()`, 2) `logisitic.display()` from the `epiDisplay` package, and 3) `Anova()`, specifying type III sums of squares to look at the results. What can you conclude?
-
-> Only fever is a good predictor of whether a person received the drug vs. placebo. The adjusted odds ratio of 0.23 (0.09 - 0.63) suggests that those with lower levels of fever were more likely to have received the drug. You can observe this in the scatterplot matrix in the upper left panel.
+Summarize the mean and standard deviation of each group in a table.
 
 ```{r}
 # FIXME
-fm <- glm(Treatment ~ Fever + BP + Pain, data = M,
-          family = "binomial")
-
-summary(fm)
-logistic.display(fm)
-Anova(fm, type = "III")
+M %>% 
+  group_by(Treatment) %>% 
+  summarize(Mean = mean(Zooplankton),
+            `Std. Dev.` = sd(Zooplankton),
+            .groups = "drop") %>% 
+  knitr::kable(digits = c(2, 2))
 ```
+
+We want to test for significant differences in Treatment while accounting for the replicated blocks. We will fit this model using the `lme()` function from the `nlme` package with `Block` as a random effect.
+
+
+```{r}
+# FIXME
+fm_lme <- lme(Zooplankton ~ Treatment,
+              random = ~ 1 | Block, M)
+```
+
+Now use `anova()` to generate the ANOVA table for the model.
+
+```{r}
+# FIXME
+anova(fm_lme)
+```
+
+Is the overall ANOVA significant? You can determine this by examining the `Treatment` effect (since there is only one predictor).
+
+> Yes, the P-value for Treatment is 0.002.
+
+If the overall ANOVA is significant, all we know is that at least one mean is different from the others. Perform a Tukey's HSD post-hoc test on the pairwise combinations of all the levels of Treatment.
+
+Refer to Lecture 08-2 for a reminder of how to code Tukey's HSD with the `multcomp` package.
+
+```{r}
+# FIXME
+tukey <- glht(fm_lme, linfct = mcp(Treatment = "Tukey"))
+summary(tukey)
+```
+
+Describe the results. Do they make sense biologically?
+
+> Overall there is a significant effect of predator level (P = 0.002). The pairwise post-hoc test shows that both high (P < 0.001) and low (P = 0.001) treatments are significantly different than control, but that high and low are not significantly different from each other (P = 0.08). Strangely, both high and low predation levels are associated with lower levels of zooplankton.
+
+
+## Grass Species Richness
+
+At the Conard Environmental Research Area (Grinnell, IA), there are 20 experimental plots with 10 burned each fall and 10 left unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
+
+```{r}
+# FIXME
+set.seed(112)
+mms <- c(rnorm(10, 5.5, 2), rnorm(10, 6.5, 2))
+all.rich <- numeric(0)
+for(ii in mms) {
+  all.rich <- c(all.rich, as.integer(rnorm(5, ii, 1)))
+}
+
+rich.dat <- data.frame('plot' = as.factor(rep(seq(1, 20), each = 5)), 
+                       'treatment' = rep(c('burned', 'unburned'), each = 50), 
+                       'richness' = all.rich)
+write.table(rich.dat, file="../data/richness.txt",
+            sep="\t", row.names = FALSE)
+```
+
+### Activity
+
+Load in the richness data (`richness.txt`), which is a tab-delimited text file (use `read_delim()` and look at the help to determine how to set the field delimiter to tab). Plot species richness vs. treatment. Include an appropriate amount of jitter and transparency and color points by plot. 
+
+```{r}
+rich.dat <- read_delim("../data/richness.txt",
+                       col_types = "dcd",
+                       delim = "\t") %>% 
+  mutate(plot = factor(plot))
+
+ggplot(rich.dat, aes(x = treatment, y = richness, color = plot)) +
+  geom_point(position = position_jitter(0.1), alpha = 0.5) +
+    guides(colour = guide_legend(ncol = 2, byrow = FALSE))
+```
+
+Do you think there is a relationship between species richness and burning?
+
+> Probably not. It doesn't look like a strong relationship.
+
+First, fit a model predicting species richness from treatment without considering plot membership. 
+
+```{r}
+anova(lm(richness ~ treatment, data = rich.dat))
+```
+
+What can you conclude from the results of this model?
+
+> It is difficult to interpret without considering plot as there is pseudoreplication.
+
+Now, calculate the mean species richness value for each plot. Fit a model predicting mean species richness from treatment. This is how you would approach this statistical problem if you did not want to use a multilevel model.
+
+```{r}
+mean.plot <- rich.dat %>%
+  group_by(plot, treatment) %>%
+  summarize(meanrich = mean(richness),
+            .groups = "drop")
+anova(lm(meanrich ~ treatment, data = mean.plot))
+```
+
+What can you conclude from this model?
+
+> There is no effect of treatment on species richness.
+
+Use the `lme()` function to fit a model predicting richness from treatment with plot as a random effect. 
+
+```{r}
+summary(lme(richness ~ treatment, random = ~1 | plot,
+            data = rich.dat))
+```
+
+Compare your results to the approach using the mean value. What can you conclude from this model? 
+
+> The results are consistent with the model using the mean values. This will not necesarily always happen.
+
+Why would you use `lme()` versus means per group?
+
+> The multilevel model is preferred because it includes all the variation associated with replicate plots. By calculating and using only the means, all the plot-to-plot variation is ignored. Furthermore, there are many patterns of variation than can give the same mean values.
+
+These 20 plots exist in an alternating pattern going from south to north on either side of an access road. What other source of non-independence should you consider? How would you account for this factor?
+
+> The spatial relationship between plots needs to be accounted for. You could include a continuous variable coding for position along the south to north axis and/or side of the road.
 

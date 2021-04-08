@@ -24,6 +24,50 @@ library(MCMCglmm)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
+
+## Testing a new drug
+
+We will use data on the effects of a drug on fever, blood pressure, and pain. There are two treatments here: the drug, and a placebo as a control. We want to ask if the drug affects fever, blood pressure, or pain and conversely whether we can predict drug treatment from the change in symptoms.
+
+### Activity
+
+First read in the data (`Drug_test.xlsx`) and make `Treatment` a factor. You will need to make "Placebo" as the base level of the factor.
+
+```{r}
+M <- read_excel("../data/Drug_test.xlsx") %>%
+  mutate(Treatment = factor(Treatment),
+         Treatment = fct_relevel(Treatment, "Placebo"))
+str(M)
+```
+
+Use `ggscatmat()` to visualize the relationships between our predictors: `Fever`, `BP`, and `Pain`. Color your points by treatment.
+
+```{r}
+ggscatmat(M, 1:3, color = "Treatment")
+```
+
+Are there any concerning patterns in the data?
+
+> No, looks fine.
+
+Fit a generalized linear model using `glm()`, predicting `Treatment` from `Fever`, `BP`, and `Pain`. Specify `family` as binomial to perform a logistic regression.
+
+Use 1) `summary()`, 2) `logisitic.display()` from the `epiDisplay` package, and 3) `Anova()`, specifying type III sums of squares to look at the results. What can you conclude?
+
+> Only fever is a good predictor of whether a person received the drug vs. placebo. The adjusted odds ratio of 0.23 (0.09 - 0.63) suggests that those with lower levels of fever were more likely to have received the drug. You can observe this in the scatterplot matrix in the upper left panel.
+
+```{r}
+# FIXME
+fm <- glm(Treatment ~ Fever + BP + Pain, data = M,
+          family = "binomial")
+
+summary(fm)
+logistic.display(fm)
+Anova(fm, type = "III")
+```
+
+########################################################
+
 Packages that you will need for this problem set that you might not have installed yet:
 
 - `ape`
@@ -31,79 +75,7 @@ Packages that you will need for this problem set that you might not have install
 
 Go ahead and install them now. Also load the `nlme` package, which has the `gls()` function.
 
-## Grass Species Richness
 
-At the Conard Environmental Research Area, there are 20 experimental plots with 10 burned each fall and 10 unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
-
-```{r }
-set.seed(112)
-mms <- c(rnorm(10, 5.5, 2), rnorm(10, 6.5, 2))
-all.rich <- numeric(0)
-for(ii in mms) {
-  all.rich <- c(all.rich, as.integer(rnorm(5, ii, 1)))
-}
-
-rich.dat <- data.frame('plot' = as.factor(rep(seq(1, 20), each = 5)), 
-                       'treatment' = rep(c('burned', 'unburned'), each = 50), 
-                       'richness' = all.rich)
-write.table(rich.dat, file="../data/richness.txt",
-            sep="\t", row.names = FALSE)
-```
-
-### Activity
-
-Load in the richness data (richness.txt). Plot species richness vs. treatment. Include an appropriate amount of jitter and transparency and color points by plot. 
-
-```{r}
-rich.dat <- read_delim("../data/richness.txt",
-                       delim = "\t") %>% 
-  mutate(plot = factor(plot))
-
-ggplot(rich.dat, aes(x = treatment, y = richness, color = plot)) +
-  geom_point(position = position_jitter(0.1), alpha = 0.5) +
-    guides(colour = guide_legend(ncol = 2, byrow = FALSE))
-```
-
-Do you think there is a relationship between species richness and burning?
-
-> Probably not. It doesn't look like a strong relationship.
-
-First, fit a model predicting species richness from treatment without considering plot membership. What can you conclude from the results of this model?
-
-> It is difficult to interpret without considering plot as there is pseudoreplication.
-
-```{r}
-anova(lm(richness ~ treatment, data = rich.dat))
-```
-
-Now, get the mean species richness value for each plot. Fit a model predicting mean species richness from treatment. What can you conclude from this model?
-
-```{r}
-mean.plot <- rich.dat %>%
-  group_by(plot, treatment) %>%
-  summarize(meanrich = mean(richness))
-anova(lm(meanrich ~ treatment, data = mean.plot))
-```
-
-> There is no effect of treatment on species richness.
-
-Use the `lme()` function to fit a model predicting richness from treatment with plot as a random effect. 
-
-```{r}
-summary(lme(richness ~ treatment, random = ~1 | plot, data = rich.dat))
-```
-
-Compare your results to the approach using the mean value. What can you conclude from this model? 
-
-> The results are consistent with the model using the mean values. 
-
-Why would you use `lme()` versus means per group?
-
-> 
-
-These 20 plots exist in an alternating pattern going from south to north on either side of an access road. What other source of non-independence should you consider? How would you account for this factor?
-
-> The spatial relationship between plots needs to be accounted for. You could include a continuous variable coding for position along the south to north axis and/or side of the road.
 
 ## Indian meal moth
 
