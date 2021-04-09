@@ -24,9 +24,15 @@ theme_set(theme_cowplot())
 > What is the relationship between the p-value and R squared? Say the p-value is really small, but so is the R-squared value, what does that mean? Also, is there a typical way that sample size effect the R-squared value (i.e., does larger sample size tend to make smaller R-squared values)?
 
 
-## *Arabidopsis* growth
+## Example Questions
+
+*Arabidopsis* growth
 
 We measured above ground biomass of plants after six weeks of growth in each of two treatment groups (n = 1000 per group). The means were 10.31 g (SEM = 0.001) for the control group and 10.42 (SEM = 0.002) for the fertilizer treatment group. A paired t-test showed highly significant difference of treatment ($t_{1998}$ = 52.4, P << 0.0001).
+
+*Drosophila* larval density
+
+You perform a multiple regression predicting wing area in Drosophila melanogaster using larval density and temperature. You have a very large data set (n = >1,000 observations). The R2 value for the regression is 0.02, and the overall P value for the linear model is 0.0003.
 
 
 ## Review Quiz 09-2
