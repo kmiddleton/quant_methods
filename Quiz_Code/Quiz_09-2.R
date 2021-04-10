@@ -1,13 +1,28 @@
 library(tidyverse)
-library(lmtest)
+library(cowplot)
 
-M <- read_excel("../data/Birds.xlsx")
+n <- 10
+m1 <- 5
+m2 <- 8
+m3 <- 5
+m4 <- 3
+sds <- 1
 
-fm0 <- lm(N_Species ~ 1, data = M)
-fm1 <- lm(N_Species ~ Dist_to_Island, data = M)
-fm2 <- lm(N_Species ~ Area + Dist_to_Ecuador, data = M)
-fm3 <- lm(N_Species ~ Dist_to_Island + Area + Dist_to_Ecuador, data = M)
-fm4 <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador, data = M)
-fm5 <- lm(N_Species ~ Dist_to_Island + Elevation + Area * Dist_to_Ecuador, data = M)
+y <- c(rnorm(n, m1, sds),
+       rnorm(n, m2, sds),
+       rnorm(n, m3, sds),
+       rnorm(n, m4, sds))
+x1 <- factor(rep(c("A", "a"), each = n * 2))
+x2 <- factor(rep(c("B", "b", "B", "b"), each = n))
 
-lrtest(fm0, fm1, fm2, fm3, fm4, fm5)
+M <- data.frame(x, y)
+
+ggplot(M, aes(x = x1,
+              y = y,
+              color = x2,
+              group = x2)) +
+  geom_point(position = position_jitter(width = 0.1)) +
+  stat_summary(fun.y = mean, geom = "point", pch = 12, size = 5) +
+  stat_summary(fun.y = mean, geom = "line")
+
+summary(lm(y ~ x1 * x2, M))

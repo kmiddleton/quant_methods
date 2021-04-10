@@ -1,30 +1,13 @@
 library(tidyverse)
-library(cowplot)
+library(lmtest)
 
-n <- 10
-mu1 <- 5
-mu2 <- 5.2
-sd1 <- 2
-sd2 <- 2
+M <- read_excel("../data/Birds.xlsx")
 
-M <- tibble(y = c(rnorm(n, mu1, sd1),
-                      rnorm(n, mu2, sd2)),
-                grp = factor(rep(c("A", "B"), each = n)))
+fm0 <- lm(N_Species ~ 1, data = M)
+fm1 <- lm(N_Species ~ Dist_to_Island, data = M)
+fm2 <- lm(N_Species ~ Area + Dist_to_Ecuador, data = M)
+fm3 <- lm(N_Species ~ Dist_to_Island + Area + Dist_to_Ecuador, data = M)
+fm4 <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador, data = M)
+fm5 <- lm(N_Species ~ Dist_to_Island + Elevation + Area * Dist_to_Ecuador, data = M)
 
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- t.test(y ~ grp, data = M)$statistic
-
-for (ii in 2:nreps) {
-  t_stats[ii] <- t.test(sample(y) ~ grp, data = M)$statistic
-}
-
-plt <- ggplot(data.frame(t_stats), aes(t_stats)) +
-  geom_histogram() +
-  geom_vline(xintercept = t_stats[1], color = "red") +
-  labs(x = "t statistics", y = "Count")
-plt
-
-(p <- 2 * mean(t_stats <= t_stats[1]))
-
-ggsave(plt, file = paste0("~/Desktop/p", round(p, 3), ".png"))
+lrtest(fm0, fm1, fm2, fm3, fm4, fm5)
