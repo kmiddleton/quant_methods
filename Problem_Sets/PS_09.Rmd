@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 08'
+title: 'Problem Set 09'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -14,9 +14,17 @@ output:
 
 ```
 
+<!--
+Datasets
+  Bird_Plasma.xlsx
+  Zooplankton.csv
+  richness.txt
+-->
+
 ## Calcium concentration in bird plasma
 
 The file `Bird_Plasma.xlsx` contains factorial data on blood plasma calcium concentration (`Calcium`, mg / 100 mL) in male and female birds (`Sex`) each of which was treated or not with a hormone (`Treatment`).
+
 
 ### Activity
 
@@ -31,6 +39,10 @@ Use `group_by()` and `tally()` to determine the sample size in each of the group
 ```{r}
 
 ```
+
+Is this a balanced factorial design?
+
+> 
 
 Create interaction plots of the calcium concentration data. Use the code from lecture as a template. Make two plots, one with `Treatment` on the x axis and one with `Sex` on the x axis. Use `plot_grid()` to place them side by side
 
@@ -48,189 +60,155 @@ Fit a factorial linear model (both main effects and the interaction term) and sa
 
 ```
 
+Using the `summary()` function, determine the R^2^ for the linear model.
+
+```{r}
+
+```
+
+How much of the variance in calcium level can be explained by the predictors?
+
+> 
+
 Using the `Anova()` function in the `car` package, calculate an ANOVA table with type III sums of squares. You might have to install `car` first.
 
 ```{r}
 
 ```
 
-Describe the results of the analysis.
+The package [`sjPlot`](https://strengejacke.github.io/sjPlot/index.html) has lots of useful functions for making tables and plotting regression results. You will probably need to install this package before you use it.
+
+Spend a few minutes looking at the documentation/examples online. An alternative is the [gtsummary](http://www.danieldsjoberg.com/gtsummary/) package.
+
+Use the `tab_model()` function from `sjPlot` to crate a publication-style ANOVA table for the model. There are a lot of options for this function. Start with the defaults and change it as you see fit. Include whatever regression information you want.
+
+```{r, echo=FALSE}
+
+```
+
+
+Describe the results of the analysis, writing a brief paragraph describing the goal of the analysis, what analysis was carried out, and the results. This is similar to how you would write part of an abstract.
 
 > 
 
+
 ## Effect of predation on zooplankton
 
-The file `Zooplankton.csv` contains data on the concentration of zooplankton in three predator treatment groups (control, low, and high). Each of the three treatments were measured in five replicate blocks.
+The file `Zooplankton.csv` contains data on the concentration of zooplankton in three predator treatment groups (control, low, and high levels of predators in an enclosure). Each of the three treatments were measured in five replicate blocks.
 
 ### Activity
 
-Read in the data and convert both Treatment and Block into factors. It is especially important to make sure that Block is a factor, because Blocks are coded 1-5. We need to make sure that R converts them to a model matrix (0's and 1's).
+Read in the data and convert both Treatment and Block into factors. It is especially important to make sure that Block is a factor, because Blocks are coded 1-5. We need to make sure that R converts them to a model matrix (0's and 1's) rather than using them as numeric 1 to 5, because the numbering is arbitrary ("exchangeable" in statistical terminology).
 
 ```{r, message = FALSE}
 
 ```
 
-Make two plots, one in which Treatment is on the x axis and Block is encoded by color, and the second in which Block is on the x axis and Treatment is encoded by color. Notice how you learn different things about the data from each of these plots.
+Print the data to confirm that each treatment was present in each block.
 
 ```{r}
 
 ```
 
-We want to test for significant differences in Treatment while accounting for the replicated blocks. We can fit this model in two different ways:
+This is a very good experimental design, because a multilevel model will allow each block to have it's own intercept and assess the difference(s) among treatments as a deviation from the block mean.
 
-1. `lm()` and `anova()` with an additive model including Treatment and Block
-2. `lme()` from the `nlme` package with Block as a random effect
+An alternative experimental design would be if the researcher had used 15 different plots and randomly assigned them to one of the three treatments. This would also work, but the multilevel "block" model is more powerful.
 
-Fit both of these models 
+Make two plots, one in which Treatment is on the x-axis and Block is encoded by color, and the second in which Block is on the x-axis and Treatment is encoded by color.
 
 ```{r}
 
 ```
 
-Compare the output of the two models.
+Notice how you learn different things about the data from each of these plots.
+
+Summarize the mean and standard deviation of each group in a table.
+
+```{r}
+
+```
+
+We want to test for significant differences in Treatment while accounting for the replicated blocks. We will fit this model using the `lme()` function from the `nlme` package with `Block` as a random effect.
+
+
+```{r}
+
+```
+
+Now use `anova()` to generate the ANOVA table for the model.
+
+```{r}
+
+```
+
+Is the overall ANOVA significant? You can determine this by examining the `Treatment` effect (since there is only one predictor).
 
 > 
 
-## Intraclass correlation coefficient
+If the overall ANOVA is significant, all we know is that at least one mean is different from the others. Perform a Tukey's HSD post-hoc test on the pairwise combinations of all the levels of Treatment.
 
-The model you use to calculate the intraclass correlation coefficient *is* a multilevel model. You have repeated measurements for a single specimen. Those measurements are obviously not independent from one another. The major question you want to ask is: What is the relative between *measurement* vs. between *specimen* variation?
+Refer to Lecture 08-2 for a reminder of how to code Tukey's HSD with the `multcomp` package.
 
-We will fit this model in two ways: using `anova(lm())` and using `lme()`. There are minor differences in the mathematics underlying how fixed and random effects are handled, which means that the differences in ICC will be small (not numerically identical).
+```{r}
+
+```
+
+Describe the results. Do they make sense biologically?
+
+> 
+
+
+## Grass Species Richness
+
+At the Conard Environmental Research Area (Grinnell, IA), there are 20 experimental plots with 10 burned each fall and 10 left unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
 
 ### Activity
 
-Load the data in `G44_Morphometrics.xlsx` and plot the two measurements for head height (`HeadHt`) against one another. 
+Load in the richness data (`richness.txt`), which is a tab-delimited text file (use `read_delim()` and look at the help to determine how to set the field delimiter to tab). Plot species richness vs. treatment. Include an appropriate amount of jitter and transparency and color points by plot. 
 
 ```{r}
 
 ```
 
-Based on your plot, do you expect repeatability to be high or low? Give an estimate?
+Do you think there is a relationship between species richness and burning?
 
 > 
 
-Follow the example from lecture to calculate repeatability of the head height (`HeadHt`) measurement using `anova(lm())`.
+First, fit a model predicting species richness from treatment without considering plot membership. 
 
 ```{r}
 
 ```
 
-Calculate repeatability of the head height (HeadHt) measurement using `lme()` with MouseID treated as a random effect. 
-
-1) Fit a linear model using `lme()` with MouseID treated as a random effect.
-
-```{r}
-
-```
-
-2) Extract the coefficients of your model. Compare these with the means for each MouseID. Hint: `group_by()` and `summarize()` will help here. What is the relationship between the intercept estimates and the means calculated for each MouseID??
- 
-> 
-
-```{r}
-
-```
-
-3) Use `VarCorr()` to calculate the variace components for your model object. The first column of the output hold the two estimated variance components. No need to do further calculations. These are true variances, not mean squares. Use these to calculate repeatability. Also, use `var()` to get the variance of the means per MouseID you calculated in #2. What is the relationship between the variance of the means per MouseID and the variances from `VarCorr()`?
+What can you conclude from the results of this model?
 
 > 
 
-```{r}
-
-```
-
-4) Using the same procedure that you used to calculate the per-mouse means, also calculate the per-mouse variances. What is the relationship between the mean of the variances per MouseID and the variances from `VarCorr()`?
+Now, calculate the mean species richness value for each plot. Fit a model predicting mean species richness from treatment. This is how you would approach this statistical problem if you did not want to use a multilevel model.
 
 ```{r}
 
 ```
+
+What can you conclude from this model?
 
 > 
 
-## Testing a new drug
-
-We will use data on the effects of a drug on fever, blood pressure, and pain. There are two treatments here: the drug, and a placebo as a control. We want to ask if the drug affects fever, blood pressure, or pain and conversely whether we can predict drug treatment from the change in symptoms.
-
-### Activity
-
-First read in the data (`Drug_test.xlsx`) and make `Treatment` a factor. You will need to make "Placebo" as the base level of the factor.     
+Use the `lme()` function to fit a model predicting richness from treatment with plot as a random effect. 
 
 ```{r}
 
 ```
 
-Use `ggscatmat()` to visualize the relationships between our predictors: `Fever`, `BP`, and `Pain`. Color your points by treatment. 
-
-```{r}
-
-```
-
-Are there any concerning patterns in the data?
+Compare your results to the approach using the mean value. What can you conclude from this model? 
 
 > 
 
-Fit a generalized linear model using `glm()`, predicting `Treatment` from `Fever`, `BP`, and `Pain`. Specify `family` as binomial to perform a logistic regression.
-
-Use 1) `summary()`, 2) `logisitic.display()` from the `epiDisplay` package, and 3) `Anova()`, specifying type III sums of squares to look at the results. What can you conclude?
+Why would you use `lme()` versus means per group?
 
 > 
 
-```{r}
-
-```
-
-## Aspirin and cancer
-
-The file `Aspirin.csv` contains data on the frequency of cancer in 39,876 women taking or not taking low-dose aspirin.^[Cook, N.R., I. Lee, J.M. Gaziano, D. Gordon, P.M. Ridker, J.E. Manson, C.H. Hennekens, and J.E. Buring. 2005. Low-dose aspirin in the primary prevention of cancer. _Journal of the American Medical Association_ 294: 47-55.]
-
-The authors were interested in determining whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin.
-
-### Activity
-
-Read in the data, and convert all the variables to factors. Look at the help for `mutate_each()` for a shortcut.
-
-```{r}
-
-```
-
-Tally up the number of obvervations in each group.
-
-```{r}
-
-```
-
-Another way to look at the same information is using a cross tabulation, also called a contingency table. The R function `xtabs()` takes a one sided formula and returns the count in each group. Your code will look something like `xtabs(~ Treatment + Cancer, M)`.
-
-```{r}
-
-```
-
-The usual way to analyze data consisting of counts is to use a $\chi^2$ test. In R, `chisq.test()` is the function that carries out this test. One of the nice things about `chisq.test()` is that you can pass it the object returned by `xtabs()`.
-
-Run a $\chi^2$ test on the cross tabulation of the aspirin data. Use the `correct = FALSE` argument to *not* use Yates's correction.
-
-```{r}
-
-```
-
-What is your interpretation of the $\chi^2$ test?
+These 20 plots exist in an alternating pattern going from south to north on either side of an access road. What other source of non-independence should you consider? How would you account for this factor?
 
 > 
 
-Because the outcome variable, `Cancer`, is binomially distributed, we could also use a logistic regression to analyze these data.
-
-Fit a logistic regression where presence of cancer is predicted by treatment. Save the result to an object.
-
-```{r}
-
-```
-
-Analyze the model you fit using ANOVA with type III sums of squares and using `logistic.display()`.
-
-```{r}
-
-```
-
-From these results, what can you conclude about a $\chi^2$ test and logistic regressin in this case?
-
-> 
