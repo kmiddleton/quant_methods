@@ -25,6 +25,65 @@ knitr::opts_chunk$set(cache = TRUE)
 ```
 
 
+## Sole
+
+In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by the salinity of the water. That data set has a great deal of additional information. In this question, we will explore the predictors of sole being found in the estuary.
+
+### Activity
+
+Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
+
+```{r}
+# FIXME
+M <- read_excel("../data/Sole.xlsx")
+M <- M %>% mutate(season = factor(season),
+                  month = factor(month),
+                  area = factor(area),
+                  Solea_solea = factor(Solea_solea))
+M <- M %>% as.data.frame()
+str(M)
+```
+
+Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
+
+```{r}
+# FIXME
+M %>% group_by(season, area) %>% tally()
+```
+
+If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary.
+
+Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
+
+```{r}
+# FIXME
+fm <- glm(Solea_solea ~ season + area, data = M,
+          family = "binomial")
+```
+
+Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
+
+```{r}
+# FIXME
+Anova(fm, type = "III")
+```
+
+Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
+
+> Only area is a good predictor (P = 0.0001).
+
+Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
+
+```{r}
+# FIXME
+logistic.display(fm)
+```
+
+See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
+
+> Adjusted odds ratio for season isn't significant (i.e., after setting area to 0), with a CI that crosses 1. Each area is compared to area 1, and all are significantly different from one another. It seems reasonable to conclude that there is considerable variation in the presence/absence of sole among the four areas. This is actullay bad, because area to area variation is higher than seasonal variation. There appears to be substantial geographic heterogeneity in sole presence.
+
+
 ## Testing a new drug
 
 We will use data on the effects of a drug on fever, blood pressure, and pain. There are two treatments here: the drug, and a placebo as a control. We want to ask if the drug affects fever, blood pressure, or pain and conversely whether we can predict drug treatment from the change in symptoms.
