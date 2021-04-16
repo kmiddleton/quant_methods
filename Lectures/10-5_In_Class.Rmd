@@ -1,0 +1,321 @@
+---
+title: "Unit 10: In Class Discussion"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(ggsci)
+library(lme4)
+library(AICcmodavg)
+
+theme_set(theme_cowplot())
+```
+
+## What are nested models?
+
+> For week 10 quiz 2, I have a question about the nested models. I was interpreting nested as everything stayed the same but you made it more complex but adding a variable or multiplying variables, so then I was confused when it went from dist_to_island in model 2, to area + dist_to_ecuador in model 3. Model 3 to 6 is what I was expecting (where a variable was added but none were changed, or addition turned into subtraction). Did I misinterpret the definition of nested?
+
+
+## Nested models
+
+```
+fm0: N_Species ~ 1
+fm1: N_Species ~ Dist_to_Island
+fm2: N_Species ~ Area + Dist_to_Ecuador
+fm3: N_Species ~ Dist_to_Island + Area + Dist_to_Ecuador
+fm4: N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador
+fm5: N_Species ~ Dist_to_Island + Elevation + Area * Dist_to_Ecuador
+```
+
+
+## Likelihood ratio test
+
+```
+Likelihood ratio test
+
+Model 1: N_Species ~ 1
+Model 2: N_Species ~ Dist_to_Island
+Model 3: N_Species ~ Area + Dist_to_Ecuador
+Model 4: N_Species ~ Dist_to_Island + Area + Dist_to_Ecuador
+Model 5: N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador
+Model 6: N_Species ~ Dist_to_Island + Elevation + Area * Dist_to_Ecuador
+
+  #Df  LogLik Df   Chisq Pr(>Chisq)
+1   2 -52.579                      
+2   3 -52.450  1  0.2578     0.6116
+3   4 -43.882  1 17.1357   3.48e-05
+4   5 -43.857  1  0.0504     0.8224
+5   6 -43.412  1  0.8903     0.3454
+6   7 -43.404  1  0.0152     0.9020
+```
+
+## Akaike Weights
+
+> I don't understand what the "weight" of each AIC model (the AICcWt column) actually tells us or how it's useful.
+
+```
+Model selection based on AICc:
+
+    K   AICc Delta_AICc AICcWt Cum.Wt     LL
+fm2 4 100.21       0.00   0.91   0.91 -43.88
+fm3 5 105.21       5.01   0.07   0.99 -43.86
+fm0 2 110.25      10.04   0.01   0.99 -52.58
+fm4 6 110.82      10.61   0.00   1.00 -43.41
+fm1 3 113.30      13.09   0.00   1.00 -52.45
+fm5 7 119.48      19.27   0.00   1.00 -43.40
+```
+
+
+## Quiz 10-4
+
+
+## Summary of model comparison procedures
+
+1. Likelihood ratio tests
+    - Significance tests of model differences
+2. AIC and AICc
+    - Model comparison that penalizes complexity (and small sample size)
+3. Akaike Weights
+    - Relative weighting of a set of models (0 - 100%)
+4. Cross validation
+    - Out-of-sample prediction error for a model
+
+
+## Random effects model formulas
+
+> What does the "~1| random" language mean?
+
+
+## Salaries and experience example
+
+```{r}
+set.seed(238476287)
+
+# Parameters for generating faculty salary data
+departments <- c('Sociology', 'Biology', 'English', 'Informatics', 'Statistics')
+base.salaries <- c(40000, 50000, 60000, 70000, 80000)
+annual.raises <- c(2000, 500, 500, 1700, 500)
+faculty.per.dept <- 20
+total.faculty <- faculty.per.dept * length(departments)
+
+# Generate dataframe of faculty and (random) years of experience
+ids <- 1:total.faculty
+Department <- rep(departments, faculty.per.dept)
+Experience <- floor(runif(total.faculty, 0, 10))
+Bases <- rep(base.salaries, faculty.per.dept) * runif(total.faculty, .9, 1.1) # noise
+Raises <- rep(annual.raises, faculty.per.dept) * runif(total.faculty, .9, 1.1) # noise
+M <- data.frame(ids, Department, Bases, Experience, Raises)
+
+# Generate salaries (base + experience * raise)
+M <- M %>% mutate(
+    Salary = Bases + Experience * Raises,
+    Department = fct_relevel(Department, "Informatics")) %>% 
+  select(-ids, -Bases, -Raises)
+```
+
+
+## Visualization
+
+```{r, echo=FALSE}
+p1 <- ggplot() +
+  # geom_vline(xintercept = 4.5, color = "gray", linetype = "dashed") +
+  # geom_hline(yintercept = mean(M$Salary), color = "gray", linetype = "dashed") +
+  geom_point(data = M, aes(x = Experience, y = Salary, color = Department),
+             size = 3, alpha = 0.5) +
+  scale_color_jama() +
+  labs(x = "Years of Experience", y = "Salary")
+p1
+```
+
+
+## Means by department
+
+```{r}
+M %>% 
+  group_by(Department) %>% 
+  summarise(Salary = mean(Salary),
+            .groups = "drop")
+```
+
+## Model with constant salary
+
+```{r}
+m0 <- lm(Salary ~ -1 + Department, data = M)
+coef(m0)
+```
+
+## Predictions
+
+```{r}
+Pred <- crossing(Experience = 0:9,
+                 Department = levels(M$Department)) %>% 
+  mutate(m0 = predict(m0, newdata = .))
+Pred %>% arrange(Department, Experience) %>% slice(1:10)
+```
+
+## Model with constant salary
+
+```{r, echo=FALSE}
+p2 <- p1 +
+  geom_line(data = Pred, aes(x = Experience, y = m0, color = Department),
+            linetype = "dotted")
+p2
+```
+
+
+## Model without respect to grouping
+
+```{r}
+m1 <- lm(Salary ~ Experience, data = M)
+coef(m1)
+Pred$m1 <- predict(m1, newdata = Pred)
+Pred %>% arrange(Experience) %>% slice(1:10)
+```
+
+
+## Model without respect to grouping
+
+```{r, echo=FALSE}
+p2 +
+  geom_line(data = Pred, aes(x = Experience, y = m1),
+            size = 2)
+```
+
+
+## Additive multiple regression model
+
+```{r}
+m2 <- lm(Salary ~ Experience + Department, data = M)
+coef(m2)
+Pred$m2 <- predict(m2, newdata = Pred)
+Pred %>% arrange(Experience) %>% slice(1:10)
+```
+
+
+## Additive multiple regression model
+
+```{r, echo=FALSE}
+p2 +
+  geom_line(data = Pred, aes(x = Experience, y = m2, color = Department),
+            size = 2)
+```
+
+
+## Multilevel model with varying intercept
+
+```{r}
+m3 <- lmer(Salary ~ Experience + (1 | Department), data = M, REML = FALSE)
+Pred$m3 <- predict(m3, newdata = Pred)
+Pred %>% arrange(Experience) %>% slice(1:10)
+```
+
+
+## Multilevel model with varying intercept
+
+```{r, echo=FALSE}
+p2 +
+  geom_line(data = Pred, aes(x = Experience, y = m3, color = Department),
+            size = 2)
+```
+
+
+## Compare varying intercept models
+
+```{r, echo=FALSE}
+p2 +
+  geom_line(data = Pred, aes(x = Experience, y = m2, color = Department),
+            size = 0.5, linetype = "dashed") +
+  geom_line(data = Pred, aes(x = Experience, y = m3, color = Department),
+            size = 0.5)
+```
+
+
+## Multilevel model with varying slope
+
+```{r}
+m4 <- lmer(Salary ~ Experience + (0 + Experience | Department), data = M,
+           REML = FALSE)
+Pred$m4 <- predict(m4, newdata = Pred)
+```
+
+
+## Multilevel model with varying slope
+
+
+```{r, echo=FALSE}
+p2 +
+  geom_hline(yintercept = mean(M$Salary)) +
+  geom_line(data = Pred, aes(x = Experience, y = m4, color = Department),
+            size = 2)
+```
+
+
+## Interaction model
+
+```{r}
+m5 <- lm(Salary ~ Experience * Department, data = M)
+Pred$m5 <- predict(m5, newdata = Pred)
+```
+
+
+## Interaction model
+
+```{r, echo=FALSE}
+p2 +
+  geom_line(data = Pred, aes(x = Experience, y = m5, color = Department),
+            size = 2)
+```
+
+
+## Multilevel model with varying slope and intercept
+
+```{r}
+m6 <- lmer(Salary ~ Experience + (1 + Experience | Department), data = M,
+           REML = FALSE)
+Pred$m6 <- predict(m6, newdata = Pred)
+```
+
+
+## Multilevel model with varying slope and intercept
+
+```{r, echo=FALSE}
+p2 +
+  geom_line(data = Pred, aes(x = Experience, y = m6, color = Department),
+            size = 2)
+```
+
+
+## Compare varying slope and intercept models
+
+```{r, echo=FALSE}
+p2 +
+  geom_line(data = Pred, aes(x = Experience, y = m5, color = Department),
+            size = 0.5, linetype = "dashed") +
+  geom_line(data = Pred, aes(x = Experience, y = m6, color = Department),
+            size = 0.5)
+```
+
+
+## Model comparison: `lm()`
+
+```{r, message=FALSE}
+library(AICcmodavg)
+aictab(list(m0, m1, m2, m5), modnames = c("m0", "m1", "m2", "m5"))
+```
+
+
+## Model comparison: `lmer()`
+
+```{r}
+aictab(list(m3, m4, m6), modnames = c("m3", "m4", "m6"))
+```
+
