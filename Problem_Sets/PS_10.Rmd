@@ -11,16 +11,20 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-knitr::opts_chunk$set(cache = TRUE)
+
 ```
 
-Some useful color palettes for ggplot: https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html
 
-Try adding `scale_color_d3()`, `scale_color_aaas()`, and others to your ggplots.
+Some useful color palettes for ggplot are in the [ggsci package](https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html)
+
+Try adding `scale_color_d3()`, `scale_color_aaas()`, and others to your plots.
+
 
 ## Nested Sites in Streams
 
-Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the original file from Dryad.
+Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the raw data file provided by the authors on Dryad.
+
+One goal is to be able to predict water temperature only using air temperature (since air temperature is more efficiently measured at large scale).
 
 Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8
 
@@ -32,9 +36,9 @@ Load the `TemperatureData` sheet from the `Streams.xlsx` file. Look at the struc
 
 ```
 
-Now load the `SiteData` sheet from the Excel file. It has four columns, including the mapping from `Stream_Name` to `Site`. We need to merge the two data.frames^[tibbles] together. Because they share a column `Site`, we can match rows, yielding a single data.frame.
+Now load the `SiteData` sheet from the Excel file. It has four columns, including the mapping from `Stream_Name` to `Site`. We need to merge the two tibbles together. Because they share a column `Site`, we can match rows, yielding a single tibble.
 
-Base R has a `merge()` function, but it can be somewhat finicky. `tidyverse` has a complex set of functions for joining data.frames. The most useful are:
+We covered joining tibbles in Unit 03-3, but here is a brief review. Base R has a `merge()` function, but it can be somewhat finicky. `tidyverse` has a complex set of functions for joining tibbles and data.frames. The most useful are:
 
 1. `inner_join()`: "return all rows from x where there are matching values in y, and all columns from x and y. If there are multiple matches between x and y, all combination of the matches are returned."
 2. `left_join()`: "return all rows from x, and all columns from x and y. Rows in x with no match in y will have NA values in the new columns. If there are multiple matches between x and y, all combinations of the matches are returned."
@@ -46,7 +50,9 @@ Base R has a `merge()` function, but it can be somewhat finicky. `tidyverse` has
 
 ```
 
-Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). Ultimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
+Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). So this is a large, multilevel dataset.
+
+Ultimately, we want to assess the ability to predict water temperature from predicted air temperature, but we have a few steps before we get there. Start by converting `Site`, `Stream_Name`, and `Date` into factors. If you look at the structure before you convert to factors, you will see that `Date` is a `POSIXct` variable, which means R recognizes it as a date.
 
 We then need to do one more thing: make a new variable that converts `Date` into a day number. We can do this with the function `as.numeric()`. Make a new variable `Day`, which is the numeric representation of `Date`. It will look something like: `mutate(Day = as.numeric(Date))`.
 
@@ -54,19 +60,21 @@ We then need to do one more thing: make a new variable that converts `Date` into
 
 ```
 
-Because not all observations have observed air temperature, first we should check for correlation between observed and predicted air temperatures. Calculate the correlation between the two. We could filter out missing data, but instead just provide the argument `use = "pairwise.complete.obs"` to `cor()`, which will tell the function to use only complete pairs for the calculation. If you find that the correlation is `NA`, that means R is using incomplete cases. Correlation with `NA`s is `NA`.
+Because not all observations have observed air temperature, first we should check for correlation between observed and predicted air temperatures. Calculate the correlation between the two. We could filter out missing data, but instead just provide the argument `use = "pairwise.complete.obs"` to `cor()`, which will tell the function to use only complete pairs for the calculation. If you find that the correlation is `NA`, that means R is using incomplete cases. Any correlation between data with `NA`s is `NA`.
 
 ```{r}
 
 ```
 
-The correlation should be pretty high. So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete). Let's plot: make a line plot with day on the x axis and predicted air temp on the y axis. Then facet by `Stream_Name`.
+The correlation should be pretty high (r = 0.95). So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete).
 
-One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly.
+Let's plot: make a line plot with day on the x-axis and predicted air temp on the-y axis. Then facet by `Stream_Name`.
 
-Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable.)
+One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly.The plot should look something like this: https://imgur.com/J0lD2cp.png
 
-```{r fig.height = 10}
+Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable).
+
+```{r}
 
 ```
 
@@ -76,12 +84,12 @@ What general patterns do you see, comparing the two plots?
 
 We want to fit two models to these data. In both models we want to model water temperature by predicted air temperature. The difference between the models will be in the random effects.
 
-We have an added wrinkle with these data that we have not yet encountered: nesting. Each site is only associated with one stream, so we need to tell R to only expect sites in some stream names. In an R formula, you can designate nesting using /. If B is nested in A, this would be coded as `A/B`.^[http://conjugateprior.org/2013/01/formulae-in-r-anova/ has a good overview of R's model formula.]
+We have an added wrinkle with these data that we have not yet encountered: nesting. Each site is only associated with one stream, so we need to tell R to only expect sites in some stream names. In an R formula, you can designate nesting using `/`. If B is nested in A, this would be coded as `A/B`.^[http://conjugateprior.org/2013/01/formulae-in-r-anova/ has a good overview of R's model formula, especially for more complicated relationships than just additive or multiplicative models.]
 
-1. Fit a model where the intercept for site nested in stream is random
-2. Fit a model where the intercept for site nested in stream is random and day is also included (as a continuous random predictor).
+1. Fit a multilevel model where the intercept for site nested in stream is random (`~ 1 | ...`). This model allows each `Site` to have it's own intercept, which is nested within `Stream_Name`. But this value does not change over time.
+2. Fit a multilevel model where the intercept for site nested in stream is random and day is also included as a continuous random predictor (`~ Day | ...`).
 
-Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood.
+Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood. Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. 
 
 ```{r}
 
@@ -89,7 +97,7 @@ Save both models to objects and take a look at the summaries to make sure that y
 
 Looking at the `summary()` of each, you should see sections in the random effects for `Stream_Name` and `Site %in% Stream_Name`.
 
-Explain in non-mathematical words what the addition of day in the random effects part of the formula accomplishes.
+Explain in non-mathematical terms what the addition of `Day` in the random effects part of the formula accomplishes.
 
 > 
 
@@ -103,55 +111,16 @@ Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the 
 
 > 
 
-```{r}
-
-```
-
-## Sole
-
-In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by the salinity of the water. That data set has a great deal of additional information. In this question, we will explore the predictors of sole being found in the estuary.
-
-### Activity
-
-Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
+Fit a third model that is the same as model 2, but with the addition of `Day` as an additive, main effect. This model fits an overall slope to `Day`, with the random effects slope now an offset from the overall slope. Then use `aictab()` to compare all three models.
 
 ```{r}
 
 ```
 
-Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
-
-```{r}
-
-```
-
-If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary.
-
-Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
-
-```{r}
-
-```
-
-Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
-
-```{r}
-
-```
-
-Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
+What do you learn? Remember that AIC can only compare models that you fit.
 
 > 
 
-Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
-
-```{r}
-
-```
-
-See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
-
-> 
 
 ## Neandertal Brains
 
@@ -165,13 +134,13 @@ The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log
 
 ```
 
-Make a scatterplot of brain size vs. body mass, with points colored by species. See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner.
+Make a scatterplot of brain size vs. body mass, with points colored by species. See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner. Your plot should look something like this https://imgur.com/CVgQ9RU.png.
 
 ```{r}
 
 ```
 
-Fit and save three linear models:
+Fit three linear models and assign each to an object:
 
 1. Brain size modeled by body mass
 2. Brain size modeled by body mass and species (additive)
@@ -191,7 +160,7 @@ What is your interpretation of the likelihood ratio test?
 
 > 
 
-Use the `aictab()` function from the `AICcmodavg` package to compare AICc for the three models.
+Now use the `aictab()` function from the `AICcmodavg` package to compare AICc for the three models.
 
 ```{r}
 
@@ -203,11 +172,11 @@ What is your interpretation of the results?
 
 In lecture, we wrote out own code to do cross-validation. In practice, you would use code from others to automate this process, which is more general than any specific code you would write. A good package for cross-validation is `cvTools`. Install this package.
 
-The function `cvFit()` performs cross-validation on a variety of R objects, including `lm()`. Look at the help for `cvFit()`. Running cross-validation is simple.
+The function `cvFit()` performs cross-validation on a variety of R objects, including `lm()`. Look at the help for `cvFit()`. Running cross-validation is simple:
 
 `cvFit(fm1, data = M, y = M$ln_Brain, K = 10, R = 100)`
 
-The basic parts are a fitted model (`fm1`), a source for the data, the ID of the `y` variable. Optionally, you can supply the number of `K` folds (default is 5 fold) and the number of replicates `R`. Increasing the number of replicates is important to get a more accurate estimate for the error.
+The basic parts are a fitted model (`fm1`), a source for the data, the ID of the `y` variable (using `$` notation). Optionally, you can supply the number of `K` folds (default is 5 fold) and the number of replicates `R`. Increasing the number of replicates is important to get a more accurate estimate for the error.
 
 Run 10-fold cross-validation on the three models with 100 replicates of each.
 
@@ -218,3 +187,40 @@ Run 10-fold cross-validation on the three models with 100 replicates of each.
 What do the results indicate? Which model has the lowest error?
 
 > 
+
+Try comparing the models with leave-one-out cross-validating, by setting `K` to the number of rows of data. 
+
+```{r}
+
+```
+
+How do these results compare to 10-fold CV?
+
+> 
+
+Compare the results of the likelihood ratio test, the AICc comparison, and cross-validation. What information does each provide you?
+
+> 
+
+Finally, let's add predicted lines for the additive model. To do this, you need to predict brain size across a range of body masses for each species. The code below does this. Change `eval=FALSE` to `eval=TRUE` to have R run the code when you knit. 
+
+Study the code and see if you can figure out what it is doing.
+
+```{r, eval=FALSE, echo=FALSE}
+
+pred <- crossing(ln_Mass = seq(3.9, 4.5, length.out = 100),
+                 Species = levels(M$Species)) %>% 
+  mutate(ln_Brain_pred = predict(fm2, newdata = .))
+
+ggplot() +
+  geom_point(data = M, aes(ln_Mass, ln_Brain, color = Species), size = 3) +
+  geom_line(data = pred, aes(ln_Mass, ln_Brain_pred, color = Species),
+            size = 1.5) +
+  scale_color_d3() +
+  theme(legend.position = c(0.75, 0.12),
+        legend.background = element_rect(size = 0.5,
+                                         color = "black",
+                                         linetype = "solid")) +
+  labs(x = "ln Body Mass", y = "ln Brain Size")
+```
+
