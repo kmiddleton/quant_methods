@@ -13,13 +13,46 @@ bibliography: Multivariate.bib
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(cowplot)
+library(readxl)
+library(lme4)
 ```
 
-## Review project
 
-- Proposed paper due tonight
-    - Assignment on Canvas
-- No reanalysis of data
+## Stream temperature data
+
+```{r}
+Temp_Data <- read_excel("../data/Streams.xlsx", sheet = "TemperatureData")
+Site_Data <- read_excel("../data/Streams.xlsx", sheet = "SiteData")
+M <- left_join(Temp_Data, Site_Data, by = "Site") %>% 
+  mutate(Site = factor(Site),
+         Date = factor(Date),
+         Stream_Name = factor(Stream_Name),
+         Day = as.numeric(Date))
+```
+
+
+## Nesting as an interaction
+
+```{r}
+fm1 <- lmer(WaterTemp ~ AirTempPredicted + Day +
+              (1 | Stream_Name/Site),
+           data = M, REML = FALSE)
+
+fm2 <- lmer(WaterTemp ~ AirTempPredicted + Day +
+              (1 | Stream_Name) +
+              (1 | Stream_Name:Site),
+           data = M, REML = FALSE)
+```
+
+
+## Nesting as an interaction
+
+```{r}
+fm1
+fm2
+```
+
+
 
 ## Independence
 
