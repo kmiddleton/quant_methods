@@ -14,473 +14,544 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
-library(forcats)
 
-# This option turn on caching of chunks. This will dramatically
-# speed up knitting, because only chunks that have changed will
-# be recompiled.
-knitr::opts_chunk$set(cache = TRUE)
+theme_set(theme_cowplot())
 ```
 
 
-## Intraclass correlation coefficient
+## Repeatability: Intraclass correlation coefficient
 
 The model you use to calculate the intraclass correlation coefficient *is* a multilevel model. You have repeated measurements for a single specimen. Those measurements are obviously not independent from one another. The major question you want to ask is: What is the relative between *measurement* vs. between *specimen* variation?
 
-We will fit this model in two ways: using `anova(lm())` and using `lme()`. There are minor differences in the mathematics underlying how fixed and random effects are handled, which means that the differences in ICC will be small (not numerically identical).
+We will fit this model in two ways: using `aov()` and using the `ICC` package. 
+
+The data we will be working with 
+
+https://imgur.com/CVTtMkJ.png
 
 ### Activity
 
-Load the data in `G44_Morphometrics.xlsx` and plot the two measurements for head height (`HeadHt`) against one another.
+Load the data in `WalkingStickFemurs.csv` 
 
 ```{r echo=FALSE}
-M <- read_excel("../data/G44_Morphometrics.xlsx")
-ggplot(M, aes(HeadHt1, HeadHt2)) +
-  geom_abline(slope = 1, intercept = 0) +
+M <- read_csv("../data/WalkingStickFemurs.csv") %>% 
+  mutate(Specimen = factor(Specimen))
+
+M_wide <- M %>% 
+  pivot_wider(id_cols = Specimen, names_from = Measurement,
+              values_from = Femur_length, names_prefix = "Measure_")
+```
+
+```{r}
+ggplot(M_wide, aes(Measure_1, Measure_2)) +
   geom_point() +
-  xlab("Head Height #1 (mm)") +
-  ylab("Head Height #2 (mm)")
+  geom_abline(slope = 1, intercept = 0) +
+  coord_equal()
 ```
 
 Based on your plot, do you expect repeatability to be high or low? Give an estimate?
 
 > The points are very close to the line, so repeatability should be large (> 0.9).
 
-Follow the example from lecture to calculate repeatability of the head height (`HeadHt`) measurement using `anova(lm())`.
+Follow the example from lecture to calculate repeatability of the femur length  measurement using `aov()`.
 
 ```{r}
-Heads <- data.frame(HeadHt = c(M$HeadHt1, M$HeadHt2),
-                    MouseID = factor(c(M$MouseID, M$MouseID)))
-Heads <- Heads %>% drop_na()
-fm <- anova(lm(HeadHt ~ MouseID, data = Heads))
-fm
+fm <- summary(aov(Femur_length ~ Specimen, data = M))
 
-var_a <- (fm$'Mean Sq'[1] - fm$'Mean Sq'[2]) / 2
-var_a / (var_a + fm$'Mean Sq'[2])
+var_a <- (0.002464 - 0.000356) / 2
+var_a / (var_a + 0.000356)
 ```
 
-Calculate repeatability of the head height (HeadHt) measurement using `lme()` with MouseID treated as a random effect.
-
-1) Fit a linear model using `lme()` with MouseID treated as a random effect.
+Calculate repeatability of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package (you might need to install the package).
 
 ```{r}
-library(nlme)
-fm_lme <- lme(HeadHt ~ 1,
-              random = ~ 1 | MouseID,
-              data = Heads,
-              method = "ML")
+ICCest(x = M$Specimen, y = M$Femur_length)
 ```
 
-2) Extract the coefficients of your model. Compare these with the means for each MouseID. Hint: `group_by()` and `summarize()` will help here. What is the relationship between the intercept estimates and the means calculated for each MouseID??
+Compare the results
 
 > The numbers are very similar.
 
-```{r}
-head(coef(fm_lme))
 
-MouseMeans <- Heads %>% group_by(MouseID) %>% summarize(mean(HeadHt))
-head(MouseMeans)
-```
-
-3) Use `VarCorr()` to calculate the variace components for your model object. The first column of the output hold the two estimated variance components. No need to do further calculations. These are true variances, not mean squares. Use these to calculate repeatability. Also, use `var()` to get the variance of the means per MouseID you calculated in #2. What is the relationship between the variance of the means per MouseID and the variances from `VarCorr()`?
-
-> It is equal to the between group variance.
 
 ```{r}
-(varcomps <- VarCorr(fm_lme))
-var.among <- as.numeric(varcomps[1, 1])
-var.within <- as.numeric(varcomps[2, 1])
-var.among / (var.among + var.within)
+## FIXME
+# Data preparation
+set.seed(28462)
 
-print(var(MouseMeans[, 2]),digits = 4)
-print(var.among, digits = 4)
-```
-
-4) Using the same procedure that you used to calculate the per-mouse means, also calculate the per-mouse variances. What is the relationship between the mean of the variances per MouseID and the variances from `VarCorr()`?
-
-```{r}
-MouseVars <- Heads %>% group_by(MouseID) %>% summarize(var(HeadHt))
-MouseVars <- as.data.frame(MouseVars)
-
-print(mean(as.numeric(MouseVars[, 2])), digits = 4)
-print(var.within, digits = 4)
-```
-
-> It is equal to the within group variance.
-
-
-## General Framework for This Week's Problem Set
-
-This week we will approach hypothesis testing for several of the models we have fit previously with generalized linear models in a randomization framework. For each, you should:
-
-1. Fit the model to the observed data (feel free to copy your code from original problem set).
-1. Decide on a test statistic to use for the randomization.
-1. Perform the randomization:
-    1. Calculate the test statistic for the *observed* data
-    1. Randomly shuffle the observations
-    1. Calculate the test statistic for that group
-    1. Repeat thousands of times
-1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
-1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
-
-Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide.
-
-Remember to start with a small number of iterations (10 or 100) until you get the code working correctly. Then increase to 10,000 for a final analysis.
-
-
-## Stalk-eyed flies (PS 05)
-
-Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
-
-```{r flies1, message=FALSE}
-# Read data
-stalk <- read_csv("../data/Stalkies.csv")
-
-# Some thoughtful plotting
-ggplot(stalk, aes(x = food_source, y = eye_span)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Food Source", y = "Eye Span")
-
-set.seed(8987324)
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- t.test(eye_span ~ food_source, data = stalk)$statistic
-
-for (ii in 2:nreps) {
-  t_stats[ii] <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
+quant.norm <- function(y) {
+  nn <- qqnorm(y, plot.it = FALSE)
+  return(nn$x)
 }
 
-tibble(t_stats) %>%
-  ggplot(aes(t_stats)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1], color = "red") +
-  labs(x = "t statistics", y = "Count")
+sid <- read_csv("../data/Butteryfly_IDs.csv",
+                col_names = c("ID", "Treatment", "Sex", "Population"))
+sid <- sid %>%
+  mutate(Treatment = str_replace(Treatment, "treatment: ", ""),
+         Sex = str_replace(Sex, "Sex: ", ""),
+         Population = str_replace(Population, "population: ", ""),
+         ID2 = str_split(ID, "_", simplify = TRUE)[, 2],
+         ID = str_split(ID, "_", simplify = TRUE)[, 1],
+         ID = str_replace_all(ID, "-", "_")) %>%
+  filter(ID2 == 450) %>%
+  dplyr::select(-ID2)
 
-2 * mean(t_stats >= t_stats[1])
+gg <- read_delim("../data/Butterfly_NormalizedCountsGenes.txt",
+                 delim = "\t")
+samp.names <- colnames(gg)[-1]
+gene.names <- gg$gene
+gg <- t(gg[, -1])
+rr.temp <- row.names(gg)
+gg <- apply(gg, 2, function(x) quant.norm(x))
+colnames(gg) <- gene.names
+rownames(gg) <- rr.temp
+gg <- bind_cols(
+  tibble(ID = str_replace_all(row.names(gg), "-", "_")),
+  as.data.frame(gg))
 
-t.test(eye_span ~ food_source, data = stalk)
+ngenes <- 100
+gg_samp <- gg[, c(1, sample(size = ngenes, x = 2:ncol(gg)))]
+
+M <- left_join(sid, gg_samp)
+M <- M[,-c(2,4)]
+
+write_csv(M, path = "../data/Butterfly_Gene_Expression.csv")
 ```
-
-10^5^ iterations took 124.7 seconds on a single processor. We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical P is 6e-10, so we expect the empirical P to be close to that scale.
-
-We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
-
-The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the combination of `foreach()` and `dopar()`, which handle the parallelization and collection of the results.
-
-```{r flies2, eval=FALSE}
-library(parallel)
-library(foreach)
-library(doParallel)
-
-t_obs <- t.test(eye_span ~ food_source, data = stalk)
-
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- t_obs$statistic
-
-# Set up parallel processor
-n_cores <- 2
-cl <- makeCluster(n_cores)
-registerDoParallel(cl, cores = n_cores)
-
-# Function to do the randomized t-test and return the t-value only.
-t_rand <- function() {
-  rnd_t <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
-  return(as.numeric(rnd_t))
-}
-
-# Parallel randomization execute t_rand(), and combine the output into t_stats.
-t_stats[2:nreps] <- foreach(i = 2:nreps, .combine = c) %dopar% t_rand()
-
-2 * mean(t_stats >= t_stats[1])
-
-# Close cluster
-stopImplicitCluster()
-```
-
-The same number of iterations but using 2 processors takes 93 seconds.
 
 ```{r}
-# Iterations per second, 1 processor
-(p1 <- 124.7 / nreps)
-
-# Iterations per second, 2 processors
-(p6 <- 93 / nreps)
-
-p1 / p6
+getP <- function(fm) {
+  sum.set <- summary(fm)
+  p.set <- lapply(sum.set, function(x) x[['coefficients']][2, 4])
+  return(unlist(p.set))
+}
 ```
 
-We get a speed-up of about 1.34 times. There is some overhead in the parallelization, and there were other things going on on the computer, so we don't get double the speed.
+## RNAseq (gene expression) on males and females of the Glanville Fritillary
 
-## Earwigs (PS 05)
+Glanville Fritillary butterflies are a model organism for studying dispersal and metapopulation dynamics, because they live in isolated meadows.
 
-In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
+<div style="width:350px">
+![](http://i1.treknature.com/photos/1289/melitaea_cinxia.jpg)
+</div>
 
-```{r earwigs}
-EW <- read_csv("../data/Earwigs.csv")
+### Activities
 
-EW %>%
-  ggplot(aes(Density, Proportion_Forceps)) +
+Load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `data.frame` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures). We will perform 100 regressions using `lm()`, predicting each gene expression measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the example code below and follow the same procedure to fit all 100 models at once.
+
+```{r}
+ex.dat <- data.frame('treatment' = rep(c('a', 'b'), each = 20),
+                     'yy1' = rnorm(40),
+                     'yy2' = rnorm(40))
+
+treat <- ex.dat$treatment
+YYs <- as.matrix(ex.dat[, 2:3])
+
+mods <- lm(YYs ~ treat)
+summary(mods)
+
+#FIXME
+M <- read_csv("../data/Butterfly_Gene_Expression.csv")
+Ys <- as.matrix(M[, 3:ncol(M)])
+fm <- lm(Ys ~ Sex, data = M)
+```
+
+Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. Do this for your data and assign it to an object, `obsP`. Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
+
+```{r}
+ex.P <- getP(mods)
+
+#FIXME
+set.seed(273645)
+obsP <- data.frame('P' = getP(fm))
+
+ggplot(obsP, aes(P)) +
+  geom_histogram(bins = 20)
+
+qqP <- data.frame('observed' = sort(-log10(obsP$P)),
+                  'expected' = sort(-log10(runif(length(obsP$P), 0, 1))))
+
+ggplot(qqP, aes(x = expected, y = observed)) +
   geom_point() +
-  geom_smooth(method = "lm")
-
-fm <- lm(Proportion_Forceps ~ Density, data = EW)
-summary(fm)
-
-set.seed(28476)
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- summary(fm)$coefficients[2, 3]
-
-for (ii in 2:nreps) {
-  fm_rnd <- lm(sample(Proportion_Forceps) ~ Density, data = EW)
-  t_stats[ii] <- summary(fm_rnd)$coefficients[2, 3]
-}
-
-tibble(t_stats) %>%
-  ggplot(aes(t_stats)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1], color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats >= t_stats[1])
-
-factorial(7)
+  geom_abline(intercept = 0, slope = 1)
 ```
 
-## Heart Transplant Survivorship (PS 07)
+Based on these visualizations, do you think there are true positives in this data set?
 
-For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
+> Probably. The P-values deviate pretty strongly from the expected line.
 
-```{r heart_transplants}
-M <- read_excel("../data/Heart_Transplants.xlsx") %>%
-  mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
-
-ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
-  labs(x = "Mismatch Degree", y = "Survival (days)")
-
-fm <- lm(Survival_Days ~ Mismatch_Degree, data = M)
-obs <- summary(fm)
-
-set.seed(823476)
-nreps <- 1e4
-F_stats <- numeric(nreps)
-F_stats[1] <- obs$fstatistic["value"]
-
-for (ii in 2:nreps) {
-  fm_rand <- lm(sample(Survival_Days) ~ Mismatch_Degree,
-                    data = M)
-  F_stats[ii] <- summary(fm_rand)$fstatistic["value"]
-}
-
-tibble(F_stats) %>%
-  ggplot(aes(F_stats)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = F_stats[1], color = "red") +
-  labs(x = "F statistics", y = "Count")
-
-mean(F_stats >= F_stats[1])
-```
-
-## Bird abundance (PS 07)
-
-We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors.
-
-There are four predictors, and you will have 5 randomization tests, though you will fit a single model with multiple predictors to obtain the test statistics for each:
-
-1. The overall multple regression (F-test)
-2. Area: "Island" size (thousands of square km)
-3. Elevation: Elevation (thousands of meters)
-4. Dist_to_Ecuador: Distance to Ecuador (km)
-5. Dist_to_Island: Distance to nearest island (km)
-
-You should do the randomization and collect the output test statistics using just one loop.
-
-```{r bird_abundance}
-M <- read_excel("../data/Birds.xlsx")
-fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
-         data = M)
-obs <- summary(fm)
-
-set.seed(2876)
-nreps <- 1e4
-
-t_stats <- matrix(NA, nrow = nreps, ncol = 5)
-colnames(t_stats) <- c(rownames(obs$coefficients)[2:5], "Fstat")
-t_stats[1, 1:4] <- obs$coefficients[2:5, 3]
-t_stats[1, 5] <- obs$fstatistic[1]
-
-for (ii in 2:nreps) {
-  fm_rand <- lm(sample(N_Species) ~ Dist_to_Island + Elevation +
-                  Area + Dist_to_Ecuador, data = M)
-  t_stats[ii, 1:4] <- summary(fm_rand)$coefficients[2:5, 3]
-  t_stats[ii, 5] <- summary(fm_rand)$fstatistic[1]
-  
-}
-
-# Dist_to_Island
-tibble(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
-  ggplot(aes(Dist_to_Island)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Dist_to_Island"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Dist_to_Island"] >= t_stats[1, "Dist_to_Island"])
-
-# Elevation
-tibble(Elevation = t_stats[, "Elevation"]) %>%
-  ggplot(aes(Elevation)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Elevation"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Elevation"] >= t_stats[1, "Elevation"])
-
-# Area
-tibble(Area = t_stats[, "Area"]) %>%
-  ggplot(aes(Area)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Area"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Area"] >= t_stats[1, "Area"])
-
-# Dist_to_Ecuador
-tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
-  ggplot(aes(Dist_to_Ecuador)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Dist_to_Ecuador"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Dist_to_Ecuador"] <= t_stats[1, "Dist_to_Ecuador"])
-
-tibble(Fstat = t_stats[, "Fstat"]) %>%
-  ggplot(aes(Fstat)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Fstat"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-mean(t_stats[, "Fstat"] >= t_stats[1, "Fstat"])
-```
-
-## Aspirin and cancer (PS 08)
-
-In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
-
-```{r aspirin1}
-M <- read_csv("../data/Aspirin.csv") %>%
-  mutate_each("factor")
-fm <- glm(Cancer ~ Treatment, M, family = "binomial")
-
-# We will use the deviance first.
-
-set.seed(8736)
-nreps <- 1e3
-devs <- numeric(nreps)
-devs[1] <- fm$deviance
-
-system.time({
-  for (ii in 2:nreps) {
-    devs[ii] <- glm(sample(Cancer) ~ Treatment, M,
-                    family = "binomial")$deviance
-  }
-})
-
-tibble(devs) %>%
-  ggplot(aes(devs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = devs[1], color = "red") +
-  labs(x = "Deviance", y = "Count")
-
-mean(devs <= devs[1])
-```
-
-We can also use the Z-score for `TreatmentPlacebo`. This runs more slowly, because you have to generate the summary for each model.
+Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction (Holmes procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a `data.frame` with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.
 
 ```{r}
-set.seed(8736)
-nreps <- 1e3
-Zs <- numeric(nreps)
-Zs[1] <- summary(fm)$coefficients[2, 3]
-
-system.time({
-  for (ii in 2:nreps) {
-    fm_rand <- glm(sample(Cancer) ~ Treatment, M,
-                    family = "binomial")
-    Zs[ii] <- summary(fm_rand)$coefficients[2, 3]
-  }
-})
-
-tibble(Zs) %>%
-  ggplot(aes(Zs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = Zs[1], color = "red") +
-  labs(x = "Z-score", y = "Count")
-
-mean(Zs <= Zs[1]) * 2
+# FIXME
+seq_bonf <- p.adjust(obsP$P, method = "holm")
+tibble(P = obsP$P,
+           seq_bonf) %>%
+  arrange(P) %>%
+  filter(seq_bonf <= 0.05)
+sum(seq_bonf < 0.05)
 ```
 
-We can also do something similar with a standard $\chi^2$ test:
+Repeat the procedure above, but now use the false discovery rate procedure of Benjamini and Hochberg.
 
-```{r aspirin2}
-obs <- chisq.test(xtabs(~ Treatment + Cancer, M),
-                  correct = FALSE)
-
-set.seed(8736)
-nreps <- 1e3
-chisqs <- numeric(nreps)
-chisqs[1] <- obs$statistic
-
-system.time({
-  for (ii in 2:nreps) {
-    chisqs[ii] <- chisq.test(xtabs(~ sample(Treatment) + Cancer, M),
-                             correct = FALSE)$statistic
-  }
-})
-
-tibble(chisqs) %>%
-  ggplot(aes(chisqs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = chisqs[1], color = "red") +
-  labs(x = "Chi-squared Statistic", y = "Count")
-
-mean(chisqs >= chisqs[1])
+```{r}
+# FIXME
+fdr <- p.adjust(obsP$P, method = "fdr")
+tibble(P = obsP$P,
+           fdr) %>%
+  arrange(P) %>%
+  filter(fdr <= 0.05)
+sum(fdr < 0.05)
 ```
 
-## Correlation
+Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the `qvalue` package, which is available through Bio conductor (rather than CRAN).
 
-Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
+```{r}
+library(qvalue)
+qobj <- qvalue(obsP$P, fdr.level = 0.05, pi0.method = "smoother")
+summary(qobj)
+```
 
-```{r correlation}
-M <- read_excel("../data/Birds.xlsx")
+What is the value of $\pi_0$? What does this value represent?
 
-set.seed(2876)
-nreps <- 1e4
+> 0.39. This means that only 39% of the null hypotheses are true.
 
-corrs <- numeric(length = nreps)
-corrs[1] <- cor(M$Area, M$Elevation)
+How many P-values are associated with q-values less than 0.05?
 
-for (ii in 2:nreps) {
-  corrs[ii] <- cor(sample(M$Area), M$Elevation)
+> 29 (of 32 nominally less than 0.05)
+
+What is an adjusted $\alpha$-level that will control pDFR at 0.05?
+
+```{r}
+max(qobj$pvalues[qobj$qvalues <= 0.05])
+```
+
+Perform a randomization to estimate the number of expected false positives for this experiment. 1) You will want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) Perform your set of 100 tests in the same way that you did above. 3) Collect the associated p values using the `getP` function. 4) Keep these in a 1000 x 100 matrix with each column as one iteration. This process will take a few minutes to run. You may want to test the steps with a small number of iterations first.
+
+```{r randomization, cache=TRUE}
+#FIXME
+set.seed(874628)
+niter <- 1000
+
+Ys <- as.matrix(M[, 3:ncol(M)])
+Sex <- M$Sex
+
+allP <- matrix(NA, ncol(Ys), niter)
+
+for (kk in 1:niter) {
+  fms <- lm(Ys ~ sample(Sex))
+  allP[, kk] <- getP(fms)
 }
-
-tibble(corrs) %>%
-  ggplot(aes(corrs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = corrs[1], color = "red") +
-  labs(x = "Correlation", y = "Count")
-
-mean(corrs >= corrs[1])
 ```
+
+Visualize the P-values from one or a few of your iterations as you did above with a histogram and a q-q plot.
+
+```{r}
+it1 <- data.frame('P' = allP[, 5])
+ggplot(it1, aes(P)) +
+  geom_histogram(bins = 20)
+
+qqP <- data.frame('observed' = sort(-log10(it1$P)),
+                  'expected' = sort(-log10(runif(100, 0, 1))))
+
+ggplot(qqP, aes(x = expected, y = observed)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1)
+```
+
+For each iteration, get a count of the number of positives at a threshold of 0.05. Visualize the number of positives with a histogram. Keep in mind, because you have randomized the data, *all positives here are false postives*.
+
+- Calculate the average number of false positives and the average false positive rate at a threshold of 0.05.
+- Now calculate the Family-Wise Error Rate (FWER) at a threshold of 0.05 by calculating the proportion of iterations that result in at least one significant result.
+- Use your average estimated number of false positives to calculate the false discovery rate at a threshold of 0.05. Note you will need to consider your observed number of positives for this calculation.
+
+
+```{r}
+th <- 0.05
+
+pos.counts <- data.frame(
+  'counts' = apply(allP, 2, function(x) sum(x < th)))
+
+ggplot(pos.counts, aes(counts)) +
+  geom_histogram(bins = 20)
+
+mean(pos.counts$counts)
+
+mean(pos.counts$counts) / 100
+
+sum(pos.counts >= 1) / 1000
+
+mean(pos.counts$counts) / sum(obsP$P < th)
+```
+
+Now use this same procedure to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `data.frame`.
+
+```{r}
+thresholds <- seq(0.0005, 0.05 , length = 200)
+
+#FIXME
+output <- data.frame('threshold' = thresholds,
+                      'FP' = numeric(length(thresholds)),
+                     'FWER' = numeric(length(thresholds)),
+                     'FDR' = numeric(length(thresholds)))
+
+for (tt in 1:length(thresholds)) {
+  th <- thresholds[tt]
+  pos.counts <- data.frame(
+    'counts' = apply(allP, 2, function(x) sum(x < th)))
+  output[tt,'FP'] <- mean(pos.counts$counts) / 100
+  output[tt,'FWER'] <- sum(pos.counts >= 1) / 1000
+  output[tt,'FDR'] <- mean(pos.counts$counts) / sum(obsP$P < th)
+}
+output
+max(output$threshold[output$FDR <= 0.05])
+```
+
+Make plots of the FDR, FP, and FWER plotted against the threshold (feel free to make three separate plots). In each, draw a horizontal line at 5%.
+
+```{r}
+#FIXME
+output %>%
+  ggplot(aes(threshold, FDR)) +
+  geom_point() +
+  geom_hline(yintercept = 0.05)
+
+output %>%
+  ggplot(aes(threshold, FP)) +
+  geom_point() +
+  geom_hline(yintercept = 0.05)
+
+output %>%
+  ggplot(aes(threshold, FWER)) +
+  geom_point() +
+  geom_hline(yintercept = 0.05)
+```
+
+Inspecting the `data.frame` you made above, what P-value threshold should you use if you want a false discovery rate of 5%?
+
+>
+
+Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here.
+
+```{r}
+minP <- apply(allP, 2, min)
+quantile(minP, 0.05)
+```
+
+
+## Planning experiments
+
+Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
+
+### Activity
+
+Use `cohen.ES()` to look up the effect size for a "small" effect for a *t*-test.
+
+```{r}
+# FIXME
+cohen.ES(test = "t", size = "small")
+```
+
+Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
+
+```{r}
+# FIXME
+pwr.t.test(d = 0.2, power = 0.80, type = "two.sample")
+```
+
+Repeat the test above but for a paired *t*-test.
+
+```{r}
+# FIXME
+pwr.t.test(d = 0.2, power = 0.80, type = "paired")
+```
+
+Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
+
+```{r}
+# FIXME
+pwr.r.test(r = 0.6, power = 0.8)
+```
+
+Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
+
+```{r}
+# FIXME
+pwr.r.test(r = 0.4, n = 15)
+```
+
+
+## Calcium concentration in bird plasma
+
+The file `Bird_Plasma.xlsx` contains factorial data on blood plasma calcium concentration (`Calcium`, mg / 100 mL) in male and female birds (`Sex`) each of which was treated or not with a hormone (`Hormone`).
+
+### Activity
+
+Load the Excel file, and convert treatment and sex to factors.
+
+```{r}
+# FIXME
+M <- read_excel("../data/Bird_Plasma.xlsx")
+M <- M %>% mutate(Treatment = factor(Treatment),
+                  Sex = factor(Sex))
+```
+
+Use `group_by()` and `tally()` to determine the sample size in each of the groups.
+
+```{r}
+# FIXME
+M %>% group_by(Treatment, Sex) %>% tally()
+```
+
+Assume that the researchers who carried out this study had performed a power analysis prior to collecting data. Calculate the minimum effect size for a main effect they could detect with their experimental design if they use an ANOVA to analyze the data. Assume that there are 4 groups and power is 0.80.
+
+```{r}
+# FIXME
+pwr.anova.test(k = 4, n = 5, power = 0.80)
+```
+
+How do you interpret the minimum effect size that the researchers could detect at power of 0.8?
+
+> The effect has to be really large (> 0.8 standard deviations) in order to detect it.
+
+
+## Power via simulation
+
+A more appropriate way to analyze the bird plasma data is to use a factorial ANOVA (both main effects and their interaction term). Imagine that you are planning just such an experiment:
+
+- Two treatment groups which each have two levels (a 2 X 2 design)
+- n = 5 in each group
+- Your alpha will be 0.05
+- You are interested in detecting main effects and interactions (full factorial model)
+
+We will simulate data where the main effect of one term varies and the interaction effect varies, figure out the power across a range of different means, and make the assumption that within-group standard deviations are equal at 4 and the main effect of the other variable does not change (for now). We will build up this simulation in steps, first considering one parameter combination and one iteration before setting up the entire simulation.
+
+a. Generate two vectors, which will represent the range of differences in treatment and the range of differences for the interaction. For now, test the sequence from -10 to 10, with a length of 10 (`length.out = 10`).
+
+The `tidyr` package, which is loaded with `tidyverse` has a handy function `crossing()`, which will expand vectors with all pairwise combinations into a `tibble`. Use this function to cross the vectors. You should have a 100 X 2 `tibble`.
+
+```{r}
+# FIXME
+low <- -10
+high <- 10
+length.out <- 10
+
+diffs_tx <- seq(low, high, length.out = length.out)
+diffs_int <- seq(low, high, length.out = length.out)
+
+pwr_sim <- crossing(diffs_tx, diffs_int)
+```
+
+Use `mutate()` at add two additional `numeric()` columns, one each for the power to detect a treatment effect and the sex X treatment interaction.
+
+```{r}
+# FIXME
+pwr_sim <- pwr_sim %>% 
+  mutate(tx = numeric(length = nrow(pwr_sim)),
+         sex_tx = numeric(length = nrow(pwr_sim)))
+```
+
+b. Let's start by considering a single parameter combination: the first row of your `tibble` from above. First we will calculate the means for the four groups defined by sex and treatment (you might call these `s0t0`, `s1t0`, `s0t1`, `s1t1`). Assign `s0t0` to have a mean of zero. Because we are focusing only on treatment, we will not simulate a main effect of sex so assign `s1t0` to also have a mean of zero. For the effect of treatment, because we are also simulating an interaction, we need to consider both when assigning the means. That is what an interaction is, the effect of one term is dependent on the state of the other. We will add the effect of the main effect and the interaction effect which will be conditional on sex. So, for `s0t1`, add the effect for treatment to 0.5 multiplied by the effect of the interaction. And for `s1t1`, add the effect for treatment to -0.5 multiplied by the effect of the interaction. This will create a set of means in which there is an overall main effect for treatment, no main effect for sex, and an interaction effect.
+
+Confirm this by calculating the values for your means.  
+
+```{r}
+# FIXME
+s0t0 <- 0
+s1t0 <- 0
+s0t1 <- as.numeric(pwr_sim[1, 1] + 0.5 * pwr_sim[1, 2])
+s1t1 <- as.numeric(pwr_sim[1, 1] + -0.5 * pwr_sim[1, 2])
+
+print(c(s0t0, s1t0, s0t1, s1t1))
+```
+
+c. Now that you have code to assign the means for each group, we can move on to simulating one iteration for this parameter combination. We want to generate data for each group from a random normal distribution. All have the same standard deviation (4). Use the sample sizes for the groups defined above. Set up a `data.frame` with these data and labels for the groups (think about how `lm()` will need the data to be formatted). Then we will fit the ANOVA using `anova(lm())` and assign a TRUE/FALSE for the treatment term and interaction term that will tell us whether it is significant or not at our alpha level.  
+
+```{r warning=FALSE}
+# FIXME
+s0t0 <- 0
+s1t0 <- 0
+s0t1 <- as.numeric(pwr_sim[10, 1] + 0.5 * pwr_sim[10, 2])
+s1t1 <- as.numeric(pwr_sim[10, 1] + -0.5 * pwr_sim[10, 2])
+stdev <- 4
+nn <- 5
+alpha <- 0.05
+  
+y_sex0_tx0 <- rnorm(nn, mean = s0t0, sd = stdev)
+y_sex1_tx0 <- rnorm(nn, mean = s1t0, sd = stdev)
+y_sex0_tx1 <- rnorm(nn, mean = s0t1, sd = stdev)
+y_sex1_tx1 <- rnorm(nn, mean = s1t1, sd = stdev)
+    
+D <- tibble(Calcium = c(y_sex0_tx0, y_sex1_tx0,
+                        y_sex0_tx1, y_sex1_tx1),
+            sex = factor(rep(c("F", "M", "F", "M"), each = nn)),
+            tx = factor(rep(c("None", "Hormone"), each = nn * 2)))
+
+fm <- anova(lm(Calcium ~ sex * tx, data = D))
+fm
+
+p_tx <- fm$`Pr(>F)`[2] < alpha
+p_sex_tx <- fm$`Pr(>F)`[3] < alpha
+```
+
+d. You now have all of the code you need to do the simulation. You just need to set it up with two loops. You want to loop through each of your parameter combinations. Then, for each combination, you want to loop through several iterations. First set this up with a small number of iterations. Then scale up to 1000.
+
+Use `Sys.time()` to get a sense for how long your program will run when you scale up. Start by assigning the output of `Sys.time()` to a variable before you loop starts (`t_start <- Sys.time()`). After your loop, subtract that from `Sys.time()` (e.g., `Sys.time() - t_start`).
+
+```{r}
+set.seed(2238746)
+niter <- 100
+alpha <- 0.05
+nn <- 5
+stdev <- 4
+
+t1 <- Sys.time()
+
+for (ii in 1:nrow(pwr_sim)) {
+  s0t0 <- 0
+  s1t0 <- 0
+  s0t1 <- as.numeric(pwr_sim[ii, 1] + 0.5 * pwr_sim[ii, 2])
+  s1t1 <- as.numeric(pwr_sim[ii, 1] + -0.5 * pwr_sim[ii, 2])
+  
+  for (jj in 1:niter) {
+    
+    y_sex0_tx0 <- rnorm(nn, mean = s0t0, sd = stdev)
+    y_sex1_tx0 <- rnorm(nn, mean = s1t0, sd = stdev)
+    y_sex0_tx1 <- rnorm(nn, mean = s0t1, sd = stdev)
+    y_sex1_tx1 <- rnorm(nn, mean = s1t1, sd = stdev)
+    
+    D <- tibble(Calcium = c(y_sex0_tx0, y_sex1_tx0,
+                            y_sex0_tx1, y_sex1_tx1),
+                sex = factor(rep(c("F", "M", "F", "M"), each = nn)),
+                tx = factor(rep(c("None", "Hormone"), each = nn * 2)))
+    
+    fm <- anova(lm(Calcium ~ sex * tx, data = D))
+    
+    p_tx[jj] <- fm$`Pr(>F)`[2] < alpha
+    p_sex_tx[jj] <- fm$`Pr(>F)`[3] < alpha
+  }
+  pwr_sim$tx[ii] <- mean(p_tx)
+  pwr_sim$sex_tx[ii] <- mean(p_sex_tx)
+}
+Sys.time() - t1
+
+save(pwr_sim, file = "pwr_sim.Rda")
+```
+
+e. Now we want to visualize the results. Make separate plots of with your sets of differences for the treatment and for the interaction on the x and y axes. Color the points by the power associated with the treatment effect in the first plot and by the power associated with the interaction effect in the second. The output should look like a grid of points (one for each combination of values) that are color coded by power. This is a kind of manual heatmap.
+
+```{r}
+load("pwr_sim.Rda")
+
+ggplot(pwr_sim, aes(x = diffs_tx, y = diffs_int, color = tx)) +
+  geom_point(size = 6)
+
+ggplot(pwr_sim, aes(x = diffs_tx, y = diffs_int, color = sex_tx)) +
+  geom_point(size = 6)
+
+ggplot(pwr_sim, aes(x=diffs_tx, y=tx)) +
+  geom_point()
+
+ggplot(pwr_sim, aes(x=diffs_int, y=sex_tx)) +
+  geom_point()
+```
+

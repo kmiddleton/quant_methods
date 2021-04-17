@@ -24,6 +24,382 @@ library(MCMCglmm)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
+## General Framework for This Week's Problem Set
+
+This week we will approach hypothesis testing for several of the models we have fit previously with generalized linear models in a randomization framework. For each, you should:
+
+1. Fit the model to the observed data (feel free to copy your code from original problem set).
+1. Decide on a test statistic to use for the randomization.
+1. Perform the randomization:
+    1. Calculate the test statistic for the *observed* data
+    1. Randomly shuffle the observations
+    1. Calculate the test statistic for that group
+    1. Repeat thousands of times
+1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
+1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+
+Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide.
+
+Remember to start with a small number of iterations (10 or 100) until you get the code working correctly. Then increase to 10,000 for a final analysis.
+
+
+## Stalk-eyed flies (PS 05)
+
+Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
+
+```{r flies1, message=FALSE}
+# Read data
+stalk <- read_csv("../data/Stalkies.csv")
+
+# Some thoughtful plotting
+ggplot(stalk, aes(x = food_source, y = eye_span)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Food Source", y = "Eye Span")
+
+set.seed(8987324)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- t.test(eye_span ~ food_source, data = stalk)$statistic
+
+for (ii in 2:nreps) {
+  t_stats[ii] <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
+}
+
+tibble(t_stats) %>%
+  ggplot(aes(t_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1], color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats >= t_stats[1])
+
+t.test(eye_span ~ food_source, data = stalk)
+```
+
+10^5^ iterations took 124.7 seconds on a single processor. We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical P is 6e-10, so we expect the empirical P to be close to that scale.
+
+We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
+
+The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the combination of `foreach()` and `dopar()`, which handle the parallelization and collection of the results.
+
+```{r flies2, eval=FALSE}
+library(parallel)
+library(foreach)
+library(doParallel)
+
+t_obs <- t.test(eye_span ~ food_source, data = stalk)
+
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- t_obs$statistic
+
+# Set up parallel processor
+n_cores <- 2
+cl <- makeCluster(n_cores)
+registerDoParallel(cl, cores = n_cores)
+
+# Function to do the randomized t-test and return the t-value only.
+t_rand <- function() {
+  rnd_t <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
+  return(as.numeric(rnd_t))
+}
+
+# Parallel randomization execute t_rand(), and combine the output into t_stats.
+t_stats[2:nreps] <- foreach(i = 2:nreps, .combine = c) %dopar% t_rand()
+
+2 * mean(t_stats >= t_stats[1])
+
+# Close cluster
+stopImplicitCluster()
+```
+
+The same number of iterations but using 2 processors takes 93 seconds.
+
+```{r}
+# Iterations per second, 1 processor
+(p1 <- 124.7 / nreps)
+
+# Iterations per second, 2 processors
+(p6 <- 93 / nreps)
+
+p1 / p6
+```
+
+We get a speed-up of about 1.34 times. There is some overhead in the parallelization, and there were other things going on on the computer, so we don't get double the speed.
+
+## Earwigs (PS 05)
+
+In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
+
+```{r earwigs}
+EW <- read_csv("../data/Earwigs.csv")
+
+EW %>%
+  ggplot(aes(Density, Proportion_Forceps)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+fm <- lm(Proportion_Forceps ~ Density, data = EW)
+summary(fm)
+
+set.seed(28476)
+nreps <- 1e4
+t_stats <- numeric(nreps)
+t_stats[1] <- summary(fm)$coefficients[2, 3]
+
+for (ii in 2:nreps) {
+  fm_rnd <- lm(sample(Proportion_Forceps) ~ Density, data = EW)
+  t_stats[ii] <- summary(fm_rnd)$coefficients[2, 3]
+}
+
+tibble(t_stats) %>%
+  ggplot(aes(t_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1], color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats >= t_stats[1])
+
+factorial(7)
+```
+
+## Heart Transplant Survivorship (PS 07)
+
+For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
+
+```{r heart_transplants}
+M <- read_excel("../data/Heart_Transplants.xlsx") %>%
+  mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
+
+ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
+  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "red", size = 0.7) +
+  labs(x = "Mismatch Degree", y = "Survival (days)")
+
+fm <- lm(Survival_Days ~ Mismatch_Degree, data = M)
+obs <- summary(fm)
+
+set.seed(823476)
+nreps <- 1e4
+F_stats <- numeric(nreps)
+F_stats[1] <- obs$fstatistic["value"]
+
+for (ii in 2:nreps) {
+  fm_rand <- lm(sample(Survival_Days) ~ Mismatch_Degree,
+                    data = M)
+  F_stats[ii] <- summary(fm_rand)$fstatistic["value"]
+}
+
+tibble(F_stats) %>%
+  ggplot(aes(F_stats)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = F_stats[1], color = "red") +
+  labs(x = "F statistics", y = "Count")
+
+mean(F_stats >= F_stats[1])
+```
+
+## Bird abundance (PS 07)
+
+We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors.
+
+There are four predictors, and you will have 5 randomization tests, though you will fit a single model with multiple predictors to obtain the test statistics for each:
+
+1. The overall multple regression (F-test)
+2. Area: "Island" size (thousands of square km)
+3. Elevation: Elevation (thousands of meters)
+4. Dist_to_Ecuador: Distance to Ecuador (km)
+5. Dist_to_Island: Distance to nearest island (km)
+
+You should do the randomization and collect the output test statistics using just one loop.
+
+```{r bird_abundance}
+M <- read_excel("../data/Birds.xlsx")
+fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
+         data = M)
+obs <- summary(fm)
+
+set.seed(2876)
+nreps <- 1e4
+
+t_stats <- matrix(NA, nrow = nreps, ncol = 5)
+colnames(t_stats) <- c(rownames(obs$coefficients)[2:5], "Fstat")
+t_stats[1, 1:4] <- obs$coefficients[2:5, 3]
+t_stats[1, 5] <- obs$fstatistic[1]
+
+for (ii in 2:nreps) {
+  fm_rand <- lm(sample(N_Species) ~ Dist_to_Island + Elevation +
+                  Area + Dist_to_Ecuador, data = M)
+  t_stats[ii, 1:4] <- summary(fm_rand)$coefficients[2:5, 3]
+  t_stats[ii, 5] <- summary(fm_rand)$fstatistic[1]
+  
+}
+
+# Dist_to_Island
+tibble(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
+  ggplot(aes(Dist_to_Island)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Dist_to_Island"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Dist_to_Island"] >= t_stats[1, "Dist_to_Island"])
+
+# Elevation
+tibble(Elevation = t_stats[, "Elevation"]) %>%
+  ggplot(aes(Elevation)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Elevation"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Elevation"] >= t_stats[1, "Elevation"])
+
+# Area
+tibble(Area = t_stats[, "Area"]) %>%
+  ggplot(aes(Area)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Area"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Area"] >= t_stats[1, "Area"])
+
+# Dist_to_Ecuador
+tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
+  ggplot(aes(Dist_to_Ecuador)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Dist_to_Ecuador"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+2 * mean(t_stats[, "Dist_to_Ecuador"] <= t_stats[1, "Dist_to_Ecuador"])
+
+tibble(Fstat = t_stats[, "Fstat"]) %>%
+  ggplot(aes(Fstat)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = t_stats[1, "Fstat"],
+             color = "red") +
+  labs(x = "t statistics", y = "Count")
+
+mean(t_stats[, "Fstat"] >= t_stats[1, "Fstat"])
+```
+
+## Aspirin and cancer (PS 08)
+
+In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
+
+```{r aspirin1}
+M <- read_csv("../data/Aspirin.csv") %>%
+  mutate_each("factor")
+fm <- glm(Cancer ~ Treatment, M, family = "binomial")
+
+# We will use the deviance first.
+
+set.seed(8736)
+nreps <- 1e3
+devs <- numeric(nreps)
+devs[1] <- fm$deviance
+
+system.time({
+  for (ii in 2:nreps) {
+    devs[ii] <- glm(sample(Cancer) ~ Treatment, M,
+                    family = "binomial")$deviance
+  }
+})
+
+tibble(devs) %>%
+  ggplot(aes(devs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = devs[1], color = "red") +
+  labs(x = "Deviance", y = "Count")
+
+mean(devs <= devs[1])
+```
+
+We can also use the Z-score for `TreatmentPlacebo`. This runs more slowly, because you have to generate the summary for each model.
+
+```{r}
+set.seed(8736)
+nreps <- 1e3
+Zs <- numeric(nreps)
+Zs[1] <- summary(fm)$coefficients[2, 3]
+
+system.time({
+  for (ii in 2:nreps) {
+    fm_rand <- glm(sample(Cancer) ~ Treatment, M,
+                    family = "binomial")
+    Zs[ii] <- summary(fm_rand)$coefficients[2, 3]
+  }
+})
+
+tibble(Zs) %>%
+  ggplot(aes(Zs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = Zs[1], color = "red") +
+  labs(x = "Z-score", y = "Count")
+
+mean(Zs <= Zs[1]) * 2
+```
+
+We can also do something similar with a standard $\chi^2$ test:
+
+```{r aspirin2}
+obs <- chisq.test(xtabs(~ Treatment + Cancer, M),
+                  correct = FALSE)
+
+set.seed(8736)
+nreps <- 1e3
+chisqs <- numeric(nreps)
+chisqs[1] <- obs$statistic
+
+system.time({
+  for (ii in 2:nreps) {
+    chisqs[ii] <- chisq.test(xtabs(~ sample(Treatment) + Cancer, M),
+                             correct = FALSE)$statistic
+  }
+})
+
+tibble(chisqs) %>%
+  ggplot(aes(chisqs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = chisqs[1], color = "red") +
+  labs(x = "Chi-squared Statistic", y = "Count")
+
+mean(chisqs >= chisqs[1])
+```
+
+## Correlation
+
+Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
+
+```{r correlation}
+M <- read_excel("../data/Birds.xlsx")
+
+set.seed(2876)
+nreps <- 1e4
+
+corrs <- numeric(length = nreps)
+corrs[1] <- cor(M$Area, M$Elevation)
+
+for (ii in 2:nreps) {
+  corrs[ii] <- cor(sample(M$Area), M$Elevation)
+}
+
+tibble(corrs) %>%
+  ggplot(aes(corrs)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = corrs[1], color = "red") +
+  labs(x = "Correlation", y = "Count")
+
+mean(corrs >= corrs[1])
+```
+
 
 ## Sole
 
