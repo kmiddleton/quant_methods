@@ -210,7 +210,9 @@ Here, we load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.
 
 Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. We will do this for this set of models and assign the p-values to an object, `obsP`. 
 
-```{r}
+Change `eval = FALSE` to `eval = TRUE` and run the chunk below. 
+
+```{r eval=TRUE}
 
 getP <- function(fm) {
   sum.set <- summary(fm)
@@ -413,7 +415,7 @@ output %>%
 
 Inspecting the data you made above, what P-value threshold should you use if you want a false discovery rate of 5%?
 
-> 
+> It looks like a threshold around 0.008 would give an FDR of 0.05. 
 
 Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here.
 

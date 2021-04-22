@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 10'
+title: 'Problem Set 11'
 author: "Your Name Here: Group X"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -11,61 +11,244 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-
-# This option turn on cacheing of chunks. This will dramatically
-# speed up knitting, because only chunks that have changed will
-# be recompiled.
-knitr::opts_chunk$set(cache = TRUE)
 ```
 
-## General Framework for This Week's Problem Set
 
-This week we will approach hypothesis testing for several of the models we have fit previously with generalized linear models in a randomization framework. For each, you should:
+## Repeatability: Intraclass correlation coefficient
 
-1. Fit the model to the observed data (feel free to copy your code from original problem set).
-1. Decide on a test statistic to use for the randomization.
-1. Perform the randomization:
-    1. Calculate the test statistic for the *observed* data
-    1. Randomly shuffle the observations
-    1. Calculate the test statistic for that group
-    1. Repeat thousands of times
-1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
-1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+The model you use to calculate the intraclass correlation coefficient *is* a multilevel model. You have repeated measurements for a single specimen. Those measurements are obviously not independent from one another (that is the point of repeated measurements -- to estimate the consistency of measurements as compared to the differences between individuals). The major question you want to ask is: What is the relative between *measurement* vs. between *specimen* variation?
 
-Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide. 
+We will fit this model in two ways: using `aov()` and using the `ICC` package. 
 
-Remember to start with a small number of iterations (10 or 100) until you get the code working correctly. Then increase to 10,000 for a final analysis.
+The data we will be working with includes repeated measurements of the femur of Walking Sticks:
 
-## Stalk-eyed flies (PS 05)
+<div style="width:350px">
+![](https://i.imgur.com/CVTtMkJ.png)
+</div>
 
-Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
+Because the measurements are small (~ 0.25 cm), you are concerned that they will not be very repeatable. Before collecting all the data, you want to estimate the intraclass correlation coefficient of these measurements.
 
-## Earwigs (PS 05)
+You take 2 measurements each on 25 different walking stick femurs, which are included in the files `WalkingStickFemurs.csv`.
 
-In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
+### Activity
 
-## Heart Transplant Survivorship (PS 07)
+Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so that R will treat it as categorical rather than as numeric.
 
-For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
+```{r echo=FALSE}
+```
 
-## Bird abundance (PS 07)
+Look at the structure of the data. The data are in long format, with one measurement per row. We want to be able to plot Measurement 1 vs. Measurement 2 to visualize the paired relationship. To do so, we need to convert the data into wide format, with 2 columns per Specimen: Measurement 1 and Measurement 2.
 
-We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors. 
+Pivot the data to wide:
 
-There are four predictors, and you will have 5 randomization tests, though you will fit a single model with multiple predictors to obtain the test statistics for each:
+- Use `Specimen` is the ID
+- Take values from `Femur_length`
+- Take column names from `Measurement`
+- Use the `names_prefix =` option to prefix "Measurement_1" before the column name
 
-1. The overall multple regression (F-test)
-2. Area: "Island" size (thousands of square km)
-3. Elevation: Elevation (thousands of meters)
-4. Dist_to_Ecuador: Distance to Ecuador (km)
-5. Dist_to_Island: Distance to nearest island (km)
+```{r}
+```
 
-You should do the randomization and collect the output test statistics using just one loop.
+Plot the pairs of observations as a scatterplot.
 
-## Aspirin and cancer (PS 08)
+- Add a line with a slope of 1 and intercept of 0 using `geom_abline()`
+- Set the axis coordinates to equal scaling with `coord_equal()`
 
-In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
+```{r}
+```
 
-## Correlation
+Based on your plot, do you expect repeatability to be high or low? Give an estimate?
 
-Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
+> 
+
+Follow the example from lecture to calculate repeatability of the femur length  measurement using `aov()`. As in the lecture, you can just manually copy the values from the `aov()` summary rather than trying to extract them programmatically.
+
+```{r}
+```
+
+What value of repeatability to you find?
+
+> 
+
+Calculate repeatability of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package (you might need to install the package).
+
+```{r}
+```
+
+Compare the results
+
+> 
+
+Would you be comfortable going forward with data collection given this value for ICC?
+
+> 
+
+## Planning experiments
+
+Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
+
+### Activity
+
+Use `cohen.ES()` to look up the effect size for a "small" effect for a *t*-test.
+
+```{r}
+```
+
+Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
+
+```{r}
+```
+
+Repeat the test above but for a paired *t*-test.
+
+```{r}
+```
+
+Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
+
+```{r}
+```
+
+Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
+
+```{r}
+```
+
+## RNAseq (gene expression) on males and females of the Glanville Fritillary
+
+Glanville Fritillary butterflies are a model organism for studying dispersal and metapopulation dynamics, because they live in isolated meadows.
+
+<div style="width:350px">
+![](https://imgur.com/d8mwElE.jpg)
+</div>
+
+### Activities
+
+Here, we load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `tibble` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures). We will perform 100 regressions using `lm()`, predicting each gene expression measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the code below to see how this works for this dataset.
+
+Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. We will do this for this set of models and assign the p-values to an object, `obsP`. 
+
+Change `eval = FALSE` to `eval = TRUE` and run the chunk below. 
+
+```{r eval=FALSE}
+
+getP <- function(fm) {
+  sum.set <- summary(fm)
+  p.set <- lapply(sum.set, function(x) x[['coefficients']][2, 4])
+  return(unlist(p.set))
+}
+
+
+set.seed(273645)
+
+M <- read_csv("../data/Butterfly_Gene_Expression.csv")
+Ys <- as.matrix(M[, 3:ncol(M)])
+fm <- lm(Ys ~ Sex, data = M)
+
+obsP <- tibble('P' = getP(fm))
+
+```
+
+Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
+
+```{r}
+```
+
+Based on these visualizations, do you think there are true positives in this data set?
+
+> 
+
+Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction (Holm procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a `tibble` with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.
+
+```{r}
+```
+
+Repeat the procedure above, but now use the false discovery rate procedure of Benjamini and Hochberg.
+
+```{r}
+```
+
+Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the `qvalue` package, which is available through Bioconductor (rather than CRAN). https://www.bioconductor.org/packages/release/bioc/html/qvalue.html
+
+```{r}
+```
+
+What is the value of $\pi_0$? What does this value represent?
+
+> 
+
+How many P-values are associated with q-values less than 0.05?
+
+> 
+
+What is an adjusted $\alpha$-level that will control pDFR at 0.05?
+
+```{r}
+```
+
+The code below shows a randomization that we can use to estimate the number of expected false positives for this experiment. 1) We want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) We performed our set of 100 tests in the same way that we did above. 3) We collected the associated p values using the `getP` function. 4) These were put into a 1000 x 100 matrix with each column as one iteration. 
+
+```{r randomization, cache=TRUE, eval=FALSE}
+
+set.seed(874628)
+niter <- 1000
+
+Ys <- as.matrix(M[, 3:ncol(M)])
+Sex <- M$Sex
+
+allP <- matrix(NA, ncol(Ys), niter)
+
+for (kk in 1:niter) {
+  fms <- lm(Ys ~ sample(Sex))
+  allP[, kk] <- getP(fms)
+}
+
+saveRDS(allP, file="../data/Shuffle_Expression.rds")
+
+```
+
+Load this matrix we generated using the `readRDS` function (this is a new one for you that will read an R object in directly) and assign it to an object called `allP`.
+
+```{r}
+
+```
+
+
+Visualize the P-values from one or a few of these iterations as you did above with a histogram and a q-q plot.
+
+```{r}
+```
+
+For each iteration, get a count of the number of positives at a threshold of 0.05. Visualize the number of positives with a histogram. Keep in mind, because you have randomized the data, *all positives here are false positives*.
+
+- Calculate the average number of false positives and the average false positive rate at a threshold of 0.05.
+- Now calculate the Family-Wise Error Rate (FWER) at a threshold of 0.05 by calculating the proportion of iterations that result in at least one significant result.
+- Use your average estimated number of false positives to calculate the false discovery rate at a threshold of 0.05. Note you will need to consider your observed number of positives for this calculation.
+
+
+```{r}
+```
+
+Now use this same procedure to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `tibble`.
+
+```{r}
+
+thresholds <- seq(0.0005, 0.05 , length = 200)
+
+```
+
+Make plots of the FDR, FP, and FWER plotted against the threshold (feel free to make three separate plots). In each, draw a horizontal line at 5%.
+
+```{r}
+```
+
+Inspecting the data you made above, what P-value threshold should you use if you want a false discovery rate of 5%?
+
+>  
+
+Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here.
+
+```{r}
+```
+
+
