@@ -43,7 +43,7 @@ Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so tha
 
 ```{r echo=FALSE}
 # FIXME
-M <- read_csv("../data/WalkingStickFemurs.csv") %>% 
+M <- read_csv("../data/WalkingStickFemurs.csv", col_types = "ddd") %>% 
   mutate(Specimen = factor(Specimen))
 ```
 
@@ -169,22 +169,29 @@ getP <- function(fm) {
 Glanville Fritillary butterflies are a model organism for studying dispersal and metapopulation dynamics, because they live in isolated meadows.
 
 <div style="width:350px">
-![](http://i1.treknature.com/photos/1289/melitaea_cinxia.jpg)
+![](https://imgur.com/d8mwElE.jpg)
 </div>
 
 ### Activities
 
-Load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `data.frame` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures). We will perform 100 regressions using `lm()`, predicting each gene expression measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the example code below and follow the same procedure to fit all 100 models at once.
+Load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `tibble` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures). We will perform 100 regressions using `lm()`, predicting each gene expression measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the example code below and follow the same procedure to fit all 100 models at once.
 
 ```{r}
-ex.dat <- data.frame('treatment' = rep(c('a', 'b'), each = 20),
-                     'yy1' = rnorm(40),
-                     'yy2' = rnorm(40))
+# Set up example data to work with
+ex.dat <- tibble('treatment' = rep(c('a', 'b'), each = 20),
+                 'yy1' = rnorm(40),
+                 'yy2' = rnorm(40))
 
+# Extract the predictor as a vector
 treat <- ex.dat$treatment
+
+# Extract the outcome y's as a matrix (40 rows x 2 columns)
 YYs <- as.matrix(ex.dat[, 2:3])
 
+# Fit separate models to both set of outcome variables
 mods <- lm(YYs ~ treat)
+
+# Summarize both models
 summary(mods)
 
 #FIXME
@@ -200,13 +207,13 @@ ex.P <- getP(mods)
 
 #FIXME
 set.seed(273645)
-obsP <- data.frame('P' = getP(fm))
+obsP <- tibble('P' = getP(fm))
 
 ggplot(obsP, aes(P)) +
   geom_histogram(bins = 20)
 
-qqP <- data.frame('observed' = sort(-log10(obsP$P)),
-                  'expected' = sort(-log10(runif(length(obsP$P), 0, 1))))
+qqP <- tibble('observed' = sort(-log10(obsP$P)),
+              'expected' = sort(-log10(runif(length(obsP$P), 0, 1))))
 
 ggplot(qqP, aes(x = expected, y = observed)) +
   geom_point() +
@@ -217,13 +224,13 @@ Based on these visualizations, do you think there are true positives in this dat
 
 > Probably. The P-values deviate pretty strongly from the expected line.
 
-Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction (Holm procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a `data.frame` with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.
+Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction (Holm procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a `tibble` with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.
 
 ```{r}
 # FIXME
 seq_bonf <- p.adjust(obsP$P, method = "holm")
 tibble(P = obsP$P,
-           seq_bonf) %>%
+       seq_bonf) %>%
   arrange(P) %>%
   filter(seq_bonf <= 0.05)
 sum(seq_bonf < 0.05)
@@ -235,7 +242,7 @@ Repeat the procedure above, but now use the false discovery rate procedure of Be
 # FIXME
 fdr <- p.adjust(obsP$P, method = "fdr")
 tibble(P = obsP$P,
-           fdr) %>%
+       fdr) %>%
   arrange(P) %>%
   filter(fdr <= 0.05)
 sum(fdr < 0.05)
@@ -266,7 +273,7 @@ max(qobj$pvalues[qobj$qvalues <= 0.05])
 Perform a randomization to estimate the number of expected false positives for this experiment. 1) You will want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) Perform your set of 100 tests in the same way that you did above. 3) Collect the associated p values using the `getP` function. 4) Keep these in a 1000 x 100 matrix with each column as one iteration. This process will take a few minutes to run. You may want to test the steps with a small number of iterations first.
 
 ```{r randomization, cache=TRUE}
-#FIXME
+# FIXME
 set.seed(874628)
 niter <- 1000
 
@@ -284,19 +291,20 @@ for (kk in 1:niter) {
 Visualize the P-values from one or a few of your iterations as you did above with a histogram and a q-q plot.
 
 ```{r}
-it1 <- data.frame('P' = allP[, 5])
+# FIXME
+it1 <- tibble('P' = allP[, 5])
 ggplot(it1, aes(P)) +
   geom_histogram(bins = 20)
 
-qqP <- data.frame('observed' = sort(-log10(it1$P)),
-                  'expected' = sort(-log10(runif(100, 0, 1))))
+qqP <- tibble('observed' = sort(-log10(it1$P)),
+              'expected' = sort(-log10(runif(100, 0, 1))))
 
 ggplot(qqP, aes(x = expected, y = observed)) +
   geom_point() +
   geom_abline(intercept = 0, slope = 1)
 ```
 
-For each iteration, get a count of the number of positives at a threshold of 0.05. Visualize the number of positives with a histogram. Keep in mind, because you have randomized the data, *all positives here are false postives*.
+For each iteration, get a count of the number of positives at a threshold of 0.05. Visualize the number of positives with a histogram. Keep in mind, because you have randomized the data, *all positives here are false positives*.
 
 - Calculate the average number of false positives and the average false positive rate at a threshold of 0.05.
 - Now calculate the Family-Wise Error Rate (FWER) at a threshold of 0.05 by calculating the proportion of iterations that result in at least one significant result.
@@ -304,9 +312,10 @@ For each iteration, get a count of the number of positives at a threshold of 0.0
 
 
 ```{r}
+# FIXME
 th <- 0.05
 
-pos.counts <- data.frame(
+pos.counts <- tibble(
   'counts' = apply(allP, 2, function(x) sum(x < th)))
 
 ggplot(pos.counts, aes(counts)) +
@@ -321,25 +330,26 @@ sum(pos.counts >= 1) / 1000
 mean(pos.counts$counts) / sum(obsP$P < th)
 ```
 
-Now use this same procedure to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `data.frame`.
+Now use this same procedure to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `tibble`.
 
 ```{r}
 thresholds <- seq(0.0005, 0.05 , length = 200)
 
 #FIXME
-output <- data.frame('threshold' = thresholds,
-                      'FP' = numeric(length(thresholds)),
-                     'FWER' = numeric(length(thresholds)),
-                     'FDR' = numeric(length(thresholds)))
+output <- tibble('threshold' = thresholds,
+                 'FP' = numeric(length(thresholds)),
+                 'FWER' = numeric(length(thresholds)),
+                 'FDR' = numeric(length(thresholds)))
 
 for (tt in 1:length(thresholds)) {
   th <- thresholds[tt]
-  pos.counts <- data.frame(
+  pos.counts <- tibble(
     'counts' = apply(allP, 2, function(x) sum(x < th)))
   output[tt,'FP'] <- mean(pos.counts$counts) / 100
   output[tt,'FWER'] <- sum(pos.counts >= 1) / 1000
   output[tt,'FDR'] <- mean(pos.counts$counts) / sum(obsP$P < th)
 }
+
 output
 max(output$threshold[output$FDR <= 0.05])
 ```
@@ -364,9 +374,9 @@ output %>%
   geom_hline(yintercept = 0.05)
 ```
 
-Inspecting the `data.frame` you made above, what P-value threshold should you use if you want a false discovery rate of 5%?
+Inspecting the data you made above, what P-value threshold should you use if you want a false discovery rate of 5%?
 
->
+> 
 
 Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here.
 
