@@ -111,6 +111,46 @@ Would you be comfortable going forward with data collection given this value for
 
 > Maybe or maybe not. If we expect fairly large differences between groups, then it's probably fine. But if the differences are small, then there may be so much variation associated with taking measurements that it will swamp out the variation between groups. It's probably fine.
 
+## Planning experiments
+
+Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
+
+### Activity
+
+Use `cohen.ES()` to look up the effect size for a "small" effect for a *t*-test.
+
+```{r}
+# FIXME
+cohen.ES(test = "t", size = "small")
+```
+
+Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
+
+```{r}
+# FIXME
+pwr.t.test(d = 0.2, power = 0.80, type = "two.sample")
+```
+
+Repeat the test above but for a paired *t*-test.
+
+```{r}
+# FIXME
+pwr.t.test(d = 0.2, power = 0.80, type = "paired")
+```
+
+Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
+
+```{r}
+# FIXME
+pwr.r.test(r = 0.6, power = 0.8)
+```
+
+Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
+
+```{r}
+# FIXME
+pwr.r.test(r = 0.4, n = 15)
+```
 
 ## RNAseq (gene expression) on males and females of the Glanville Fritillary
 
@@ -155,15 +195,7 @@ gg_samp <- gg[, c(1, sample(size = ngenes, x = 2:ncol(gg)))]
 M <- left_join(sid, gg_samp)
 M <- M[,-c(2,4)]
 
-write_csv(M, path = "../data/Butterfly_Gene_Expression.csv")
-```
-
-```{r}
-getP <- function(fm) {
-  sum.set <- summary(fm)
-  p.set <- lapply(sum.set, function(x) x[['coefficients']][2, 4])
-  return(unlist(p.set))
-}
+write_csv(M, file = "../data/Butterfly_Gene_Expression.csv")
 ```
 
 Glanville Fritillary butterflies are a model organism for studying dispersal and metapopulation dynamics, because they live in isolated meadows.
@@ -174,40 +206,32 @@ Glanville Fritillary butterflies are a model organism for studying dispersal and
 
 ### Activities
 
-Load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `tibble` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures). We will perform 100 regressions using `lm()`, predicting each gene expression measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the example code below and follow the same procedure to fit all 100 models at once.
+Here, we load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `tibble` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures). We will perform 100 regressions using `lm()`, predicting each gene expression measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the code below to see how this works for this dataset.
+
+Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. We will do this for this set of models and assign the p-values to an object, `obsP`. 
 
 ```{r}
-# Set up example data to work with
-ex.dat <- tibble('treatment' = rep(c('a', 'b'), each = 20),
-                 'yy1' = rnorm(40),
-                 'yy2' = rnorm(40))
 
-# Extract the predictor as a vector
-treat <- ex.dat$treatment
+getP <- function(fm) {
+  sum.set <- summary(fm)
+  p.set <- lapply(sum.set, function(x) x[['coefficients']][2, 4])
+  return(unlist(p.set))
+}
 
-# Extract the outcome y's as a matrix (40 rows x 2 columns)
-YYs <- as.matrix(ex.dat[, 2:3])
 
-# Fit separate models to both set of outcome variables
-mods <- lm(YYs ~ treat)
+set.seed(273645)
 
-# Summarize both models
-summary(mods)
-
-#FIXME
 M <- read_csv("../data/Butterfly_Gene_Expression.csv")
 Ys <- as.matrix(M[, 3:ncol(M)])
 fm <- lm(Ys ~ Sex, data = M)
+
+obsP <- tibble('P' = getP(fm))
+
 ```
 
-Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. Do this for your data and assign it to an object, `obsP`. Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
+Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
 
 ```{r}
-ex.P <- getP(mods)
-
-#FIXME
-set.seed(273645)
-obsP <- tibble('P' = getP(fm))
 
 ggplot(obsP, aes(P)) +
   geom_histogram(bins = 20)
@@ -218,6 +242,7 @@ qqP <- tibble('observed' = sort(-log10(obsP$P)),
 ggplot(qqP, aes(x = expected, y = observed)) +
   geom_point() +
   geom_abline(intercept = 0, slope = 1)
+
 ```
 
 Based on these visualizations, do you think there are true positives in this data set?
@@ -270,10 +295,10 @@ What is an adjusted $\alpha$-level that will control pDFR at 0.05?
 max(qobj$pvalues[qobj$qvalues <= 0.05])
 ```
 
-Perform a randomization to estimate the number of expected false positives for this experiment. 1) You will want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) Perform your set of 100 tests in the same way that you did above. 3) Collect the associated p values using the `getP` function. 4) Keep these in a 1000 x 100 matrix with each column as one iteration. This process will take a few minutes to run. You may want to test the steps with a small number of iterations first.
+The code below shows a randomization that we can use to estimate the number of expected false positives for this experiment. 1) We want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) We performed our set of 100 tests in the same way that we did above. 3) We collected the associated p values using the `getP` function. 4) These were put into a 1000 x 100 matrix with each column as one iteration. 
 
-```{r randomization, cache=TRUE}
-# FIXME
+```{r randomization, cache=TRUE, eval=FALSE}
+
 set.seed(874628)
 niter <- 1000
 
@@ -286,9 +311,21 @@ for (kk in 1:niter) {
   fms <- lm(Ys ~ sample(Sex))
   allP[, kk] <- getP(fms)
 }
+
+saveRDS(allP, file="../data/Shuffle_Expression.rds")
+
 ```
 
-Visualize the P-values from one or a few of your iterations as you did above with a histogram and a q-q plot.
+Load this matrix we generated using the `readRDS` function (this is a new one for you that will read an R object in directly) and assign it to an object called `allP`.
+
+```{r}
+#FIXME
+allP <- readRDS(file="../data/Shuffle_Expression.rds")
+
+```
+
+
+Visualize the P-values from one or a few of these iterations as you did above with a histogram and a q-q plot.
 
 ```{r}
 # FIXME
@@ -386,43 +423,3 @@ quantile(minP, 0.05)
 ```
 
 
-## Planning experiments
-
-Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
-
-### Activity
-
-Use `cohen.ES()` to look up the effect size for a "small" effect for a *t*-test.
-
-```{r}
-# FIXME
-cohen.ES(test = "t", size = "small")
-```
-
-Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
-
-```{r}
-# FIXME
-pwr.t.test(d = 0.2, power = 0.80, type = "two.sample")
-```
-
-Repeat the test above but for a paired *t*-test.
-
-```{r}
-# FIXME
-pwr.t.test(d = 0.2, power = 0.80, type = "paired")
-```
-
-Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
-
-```{r}
-# FIXME
-pwr.r.test(r = 0.6, power = 0.8)
-```
-
-Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
-
-```{r}
-# FIXME
-pwr.r.test(r = 0.4, n = 15)
-```
