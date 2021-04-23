@@ -44,7 +44,7 @@ Pivot the data to wide:
 - Use `Specimen` is the ID
 - Take values from `Femur_length`
 - Take column names from `Measurement`
-- Use the `names_prefix =` option to prefix "Measurement_1" before the column name
+- Use the `names_prefix =` option to prefix "Measurement_" before the column name
 
 ```{r}
 ```
@@ -83,6 +83,7 @@ Would you be comfortable going forward with data collection given this value for
 
 > 
 
+
 ## Planning experiments
 
 Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
@@ -114,6 +115,7 @@ Calculate the power for a correlation test where you estimate the correlation co
 ```{r}
 ```
 
+
 ## RNAseq (gene expression) on males and females of the Glanville Fritillary
 
 Glanville Fritillary butterflies are a model organism for studying dispersal and metapopulation dynamics, because they live in isolated meadows.
@@ -128,25 +130,20 @@ Here, we load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.
 
 Note this method produces a list of `lm()` results. We have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. We will do this for this set of models and assign the p-values to an object, `obsP`. 
 
-Change `eval = FALSE` to `eval = TRUE` and run the chunk below. 
+Change `eval = FALSE` to `eval = TRUE` and run the chunk below. You might need to change the path to `Butterfly_Gene_Expression.csv`.
 
 ```{r eval=FALSE}
-
 getP <- function(fm) {
   sum.set <- summary(fm)
   p.set <- lapply(sum.set, function(x) x[['coefficients']][2, 4])
   return(unlist(p.set))
 }
 
-
-set.seed(273645)
-
 M <- read_csv("../data/Butterfly_Gene_Expression.csv")
 Ys <- as.matrix(M[, 3:ncol(M)])
 fm <- lm(Ys ~ Sex, data = M)
 
 obsP <- tibble('P' = getP(fm))
-
 ```
 
 Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
@@ -189,7 +186,6 @@ What is an adjusted $\alpha$-level that will control pDFR at 0.05?
 The code below shows a randomization that we can use to estimate the number of expected false positives for this experiment. 1) We want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) We performed our set of 100 tests in the same way that we did above. 3) We collected the associated p values using the `getP` function. 4) These were put into a 1000 x 100 matrix with each column as one iteration. 
 
 ```{r randomization, cache=TRUE, eval=FALSE}
-
 set.seed(874628)
 niter <- 1000
 
@@ -203,8 +199,8 @@ for (kk in 1:niter) {
   allP[, kk] <- getP(fms)
 }
 
+# Change path to where you want to save the file
 saveRDS(allP, file="../data/Shuffle_Expression.rds")
-
 ```
 
 Load this matrix we generated using the `readRDS` function (this is a new one for you that will read an R object in directly) and assign it to an object called `allP`.
