@@ -273,6 +273,8 @@ sum(fdr < 0.05)
 
 Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the `qvalue` package, which is available through Bioconductor (rather than CRAN). https://www.bioconductor.org/packages/release/bioc/html/qvalue.html
 
+**Note**: When you install from bioconductor, it will ask you if you want to update your packages, expecting a response at the command line. You can enter "y" or "n", but you need to enter something. Otherwise, R will appear to be frozen.
+
 ```{r}
 library(qvalue)
 qobj <- qvalue(obsP$P, fdr.level = 0.05, pi0.method = "smoother")
@@ -321,7 +323,6 @@ Load this matrix we generated using the `readRDS` function (this is a new one fo
 #FIXME
 allP <- readRDS(file="../data/Shuffle_Expression.rds")
 ```
-
 
 Visualize the P-values from one or a few of these iterations as you did above with a histogram and a q-q plot.
 

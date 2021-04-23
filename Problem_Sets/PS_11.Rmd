@@ -167,6 +167,8 @@ Repeat the procedure above, but now use the false discovery rate procedure of Be
 
 Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the `qvalue` package, which is available through Bioconductor (rather than CRAN). https://www.bioconductor.org/packages/release/bioc/html/qvalue.html
 
+**Note**: When you install from bioconductor, it will ask you if you want to update your packages, expecting a response at the command line. You can enter "y" or "n", but you need to enter something. Otherwise, R will appear to be frozen.
+
 ```{r}
 ```
 

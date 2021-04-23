@@ -242,7 +242,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Problem Set 11</h1>
 <h4 class="author">Your Name Here: Group X</h4>
-<h4 class="date">Last updated: 2021-04-22</h4>
+<h4 class="date">Last updated: 2021-04-23</h4>
 
 </div>
 
@@ -335,6 +335,7 @@ obsP &lt;- tibble(&#39;P&#39; = getP(fm))</code></pre>
 <p>Use R’s built-in <code>p.adjust()</code> function to adjust the P-values using the sequential Bonferroni correction (Holm procedure). You don’t have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a <code>tibble</code> with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.</p>
 <p>Repeat the procedure above, but now use the false discovery rate procedure of Benjamini and Hochberg.</p>
 <p>Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the <code>qvalue</code> package, which is available through Bioconductor (rather than CRAN). <a href="https://www.bioconductor.org/packages/release/bioc/html/qvalue.html" class="uri">https://www.bioconductor.org/packages/release/bioc/html/qvalue.html</a></p>
+<p><strong>Note</strong>: When you install from bioconductor, it will ask you if you want to update your packages, expecting a response at the command line. You can enter “y” or “n”, but you need to enter something. Otherwise, R will appear to be frozen.</p>
 <p>What is the value of <span class="math inline">\(\pi_0\)</span>? What does this value represent?</p>
 <blockquote>
 

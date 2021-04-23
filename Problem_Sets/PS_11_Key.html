@@ -242,7 +242,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Problem Set 11</h1>
 <h4 class="author">Your Name Here: Group X</h4>
-<h4 class="date">Last updated: 2021-04-22</h4>
+<h4 class="date">Last updated: 2021-04-23</h4>
 
 </div>
 
@@ -565,6 +565,7 @@ tibble(P = obsP$P,
 <pre class="r"><code>sum(fdr &lt; 0.05)</code></pre>
 <pre><code>## [1] 16</code></pre>
 <p>Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the <code>qvalue</code> package, which is available through Bioconductor (rather than CRAN). <a href="https://www.bioconductor.org/packages/release/bioc/html/qvalue.html" class="uri">https://www.bioconductor.org/packages/release/bioc/html/qvalue.html</a></p>
+<p><strong>Note</strong>: When you install from bioconductor, it will ask you if you want to update your packages, expecting a response at the command line. You can enter “y” or “n”, but you need to enter something. Otherwise, R will appear to be frozen.</p>
 <pre class="r"><code>library(qvalue)
 qobj &lt;- qvalue(obsP$P, fdr.level = 0.05, pi0.method = &quot;smoother&quot;)
 summary(qobj)</code></pre>
