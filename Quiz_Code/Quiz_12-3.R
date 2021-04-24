@@ -1,5 +1,6 @@
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 
 n <- 10
 mu1 <- 5
