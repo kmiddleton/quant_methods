@@ -22,6 +22,12 @@ library(knitr)
 theme_set(theme_cowplot())
 ```
 
+<!--
+Datasets
+  Milk.xlsx
+  mammals.xlsx
+-->
+
 
 ## Motivation: the curse of dimensionality
 

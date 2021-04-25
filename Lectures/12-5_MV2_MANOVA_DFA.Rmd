@@ -21,6 +21,10 @@ library(MASS)
 theme_set(theme_cowplot())
 ```
 
+<!--
+Datasets
+  Tibetan_Skulls.xlsx
+-->
 
 ## Hierarchy of GLMs
 

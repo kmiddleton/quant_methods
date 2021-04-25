@@ -159,6 +159,4 @@ ggscatmat(MM, columns = 2:4)
 
 ```
 
-
-
 ## References
