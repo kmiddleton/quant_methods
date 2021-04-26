@@ -34,6 +34,52 @@ knitr::opts_chunk$set(cache = TRUE)
 
 ## Non-independence
 
+![](https://i.imgur.com/2RWqKnY.jpg)
+
+
+
+```{r}
+library(ape)
+library(nlme)
+library(AICcmodavg)
+
+tree <- read.nexus("../data/Mammal_Limb.nex")
+str(tree)
+
+M <- read_excel("../data/Mammal_Limb.xlsx", na = "-9999") %>% 
+  mutate(NVMBat = factor(NVMBat, levels = c("Non-volant mammal", "Bat"))) %>% 
+  drop_na(humerus_length)
+
+M %>% count(NVMBat)
+
+# Check match
+tree$tip.label[!(tree$tip.label %in% M$gensp)]
+
+tree <- drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% M$gensp)])
+
+tree$tip.label[!(tree$tip.label %in% M$gensp)]
+M$gensp[!(M$gensp %in% tree$tip.label)]
+
+ggplot(M, aes(x = mass, y = humerus_length, color = NVMBat)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10()
+
+M <- M %>% 
+  mutate(mass = log10(mass),
+         humerus_length = log10(humerus_length))
+
+phycor <- corBrownian(1, tree, form = ~ gensp)
+
+fm1 <- gls(humerus_length ~ mass, data = M, correlation = phycor, method = "ML")
+fm2 <- gls(humerus_length ~ mass + NVMBat, data = M, correlation = phycor, method = "ML")
+fm3 <- gls(humerus_length ~ mass * NVMBat, data = M, correlation = phycor, method = "ML")
+
+AICc(fm1)
+AICc(fm2)
+AICc(fm3)
+
+```
 
 
 ## Return of the Sole (Logistic & PCA)
