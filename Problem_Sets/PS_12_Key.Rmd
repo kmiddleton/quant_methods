@@ -14,59 +14,158 @@ output:
 library(tidyverse)
 library(readxl)
 library(cowplot)
-library(ape)
-library(nlme)
-library(MCMCglmm)
 
-# This option turn on cacheing of chunks. This will dramatically
+theme_set(theme_cowplot())
+
+# This option turn on caching of chunks. This will dramatically
 # speed up knitting, because only chunks that have changed will
 # be recompiled.
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
-## General Framework for This Week's Problem Set
+<!--
+  Non-independence
+  Logistic
+  Randomization
+  Composite PCA
+  MANOVA/DFA
+-->
 
-This week we will approach hypothesis testing for several of the models we have fit previously with generalized linear models in a randomization framework. For each, you should:
 
-1. Fit the model to the observed data (feel free to copy your code from original problem set).
-1. Decide on a test statistic to use for the randomization.
-1. Perform the randomization:
-    1. Calculate the test statistic for the *observed* data
-    1. Randomly shuffle the observations
-    1. Calculate the test statistic for that group
-    1. Repeat thousands of times
-1. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
-1. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
+## Non-independence
 
-Part of the challenge this week will be figuring out how to implement these steps without step by step guidance, using the tools you've developed so far and the lecture slides  and previous problem sets as a guide.
+
+
+## Return of the Sole (Logistic & PCA)
+
+In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by different factors such as the salinity of the water. Here we will focus on the composition of the substrate.  
+
+### Activity
+
+Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
+
+```{r}
+# FIXME
+M <- read_excel("../data/Sole.xlsx")
+M <- M %>% mutate(season = factor(season),
+                  month = factor(month),
+                  area = factor(area),
+                  Solea_solea = factor(Solea_solea))
+M <- M %>% as.data.frame()
+str(M)
+```
+
+The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent their proportional concentrations in the substrate (they sum to 100). Calculate a composite score for "substrate". Use principal components analysis on these columns.
+
+```{r}
+# FIXME
+z <- prcomp(~ gravel + large_sand + med_fine_sand + mud,
+              data = M,
+              scale. = TRUE,
+              center = TRUE)
+```
+
+Use the `summary()` and `print()` methods to determine the percent of variance accounted for by each PC and the relative loadings of each variable.
+
+```{r}
+# FIXME
+summary(z)
+print(z)
+```
+
+What is your interpretation of the PCA?
+
+> PC 1 accounts for 62% of the variation, which is fairly high. Mud loads positively, whereas two kinds of sand load negatively. Gravel doesn't load at all really. So PC represents a mud vs. sand axis.
+
+Fit a logistic regression where presence of sole is predicted by the first PC from the PCA above. Refer to the lecture slides if you need to.
+
+```{r}
+# FIXME
+fm2 <- glm(Solea_solea ~ z$x[, 1], data = M, family = "binomial")
+```
+
+Try to interpret the output of the summary of the fitted model. What kind of substrate do sole appear to prefer?
+
+```{r}
+# FIXME
+summary(fm2)
+```
+
+> PC is basically as axis of sand with values in negative PC1 scores to mud in positive PC1 scores. Gravel doesn't load appreciably on PC1. Logistic regression shows that as PC1 score increases, sole are less likely to be present (negative coefficient estimate). So sole are less likely to be present as the substrate gets more muddy. They are more likely to be present as the substrate gets more sandy.
+
+The code below plots the outcome. Change eval=FALSE to eval=TRUE to run this chunk when knitting.
+
+```{r, eval=FALSE}
+# Plotting the outcome.
+# FIXME
+M$PC1 <- z$x[, 1]
+
+ggplot(M, aes(x = PC1,
+              y = as.numeric(Solea_solea) - 1)) +
+  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_smooth(method = "glm",
+              formula = y ~ x,
+              method.args = list(family = "binomial"),
+              se = FALSE, size = 2) +
+  geom_point(size = 3) +
+  labs(y = "Probability of Presence", x = "PC1") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
+  annotate("text", x = -3, y = -0.2, label = "Sandy") +
+  annotate("text", x = 3, y = -0.2, label = "Muddy")
+```
+
+
+## Randomization and Empirical P-values
+
+Randomization is an approach hypothesis testing that doesn't rely on the same set of assumption as the "original" test. The general procedure is:
+
+1. Fit the model to the observed data.
+2. Decide on a test statistic to use for the randomization (mean, difference of means, *t*, *F*, etc.).
+3. Perform the randomization:
+    - Calculate the test statistic for the *observed* data
+    - Randomly shuffle the observations
+    - Calculate the test statistic for that group
+    - Repeat thousands of times
+4. Plot a histogram of the resulting set of test statistics and add a line denoting your observed value
+5. Determine the proportion of random combinations resulting in a test statistic more extreme than the observed value ("empirical *P*")
 
 Remember to start with a small number of iterations (10 or 100) until you get the code working correctly. Then increase to 10,000 for a final analysis.
 
 
-## Stalk-eyed flies (PS 05)
+### Worked example: Stalk-eyed flies
 
-Compare the mean eye span on two food sources in stalk-eyed flies. This model is a good candidate for randomization because the variances are likely unequal.
+We will start with a worked example: compare the mean eye span in stalk-eyed flies raised on two food sources. This model is a good candidate for randomization because the variances are unequal (there is about 4x difference).
 
 ```{r flies1, message=FALSE}
+library(tictoc)
+
 # Read data
 stalk <- read_csv("../data/Stalkies.csv")
+
+# Check standard deviations
+stalk %>% 
+  group_by(food_source) %>% 
+  summarize(st_dev = sd(eye_span),
+            .groups = "drop")
 
 # Some thoughtful plotting
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
-  stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Food Source", y = "Eye Span")
 
 set.seed(8987324)
-nreps <- 1e4
+nreps <- 1e5
 t_stats <- numeric(nreps)
 t_stats[1] <- t.test(eye_span ~ food_source, data = stalk)$statistic
 
+tic() # Start timer
 for (ii in 2:nreps) {
   t_stats[ii] <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
 }
+toc() # Stop timer
 
 tibble(t_stats) %>%
   ggplot(aes(t_stats)) +
@@ -79,96 +178,76 @@ tibble(t_stats) %>%
 t.test(eye_span ~ food_source, data = stalk)
 ```
 
-10^5^ iterations took 124.7 seconds on a single processor. We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical P is 6e-10, so we expect the empirical P to be close to that scale.
+10^5^ iterations took ~60 seconds on a single processor. We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical *P* is 6e-10, so we expect the empirical *P* to be on the same scale.
 
 We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
 
-The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the combination of `foreach()` and `dopar()`, which handle the parallelization and collection of the results.
+The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the furrr package (https://furrr.futureverse.org/), which handle the parallelization and collection of the results.
+
+The following chunk will not run during knitting.
 
 ```{r flies2, eval=FALSE}
-library(parallel)
-library(foreach)
-library(doParallel)
+# Load packages
+library(furrr)
 
-t_obs <- t.test(eye_span ~ food_source, data = stalk)
+# Calculate observed t-statistic
+t_obs <- t.test(eye_span ~ food_source, data = stalk)$statistic
 
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- t_obs$statistic
+# Set up iterations
+nreps <- 1e5 - 1
 
 # Set up parallel processor
-n_cores <- 2
-cl <- makeCluster(n_cores)
-registerDoParallel(cl, cores = n_cores)
+# Use the number of cores minus one to reserve some processing power for system
+# processes.
+n_cores <- availableCores() - 1
+message("Using ", n_cores, " cores.")
 
-# Function to do the randomized t-test and return the t-value only.
-t_rand <- function() {
+# Setup parallelization
+plan(multisession, workers = n_cores)
+
+# Function to do the randomized t-test and return the t-statistic only.
+t_rand <- function(.x, stalk) { # the 1st parameter is the iterator .x
   rnd_t <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
   return(as.numeric(rnd_t))
 }
 
 # Parallel randomization execute t_rand(), and combine the output into t_stats.
-t_stats[2:nreps] <- foreach(i = 2:nreps, .combine = c) %dopar% t_rand()
+tic()
+rand_ts <- future_map_dbl(.x = 1:nreps,
+               .f = t_rand,
+               stalk = stalk,
+               .options = furrr_options(seed = TRUE))
+toc()
+
+# Stop cluster
+plan(sequential)
+
+# Combine observed and randomized
+t_stats <- c(t_obs, rand_ts)
 
 2 * mean(t_stats >= t_stats[1])
-
-# Close cluster
-stopImplicitCluster()
 ```
 
-The same number of iterations but using 2 processors takes 93 seconds.
+The same number of iterations but using 7 processors takes 16.9 seconds.
 
 ```{r}
 # Iterations per second, 1 processor
-(p1 <- 124.7 / nreps)
+(p1 <- 60.6 / nreps)
 
-# Iterations per second, 2 processors
-(p6 <- 93 / nreps)
+# Iterations per second, 7 processors
+(p7 <- 16.9 / nreps)
 
-p1 / p6
+p1 / p7
 ```
 
-We get a speed-up of about 1.34 times. There is some overhead in the parallelization, and there were other things going on on the computer, so we don't get double the speed.
+We get a speed-up of about 3.6 times. There is some overhead in the parallelization, passing data back and forth between the processes, so we don't get 7x the speed that we might expect.
 
-## Earwigs (PS 05)
 
-In PS 05, we studied the proportion of earwigs in a sample that have forceps and associated data on the population density of earwigs. Reanalyze these data.
+### Heart Transplant Survivorship (PS 08)
 
-```{r earwigs}
-EW <- read_csv("../data/Earwigs.csv")
+For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation, testing the same hypothesis as before.
 
-EW %>%
-  ggplot(aes(Density, Proportion_Forceps)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-
-fm <- lm(Proportion_Forceps ~ Density, data = EW)
-summary(fm)
-
-set.seed(28476)
-nreps <- 1e4
-t_stats <- numeric(nreps)
-t_stats[1] <- summary(fm)$coefficients[2, 3]
-
-for (ii in 2:nreps) {
-  fm_rnd <- lm(sample(Proportion_Forceps) ~ Density, data = EW)
-  t_stats[ii] <- summary(fm_rnd)$coefficients[2, 3]
-}
-
-tibble(t_stats) %>%
-  ggplot(aes(t_stats)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1], color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats >= t_stats[1])
-
-factorial(7)
-```
-
-## Heart Transplant Survivorship (PS 07)
-
-For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation.
+Refer to the key for PS 08 to refresh yourself with the question.
 
 ```{r heart_transplants}
 M <- read_excel("../data/Heart_Transplants.xlsx") %>%
@@ -204,585 +283,3 @@ tibble(F_stats) %>%
 mean(F_stats >= F_stats[1])
 ```
 
-## Bird abundance (PS 07)
-
-We looked at the abundance of bird species in high-altitude "islands" in South America using multiple regression. This is the first model in which we have multiple predictors. In this case, it is usual that you will want to randomize only the outcome variable and retain the associations between the predictors.
-
-There are four predictors, and you will have 5 randomization tests, though you will fit a single model with multiple predictors to obtain the test statistics for each:
-
-1. The overall multple regression (F-test)
-2. Area: "Island" size (thousands of square km)
-3. Elevation: Elevation (thousands of meters)
-4. Dist_to_Ecuador: Distance to Ecuador (km)
-5. Dist_to_Island: Distance to nearest island (km)
-
-You should do the randomization and collect the output test statistics using just one loop.
-
-```{r bird_abundance}
-M <- read_excel("../data/Birds.xlsx")
-fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
-         data = M)
-obs <- summary(fm)
-
-set.seed(2876)
-nreps <- 1e4
-
-t_stats <- matrix(NA, nrow = nreps, ncol = 5)
-colnames(t_stats) <- c(rownames(obs$coefficients)[2:5], "Fstat")
-t_stats[1, 1:4] <- obs$coefficients[2:5, 3]
-t_stats[1, 5] <- obs$fstatistic[1]
-
-for (ii in 2:nreps) {
-  fm_rand <- lm(sample(N_Species) ~ Dist_to_Island + Elevation +
-                  Area + Dist_to_Ecuador, data = M)
-  t_stats[ii, 1:4] <- summary(fm_rand)$coefficients[2:5, 3]
-  t_stats[ii, 5] <- summary(fm_rand)$fstatistic[1]
-  
-}
-
-# Dist_to_Island
-tibble(Dist_to_Island = t_stats[, "Dist_to_Island"]) %>%
-  ggplot(aes(Dist_to_Island)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Dist_to_Island"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Dist_to_Island"] >= t_stats[1, "Dist_to_Island"])
-
-# Elevation
-tibble(Elevation = t_stats[, "Elevation"]) %>%
-  ggplot(aes(Elevation)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Elevation"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Elevation"] >= t_stats[1, "Elevation"])
-
-# Area
-tibble(Area = t_stats[, "Area"]) %>%
-  ggplot(aes(Area)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Area"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Area"] >= t_stats[1, "Area"])
-
-# Dist_to_Ecuador
-tibble(Dist_to_Ecuador = t_stats[, "Dist_to_Ecuador"]) %>%
-  ggplot(aes(Dist_to_Ecuador)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Dist_to_Ecuador"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-2 * mean(t_stats[, "Dist_to_Ecuador"] <= t_stats[1, "Dist_to_Ecuador"])
-
-tibble(Fstat = t_stats[, "Fstat"]) %>%
-  ggplot(aes(Fstat)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = t_stats[1, "Fstat"],
-             color = "red") +
-  labs(x = "t statistics", y = "Count")
-
-mean(t_stats[, "Fstat"] >= t_stats[1, "Fstat"])
-```
-
-## Aspirin and cancer (PS 08)
-
-In PS 08, we analyzed whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin. Reanalyze these data using randomization of a generalized linear model. This is more challenging, because you have to decide what test statistic to use. Look at the summary of the "observed" model to try to decide what to use.
-
-```{r aspirin1}
-M <- read_csv("../data/Aspirin.csv") %>%
-  mutate_each("factor")
-fm <- glm(Cancer ~ Treatment, M, family = "binomial")
-
-# We will use the deviance first.
-
-set.seed(8736)
-nreps <- 1e3
-devs <- numeric(nreps)
-devs[1] <- fm$deviance
-
-system.time({
-  for (ii in 2:nreps) {
-    devs[ii] <- glm(sample(Cancer) ~ Treatment, M,
-                    family = "binomial")$deviance
-  }
-})
-
-tibble(devs) %>%
-  ggplot(aes(devs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = devs[1], color = "red") +
-  labs(x = "Deviance", y = "Count")
-
-mean(devs <= devs[1])
-```
-
-We can also use the Z-score for `TreatmentPlacebo`. This runs more slowly, because you have to generate the summary for each model.
-
-```{r}
-set.seed(8736)
-nreps <- 1e3
-Zs <- numeric(nreps)
-Zs[1] <- summary(fm)$coefficients[2, 3]
-
-system.time({
-  for (ii in 2:nreps) {
-    fm_rand <- glm(sample(Cancer) ~ Treatment, M,
-                    family = "binomial")
-    Zs[ii] <- summary(fm_rand)$coefficients[2, 3]
-  }
-})
-
-tibble(Zs) %>%
-  ggplot(aes(Zs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = Zs[1], color = "red") +
-  labs(x = "Z-score", y = "Count")
-
-mean(Zs <= Zs[1]) * 2
-```
-
-We can also do something similar with a standard $\chi^2$ test:
-
-```{r aspirin2}
-obs <- chisq.test(xtabs(~ Treatment + Cancer, M),
-                  correct = FALSE)
-
-set.seed(8736)
-nreps <- 1e3
-chisqs <- numeric(nreps)
-chisqs[1] <- obs$statistic
-
-system.time({
-  for (ii in 2:nreps) {
-    chisqs[ii] <- chisq.test(xtabs(~ sample(Treatment) + Cancer, M),
-                             correct = FALSE)$statistic
-  }
-})
-
-tibble(chisqs) %>%
-  ggplot(aes(chisqs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = chisqs[1], color = "red") +
-  labs(x = "Chi-squared Statistic", y = "Count")
-
-mean(chisqs >= chisqs[1])
-```
-
-## Correlation
-
-Use the bird abundance data above to test for a significant correlation between `Area` and `Elevation`. Again, you have to decide what test statistic to use.
-
-```{r correlation}
-M <- read_excel("../data/Birds.xlsx")
-
-set.seed(2876)
-nreps <- 1e4
-
-corrs <- numeric(length = nreps)
-corrs[1] <- cor(M$Area, M$Elevation)
-
-for (ii in 2:nreps) {
-  corrs[ii] <- cor(sample(M$Area), M$Elevation)
-}
-
-tibble(corrs) %>%
-  ggplot(aes(corrs)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = corrs[1], color = "red") +
-  labs(x = "Correlation", y = "Count")
-
-mean(corrs >= corrs[1])
-```
-
-
-## Sole
-
-In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by the salinity of the water. That data set has a great deal of additional information. In this question, we will explore the predictors of sole being found in the estuary.
-
-### Activity
-
-Load the sole data from the file `Sole.xlsx`. Several of the variables are categorical and should be converted into factors: season, month, area, and Solea_solea. Go ahead and do this now. As a final step, convert your object with the data into a `data.frame` with `as.data.frame()`.
-
-```{r}
-# FIXME
-M <- read_excel("../data/Sole.xlsx")
-M <- M %>% mutate(season = factor(season),
-                  month = factor(month),
-                  area = factor(area),
-                  Solea_solea = factor(Solea_solea))
-M <- M %>% as.data.frame()
-str(M)
-```
-
-Season and area are going to be of particular interest in these data. Check the number of observations (i.e., count the rows) for each combination of season and area. Ensure that there are observations for all combinations.
-
-```{r}
-# FIXME
-M %>% group_by(season, area) %>% tally()
-```
-
-If all goes well, you should find 6-12 observations for each season/area combination. That isn't really a lot, but probably enough for this example. Let's determine if there is a seasonality in the appearance of sole in the estuary.
-
-Fit a generalized linear model where the presence of sole is modeled by the additive effects of season and area. This formula will look much like an `lm()` model, except that it will call `glm()` and include `family "binomial"` to indicate the R should use the logit link function.
-
-```{r}
-# FIXME
-fm <- glm(Solea_solea ~ season + area, data = M,
-          family = "binomial")
-```
-
-Generate an ANOVA table with the `Anova()` function using type III sums of squares for your fitted model. This process is similar to what you would use for a regular linear model.
-
-```{r}
-# FIXME
-Anova(fm, type = "III")
-```
-
-Which of season, area, or both are good predictors of the presence of sole? What is your interpretation of these results? Which of the two is more variable?
-
-> Only area is a good predictor (P = 0.0001).
-
-Use the `logistic.display()` function from the `epiDisplay` package to generate the odds ratio table for the model. You will likely have to install the package.
-
-```{r}
-# FIXME
-logistic.display(fm)
-```
-
-See if you can make sense of the odds ratios in the context of the ANOVA table. Try to explain what it tells you.
-
-> Adjusted odds ratio for season isn't significant (i.e., after setting area to 0), with a CI that crosses 1. Each area is compared to area 1, and all are significantly different from one another. It seems reasonable to conclude that there is considerable variation in the presence/absence of sole among the four areas. This is actullay bad, because area to area variation is higher than seasonal variation. There appears to be substantial geographic heterogeneity in sole presence.
-
-
-## Testing a new drug
-
-We will use data on the effects of a drug on fever, blood pressure, and pain. There are two treatments here: the drug, and a placebo as a control. We want to ask if the drug affects fever, blood pressure, or pain and conversely whether we can predict drug treatment from the change in symptoms.
-
-### Activity
-
-First read in the data (`Drug_test.xlsx`) and make `Treatment` a factor. You will need to make "Placebo" as the base level of the factor.
-
-```{r}
-M <- read_excel("../data/Drug_test.xlsx") %>%
-  mutate(Treatment = factor(Treatment),
-         Treatment = fct_relevel(Treatment, "Placebo"))
-str(M)
-```
-
-Use `ggscatmat()` to visualize the relationships between our predictors: `Fever`, `BP`, and `Pain`. Color your points by treatment.
-
-```{r}
-ggscatmat(M, 1:3, color = "Treatment")
-```
-
-Are there any concerning patterns in the data?
-
-> No, looks fine.
-
-Fit a generalized linear model using `glm()`, predicting `Treatment` from `Fever`, `BP`, and `Pain`. Specify `family` as binomial to perform a logistic regression.
-
-Use 1) `summary()`, 2) `logisitic.display()` from the `epiDisplay` package, and 3) `Anova()`, specifying type III sums of squares to look at the results. What can you conclude?
-
-> Only fever is a good predictor of whether a person received the drug vs. placebo. The adjusted odds ratio of 0.23 (0.09 - 0.63) suggests that those with lower levels of fever were more likely to have received the drug. You can observe this in the scatterplot matrix in the upper left panel.
-
-```{r}
-# FIXME
-fm <- glm(Treatment ~ Fever + BP + Pain, data = M,
-          family = "binomial")
-
-summary(fm)
-logistic.display(fm)
-Anova(fm, type = "III")
-```
-
-########################################################
-
-Packages that you will need for this problem set that you might not have installed yet:
-
-- `ape`
-- `MCMCglmm`
-
-Go ahead and install them now. Also load the `nlme` package, which has the `gls()` function.
-
-
-
-## Indian meal moth
-
-For this activity, we will use a dataset measuring the amount of phenoloxidase (PO) produced by indian meal moth caterpillars in full-sibling families. 
-
-### Activity
-
-First we will load the `MCMCglmm` library and get the moth data called `PlodiaPO`.
-
-```{r}
-library(MCMCglmm)
-data(PlodiaPO)
-```
-
-Examine the data. Look at the first few rows and use `unique()` to see the list of families in this dataset. Plot a histogram of the PO values and calculate the overall mean value.
-
-
-```{r}
-head(PlodiaPO)
-unique(PlodiaPO$FSfamily)
-
-ggplot(PlodiaPO, aes(x = PO)) +
-  geom_histogram()
-
-mean(PlodiaPO$PO)
-```
-
-Now we will fit the MCMCglmm model with family as a random effect.
-
-```{r}
-fm <- MCMCglmm(PO ~ 1,
-               random = ~ FSfamily,
-               data = PlodiaPO,
-               verbose = TRUE)
-```
-
-Refer to the lecture slides for the next section. Plot the fixed effects and calculate the median for the estimate of the intercept. Compare this value to the mean value you calculated above. 
-
-```{r}
-plot(fm$Sol)
-
-mean(PlodiaPO$PO)
-median(fm$Sol)
-```
-
-Now plot the random effects and calculate heritability for all the MCMC samples. Because we have fit family here instead of using an animal model like in lecture, you should multiply your estimate by 2. This is because full-sib families share 50% of their genes on average. Plot the resulting distribution of heritability estimates. Estimate the median value and the standard error. 
-
-```{r}
-plot(fm$VCV)
-
-h2 <- 2 * fm$VCV[, "FSfamily"]/(fm$VCV[, "FSfamily"] + fm$VCV[, "units"])
-
-plot(h2)
-
-median(h2)
-sd(h2)
-```
-
-## Primate life history
-
-We are going to work with two files, one containing a tree of (extant) primates (226 tips; `Primate_Masses_Tree.nex`) and another containing data of primate life history (`Primate_Masses.xlsx`). We will use these data to explore phylogenetic comparative methods.
-
-### Activity
-
-Load the `Primate_Masses.xlsx` file and explore the contents. You will find columns:
-
-- `Order`: Traditional Linnean order
-- `Family`: Traditional Linnean family
-- `Binomial`: Genus species binomial. *This column matches the tree tip labels.*
-- `AdultBodyMass_g`: Body mass in grams
-- `GestationLen_d`: Gestation length in days
-- `HomeRange_km2`: Home range area in square kilometers
-- `MaxLongevity_m`: Maximum longevity in months
-- `SocialGroupSize`: Mean social group size
-
-As a final step, be sure to convert the object into a `data.frame` from the `tibble` that `read_excel()` produces by default.
-
-```{r}
-# FIXME
-M <- read_excel("../data/Primate_Masses.xlsx") %>% as.data.frame()
-```
-
-Load the tree from the file `Primate_Masses_Tree.nex` using the function `read.nexus()` which is in the `ape` package.
-
-Give it is useful name like `tree`. Plot the tree using the `plot()` method for `phylo` objects (which is what your tree will be). In the `plot()` call, include you can make the tip labels smaller with `cex = 0.8`. We expanded the figure size in the chunk header to keep the tips from overlapping. It will look like a mess in the RStudio window, but will look OK when knitted.
-
-```{r, fig.height=30, fig.width=10}
-# FIXME
-tree <- read.nexus("../data/Primate_Masses_Tree.nex")
-plot(tree, cex = 0.8)
-```
-
-Any time you have comparative data and a tree, you should do a lot of tests to make sure that the tree labels match the data column that codes for them. 
-Some functions will do these checks for you. However, it's important to do these checks yourself, just to be sure. They are absolutely necessary when you are using phylogenetically independent contrasts or another method that makes assumptions about a match between tips and data without an explicit check. Using `gls()` for PGLS will do this also, albeit with a warning message.
-
-Start by looking at both the `Binomial` column of your data frame and the tip labels of the tree (e.g., `tree$tip.label`).
-
-```{r}
-# FIXME
-M$Binomial
-tree$tip.label
-```
-
-Let's figure out what tree tips are not represented in the data file (a lot probably) and what data are not represented in the tree (hopefully only a few). Let's start by looking at the species that are present in both the data and the tree. We use the intersection of the `Binomial` column and the tip labels (the function `intersect()`). Change `eval` to true in the following chunk.
-
-```{r eval=TRUE}
-# FIXME
-intersect(tree$tip.label, M$Binomial)
-```
-
-How many species are present in both? How many rows of data are there? How many tips or taxa need to be dropped in total (we don't know yet which are tips are which are taxa)?
-
-> 83 are present in both. There are 91 data observations, so 8 must not match up.
-
-The first step in the process is to keep only the tips of the tree where tips are present in the data. The `setdiff()` function returns a vector of the differences between two sets. If we use the same syntax as above but with `setdiff` rather than `intersect`, we'll get the list of tips that need to be dropped. Create that variable and call it something memorable like `tips_to_drop`. There should be 143 tips in the list.
-
-```{r}
-tips_to_drop <- setdiff(tree$tip.label, M$Binomial)
-length(tips_to_drop)
-```
-
-Now we can actually drop the tips from the tree. The `ape` package has a function `drop.tip()` which does just this. Create a new tree (e.g., `tree_pruned`) where all the orphan tips are dropped. Look at the help for `drop.tip()` for the syntax. Then plot your tree to make sure it still looks OK. We we use this tree for the rest of this exercise.
-
-```{r, fig.height=15, fig.width=10}
-# FIXME
-tree_pruned <- drop.tip(tree, tips_to_drop)
-plot(tree_pruned)
-```
-
-We should probably also remove any rows from the data that are not present in the tree. This isn't strictly necessary in most cases, but it's good practice. We can use `setdiff()` again, but this time reverse the order: `setdiff(M$Binomial, tree_pruned$tip.label)`. Do this, and save to a new variable `rows_to_drop`. You should find 8 rows that need to be dropped from the data frame.
-
-```{r}
-# FIXME
-rows_to_drop <- setdiff(M$Binomial, tree_pruned$tip.label)
-length(rows_to_drop)
-```
-
- Drop the rows from the data that are not in the tree. The best (though least clear) way to do this is with a notation like `M[!(M$Binomial %in% rows_to_drop), ]`. The `!` negates the entire parenthetical that follows. Inside parentheses, the function `%in%` returns true for all the rows in `M$Binomial` that match any items in `rows_to_drop`. So by negating this set, we get all the rows that are *not* in `rows_to_drop`.
-
-Assign a new variable the data frame resulting from dropping all rows not in the tree file. Check the number of rows. You should find 83.
-
-```{r}
-# FIXME
-M_pruned <- M[!(M$Binomial %in% rows_to_drop), ]
-nrow(M_pruned)
-```
-
-The final thing to do is to assign `Binomial` to the row names (`row.names()`) of the data.frame.
-
-```{r}
-# FIXME
-row.names(M_pruned) <- M_pruned$Binomial
-```
-
-We have finally arrived at the point of being able to do something with these data. As you may have realized, working with comparative data is much more involved in terms of processing than working with regular data.
-
-For the rest of this question, we will be exploring the relationship between body mass and maximum longevity. Make a scatterplot of the raw data for maximum longevity vs. body mass.
-
-```{r}
-# FIXME
-ggplot(M_pruned, aes(x = AdultBodyMass_g, y = MaxLongevity_m)) +
-  geom_point()
-```
-
-Assess the bivariate relationship and transform either or both of the variables if they require it.
-
-```{r}
-# FIXME
-M_pruned$log_Mass <- log10(M_pruned$AdultBodyMass_g)
-M_pruned$log_Longevity <- log10(M_pruned$MaxLongevity_m)
-ggplot(M_pruned, aes(x = log_Mass, y = log_Longevity, color = Family)) +
-  geom_point()
-```
-
-> We can log10 transform both variables. It's probably adequate to only log mass, but it looks a little better with both transformed.
-
-We're ready to perform PGLS. Fit a PGLS using `gls()` regressing longevity on mass. Use a Brownian motion correlation structure. Follow the lecture slides as an example. Save this model to an R object. Print the summary of the `gls` object that you just made.
-
-```{r}
-# FIXME
-fm1 <- gls(log_Longevity ~ log_Mass, data = M_pruned,
-           correlation = corBrownian(phy = tree_pruned),
-           method = "ML")
-summary(fm1)
-```
-
-e. What is the linear equation for the phylogenetic regression of longevity on body mass?
-
-> log Longevity = 2.07 + 0.11 * log Mass. 
-
-Fit a second model where `Family` is used in addition to mass. Use an additive model and Brownian motion model of trait evolution. Use the `anova()` method to generate an ANOVA table for the model fit.
-
-```{r}
-fm2 <- gls(log_Longevity ~ log_Mass + Family, data = M_pruned,
-           correlation = corBrownian(phy = tree_pruned),
-           method = "ML")
-summary(fm2)
-anova(fm2)
-```
-
-Considering the ANOVA table, does the relationship between longevity and mass differ by family? Briefly explain.
-
-> No. The *P*-value for family is 0.999, so there is no difference in the relationship based on family. The intercepts are all equal to one another.
-
-Extract (`AIC()`) and compare the AICs for the two models you just fit. Interpret the difference in AIC values.
-
-```{r}
-AIC(fm1, fm2)
-```
-
-> The difference is 25 AIC units, with the simpler model *much* preferred.
-
-Feel free to explore other variables in this data set.
-
-
-## Aspirin and cancer
-
-The file `Aspirin.csv` contains data on the frequency of cancer in 39,876 women taking or not taking low-dose aspirin.^[Cook, N.R., I. Lee, J.M. Gaziano, D. Gordon, P.M. Ridker, J.E. Manson, C.H. Hennekens, and J.E. Buring. 2005. Low-dose aspirin in the primary prevention of cancer. _Journal of the American Medical Association_ 294: 47-55.]
-
-The authors were interested in determining whether the odds of cancer differed in women, depending on whether they regularly took a low dose of aspirin.
-
-### Activity
-
-Read in the data, and convert all the variables to factors. Look at the help for `mutate_each()` for a shortcut.
-
-```{r message = FALSE}
-M <- read_csv("../data/Aspirin.csv") %>%
-  mutate_each("factor")
-str(M)
-```
-
-Tally up the number of obvervations in each group.
-
-```{r}
-M %>% group_by(Treatment, Cancer) %>% tally()
-```
-
-Another way to look at the same information is using a cross tabulation, also called a contingency table. The R function `xtabs()` takes a one sided formula and returns the count in each group. Your code will look something like `xtabs(~ Treatment + Cancer, M)`.
-
-```{r}
-#FIXME
-xtabs(~ Treatment + Cancer, M)
-```
-
-The usual way to analyze data consisting of counts is to use a $\chi^2$ test. In R, `chisq.test()` is the function that carries out this test. One of the nice things about `chisq.test()` is that you can pass it the object returned by `xtabs()`.
-
-Run a $\chi^2$ test on the cross tabulation of the aspirin data. Use the `correct = FALSE` argument to *not* use Yates's correction.
-
-```{r}
-chisq.test(xtabs(~ Treatment + Cancer, M),
-           correct = FALSE)
-```
-
-What is your interpretation of the $\chi^2$ test?
-
-> P = 0.82, so there is no association between treatment and cancer.
-
-Because the outcome variable, `Cancer`, is binomially distributed, we could also use a logistic regression to analyze these data.
-
-Fit a logistic regression where presence of cancer is predicted by treatment. Save the result to an object.
-
-```{r}
-fm <- glm(Cancer ~ Treatment, M, family = "binomial")
-```
-
-Analyze the model you fit using ANOVA with type III sums of squares and using `logistic.display()`.
-
-```{r}
-Anova(fm, type = "III")
-logistic.display(fm)
-```
-
-From these results, what can you conclude about a $\chi^2$ test and logistic regression in this case?
-
-> They are equivalent in this situation.
