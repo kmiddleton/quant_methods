@@ -24,65 +24,13 @@ knitr::opts_chunk$set(cache = TRUE)
 ```
 
 <!--
-  Non-independence
-  Logistic
-  Randomization
-  Composite PCA
-  MANOVA/DFA
+Datasets
+  Sole.xlsx
+  Stalkies.csv
+  Heart_Transplants.xlsx
 -->
 
-
-## Non-independence
-
-![](https://i.imgur.com/2RWqKnY.jpg)
-
-
-
-```{r}
-library(ape)
-library(nlme)
-library(AICcmodavg)
-
-tree <- read.nexus("../data/Mammal_Limb.nex")
-str(tree)
-
-M <- read_excel("../data/Mammal_Limb.xlsx", na = "-9999") %>% 
-  mutate(NVMBat = factor(NVMBat, levels = c("Non-volant mammal", "Bat"))) %>% 
-  drop_na(humerus_length)
-
-M %>% count(NVMBat)
-
-# Check match
-tree$tip.label[!(tree$tip.label %in% M$gensp)]
-
-tree <- drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% M$gensp)])
-
-tree$tip.label[!(tree$tip.label %in% M$gensp)]
-M$gensp[!(M$gensp %in% tree$tip.label)]
-
-ggplot(M, aes(x = mass, y = humerus_length, color = NVMBat)) +
-  geom_point() +
-  scale_x_log10() +
-  scale_y_log10()
-
-M <- M %>% 
-  mutate(mass = log10(mass),
-         humerus_length = log10(humerus_length))
-
-phycor <- corBrownian(1, tree, form = ~ gensp)
-
-fm1 <- gls(humerus_length ~ mass, data = M, correlation = phycor, method = "ML")
-fm2 <- gls(humerus_length ~ mass + NVMBat, data = M, correlation = phycor, method = "ML")
-fm3 <- gls(humerus_length ~ mass * NVMBat, data = M, correlation = phycor, method = "ML")
-
-AICc(fm1)
-AICc(fm2)
-AICc(fm3)
-
-```
-
-
-## Return of the Sole (Logistic & PCA)
+## Return of the Sole
 
 In lecture, we looked at presence/absence data for the common sole ([*Solea solea*](https://en.wikipedia.org/wiki/Common_sole)) predicted by different factors such as the salinity of the water. Here we will focus on the composition of the substrate.  
 
@@ -182,11 +130,14 @@ Remember to start with a small number of iterations (10 or 100) until you get th
 
 We will start with a worked example: compare the mean eye span in stalk-eyed flies raised on two food sources. This model is a good candidate for randomization because the variances are unequal (there is about 4x difference).
 
-```{r flies1, message=FALSE}
+Study the code below, and make sure that you understand what each line does.
+
+```{r, flies1, message=FALSE}
+# Use the tictoc package to time how long the code takes.
 library(tictoc)
 
 # Read data
-stalk <- read_csv("../data/Stalkies.csv")
+stalk <- read_csv("../data/Stalkies.csv", col_types = "cd")
 
 # Check standard deviations
 stalk %>% 
@@ -232,7 +183,7 @@ The code below implements a simple parallel loop using some straightforward R pa
 
 The following chunk will not run during knitting.
 
-```{r flies2, eval=FALSE}
+```{r, flies2, eval=FALSE}
 # Load packages
 library(furrr)
 
@@ -243,8 +194,8 @@ t_obs <- t.test(eye_span ~ food_source, data = stalk)$statistic
 nreps <- 1e5 - 1
 
 # Set up parallel processor
-# Use the number of cores minus one to reserve some processing power for system
-# processes.
+# Use the number of cores minus one to reserve some processing power for
+# system processes.
 n_cores <- availableCores() - 1
 message("Using ", n_cores, " cores.")
 
@@ -253,11 +204,12 @@ plan(multisession, workers = n_cores)
 
 # Function to do the randomized t-test and return the t-statistic only.
 t_rand <- function(.x, stalk) { # the 1st parameter is the iterator .x
-  rnd_t <- t.test(sample(eye_span) ~ food_source, data = stalk)$statistic
-  return(as.numeric(rnd_t))
+  rnd_t <- t.test(sample(eye_span) ~ food_source, data = stalk)
+  return(as.numeric(rnd_t$statistic))
 }
 
-# Parallel randomization execute t_rand(), and combine the output into t_stats.
+# Parallel randomization execute t_rand(), and combine the output into
+# t_stats (numeric vector).
 tic()
 rand_ts <- future_map_dbl(.x = 1:nreps,
                .f = t_rand,
@@ -293,9 +245,10 @@ We get a speed-up of about 3.6 times. There is some overhead in the parallelizat
 
 For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation, testing the same hypothesis as before.
 
-Refer to the key for PS 08 to refresh yourself with the question.
+Refer to the key for PS 08 to refresh yourself with the question and adapt the code from the example above (either sequential or parallel). Otherwise we will leave this exercise undirected.
 
-```{r heart_transplants}
+```{r, heart_transplants}
+# FIXME
 M <- read_excel("../data/Heart_Transplants.xlsx") %>%
   mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
 
