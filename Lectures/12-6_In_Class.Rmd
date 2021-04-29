@@ -1,0 +1,77 @@
+---
+title: "In class discussion"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King and Kevin Middleton'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(readxl)
+library(lme4)
+```
+
+## Non-independence
+
+> With regard to non-independence, I kind of feel like sometimes that could become a blurry line, and am wondering if there are general guidelines for some blurry spaces. For example, in the quiz, you mentioned that there were 200 wild caught frogs, each sampled once. But for a moment in my head, I thought "well, some of them could be related to each other." But we also have no way of knowing which are and are not related to each other, so it would be near impossible (unless you did genetic sampling) to include this is your model. Is that something that just ends up in random "noise?"  Is it only non-independent if you know you are what those differences are (like when you know you have sampled from two different populations)?
+
+## Direction of the inequality in randomization
+
+> In the 12-3 Lecture, I was trying to understand why the inequality sign should be one way or another. In the lion noses case, should it be ">=" because the observed t-stat was greater than zero?  And then in the quiz for 12-3, should we be thinking about "<=" because the observed t-stat was less than zero?  I also wanted to clarify, do we use the "2*" in 2*mean(t_stats >= t_stats[1])  because the t-distribution is, itself, 2-tailed, but we are asking a one-tailed question?
+
+
+## Stream temperature data
+
+```{r}
+Temp_Data <- read_excel("../data/Streams.xlsx", sheet = "TemperatureData")
+Site_Data <- read_excel("../data/Streams.xlsx", sheet = "SiteData")
+M <- left_join(Temp_Data, Site_Data, by = "Site") %>% 
+  mutate(Site = factor(Site),
+         Date = factor(Date),
+         Stream_Name = factor(Stream_Name),
+         Day = as.numeric(Date))
+```
+
+
+## Nesting as an interaction
+
+```{r}
+fm1 <- lmer(WaterTemp ~ AirTempPredicted + Day +
+              (1 | Stream_Name/Site),
+            data = M, REML = FALSE)
+
+fm2 <- lmer(WaterTemp ~ AirTempPredicted + Day +
+              (1 | Stream_Name) +
+              (1 | Stream_Name:Site),
+            data = M, REML = FALSE)
+```
+
+
+## Nesting as an interaction
+
+```{r}
+summary(fm1)
+```
+
+## Nesting as an interaction
+
+```{r}
+summary(fm2)
+```
+
+
+## Nesting as an interaction
+
+```{r}
+fixef(fm1)
+fixef(fm2)
+
+ranef(fm1)$`Site:Stream_Name`[1:10, 1]
+ranef(fm2)$`Stream_Name:Site`[1:10, 1]
+```
