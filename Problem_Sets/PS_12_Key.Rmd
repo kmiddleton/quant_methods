@@ -175,7 +175,7 @@ tibble(t_stats) %>%
 t.test(eye_span ~ food_source, data = stalk)
 ```
 
-10^5^ iterations took ~60 seconds on a single processor. We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical *P* is 6e-10, so we expect the empirical *P* to be on the same scale.
+10^5^ iterations took ~84 seconds on a single processor (on this computer). We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical *P* is 6e-10, so we expect the empirical *P* to be on the same scale.
 
 We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
 
@@ -226,11 +226,11 @@ t_stats <- c(t_obs, rand_ts)
 2 * mean(t_stats >= t_stats[1])
 ```
 
-The same number of iterations but using 7 processors takes 16.9 seconds.
+The same number of iterations but using 7 processors takes 16.9 seconds (on this computer).
 
 ```{r}
 # Iterations per second, 1 processor
-(p1 <- 60.6 / nreps)
+(p1 <- 80 / nreps)
 
 # Iterations per second, 7 processors
 (p7 <- 16.9 / nreps)
@@ -238,7 +238,7 @@ The same number of iterations but using 7 processors takes 16.9 seconds.
 p1 / p7
 ```
 
-We get a speed-up of about 3.6 times. There is some overhead in the parallelization, passing data back and forth between the processes, so we don't get 7x the speed that we might expect.
+We get a speed-up of about 4.7 times. There is some overhead in the parallelization, passing data back and forth between the processes, so we don't get 7x the speed that we might expect.
 
 
 ### Heart Transplant Survivorship (PS 08)
