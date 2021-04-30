@@ -1,7 +1,7 @@
 ---
-title: "In class discussion"
+title: "Unit 12: In Class Discussion"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King and Kevin Middleton'
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
   ioslides_presentation:
     fig_width: 8
@@ -17,22 +17,23 @@ library(readxl)
 library(lme4)
 ```
 
+
 ## Course Evaluations
 
-  - Instructor specific (so there are 2 - sorry!)
-  - Already have an email
-  - Open until May 14
-  - Can't find email? 
-    - go to [evaluations.missouri.edu](https://evaluation.missouri.edu/)
+- Instructor specific (so there are 2 - sorry!)
+- Already have an email
+- Open until May 14
+- Can't find email? 
+    - Go to [evaluations.missouri.edu](https://evaluation.missouri.edu/)
+
 
 ## Progress Check 3
 
-  - Posted early next week
-  - Due Friday, May 14th by end of day (11:59pm)
-  - Review and Q & A: Friday May 7 1-2:50
+- Posted early next week
+- Due Friday, May 14th by end of day (11:59pm)
+- Review and Q & A: Friday May 7 1-2:50
     - Optional
     - Recorded
-
 
 
 ## Non-independence
@@ -44,12 +45,12 @@ library(lme4)
 
 > In the 12-3 Lecture, I was trying to understand why the inequality sign should be one way or another. In the lion noses case, should it be ">=" because the observed t-stat was greater than zero?  And then in the quiz for 12-3, should we be thinking about "<=" because the observed t-stat was less than zero?  I also wanted to clarify, do we use the "2*" in 2*mean(t_stats >= t_stats[1])  because the t-distribution is, itself, 2-tailed, but we are asking a one-tailed question?
 
-> How do we calculate the empirical P-value given the histogram?"
+> How do we calculate the empirical P-value given the histogram?
 
 
 ## Interpretation of PCs
 
->"Can you go over on the interpretation of principle components, and how to compare the variables?
+> Can you go over on the interpretation of principle components, and how to compare the variables?
 
 
 ## Unit 12 quizzes
@@ -101,7 +102,12 @@ summary(fm2)
 ```{r}
 fixef(fm1)
 fixef(fm2)
+```
 
+
+## Nesting as an interaction
+
+```{r}
 ranef(fm1)$`Site:Stream_Name`[1:10, 1]
 ranef(fm2)$`Stream_Name:Site`[1:10, 1]
 ```
