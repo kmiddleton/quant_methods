@@ -17,6 +17,23 @@ library(readxl)
 library(lme4)
 ```
 
+## Course Evaluations
+
+  - Instructor specific (so there are 2 - sorry!)
+  - Already have an email
+  - Open until May 14
+  - Can't find email? 
+    - go to [evaluations.missouri.edu](https://evaluation.missouri.edu/)
+
+## Progress Check 3
+
+  - Posted early next week
+  - Due Friday, May 14th by end of day (11:59pm)
+  - Review and Q & A: Friday May 7 1-2:50
+    - Optional
+    - Recorded
+
+
 
 ## Non-independence
 
