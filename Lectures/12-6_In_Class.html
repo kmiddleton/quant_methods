@@ -159,7 +159,7 @@ slide:not(.current) .plotly.html-widget{
         
   </style>
 
-  <link rel="stylesheet" href="data:text/css,%23bluefont%20%7Bcolor%3A%20blue%3B%7D%2Ereferences%20%7Bfont%2Dsize%3A%2050%25%3Bpadding%2Dleft%3A%2022px%20%3Btext%2Dindent%3A%20%2D22px%20%3B%7D%2Ecenter%20%7Bdisplay%3A%20block%3Bmargin%2Dleft%3A%20auto%3Bmargin%2Dright%3A%20auto%3B%7Dblockquote%20%7Bbackground%3A%20%23f9f9f9%3Bborder%2Dleft%3A%2010px%20solid%20%23ccc%3Bmargin%3A%201%2E5em%2010px%3Bpadding%3A%200%2E5em%2010px%3Bquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%7Dp%20ul%20ol%20%7Btext%2Dalign%3A%20left%3Bfont%2Dsize%3A%2080%25%3B%7Dblockquote%20p%20%7Bfont%2Dsize%3A%2080%25%3Bdisplay%3A%20inline%3Btext%2Dalign%3A%20left%3B%7D%3Cstyle%3E%2Ecol2%20%7B%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%2Dmoz%2Dcolumns%3A%202%20300px%3B%20columns%3A%202%20300px%3B%20%7D%2Ecol3%20%7B%2Dwebkit%2Dcolumns%3A%203%20100px%3B%2Dmoz%2Dcolumns%3A%203%20100px%3Bcolumns%3A%203%20100px%3B%7D%3C%2Fstyle%3E" type="text/css" />
+  <link rel="stylesheet" href="data:text/css,%23bluefont%20%7B%0Acolor%3A%20blue%3B%0A%7D%0A%2Ereferences%20%7B%0Afont%2Dsize%3A%2050%25%3B%0Apadding%2Dleft%3A%2022px%20%3B%0Atext%2Dindent%3A%20%2D22px%20%3B%0A%7D%0A%2Ecenter%20%7B%0Adisplay%3A%20block%3B%0Amargin%2Dleft%3A%20auto%3B%0Amargin%2Dright%3A%20auto%3B%0A%7D%0Ablockquote%20%7B%0Abackground%3A%20%23f9f9f9%3B%0Aborder%2Dleft%3A%2010px%20solid%20%23ccc%3B%0Amargin%3A%201%2E5em%2010px%3B%0Apadding%3A%200%2E5em%2010px%3B%0Aquotes%3A%20%22%5C201C%22%22%5C201D%22%22%5C2018%22%22%5C2019%22%3B%0A%7D%0Ap%20ul%20ol%20%7B%0Atext%2Dalign%3A%20left%3B%0Afont%2Dsize%3A%2080%25%3B%0A%7D%0Ablockquote%20p%20%7B%0Afont%2Dsize%3A%2080%25%3B%0Adisplay%3A%20inline%3B%0Atext%2Dalign%3A%20left%3B%0A%7D%0A%3Cstyle%3E%0A%2Ecol2%20%7B%0A%2Dwebkit%2Dcolumns%3A%202%20300px%3B%20%0A%2Dmoz%2Dcolumns%3A%202%20300px%3B%20%0Acolumns%3A%202%20300px%3B%20%0A%7D%0A%2Ecol3%20%7B%0A%2Dwebkit%2Dcolumns%3A%203%20100px%3B%0A%2Dmoz%2Dcolumns%3A%203%20100px%3B%0Acolumns%3A%203%20100px%3B%0A%7D%0A%3C%2Fstyle%3E%0A" type="text/css" />
 
 </head>
 
@@ -188,6 +188,18 @@ slide:not(.current) .plotly.html-widget{
 <p>In the 12-3 Lecture, I was trying to understand why the inequality sign should be one way or another. In the lion noses case, should it be &ldquo;&gt;=&rdquo; because the observed t-stat was greater than zero? And then in the quiz for 12-3, should we be thinking about &ldquo;&lt;=&rdquo; because the observed t-stat was less than zero? I also wanted to clarify, do we use the &quot;2<em>&quot; in 2</em>mean(t_stats &gt;= t_stats[1]) because the t-distribution is, itself, 2-tailed, but we are asking a one-tailed question?</p>
 </blockquote>
 
+<blockquote>
+<p>How do we calculate the empirical P-value given the histogram?&quot;</p>
+</blockquote>
+
+</article></slide><slide class=""><hgroup><h2>Interpretation of PCs</h2></hgroup><article  id="interpretation-of-pcs">
+
+<blockquote>
+<p>&quot;Can you go over on the interpretation of principle components, and how to compare the variables?</p>
+</blockquote>
+
+</article></slide><slide class=""><hgroup><h2>Unit 12 quizzes</h2></hgroup><article  id="unit-12-quizzes">
+
 </article></slide><slide class=""><hgroup><h2>Stream temperature data</h2></hgroup><article  id="stream-temperature-data">
 
 <pre class = 'prettyprint lang-r'>Temp_Data &lt;- read_excel(&quot;../data/Streams.xlsx&quot;, sheet = &quot;TemperatureData&quot;)
@@ -202,12 +214,12 @@ M &lt;- left_join(Temp_Data, Site_Data, by = &quot;Site&quot;) %&gt;%
 
 <pre class = 'prettyprint lang-r'>fm1 &lt;- lmer(WaterTemp ~ AirTempPredicted + Day +
               (1 | Stream_Name/Site),
-           data = M, REML = FALSE)
+            data = M, REML = FALSE)
 
 fm2 &lt;- lmer(WaterTemp ~ AirTempPredicted + Day +
               (1 | Stream_Name) +
               (1 | Stream_Name:Site),
-           data = M, REML = FALSE)</pre>
+            data = M, REML = FALSE)</pre>
 
 </article></slide><slide class=""><hgroup><h2>Nesting as an interaction</h2></hgroup><article  id="nesting-as-an-interaction-1">
 

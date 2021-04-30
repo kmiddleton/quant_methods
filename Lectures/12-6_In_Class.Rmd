@@ -17,13 +17,25 @@ library(readxl)
 library(lme4)
 ```
 
+
 ## Non-independence
 
 > With regard to non-independence, I kind of feel like sometimes that could become a blurry line, and am wondering if there are general guidelines for some blurry spaces. For example, in the quiz, you mentioned that there were 200 wild caught frogs, each sampled once. But for a moment in my head, I thought "well, some of them could be related to each other." But we also have no way of knowing which are and are not related to each other, so it would be near impossible (unless you did genetic sampling) to include this is your model. Is that something that just ends up in random "noise?"  Is it only non-independent if you know you are what those differences are (like when you know you have sampled from two different populations)?
 
+
 ## Direction of the inequality in randomization
 
 > In the 12-3 Lecture, I was trying to understand why the inequality sign should be one way or another. In the lion noses case, should it be ">=" because the observed t-stat was greater than zero?  And then in the quiz for 12-3, should we be thinking about "<=" because the observed t-stat was less than zero?  I also wanted to clarify, do we use the "2*" in 2*mean(t_stats >= t_stats[1])  because the t-distribution is, itself, 2-tailed, but we are asking a one-tailed question?
+
+> How do we calculate the empirical P-value given the histogram?"
+
+
+## Interpretation of PCs
+
+>"Can you go over on the interpretation of principle components, and how to compare the variables?
+
+
+## Unit 12 quizzes
 
 
 ## Stream temperature data
@@ -58,6 +70,7 @@ fm2 <- lmer(WaterTemp ~ AirTempPredicted + Day +
 ```{r}
 summary(fm1)
 ```
+
 
 ## Nesting as an interaction
 
