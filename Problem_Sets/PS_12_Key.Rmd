@@ -170,8 +170,14 @@ tibble(t_stats) %>%
   geom_vline(xintercept = t_stats[1], color = "red") +
   labs(x = "t statistics", y = "Count")
 
+# Calculate the empirical P-value as the mean of the inequality
+# Because t is positive, we want the number of times that the 
+# randomized data was more extreme (larger) than the observed value.
+# This is converted to 0 (false) and 1 (true), and the mean is the
+# proportion of trues. The value is doubled for a 2-tailed test.
 2 * mean(t_stats >= t_stats[1])
 
+# Compare to the observed P-value
 t.test(eye_span ~ food_source, data = stalk)
 ```
 
