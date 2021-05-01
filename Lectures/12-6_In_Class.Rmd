@@ -71,6 +71,8 @@ M <- left_join(Temp_Data, Site_Data, by = "Site") %>%
 
 ## Nesting as an interaction
 
+Nesting is equivalent to one main effect and an interaction between the main effect and the nested factor.
+
 ```{r}
 fm1 <- lmer(WaterTemp ~ AirTempPredicted + Day +
               (1 | Stream_Name/Site),
