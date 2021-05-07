@@ -19,72 +19,71 @@ bibliography: Multivariate.bib
   - Problem Set 12
   - The Role of Simulations
   - Pipelines & Guides
-  
+
+
 ## False negatives & False positives
 
-I feel like determining effect size beforehand is kind of arbitrary, especially if you were in a situation where not a lot of previous studies had been done on something, and you are unsure of what kind of effect size would be meaningful. Are there any guidelines for how to handle a situation like that?
+> I feel like determining effect size beforehand is kind of arbitrary, especially if you were in a situation where not a lot of previous studies had been done on something, and you are unsure of what kind of effect size would be meaningful. Are there any guidelines for how to handle a situation like that?
 
-Could you please review the relationship between alpha levels and power? I'm having a difficult time trying to figure out how to increase power for a given alpha level.
+> Could you please review the relationship between alpha levels and power? I'm having a difficult time trying to figure out how to increase power for a given alpha level.
 
-Can we go over type I and type II errors again? I still don't fully understand them and how they inform the tests we do.
+> Can we go over type I and type II errors again? I still don't fully understand them and how they inform the tests we do.
 
-I would like to go over power analysis one more time--I think another example might help it click better for me.
 
-Can we review the differences between FWER, FDR, and pFDR.
+## False negatives & False positives
 
-I was/am confused on the last question of the key for PS-11 where it asks to "Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile." - why isn't it: "1-(quantile(minP, 0.05))"? When I look at the graph of FWER against alpha thresholds, it looks like the FWER is very close to 1 at an alpha of 0.05? I feel like I'm misinterpreting the concept and/or the question.
+> I would like to go over power analysis one more time--I think another example might help it click better for me.
 
-I will be doing protein analysis in the near future, and I would like to know more about FDR. If possible, please go over this topic again
+>Can we review the differences between FWER, FDR, and pFDR.
+
+> I was/am confused on the last question of the key for PS-11 where it asks to "Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile." - why isn't it: "1-(quantile(minP, 0.05))"? When I look at the graph of FWER against alpha thresholds, it looks like the FWER is very close to 1 at an alpha of 0.05? I feel like I'm misinterpreting the concept and/or the question.
+
+>I will be doing protein analysis in the near future, and I would like to know more about FDR. If possible, please go over this topic again
 
 
 ## PCA 
 
-Does a loading value closer to 1 indicate that it explains more variation within that PC?
+> Does a loading value closer to 1 indicate that it explains more variation within that PC?
 
-I would appreciated if you talk about nested models, and the interpretation of PCA.
+> I would appreciated if you talk about nested models, and the interpretation of PCA.
 
-can you review PCA and biplots?
+> Can you review PCA and biplots?
 
 
 ## Linear models
 
-How do you determine non-independence between variables? How does determining this lead to choosing Type II or Type III sums of squares?
+> How do you determine non-independence between variables? How does determining this lead to choosing Type II or Type III sums of squares?
 
-For the guppy simulation in the problem set, how is it showing pseudoreplication? Is it because the two sets of three rivers are not all independent?
+> For the guppy simulation in the problem set, how is it showing pseudoreplication? Is it because the two sets of three rivers are not all independent?
 
-Can we talk about how incorporating multiple measurements at varying time points affects stats and to what degree we need to account for this?
+> Can we talk about how incorporating multiple measurements at varying time points affects stats and to what degree we need to account for this?
 
-Could you review the differences between lm(), lme(), aov(), etc?
+> Could you review the differences between lm(), lme(), aov(), etc?
 
-I would appreciated if you talk about nested models, and the interpretation of PCA.
+> I would appreciated if you talk about nested models, and the interpretation of PCA.
 
-how to read the summaries of all of the independence tests.
+> How to read the summaries of all of the independence tests.
 
 
 ## PS 12
 
-I don't understand the output of the last chunk on PS12. What does getting the 10,000 F statistics mean, again?
+> I don't understand the output of the last chunk on PS12. What does getting the 10,000 F statistics mean, again?
 
-I would like to go over Problem Set 12 because I am not sure what exactly we were trying to do.
+> I would like to go over Problem Set 12 because I am not sure what exactly we were trying to do.
 
 
 ## Simulations
 
-When we are pulling and plotting p-values in the simulated data set (around line 100ish of the PC_03) are we pulling the p-value associated with "intercept", "low/high" (depending on factor level), or both intercept and low/high. I pulled all p-values in to a 4 column tibble, and have 4 plots total for that section and I want to make sure I am on the right track and interpreting this correctly.
+> When we are pulling and plotting p-values in the simulated data set (around line 100ish of the PC_03) are we pulling the p-value associated with "intercept", "low/high" (depending on factor level), or both intercept and low/high. I pulled all p-values in to a 4 column tibble, and have 4 plots total for that section and I want to make sure I am on the right track and interpreting this correctly.
 
-for loops (again) & setting up data. frames to store objects as a for loop is executing.
+> for loops (again) & setting up data. frames to store objects as a for loop is executing.
 
-Can you explain in what scenarios we want to create a simulation? I know we do it a lot here to demonstrate how certain theories are true, but when would you use them while doing research?
+> Can you explain in what scenarios we want to create a simulation? I know we do it a lot here to demonstrate how certain theories are true, but when would you use them while doing research?
 
 
 ## Pipelines & Guides
 
-Is there a cheat sheet or a checklist to go through to deduce which statistical test to use in which situation?
+> Is there a cheat sheet or a checklist to go through to deduce which statistical test to use in which situation?
 
-Depending data nature we can use multiple tools we covered. It would be great if you can put together one example from data acquisition to analysis (the whole process) in one template; I meant sort of pipeline that we just change file name and analyze the whole data in one go.
-
-
-
-
-
+> Depending data nature we can use multiple tools we covered. It would be great if you can put together one example from data acquisition to analysis (the whole process) in one template; I meant sort of pipeline that we just change file name and analyze the whole data in one go.
 
