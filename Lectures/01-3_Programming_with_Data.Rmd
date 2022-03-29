@@ -271,7 +271,7 @@ M[, 2]
 
 ## Functions
 
-We will get to writing our own functions later, for now: `functionName()`, where parameters go inside ().
+We will get to writing our own functions later, for now: `functionName()`, where parameters go inside `()`.
 
 ```{r}
 c(1)
