@@ -34,6 +34,7 @@ Modern Scientist == Programmer
 
 - 95% of your analysis time is spent _not_ doing statistics.
     - Wrangling data
+    - Plotting data
 - Invest time now in learning the logic of programming. Save time later.
 - Reproducibility. You always know what you did.
     - Code with comments reads as a step-by-step of your analysis
@@ -41,7 +42,7 @@ Modern Scientist == Programmer
 
 ## Why program?
 
-> "If you had done something twice, you are likely to do it again." -- Brian Kernighan and Bob Pike
+> "If you had done something twice, you are likely to do it again." -- Brian Kernighan and Rob Pike
 
 ## Good things about programming with data
 
@@ -76,7 +77,7 @@ Should you learn the base R way or the new tools?
 
 ## The tidyverse
 
-A set of packages to load, clean, filter, plot, and generally deal with data in a "tidy" way. Largely the work of [Hadley Wickham](http://hadley.nz/).
+A set of packages to load, clean, filter, plot, and generally deal with data in a "tidy" way. Largely the work of [Hadley Wickham](http://hadley.nz/) and colleagues.
 
 ```{r eval=FALSE}
 install.packages("tidyverse") # Once
