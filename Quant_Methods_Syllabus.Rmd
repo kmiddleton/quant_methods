@@ -1,7 +1,7 @@
 ---
 title: "Quantitative Methods in Life Sciences"
 author: "Elizabeth King and Kevin Middleton"
-date: "Spring 2021"
+date: "Spring 2023"
 output:
   html_document:
     smart: no
@@ -58,19 +58,15 @@ Elizabeth King
 
 - kingeg@missouri.edu
 - Tucker 401
-- 882-8518
 
 Kevin Middleton
 
 - middletonk@missouri.edu
-- Medical Sciences M311
-- 884-3192
-
+- Tucker 222
 
 ### Meeting times and place
 
-The course will meet Fridays from 1:00-2:50 online via zoom. You can find the zoom info on Canvas. We will record our zoom meetings and post them to Canvas.
-
+The course will meet Fridays from 10:00-11:50 in Tucker 322. 
 
 ### Expectations
 
@@ -133,27 +129,27 @@ Note that this is a general outline. The schedule of topics is subject to change
 
 _#_  | _Date_  | _Topic_                          |
 -----|---------|----------------------------------|
-00   | F 1/15  | Pre-workshop. Installing R, etc. |
-01   | F 1/22  | Reproducible research, programming with data |
-02   | F 1/29  | Data organization, loading, visualization |
-03   | F 2/05  | Tidy data and transformations |
-04   | F 2/12  | Probability and distributions |
---   | F 2/19  | Progress Check: Weeks 1-4  |
-05   | F 2/26  | Frameworks for inference |
-06   | F 3/05  | Central tendency, differences of means, linear regression |
-07   | F 3/12  | Parameter estimation |
-08   | F 3/19  | Multiple predictors |
---   | F 3/26  | Progress Check: Weeks 5-8  |
-09   | F 4/09  | Partitioning variance, multilevel models |
-10   | F 4/16  | Model comparison, model-based inference, cross-validation |
-11   | F 4/23  | Experimental Design, multiple comparison procedures, power analysis |
-12   | F 4/30  | Advanced Data Analysis Topics |
---   | F 5/07  | Progress Check Weeks: 9-12  |
+00   | F 1/13  | Pre-workshop. Installing R, etc. |
+01   | F 1/20  | Reproducible research, programming with data |
+02   | F 1/27  | Data organization, loading, visualization |
+03   | F 2/03  | Tidy data and transformations |
+04   | F 2/10  | Probability and distributions |
+--   | F 2/17  | Progress Check: Weeks 1-4  |
+05   | F 2/24  | Frameworks for inference |
+06   | F 3/03  | Central tendency, differences of means, linear regression |
+07   | F 3/10  | Parameter estimation |
+08   | F 3/17  | Multiple predictors |
+--   | F 3/24  | Progress Check: Weeks 5-8  |
+09   | F 4/07  | Partitioning variance, multilevel models |
+10   | F 4/14  | Model comparison, model-based inference, cross-validation |
+11   | F 4/21  | Experimental Design, multiple comparison procedures, power analysis |
+12   | F 4/28  | Advanced Data Analysis Topics |
+--   | F 5/05  | Progress Check Weeks: 9-12  |
 
 
 ## Course Communication
 
-While we know students are always dealing with a lot, there is no doubt this will be a particularly challenging semester for all of us with a global pandemic, adjustment to online learning, and recent global events that have highlighted big challenges our society is facing, such as racial injustice and climate change. Our main goal in how we have set up this course is to help you to learn the course material in these challenging circumstances. You should know that we understand that there may be times that your ability to engage with the course is impacted. We will ask in these situations simply that you communicate with us and let us know what is going on. *The more and the earlier, you communicate with us, the more we will be able to help.*
+While we know students are always dealing with a lot, and that has been particularly true the past few years with the global pandemic, adjustment to a lot of remote work, and constant global events that highlight big challenges our society is facing, such as racial injustice and climate change. Our main goal in how we have set up this course is to help you to learn the course material in these challenging circumstances. You should know that we understand that there may be times that your ability to engage with the course is impacted. We will ask in these situations simply that you communicate with us and let us know what is going on. *The more and the earlier, you communicate with us, the more we will be able to help.*
 
 All course material, announcements, and instructions will be available on the course Canvas site. We assume you will check Canvas regularly. We will only communicate with you via Canvas messaging. Please make sure you have checked your notification settings to ensure you receive these messages. You may communicate with us via Canvas messaging or by emailing our university email addresses. 
 
