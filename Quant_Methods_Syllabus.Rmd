@@ -1,5 +1,6 @@
 ---
 title: "Quantitative Methods in Life Sciences"
+subtitle: BIO_SC 8640
 author: "Elizabeth King and Kevin Middleton"
 date: "Spring 2023"
 output:
@@ -16,7 +17,6 @@ geometry: margin=1in
 mainfont: Arial
 mathfont: Arial
 fontsize: 12pt
-subtitle: BIO_SC 8640 / PTH_AS 8640
 csl: evolution.csl
 ---
 
@@ -25,15 +25,17 @@ csl: evolution.csl
 
 This is a graduate-level course in statistical analysis designed with the specific needs of students in life sciences, focusing on statistical literacy: performing, interpreting, and writing about biological data analysis. As such, we will assume a basic understanding of some topics and zero understanding of other topics. We will cover most topics broadly and occasionally in great depth, highlighting the perils and pitfalls of different methods, while providing guidelines for a wide array of statistical approaches to data analysis. We will seek to find the balance between really understanding all the math involved and learning to be a competent practitioner and consumer of analysis. We will emphasize the practical over the theoretical, with additional emphasis on the communication of data (plotting, graphs, figures) and of results.
 
+
 ### Guiding idea
 
 > "Science is a way to teach how something gets known, what is not known, to what extent things are known (for nothing is known absolutely), how to handle doubt and uncertainty, what the rules of evidence are, how to think about things so that judgments can be made, how to distinguish truth from fraud, from show..." (Feynman, 1953)
 
 By the end of this course, you will have a foundation in the quantitative methods that are used to answer these fundamental questions of science.
 
+
 ### Background knowledge
 
-**If you have never used R before**, you must attend the pre-course workshop (01/15) to install R on your laptop and work through some Swirl tutorials (http://swirlstats.com/) prior to the first course meeting (01/22).
+**If you have never used R before**, you must attend the pre-course workshop (01/13) to install R on your laptop and work through some Swirl tutorials (http://swirlstats.com/) prior to the first course meeting (01/20).
 
 We will start with the assumption of some very minimal previous exposure to the following topics:
 
@@ -52,6 +54,7 @@ We will start with the assumption of some very minimal previous exposure to the 
 
 ## Course information
 
+
 ### Your Collaborators
 
 Elizabeth King
@@ -64,21 +67,23 @@ Kevin Middleton
 - middletonk@missouri.edu
 - Tucker 222
 
+
 ### Meeting times and place
 
 The course will meet Fridays from 10:00-11:50 in Tucker 322. 
 
+
 ### Expectations
 
-You will get as much or as little from this class as you put into it. Assignments are graded only for completion. You should go through your own answers along with the provided answer key to check. There are many equally correct ways to do many things in R. Your method may differ, but the results should not. Our provided solution methods are just our preferred way.
+You will get as much or as little from this course as you put into it. Assignments are graded only for completion. You should go through your own answers along with the provided answer key to check and compare. There are many equally correct ways to do many things in R. Your method may differ, but the results should not. Our provided solution methods are just our preferred way.
 
-This course will require you to watch lecture videos outside of class and answer questions related to those videos through Canvas. Treat these online lectures as you would a regular, in-person lecture:
+This course will require you to watch lecture videos outside of class and answer questions related to those videos through Canvas (these questions help guide what we cover in-erpson). Treat these online lectures as you would a regular, in-person lecture:
 
 - You should be taking notes.
 - You should pause the videos if you need to.
 - You may need to re-watch and/or search the internet or the provided resources for additional information.
 
-We expect you to be an active participant in class. If you do not understand something, it is your responsibility to ask. Being a silent attendee will not benefit you, and your instructors will not know if you do not understand until it is too late. We will provide a way to anonymously ask questions via Canvas.
+We expect you to be an active participant in class. If you do not understand something, it is your responsibility to ask. Being a silent attendee will not benefit you, and your instructors will not know if you do not understand until it is too late. We will provide a way to anonymously ask questions.
 
 - You must try, be willing to fail, and keep trying. This process is part of learning.
 - You must try to learn from your mistakes, so that you will avoid making them again.
@@ -106,14 +111,14 @@ You will fill out a peer evaluation of your group members each week. These evalu
 
 ### Progress checks
 
-Following each four week period, we will spend one week reviewing what we have learned and assessing our progress. During these weeks, instead of completing a problem set in a group, you will check your own understanding and progress in the course by completing a progress check independently. *You can not work with other members of the class or anyone else on this assignment*. You will be able to use all other available resources (books, notes, lectures, internet, etc.). Our in-class time this week will be an opportunity to ask questions about any of the material we have covered to that point. 
+Following each four week period, we will spend one week reviewing what we have learned and assessing our progress. During these weeks, instead of completing a problem set in a group, you will check your own understanding and progress in the course by completing a progress check independently. *You should not work with other members of the class or anyone else on this assignment*. You will be able to use all other available resources (books, notes, lectures, internet, etc.). Our in-class time this week will be an opportunity to ask questions about any of the material we have covered to that point. 
 
 
 ### Grading
 
 Your grade in the course will be a function of:
 
-1. Quiz questions 
+1. Quiz questions (completion, not correctness)
 1. Problem sets 
 1. Peer evaluations (both your own completion of and others' evaluation of you)
 1. In class contributions
@@ -151,7 +156,7 @@ _#_  | _Date_  | _Topic_                          |
 
 While we know students are always dealing with a lot, and that has been particularly true the past few years with the global pandemic, adjustment to a lot of remote work, and constant global events that highlight big challenges our society is facing, such as racial injustice and climate change. Our main goal in how we have set up this course is to help you to learn the course material in these challenging circumstances. You should know that we understand that there may be times that your ability to engage with the course is impacted. We will ask in these situations simply that you communicate with us and let us know what is going on. *The more and the earlier, you communicate with us, the more we will be able to help.*
 
-All course material, announcements, and instructions will be available on the course Canvas site. We assume you will check Canvas regularly. We will only communicate with you via Canvas messaging. Please make sure you have checked your notification settings to ensure you receive these messages. You may communicate with us via Canvas messaging or by emailing our university email addresses. 
+All course material, announcements, and instructions will be available on the course Canvas site. We assume you will check Canvas regularly. After the initial course emails, we will only communicate with you via Canvas messaging. Please make sure you have checked your notification settings to ensure you receive these messages. You may communicate with us via Canvas messaging or by emailing our university email addresses. 
 
 
 ## Due Dates and Extensions
@@ -175,7 +180,7 @@ All students will have the opportunity to submit an anonymous evaluation of the 
 
 The University of Missouri is committed to supporting student well-being through an integrated network of care, with a wide range of services to help students succeed. The MU Counseling Center offers professional mental health care, and can help you find the best approach to treatment based on your needs. Call to make an appointment at 573-882-6601. Any student in crisis may call or go to the MU Counseling Center between 8:00–-5:00 M-F. After hours phone support is available at 573-882-6601.
 
-Visit our website at https://wellbeing.missouri.edu to take an online mental health screening, find out about workshops and resources that can help you thrive, or learn how to support a friend. Download Sanvello, a phone app that teaches skills and strategies to help you maintain good mental health. Log in with your Mizzou e-mail to unlock all the tools available through Sanvello at no cost to you.
+Visit the website at https://wellbeing.missouri.edu to take an online mental health screening, find out about workshops and resources that can help you thrive, or learn how to support a friend. Download Sanvello, a phone app that teaches skills and strategies to help you maintain good mental health. Log in with your Mizzou e-mail to unlock all the tools available through Sanvello at no cost to you.
 
 
 ## ADA
@@ -192,6 +197,7 @@ If disability related accommodations are necessary (for example, a note taker, e
 Academic integrity is fundamental to the activities and principles of a university. All members of the academic community must be confident that each person's work has been responsibly and honorably acquired, developed, and presented. Any effort to gain an advantage not given to all students is dishonest whether or not the effort is successful. The academic community regards breaches of the academic integrity rules as extremely serious matters. Sanctions for such a breach may include academic sanctions from the instructor, including failing the course for any violation, to disciplinary sanctions ranging from probation to expulsion. When in doubt about plagiarism, paraphrasing, quoting, collaboration, or any other form of cheating, consult the course instructor.
 
 Executive Order #38, Academic Inquiry, Course Discussion and Privacy
+
 University of Missouri System Executive Order No. 38 lays out principles regarding the sanctity of classroom discussions at the university. The policy is described fully in section 200.015 of the Collected Rules and Regulations. In this class, students may not make audio or video recordings of course activity, except students permitted to record as an accommodation under section 240.040 of the Collected Rules. All other students who record and/or distribute audio or video recordings of class activity are subject to discipline in accordance with provisions of section 200.020 of the Collected Rules and Regulations of the University of Missouri pertaining to student conduct matters.
 
 Those students who are permitted to record are not permitted to redistribute audio or video recordings of statements or comments from the course to individuals who are not students in the course without the express permission of the faculty member and of any students who are recorded. Students found to have violated this policy are subject to discipline in accordance with provisions of section 200.020 of the Collected Rules and Regulations of the University of Missouri pertaining to student conduct matters.
