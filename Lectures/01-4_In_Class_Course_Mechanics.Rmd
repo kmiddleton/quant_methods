@@ -82,8 +82,6 @@ Progress Checks:
 ## Working together
 
 - Many possible successful strategies
-    - One person shares screen, all follow along
-    - Each work on same part & share screen as needed
     - Remember you have access to lecture code, the google, etc
 - One unsuccessful strategy
     - Splitting up the problem set & not learning all the parts
