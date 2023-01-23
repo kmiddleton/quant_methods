@@ -14,17 +14,20 @@ output:
 library(tidyverse)
 ```
 
+
 ## How to use the problem sets
 
 Each problem set will contain narrative text interspersed with R code. Some of this code will already be completed for you, while some you will need to fill in. You should read through all of the text (just as you are doing right now). The exercises (**Activities**) are interspersed throughout the text.
 
 Right now, go up to the header and change the line "author:" to have your name and your group number.
 
+
 ### Important
 
 As you work through the exercises, really think about what you are doing. In the upcoming problem sets, you will be learning how to think through analyses step by step, from loading data, to visualizing it, to actually carrying out statistical tests, and then interpreting the results.
 
 Read the code like you would a textbook (meaning studying and digesting as you go). It's easy to copy and paste or just run code chunks without really thinking about what the code is doing (we've done it too), but that's not a good way to learn.=
+
 
 ## R Markdown $\rightarrow$ HTML
 
@@ -44,9 +47,11 @@ You might get a message about installing some packages. Click yes to install the
 
 You have just compiled an R Markdown file into HTML. These Rmd and HTML files will be the basic currency of the problems sets and progress checks you will do in this class.
 
+
 ## Insert an R code chunk
 
 An Rmd file can include R code that is run at compile time.
+
 
 ### Activity
 
@@ -61,6 +66,7 @@ Enter some R code into the chunk on the blank line: `sqrt(2)`. Then compile the 
 You can also run code interactively from an Rmd file to the R console. To run a single line, press *Ctrl-Enter* / *Cmd-Return*. To run the current chunk, use *Ctrl-Alt-c* / *Cmd-Shift-Return*. This is a good way to test code that you are working on, rather then waiting to compile the Rmd to HTML (or whatever format you are using).
 
 You can also enter the code to set up code chunks manually, but we find it easier to use the insert code chunk shortcut.
+
 
 ## Naming R objects
 
@@ -86,6 +92,7 @@ sd
 sd(4:10)
 ```
 
+
 ### Activity
 
 Execute the chunk above and look at the R console output. Explain what we have done here and what R must be doing without telling you. Write your answer after the ">" below. (">"" is the Rmd for a block quote, which will make finding your answers easier.)
@@ -94,9 +101,11 @@ Execute the chunk above and look at the R console output. Explain what we have d
 
 Now add comments to the code chunk above briefly annotating your answer above. 
 
+
 ## Vectors
 
 Vectors are one of the fundamental data structures in R. They consist of data of all the same type (numeric, character, etc.) in a 1 X n structure. You can manually create vectors using the combine function `c()`. Some functions like `seq()`, `rep()`, and the random number generators (`rnorm()`, `runif()`, etc.) produce vectors by default.
+
 
 ### Activity
 
@@ -107,12 +116,12 @@ Assign vectors with the following characteristics:
 3. a, aa, aaa (as characters)
 4. The sequence 5 to 100 by 1
 5. The sequence 5 to 100 by 5
-6. The sequence starting with 5 and ending at 100 with a length of 60
+6. The sequence starting with 5 and ending at 100 with a length of 60 (i.e., 60 evenly spaced values from 5 to 100)
 7. 17 repeated 10 times
-8. The sequence 1, 2, 3 where each is repeated 10 times in a row
-9. The sequence 1, 2, 3 repeated 10 times
+8. The sequence 1, 2, 3 where each is repeated 10 times in a row (i.e., 1, 1, 1, 1, ..., 2, 2, 2, 2, ..., 3, 3, 3, 3, ...)
+9. The sequence 1, 2, 3 repeated 10 times (i.e., 1, 2, 3, 1, 2, 3, 1, 2, 3, ...)
 
-Choose names for these vectors. Add your code to the block below.
+Choose names for each of these vectors. Add your code to the block below.
 
 ```{r}
 v1 <- c(1, 6, 10, 14.75)
@@ -141,9 +150,12 @@ Binary operations are very important in R for selecting, subsetting, and choosin
 
 When these operators are applied to vectors, the result is a vector of logicals (`TRUE`s and `FALSE`s).
 
+
 ### Activity
 
 Use your vectors from above in the same order to test the following relational operators.
+
+The numbers (1-9) in the list below correspond to those in the list above.
 
 1. Which values are greater than 5?
 2. Which values equal FALSE?
@@ -210,6 +222,7 @@ which(v8 == 1)
 which(v9 != 1)
 ```
 
+
 ## Perils of relational operators
 
 Computers only infrequently store numbers internally as integers ([computer algebra systems](https://en.wikipedia.org/wiki/Computer_algebra_system) do this), particularly after any kind of numeric operation.
@@ -232,13 +245,15 @@ Line by line, explain what the statements above are doing and the R output of ea
 > 4. Test whether `a` * `a` equals 2. FALSE. So R is storing a internally with some number of digits. So that when `a` is squared, it doesn't exactly equal 2. Because of #3, R must be rounding when it prints. Try `print(a * a, digits = 20)`.
 > 5. The `all.equal()` function compares two values and tests where they are equal to a certain level of certainty, called the `tolerance`. By default this value is $10^{-8}$.
 
+
 ## Matrices
 
 Matrices are square objects (rows and columns) in which all of the cells have the same type of data. In most cases when you use matrices, you will have numbers only, however, matrices can hold characters, logicals, or factors as well.
 
+
 ### Activity
 
-(a) Use the `matrix()` function and `rnorm(36, mean = 10, sd = 5)` to create a 6 X 6 matrix. The `rnorm()` draw random normally distributed numbers. By supplying the `mean` and `sd` arguments, we can specify the mean and standard deviation of the distribution.
+(a) Use the `matrix()` function and `rnorm(36, mean = 10, sd = 5)` to create a 6 X 6 matrix. The `rnorm()` function draws random normally distributed numbers. By supplying the `mean` and `sd` arguments, we can specify the mean and standard deviation of the distribution.
 
 You might need to refer to the help for matrix (`?matrix`) for assistance with arguments.
 
@@ -258,7 +273,7 @@ What is the default order for creating matrices?
 colMeans(M6_by_6)
 ```
 
-(c) Use an inequality to find all values less than 10.
+(c) Use an inequality to find all values in the matrix less than 10.
 
 ```{r}
 M6_by_6 < 10
@@ -278,9 +293,11 @@ Compare the results of the column means with the results of part (c). What is R 
 
 > R is converting TRUE to 1 and FALSE to 0 and then using the 0's and 1's to take column means. This "coercion" is a very handy trick that we will use in the future.
 
-## data.frames and tibbles
 
-`data.frame`s (and their cousins `tibble`s) are one of the most important objects that you will work with in R. They are the closest thing to an Excel spreadsheet in R (with the added restriction that a column must be all of one data type)..
+## `data.frame()`s and `tibble()`s
+
+`data.frame`s (and their cousins `tibble`s) are one of the most important objects that you will work with in R. They are the closest thing to an Excel spreadsheet in R (with the added restriction that a column must be all of one data type).
+
 
 ### Activity
 
@@ -290,7 +307,7 @@ Create a data.frame or tibble with the following columns:
 - A numeric vector `Replicate` with values 1 and 2, repeated 5 times each for both values in `Tx_Group`.
 - A numeric vector `Productivity`, where the first 10 values are normally distributed with a mean of 5 and standard deviation of 2 and the second 10 values are normally distributed with a mean of 8 and standard deviation of 2. `c()` will be useful here.
 
-Include the argument `stringsAsFactors = FALSE` to tell R not to convert the strings to factors.
+If you use `data.frame()`, include the argument `stringsAsFactors = FALSE` to tell R not to convert the strings to factors.
 
 ```{r}
 D <- data.frame(
@@ -316,15 +333,17 @@ Use the `str()` function to get information about the data.frame. This will allo
 str(D)
 ```
 
+
 ## Indexing
 
 Taking subsets of objects in R is very common. This can include slicing or filtering rows, extracting one or more columns, and referencing columns in other functions.
 
 You can use standard bracket notation `[ ]` to subset vectors, matrices, and data.frames. The latter two require a comma to denote rows and columns: `[rows, columns]`. You can also take a single column of a data.frame with the `$` operator.
 
+
 ### Activity
 
-Use your data.frame from the question above. Extract the following subsets:
+Use your data.frame (or tibble) from the question above. Extract the following subsets:
 
 1. The column `Productivity` using bracket notation
 2. The column `Productivity` using `$` notation
@@ -352,6 +371,7 @@ D$Productivity[1:10] # Get column with $, then subset
 
 We will do more complex filtering next week (e.g., only rows from replicate 1 where productivity is less than 5).
 
+
 ## Basic calculations in R
 
 R can do basic (and not so basic) calculations. First set up a vector of numbers to work with.
@@ -364,6 +384,7 @@ set.seed(5)
 x <- runif(10)
 x
 ```
+
 
 ### Activity
 
@@ -380,13 +401,15 @@ median(x)
 t(x)
 ```
 
+
 ## Cleaning up code
 
-Whitespace is your friend. Imaginetryingtoreadasentencethathasnospacing. It's pretty difficult. Writing clean code helps your future self and those you work with to understand the steps of your analysis.
+Spaces and returns are your friend. Imaginetryingtoreadasentencethathasnospacing. It's pretty difficult. Writing clean, organized code helps your future self and those you work with to understand the steps of your analysis.
+
 
 ### Activity
 
-Take the following code chunk and make the code more readable by adding whitespace (and carriage returns) as well as explicitly naming some of the arguments (check the help files for the assumed ordering of argument).
+Take the following code chunk and make the code more readable by adding spaces and returns as well as explicitly naming some of the arguments (check the help files for the assumed ordering of argument).
 
 ```{r}
 M1 <- data.frame(x = 11:20,
