@@ -355,16 +355,16 @@ Use your data.frame (or tibble) from the question above. Extract the following s
 # 1
 D[, "Productivity"]
 
-#2
+# 2
 D$Productivity
 
-#3
+# 3
 D[, 2]
 
-#4
+# 4
 D[1:10, ]
 
-#5
+# 5
 D[1:10, "Productivity"]
 D$Productivity[1:10] # Get column with $, then subset
 ```
