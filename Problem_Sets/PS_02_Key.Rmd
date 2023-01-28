@@ -25,6 +25,7 @@ theme_set(theme_cowplot())
 
 By default, R will read and write files from its working directory. The status of the current directory can be found at the top of the Console window. You can also check the current working directory with the command `getwd()`.
 
+
 ### Best practices
 
 Store all the files for an analysis (problem set) in a single directory. You might have the following directory structure:
@@ -47,11 +48,18 @@ Setting the working directory to the location of the current files will ensure t
 
 As you get more comfortable with R, you can move files around, use sub-directories, etc. For now, keep it simple and store associated files in the same directory, even if this means duplicating files (which is something you definitely don't want to do in general practice).
 
+
+### Please do not use `setwd()`
+
+You will often see tutorials online that advise you to set the working directory explicitly in an R script using the function `setwd()`. This practice is unnecessary and often counterproductive for a couple of reasons.
+
+- When you are working with `.Rmd` files and click "Knit" RStudio starts a new R session in the directory that the Rmd file is located. Thus if you use `setwd()` within a R chunk of an Rmd file, you will get a warning. Better practice when working with an Rmd file interactively is to set the R working directory using the menu commands: **Session $\rightarrow$ Set Working Directory $\rightarrow$ To Source File Location**. This way, you will be able to work interactively in RStudio and the relative paths will be the same as when you knit.
+- If you set the working directory explicitly, then your files will be less portable. For example, if you move the file from one machine to another, it is very likely that the full path to your working directory will change. So you are left with either changing that every time you change computers or switching between `setwd()` statements. Better to just set the working directory with the RStudio menu and not have to go through such contortions.
+
+
 ### Activity
 
 Organize your files and set the working directory to the directory where this file and the required data files for this problem set are located. In the code chunk below check your working directory and use the '#' to outline and describe the folder structure you have chosen.
-
-When you are working with standalone .R files, it can be useful to set the working directory with the `setwd()` function. This is best to be avoided when working with .Rmd files. When you knit an Rmd by clicking the "Knit" button, RStudio starts a new R session and sets the working directory to the directory containing the file you are knitting. Thus if you use `setwd()` within a R chunk, you will get a warning. Better practice when working with an Rmd file interactively is to set the R working directory using the menu commands: **Session $\rightarrow$ Set Working Directory $\rightarrow$ To Source File Location**. This way, you will be able to work interactively in RStudio and the relative paths will be the same as when you knit.
 
 ```{r}
 # FIXME
@@ -75,7 +83,7 @@ getwd()
 
 ## Loading Packages
 
-> In R, the fundamental unit of shareable code is the package. A package bundles together code, data, documentation, and tests, and is easy to share with others. As of January 2015, there were over 6,000^[There are >17,000 as of January, 2021] packages available on the Comprehensive R Archive Network, or CRAN, the public clearing house for R packages. This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you're working on, and you can benefit from their work by downloading their package. (http://r-pkgs.had.co.nz/intro.html)
+> In R, the fundamental unit of shareable code is the package. A package bundles together code, data, documentation, and tests, and is easy to share with others. As of January 2015, there were over 6,000^[There are >20,000 as of January, 2023] packages available on the Comprehensive R Archive Network, or CRAN, the public clearing house for R packages. This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you're working on, and you can benefit from their work by downloading their package. (http://r-pkgs.had.co.nz/intro.html)
 
 The `library()` function with the following syntax is used to load packages:
 
@@ -95,12 +103,14 @@ install.packages("tidyverse")
 
 and then rerun the code chunk that includes the `library()`^[Inside the call to `library()`, package names do not need to be quoted (but they can be without incident). `install.packages()`, on the other hand, expects to receive a string or vector of strings, so you do need quotes.] commands.
 
+
 ### Best practices (things to remember)
 
 - It is best to install packages (e.g., `install.packages("cowplot")`) from the command line only. If you include this code in a R code chunk, you risk R trying to reinstall the package each time you knit your file. 
 - Packages only need to be installed once on each computer. They are stored locally.
 - Packages do need to be loaded (`library()`) each time you restart R. Loaded packages are not persistent across R sessions.
 - Load all of the packages you need at the start of a document to keep track of what packages your analysis needs.
+
 
 ### Activity
 
@@ -111,6 +121,7 @@ In the *Setup* code chunk at the beginning of this document, add code to load th
 1. `cowplot`
 
 Install these packages if you need to (see **Loading Packages** above for the installation syntax). 
+
 
 ## Loading Data
 
@@ -130,6 +141,7 @@ In contrast, in the wolf spider (*Pardosa ramulosa*), males and females do not s
 
 The file `Size_Dimorphism.xlsx` contains data on body mass and body length for males and females in these two species. 
 
+
 ### Activity
 
 Using the `read_excel()` function, load the file `Size_Dimorphism.xlsx` in R. Assign it to the object, `M`.
@@ -139,11 +151,13 @@ Using the `read_excel()` function, load the file `Size_Dimorphism.xlsx` in R. As
 M <- read_excel("../data/Size_Dimorphism.xlsx")
 ```
 
+
 ## Exploring Data
 
 Any time you load data from an external source (which is almost every time you are working with data), you should check to make sure that the data has been correctly imported.
 
 You can use two functions to get a quick overview of the columns of a `data.frame` (or any R object, really), `str()` and `glimpse()`, each of which gives a list of the columns and their first few values.
+
 
 ### Activity
 
@@ -168,9 +182,11 @@ Using the output of `str(M)`, answer the following questions.
 
 > 5. This matches. No header issues.
 
+
 ## Number of Observations per Group
 
 This experiment is balanced, meaning there are equal numbers of males and females in each species (50 of each). 
+
 
 ### Activity 
 
@@ -234,9 +250,11 @@ We prefer to use `write_csv()`, which is part of tidyverse, to R's built-in `wri
 M <- read_csv("../data/Size_Dimorphism_corrected.csv")
 ```
 
+
 ## Data Filtering
 
 A very common activity when you are analyzing data is to take subsets, be they subsets of rows or one or more columns (or both simultaneously). Gaining experience at this kind of filtering will make you much more efficient.
+
 
 ### Activity
 
@@ -283,9 +301,11 @@ M %>% filter(Species == "Pardosa_ramulosa" & Sex == "M") %>%
   filter(BodyLength < 4 | BodyLength > 6)
 ```
 
+
 ## Plotting Histograms
 
 To start looking at sexual size dimorphism, we will make some histograms. This is the easiest method to visualize univariate data.
+
 
 ### Activity
 
@@ -332,6 +352,7 @@ With this you can clearly see SSD in *Nephila* but not in *Pardosa*.
 ## Scatterplot
 
 You might be interested in the relationship between body length and body mass. Scatterplots are the most common way to visualize such bivariate relationships.
+
 
 ### Activity
 

@@ -1504,7 +1504,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Problem Set 02</h1>
 <h4 class="author">Your Name Here: Group X</h4>
-<h4 class="date">Last updated: 2023-01-23</h4>
+<h4 class="date">Last updated: 2023-01-25</h4>
 
 </div>
 
@@ -1560,6 +1560,30 @@ sub-directories, etc. For now, keep it simple and store associated files
 in the same directory, even if this means duplicating files (which is
 something you definitely don’t want to do in general practice).</p>
 </div>
+<div id="please-do-not-use-setwd" class="section level3">
+<h3>Please do not use <code>setwd()</code></h3>
+<p>You will often see tutorials online that advise you to set the
+working directory explicitly in an R script using the function
+<code>setwd()</code>. This practice is unnecessary and often
+counterproductive for a couple of reasons.</p>
+<ul>
+<li>When you are working with <code>.Rmd</code> files and click “Knit”
+RStudio starts a new R session in the directory that the Rmd file is
+located. Thus if you use <code>setwd()</code> within a R chunk of an Rmd
+file, you will get a warning. Better practice when working with an Rmd
+file interactively is to set the R working directory using the menu
+commands: <strong>Session <span class="math inline">\(\rightarrow\)</span> Set Working Directory <span class="math inline">\(\rightarrow\)</span> To Source File
+Location</strong>. This way, you will be able to work interactively in
+RStudio and the relative paths will be the same as when you knit.</li>
+<li>If you set the working directory explicitly, then your files will be
+less portable. For example, if you move the file from one machine to
+another, it is very likely that the full path to your working directory
+will change. So you are left with either changing that every time you
+change computers or switching between <code>setwd()</code> statements.
+Better to just set the working directory with the RStudio menu and not
+have to go through such contortions.</li>
+</ul>
+</div>
 <div id="activity" class="section level3">
 <h3>Activity</h3>
 <p>Organize your files and set the working directory to the directory
@@ -1567,19 +1591,6 @@ where this file and the required data files for this problem set are
 located. In the code chunk below check your working directory and use
 the ‘#’ to outline and describe the folder structure you have
 chosen.</p>
-<p>When you are working with standalone .R files, it can be useful to
-set the working directory with the <code>setwd()</code> function. This
-is best to be avoided when working with .Rmd files. When you knit an Rmd
-by clicking the “Knit” button, RStudio starts a new R session and sets
-the working directory to the directory containing the file you are
-knitting. Thus if you use <code>setwd()</code> within a R chunk, you
-will get a warning. Better practice when working with an Rmd file
-interactively is to set the R working directory using the menu commands:
-<strong>Session <span class="math inline">\(\rightarrow\)</span> Set
-Working Directory <span class="math inline">\(\rightarrow\)</span> To
-Source File Location</strong>. This way, you will be able to work
-interactively in RStudio and the relative paths will be the same as when
-you knit.</p>
 <pre class="r"><code># FIXME
 getwd()</code></pre>
 <pre><code>## [1] &quot;/Users/kmm/Documents/GitHub/quant_methods/Problem_Sets&quot;</code></pre>
@@ -2154,7 +2165,7 @@ across the four groups.</p>
 <div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>There are &gt;17,000 as of January, 2021<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>There are &gt;20,000 as of January, 2023<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Inside the call to <code>library()</code>, package names
 do not need to be quoted (but they can be without incident).
 <code>install.packages()</code>, on the other hand, expects to receive a
