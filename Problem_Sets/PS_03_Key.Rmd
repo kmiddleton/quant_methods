@@ -19,18 +19,20 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
+
 # Plant Growth Rates
+
 
 ## Tidy Data
 
 We will be using `library(tidyverse)` a lot in this course, and one thing that makes this set of packages function really well is having "tidy" data. This will help you for future data manipulation, cleaning, visualization and analysis.
+
 
 ### Activity
 
 What are the 3 rules that make data tidy?
 
 > Tidy data has 3 rules. 1) Each variable must have its own column. 2) Each observation must have its own row. 3) Each value must have its own cell.
-
 
 To practice learning how to tidy data, we will will use a dataset from Hautier, Yann et al. (2020), *Fast and furious: Early differences in growth rate drive short-term plant dominance and exclusion under eutrophication.* In this paper, the authors are trying to understand the mechanisms by which diversity is lost under fertilization (i.e., eutrophication). One way they think some species have an advantage is by having a fast early growth rate.  Let's tidy up this dataset so we can look at the trends in growth of different plant species.
 
@@ -58,7 +60,7 @@ To make this data go from wide to long format, you need to use the function `piv
 # We show three ways below.
 
 # Pass a string vector specifying all the column names directly
-gr_long <- gr %>%
+gr_long <- gr |>
   pivot_longer(cols = c("day_0","day_13","day_34","day_54","day_61","day_68",
                         "day_75","day_90","day_97", "day_103", "day_112"), 
                names_to ="day", 
@@ -67,7 +69,7 @@ gr_long
 
 
 # Just specifying the column numbers
-gr_long2 <- gr %>%
+gr_long2 <- gr |>
   pivot_longer(cols = c(3:13), 
                names_to ="day", 
                values_to ="biomass")
@@ -75,7 +77,7 @@ gr_long2
 
 # Use the starts_with() function to select all columns beginning with the 
 # string "day_"
-gr_long3 <- gr %>%
+gr_long3 <- gr |>
   pivot_longer(cols = starts_with("day_"), 
                names_to ="day", 
                values_to ="biomass")
@@ -87,7 +89,6 @@ all.equal(gr_long, gr_long3)
 all.equal(gr_long2, gr_long2)
 ```
 
-
 Now that you have tidied this data, explain why it is tidy. Hint - use the column and row descriptions to explain each of the three rules above.
 
 > Each variable has it's own column, including plot, species, day, and biomass.  Each row is a unique plot by species combination, thus each row is an observation.  Finally, each cell is a value, there is one actual number/entry for each cell in the dataset.
@@ -97,13 +98,14 @@ Now that you have tidied this data, explain why it is tidy. Hint - use the colum
 
 The `separate()` function allows you to split columns of your data into two.
 
+
 ### Activity
 
 You can see our `day` column is a `<chr>`, but we really only need the numeric part (i.e., removing "day_" from each. To be able to plot plant biomass growth through time, in the chunk below, pipe `gr_long` to `separate()` to split this column into two, making sure the column of integers for the day number is called `days`.
 
 ```{r, message=FALSE}
 # FIXME
-gr_long <- gr_long %>%
+gr_long <- gr_long |>
   separate(day, into = c("text", "days"), convert = TRUE)
 
 # You can also remove this extraneous column using this the [] and - the column of interest
@@ -111,33 +113,38 @@ gr_long <- gr_long[,-3]
 gr_long
 
 # Alternately, you can use select() with - to do this step in a pipe:
-gr_long2 <- gr_long2 %>%
-  separate(day, into = c("text", "days"), convert = TRUE) %>% 
+gr_long2 <- gr_long2 |>
+  separate(day, into = c("text", "days"), convert = TRUE) |> 
   select(-text)
 ```
 
 Check the structure of your modified tibble. You may notice that your new column `days` is still a character.  If so, go back and fix the code above so it is no longer a character. Check the help file for `separate()`.
 
+
 ## Data Counts
 
-Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups.
+Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups. Similarly, the `count()` function does both steps in one, grouping by the columns inside `()` and then counting.
+
 
 ### Activity
 
-In the chunk below, pipe `gr_long` to `group_by()`, grouping by species. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way.
+In the chunk below, pipe `gr_long` to `group_by()`, grouping by species. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way. Also try the same using `count()`.
 
 ```{r}
 #FIXME
-gr_long %>% group_by(species) %>% tally()
+gr_long |> group_by(species) |> tally()
+gr_long |> count(species)
 ```
 
 Do you have equal sample size across all species?
 
 > Yes, 55.
 
+
 ## NA's
 
-Missing data can sometimes throw off our estimates if we are not sure if data is there or not. R will code blank cells in your dataset as `NA` when you read in your data.  `NA`'s are explicit if you can see them in your dataset, and they are implicit if a row does not exist in a dataset when a data value is missing. Exploicit `NA`'s will be counted by `tally()`.
+Missing data can sometimes throw off our estimates if we are not sure if data is there or not. R will code blank cells in your dataset as `NA` when you read in your data. `NA`'s are explicit if you can see them in your dataset, and they are implicit if a row does not exist in a dataset when a data value is missing. Explicit `NA`'s will be counted by `tally()`.
+
 
 ### Activity
 
@@ -145,6 +152,7 @@ Our code above indicates that we have equal sample size in our data for each spe
 
 ```{r}
 #FIXME
+
 #View(gr_long)
 ```
 
@@ -154,6 +162,7 @@ The function `is.na()` returns true when a value is `NA`. By summing the number 
 
 ```{r}
 # FIXME
+
 sum(is.na(gr_long$biomass))
 ```
 
@@ -169,10 +178,11 @@ The `drop_na()` function allows you to drop rows that have `NA`s in them in orde
 
 ```{r}
 #FIXME
-gr_long2 <- gr_long %>%
+gr_long2 <- gr_long |>
   drop_na()
 
-gr_long2 %>% group_by(species) %>% tally()
+gr_long2 |> group_by(species) |> tally()
+gr_long2 |> count(species)
 ```
 
 > No, now we see we have different sample sizes per species. 
@@ -181,6 +191,7 @@ gr_long2 %>% group_by(species) %>% tally()
 ## Data Exploration
 
 Let's look at this growth rate data to see if we see any differences between species.  
+
 
 ### Activity
 
@@ -235,28 +246,31 @@ comp <- read_csv("../data/rainout_plantspecies_presence.csv")
 str(comp)
 ```
 
+
 ## Summarizing
 
 One very important tool you will learn from the tidyverse is how to summarize your data. We will use the `summarize()` function quite a bit in this course, so let's get some practice. One thing we might want to know about is how many unique species are in each subplot within each plot. That way we can start to make predictions about how rain exclusion influences species richness.  Using `group_by()` and `summarize()`, calculate the number of unique species per subplot within each plot in `comp`. Save the new object as `richness`, and also name the new variable `richness`.  Hint `(length(unique(<variable-of-interest>)))` will give you the number of rows that are unique within the groups you have set, which equates to the number of unique species, or richness, per subplot.
+
 
 ### Activity
 
 ```{r, message=FALSE}
 # FIXME
 
-richness <- comp %>%
-  group_by(plot_no, subplot) %>%
+richness <- comp |>
+  group_by(plot_no, subplot) |>
   summarize(richness = length(unique(species)))
 richness
 
-# You can get rid of the message `summarise()` has grouped output by 'plot_no'
+# You can get rid of the message `summarize()` has grouped output by 'plot_no'
 # like this:
-richness2 <- comp %>%
-  group_by(plot_no, subplot) %>%
+richness2 <- comp |>
+  group_by(plot_no, subplot) |>
   summarize(richness = length(unique(species)),
             .groups = "drop")
 richness2
 ```
+
 
 ## Joining
 
@@ -279,18 +293,20 @@ Join your plot level data to your species richness data using `left_join()`. You
 
 ```{r, message=FALSE}
 # FIXME
-richness <- richness %>%
+richness <- richness |>
   left_join(plot_ids, by = c("plot_no", "subplot"))
 richness
 
 #Also
-richness %>%
+richness |>
   left_join(plot_ids)
 ```
+
 
 ## More Summarizing
 
 Along with the minimum, maximum, and range, two of the simplest and most common descriptive statistics are means and standard deviations.
+
 
 ### Activity
 
@@ -298,8 +314,8 @@ Calculate the mean and standard deviation for species richness for each plot. Us
 
 ```{r}
 # FIXME
-mean_richness <- richness %>%
-  group_by(plot_no) %>%
+mean_richness <- richness |>
+  group_by(plot_no) |>
   summarize(mean = mean(richness),
             sd = sd(richness))
 mean_richness
@@ -307,14 +323,16 @@ mean_richness
 
 To visualize whether there are consistent differences in richness between rainout treatments, we will plot our data. 
 
+
 ### Activity
 
 Create a graph that shows how rain removal influences the average species richness using a scatter plot.  Color your points by plot number in the `aes()`. Add transparency and/or jitter to make sure you can see all points clearly. Because plots are a category, make sure it is being treated as a factor when you make your plot. Feel free to fix up the axis labels or choose a new color scheme if you wish.
 
 ```{r}
 # FIXME
-ggplot(richness, aes(x = rain_removal, y = richness, color = factor(plot_no))) +
-  geom_point(position = position_jitter(width=0.2), alpha = 1/2) 
+ggplot(richness, aes(x = rain_removal, y = richness,
+                     color = factor(plot_no))) +
+  geom_point(position = position_jitter(width = 0.2), alpha = 1/2) 
 
 ```
 
@@ -324,7 +342,8 @@ With a scatterplot and this number of plots, it is difficult to see the trends p
 ```{r}
 # FIXME
 
-ggplot(richness, aes(x = rain_removal, y = richness, color = factor(plot_no))) +
+ggplot(richness, aes(x = rain_removal, y = richness,
+                     color = factor(plot_no))) +
   geom_boxplot() 
 
 ```
@@ -335,6 +354,7 @@ Notice how setting `color =` in the aesthetics causes ggplot to split the data i
 # Cleaning up the Spider Size Dimorphism data again
 
 In the last problem set, you spent some time cleaning up the spider size dimorphism data using base R functions. This week, we will so some of the same operations, but use functions from the tidyverse. While it is very good to know and be able to use base R functions, the same set of operations can be accomplished using tidy functions in pipes. This makes for more compact code that requires less deciphering of logical subsetting (all the `[]` notation).
+
 
 ### Activity
 
@@ -349,25 +369,23 @@ Counting the numbers of groups is easily accomplished by using the `tally()` fun
 
 ```{r}
 ## FIXME
-M %>% 
-  group_by(Species, Sex) %>% 
-  tally()
+M |> 
+  count(Species, Sex)
 ```
 
 You should be able to easily detect the mis-coded `Sex` variables and spelling errors in the `Species` names.
 
 We will fix the `Sex` variable first. Because you currently have a mix of lower and upper case, and we want all uppercase, we can use the built-in `toupper()` function which makes a string all uppercase. There is a similar `tolower()` function, if you happen to want all lower case.
 
-In this chunk, mutate `Sex` using `toupper()`. Overwrite your R object from above with the output. Then use the same `group_by() %>% tally` code your wrote above to check that you now only have `F` and `M` in the `Sex` column.
+In this chunk, mutate `Sex` using `toupper()`. Overwrite your R object from above with the output. Then use the same tallying code your wrote above to check that you now only have `F` and `M` in the `Sex` column.
 
 ```{r}
 ## FIXME
-M <- M %>% 
+M <- M |> 
   mutate(Sex = toupper(Sex)) 
 
-M %>% 
-  group_by(Species, Sex) %>% 
-  tally()
+M |> 
+  count(Species, Sex)
 ```
 
 You should now see that just two observations of `Species` are incorrect. There are a few ways to "find and replace" strings in R. The `stringr` package, which is loaded automatically as part of the tidyverse has a series of functions that start with `str_` to work with strings (find, replace, subset, etc.).
@@ -381,16 +399,15 @@ zz <- c("x_1", "x_2")
 str_replace(zz, "x", "xyz")
 ```
 
-This code replaces `x` with `xyz`. In the following chunk, overwrite `Species` with a `mutate()`ed version of itself passed through `str_replace()` where you correct the two spellings that are incorrect (you will mutate Species twice, once for each correction). Then use the same code as above to `tally()` the data and check that the four groups now have 50 observations each.
+This code replaces `x` with `xyz`. In the following chunk, overwrite `Species` with a `mutate()`ed version of itself passed through `str_replace()` where you correct the two spellings that are incorrect (you will mutate Species twice, once for each correction). Then use the same code as above to tally the data and check that the four groups now have 50 observations each.
 
 ```{r}
 ## FIXME
-M <- M %>% 
+M <- M |> 
   mutate(Species = str_replace(Species, "Pardosa ramulosa", "Pardosa_ramulosa"),
          Species = str_replace(Species, "Pardosa_ramuloso", "Pardosa_ramulosa")) 
-M %>% 
-  group_by(Species, Sex) %>% 
-  tally()
+M |> 
+  count(Species, Sex)
 
 ```
 

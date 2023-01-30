@@ -13,6 +13,7 @@ output:
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 
+library(tidyverse)
 
 ```
 
@@ -70,11 +71,11 @@ Check the structure of your modified tibble. You may notice that your new column
 
 ## Data Counts
 
-Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups.
+Another way to get counts by group uses `group_by()` and `tally()`, which are part of tidyverse. `group_by()` splits data by factors (most commonly, but numerics will work as well) and `tally()` adds up the number of observations in each of those groups. Similarly, the `count()` function does both steps in one, grouping by the columns inside `()` and then counting.
 
 ### Activity
 
-In the chunk below, pipe `gr_long` to `group_by()`, grouping by species. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way.
+In the chunk below, pipe `gr_long` to `group_by()`, grouping by species. Then pipe that to `tally()`. `tally()` does not require any arguments when used this way. Also try the same using `count()`.
 
 ```{r}
 
@@ -86,7 +87,7 @@ Do you have equal sample size across all species?
 
 ## NA's
 
-Missing data can sometimes throw off our estimates if we are not sure if data is there or not. R will code blank cells in your dataset as `NA` when you read in your data.  `NA`'s are explicit if you can see them in your dataset, and they are implicit if a row does not exist in a dataset when a data value is missing. Exploicit `NA`'s will be counted by `tally()`.
+Missing data can sometimes throw off our estimates if we are not sure if data is there or not. R will code blank cells in your dataset as `NA` when you read in your data. `NA`'s are explicit if you can see them in your dataset, and they are implicit if a row does not exist in a dataset when a data value is missing. Explicit `NA`'s will be counted by `tally()`.
 
 ### Activity
 
@@ -237,7 +238,7 @@ Start by loading the original `Size_Dimprphism.xlsx` file into an R object. Use 
 
 ```
 
-Counting the numbers of groups is easily accomplished by using the `tally()` function of grouped data like you saw above. In the next chunk, use `group_by()` to group the data by `Species` and `Sex` and then pipe this result to `tally()`
+In this chunk, mutate `Sex` using `toupper()`. Overwrite your R object from above with the output. Then use the same tallying code your wrote above to check that you now only have `F` and `M` in the `Sex` column.
 
 ```{r}
 
@@ -266,7 +267,7 @@ str_replace(zz, "x", "xyz")
 
 ```
 
-This code replaces `x` with `xyz`. In the following chunk, overwrite `Species` with a `mutate()`ed version of itself passed through `str_replace()` where you correct the two spellings that are incorrect (you will mutate Species twice, once for each correction). Then use the same code as above to `tally()` the data and check that the four groups now have 50 observations each.
+This code replaces `x` with `xyz`. In the following chunk, overwrite `Species` with a `mutate()`ed version of itself passed through `str_replace()` where you correct the two spellings that are incorrect (you will mutate Species twice, once for each correction). Then use the same code as above to tally the data and check that the four groups now have 50 observations each.
 
 ```{r}
 
