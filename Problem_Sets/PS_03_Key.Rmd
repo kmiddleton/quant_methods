@@ -116,6 +116,12 @@ gr_long
 gr_long2 <- gr_long2 |>
   separate(day, into = c("text", "days"), convert = TRUE) |> 
   select(-text)
+
+# A fourth method to is to remove "day_" from `day` with `str_remove()` via
+# `mutate()`
+#
+# gr_long <- gr_long |> 
+#   mutate(days = as.numeric(str_remove(day, "day_")), .keep = "unused")
 ```
 
 Check the structure of your modified tibble. You may notice that your new column `days` is still a character.  If so, go back and fix the code above so it is no longer a character. Check the help file for `separate()`.
