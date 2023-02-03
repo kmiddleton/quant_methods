@@ -238,7 +238,7 @@ Start by loading the original `Size_Dimprphism.xlsx` file into an R object. Use 
 
 ```
 
-In this chunk, mutate `Sex` using `toupper()`. Overwrite your R object from above with the output. Then use the same tallying code your wrote above to check that you now only have `F` and `M` in the `Sex` column.
+Counting the numbers of groups is easily accomplished by using the `tally()` function of grouped data like you saw above. In the next chunk, use `group_by()` to group the data by `Species` and `Sex` and then pipe this result to `tally()`
 
 ```{r}
 

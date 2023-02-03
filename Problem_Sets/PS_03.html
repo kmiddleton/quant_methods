@@ -1504,7 +1504,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Problem Set 03</h1>
 <h4 class="author">Your Name Here: Group X</h4>
-<h4 class="date">Last updated: 2023-01-30</h4>
+<h4 class="date">Last updated: 2023-02-03</h4>
 
 </div>
 
@@ -1792,10 +1792,11 @@ subsetting (all the <code>[]</code> notation).</p>
 <p>Start by loading the original <code>Size_Dimprphism.xlsx</code> file
 into an R object. Use the original version with the data entry errors,
 not the cleaned version that you exported.</p>
-<p>In this chunk, mutate <code>Sex</code> using <code>toupper()</code>.
-Overwrite your R object from above with the output. Then use the same
-tallying code your wrote above to check that you now only have
-<code>F</code> and <code>M</code> in the <code>Sex</code> column.</p>
+<p>Counting the numbers of groups is easily accomplished by using the
+<code>tally()</code> function of grouped data like you saw above. In the
+next chunk, use <code>group_by()</code> to group the data by
+<code>Species</code> and <code>Sex</code> and then pipe this result to
+<code>tally()</code></p>
 <p>You should be able to easily detect the mis-coded <code>Sex</code>
 variables and spelling errors in the <code>Species</code> names.</p>
 <p>We will fix the <code>Sex</code> variable first. Because you
