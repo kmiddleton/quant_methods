@@ -33,6 +33,7 @@ Among a hypothetical population, blood type probabilities for all the combinatio
 | AB+ |     0.07  |
 | AB- |     0.001 |
 
+
 ### Activity
 
 What are the probabilities that a randomly selected individual has:
@@ -61,17 +62,17 @@ f. Rh+ blood
 
 > 0.39 + 0.27 + 0.25 + 0.07 = 0.98
 
+
 ## PSA
 
 Elevated prostate-specific antigen (PSA) can indicate prostate cancer but can also result from other conditions unrelated to cancer. As with most medical tests, the PSA blood test, which is used as a screen for prostate cancer, is not 100% accurate. 4% of men over 65 have prostate cancer. When cancer is present, the test is positive 75% of the time. When cancer is absent, the test is positive in 7% of tests.
 
+
 ### Activity
 
-What is the probability that randomly tested man over 65 has prostate cancer, given that they have received a positive PSA test? Solve this problem however you would like.
+What is the probability that randomly tested person over 65 has prostate cancer, given that they have received a positive PSA test? Solve this problem however you would like.
 
 You are trying to find $Pr[Ca|Positive~Test]$.
-
-### FIXME
 
 #### Via Bayes' Rule
 
@@ -90,12 +91,12 @@ False_pos <- 0.07
 (True_pos * Ca_rate) / (True_pos * Ca_rate + (1 - Ca_rate) * False_pos)
 ```
 
-#### Or intuitively using an arbitrary number of tests
+#### Using an arbitrary number of tests
 
 Assume that you carry out 1,000 tests.
 
-- Total men with cancer: 1000 $\times$ 0.04 = 40
-- Total men with no cancer: 1000 $\times$ (1 − 0.04) = 960
+- Total with cancer: 1000 $\times$ 0.04 = 40
+- Total with no cancer: 1000 $\times$ (1 − 0.04) = 960
 - Positive tests among cancer group: 40 $\times$ 0.75 = 30
 - Positive tests among no cancer group: 960 $\times$ 0.07 = 67.2
 - Total positive tests: 30 + 67.2 = 97.2
@@ -142,6 +143,7 @@ What is your interpretation of the factors that result in the condition, given a
 ## Random Samples
 
 R has a random number generator (actually a [pseudorandom number generator](https://en.wikipedia.org/wiki/Pseudorandom_number_generator)). Being able to simulate randomness is a critical component of programming. However, how does one avoid getting slightly different results every time you run your program if it includes randomness? R's solution, and the way to make your code reproducible, is to set the seed using `set.seed()`. Imagine you run a power simulation by randomly generating data and claim your power is 84%. How would another research confirm your results? Let's explore this feature.
+
 
 ### Activity
 
@@ -212,7 +214,7 @@ sample(pp_all$id, 5)
 
 # 2
 pp_all[sample(seq(1, nrow(pp_all)), 5), ]
-pp_all %>% 
+pp_all |> 
   slice_sample(n = 5)
 ```
 
@@ -220,7 +222,7 @@ How would you use `slice_sample()` to randomly select 50% of the rows without fi
 
 ```{r}
 ## FIXME
-pp_all %>% 
+pp_all |> 
   slice_sample(prop = 0.5)
 ```
 
@@ -230,6 +232,7 @@ One final note on `set.seed()`: typically, you just need to set the seed once at
 ## Distributions
 
 We want to give you some practice generating random numbers and plotting. These activities are critical to numerical simulation, which we will do off and on throughout the course.
+
 
 ### Activity
 
@@ -309,8 +312,8 @@ Consider #3 and #6 from above. What proportion of values from each set are above
 
 ```{r}
 # FIXME
-xx.b %>%
-  group_by(id) %>%
+xx.b |>
+  group_by(id) |>
   summarize(pct = sum(value > 7) / n)
 
 #3
