@@ -74,6 +74,7 @@ What is the probability that randomly tested person over 65 has prostate cancer,
 
 You are trying to find $Pr[Ca|Positive~Test]$.
 
+
 #### Via Bayes' Rule
 
 $$Pr[Ca|Positive~Test] = \frac{Pr[Positive~Test|Ca] \times Pr[Ca]}{Pr[Positive~Test]}$$
@@ -91,9 +92,10 @@ False_pos <- 0.07
 (True_pos * Ca_rate) / (True_pos * Ca_rate + (1 - Ca_rate) * False_pos)
 ```
 
+
 #### Using an arbitrary number of tests
 
-Assume that you carry out 1,000 tests.
+Assume that you carry out 1,000 tests. Note that is doesn't matter that there are "partial"positive tests (i.e., 67.2 below). The calculations work just fine.
 
 - Total with cancer: 1000 $\times$ 0.04 = 40
 - Total with no cancer: 1000 $\times$ (1 − 0.04) = 960
