@@ -1,5 +1,5 @@
 ---
-title: "In Class Exercises"
+title: "Unit 4: In Class Exercises"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
@@ -15,6 +15,12 @@ library(tidyverse)
 library(cowplot)
 theme_set(theme_cowplot())
 ```
+
+
+## Announcements
+
+- Submit both your Rmd and the knitted HTML file. It helps us to review what you have done.
+- A few words on peer evaluations
 
 
 ## Thinking about probabilities
@@ -302,8 +308,3 @@ Probability of having cancer, given negative test:
 ```{r}
 0.2/89.3
 ```
-
-
-
-
-
