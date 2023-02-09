@@ -154,13 +154,9 @@ Missing data can sometimes throw off our estimates if we are not sure if data is
 
 ### Activity
 
-Our code above indicates that we have equal sample size in our data for each species, however you may have noticed that in our initial dataset there are some `NA`'s.  Do we still have `NA`'s in our dataset? Use `View()` to investigate `gr_long` and find out.
+Our code above indicates that we have equal sample size in our data for each species, however you may have noticed that in our initial dataset there are some `NA`'s.  Do we still have `NA`'s in our dataset? 
 
-```{r}
-#FIXME
-
-#View(gr_long)
-```
+You can type `View(gr_long)` into the R console to investigate `gr_long` and find out. In general, don't put `View()` into a chunk or R will pause when knitting.
 
 > Yes we still have NA's.
 
