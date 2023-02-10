@@ -20,6 +20,7 @@ theme_set(theme_cowplot())
 ## Announcements
 
 - Submit both your Rmd and the knitted HTML file. It helps us to review what you have done.
+- Progress Check 1 coming next week
 - A few words on peer evaluations
 
 
@@ -28,52 +29,6 @@ theme_set(theme_cowplot())
 Why learn probability?
 
 - You could learn all the statistical analyses/tests without really understanding probability.
-
-
-## Should the Packers have gone for 2? | 2015 NFL playoffs
-
-Packers score a touchdown as time ends to trail by 1 point at the end of the game.
-
-<center>
-<img src="https://i.imgur.com/OIhNSSM.jpg" width="50%" />
-</center>
-
-
-## Should the Packers have gone for 2?
-
-Two-point conversion + win:
-
-- League-wide success rate (since 2003): 431 of 913
-
-Extra point + overtime:
-
-- Extra point success rate (2015 only; after the extra point attempt was moved back): 1,131 of 1,199
-- Expected winning percentage in overtime (since 2001): Away team has won 110 of 242 games
-
-
-## Should the Packers have gone for 2?
-
-```{r}
-# 2-pt conversion
-431/913
-```
-
-```{r}
-# Extra point + overtime
-(1131 / 1199) * (110 / 242)
-```
-
-```{r}
-# Odds
-(431/913) / ((1131 / 1199) * (110 / 242))
-```
-
-
-## Should the Packers have gone for 2?
-
-<center>
-<img src="https://i.imgur.com/NRceB91.png" width="100%" />
-</center>
 
 
 ## Binomial probabilities
@@ -173,15 +128,6 @@ ggplot(M, aes(Lefties, log_Prob)) +
 ```
 
 
-## Reached Via a Mind-Reading Device...
-
-[... Deeply Paralyzed Patients Say They Want to Live](https://www.technologyreview.com/s/603512/reached-via-a-mind-reading-device-deeply-paralyzed-patients-say-they-want-to-live/?set=603545)
-
-> In response to the statement "I love to live" three of the four replied yes.
-
-> To verify the four could communicate, Birbaumer's team asked patients, over the course of about 10 days of testing, to respond yes or no to statements such as "You were born in Berlin" or "Paris is the capital of Germany" by modulating their thoughts and altering the blood-flow pattern. The answers relayed through the system were consistent about 70 percent of the time, substantially better than chance. 
-
-
 ## Powerball
 
 1. 69 balls in one pool: Choose 5
@@ -216,20 +162,6 @@ choose(69, 5) * choose(26, 1)
 ```
 
 What if the order had to be correct as well?
-
-
-## Conditional probability thought experiment
-
-A coin is tossed 100 times. Gamblers can bet on the total number of heads that will be thrown. They can do so at any time before or during the game.
-
-- Imagine that you're betting before the game starts. What is your best bet?
-
-
-## Conditional probability thought experiment
-
-Now imagine that you're betting after the coin was already tossed 10 times and came up heads all 10 times.
-
-- What is the best bet now?
 
 
 ## Breast cancer screening
