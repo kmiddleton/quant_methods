@@ -27,24 +27,25 @@ island_data <- tibble(
 ## Topics for Today
 
 1. Learning R: help, syntax, resources, time?
-2. Setting the seed
+2. Distributions
 3. Tidyverse functions
 4. Data Visualization
 5. Probability & Distributions
 
 ## Learning R {.smaller}
 
-> How long should this reasonably take us if this class is one of our first experiences coding?
+> I have the basics, but a lot of times the problem sets ask for more and it's a bit hard to understand even with outside help (internet, R help, etc.)
 
-> What is the best way to learn the syntax of R? I have noticed that there are sometimes ways of doing things that generate the same output, but it can be very confusing to practice or attempt to do our exercises because I'm not consistently using the "same" way of doing a task.
+> I think I would most like a quick/comprehensive review of the 5 to 10 most used R functions for the class. It doesn't have to be long, but just an explanation of what they are, what they do, what their arguments are, how they work together, etc.
 
-> Are there any resources that provide additional R practice for complete beginners that you would recommend? I'd like to get better at knowing which codes to use when (from memory), and especially how to combine codes to perform more complex operations. Googling has been super helpful so far, but a lot of the time I don't understand the answers I find so I wind up copy+pasting code without really knowing how it works. Thanks!
+> Should we memorize these functions that we covered in class?
+
+> When writing in R how do you know when to use " " and when not two when referring to variables and values.
+
 
 ## Learning R {.smaller}
 
-> Is there a resource that puts R language in simple terms? To elaborate, does a resource exist that allows you to study what words go to which functions? I have trouble forming code because I simply cannot put together functional language in R. I learn to use certain verbiage in some functions, but they dont work in others, or the language is recycled, but I have no way of knowing that. I do not find the ?sample help to be helpful, in that, it puts the examples in code and not in plain language.
-
-> My question is about using help files in general. I know how to access help files (?mutate) but I have a hard time understanding how to use the help file. There are often a lot of components involved and I have a hard time making sense of the instructions/info within the help files.
+> Secondly (and this is a bit more philosophical) is there a "right" answer? Although you said at the beginning of the semester that there are many ways to do the same operation in R, it does seem like there are particular ways you would prefer us to do things in opposition to that. Could you be explicit about where we can have freedom to experiment and where you want "your" answer?
 
 
 ## Strategies for Learning R
@@ -61,42 +62,126 @@ island_data <- tibble(
     - For learning R & lots of other stuff (like Git)
 
 
-## Quick Git Question
+## Distributions
 
-> How do you transfer the traceback of your edits to github? Or do you have to start on github in order to have everything be in sync? Hopefully this question makes sense... I am sure I am not wording it right.
+> Does the sample size affect what type of distribution we use? How big should the population be in order to use a binomial distribution, for example? Is there a specific guide to help us pick the type of distribution for publication purposes? Can binomial data be normally distributed?
 
-
-## Setting the Seed {.smaller}
-
-> I was also wondering how set.seed() behaves when you have to use it multiple times consecutively. For example, say you set.seed(1) to then create a vector of random numbers (AA). Then if you want to create a second vector of random numbers (BB) - if you do not set.seed() again, will R automatically start at set.seed(2)? Or does it start with a very different random/haphazard number, like set.seed(4378)?
-
-> what is the basis of the set.seed() function that allows you to set the seed one time and assign several functions with random variables that give you different values (though consistent each time you run) but if you set the seed again before assigning each variable and you get identical values.
+> I am confused about the Distribution part. The activity under the distribution section of Problem set 4 gave me a hard time; luckily, we work in groups so got help.
 
 
-## Setting the Seed {.smaller}
+## What kind of data do I have?
 
-- Think of `set.seed()` as telling R - "start the random number generator here"
+Continuous values:
+
+- Can the data take any value on the number line (including integers)?
+- Normal (Gaussian) or some variation
+
+Discrete "successes" with two possible outcomes:
+
+- Yes/no, presence/absence, survived/didn't, A/a, XX/XY
+- Binomial
+- Poisson (counts per space/time)
+
+
+## Distributions
+
+> What are power analyses and are they actually useful, or just a way of trying to get your data to a point of potential 'normality'? Would you recommend using it for any type of analysis?
+
+> The second question is related to distribution of data. Supposed we want to check which distribution our data fit in. Let's say we plot the histogram. Visually it looks that the data has a Poisson distribution with a lot of zero in our data. How can we test that it fits statistically that specific distribution?
+
+
+## Tests of normality
+
+```{r, echo=FALSE, fig.height=3}
+x <- rnorm(5000)
+ggplot(tibble(x), aes(x)) +
+  geom_histogram(bins = 30)
+```
 
 ```{r}
-
-set.seed(624221)
-
-sample(letters, 5)
-sample(letters, 5)
-
-set.seed(624221)
-
-sample(letters, 5)
+shapiro.test(x)
 ```
 
 
-## Tidyverse: joins & pivots
+## Tests of normality
 
-> I don't have a specific question, but I think I could use more time going over joins. I think in particular, I don't fully understand how to handle a situation with duplicate keys or when there are not unique identifiers.
+```{r, echo=FALSE, fig.height=3}
+x <- runif(500)
+ggplot(tibble(x), aes(x)) +
+  geom_histogram(bins = 30)
+```
 
-> I am still having issue understanding well the pivot (long and short) function.
+```{r}
+shapiro.test(x)
+```
 
-> In what situations do you use pivot_longer and pivot_wider?
+
+## Tests of normality
+
+```{r, echo=FALSE, fig.height=3}
+x <- rnorm(20)
+ggplot(tibble(x), aes(x)) +
+  geom_histogram(bins = 30)
+```
+
+```{r}
+shapiro.test(x)
+```
+
+
+## Tibbles, matrices, and data.frames
+
+> Dataframes, matrices, and tibbles are still a bit confusing. Could you go over the differences in each one and how they are similar and different?
+
+> When is it appropriate to select creating a tibble over a data frame?
+
+> What is the best way to determine if there are formatting issues in the data.
+
+- `str()`, `glimpse()`, `unique()`, `count()`
+
+
+## Slicing
+
+> I still don't understand slice_sample() very well or how it works. Could you please go over it?
+
+NYC Air quality May-September 1973
+
+```{r}
+str(airquality)
+```
+
+
+## Slicing specific rows
+
+```{r}
+airquality[c(1, 3, 5), ]
+airquality |> slice(1, 3, 5)
+```
+
+
+## 7 rows
+
+```{r}
+airquality[sample(1:nrow(airquality), 7), ]
+
+airquality |> slice_sample(n = 7)
+```
+
+
+## 5% of rows
+
+```{r}
+airquality[sample(1:nrow(airquality), nrow(airquality) %/% 20), ]
+
+airquality |> slice_sample(prop = 0.05)
+```
+
+
+## Tidyverse: pivots
+
+> Why is it good data practice to keep my data in a bunch of smaller tables that I join together?
+
+> When making clean data, what is the best way to determine whether or not you need to make it longer or wider at a quick glance of the data.
 
 
 ## Pivots
@@ -250,9 +335,30 @@ penguins_long %>%
 ```
 
 
+## Tidyverse: joins
+
+> Could you go over mutating joins?
+
+> A review of the different join methods and how to select one.
+
+> I would like to get explanation again on how the code for joining two datasets work and how can we specify in the code what we need; for example if we want only one column from df1 to merge it from only one column from df2. Or if we wouldn't want all observations/rows in the new merged set.
+
+
+## Tidyverse: joins
+
+Always joining two tibbles/data.frames.
+
+What rows do you want to keep?
+
+- `left_join(x, y)`: includes all rows in x.
+- `right_join(x, y)`: includes all rows in y.
+- `inner_join(x, y)`: includes all rows in x *and* y.
+- `full_join(x, y)`: includes all rows in x *or* y.
+
+
 ## Joining
 
-You also have data about the islands:
+You also have data about the penguins' islands:
 
 ```{r}
 island_data
@@ -261,8 +367,8 @@ island_data
 
 ## Which way to join?
 
-1. penguin data into island data
-2. island data into penguin data
+1. Penguin data into island data
+2. Island data into penguin data
 
 
 ## Keys
@@ -279,13 +385,10 @@ left_join(penguins, island_data)
 ```
 
 
-## Tidyverse: summarize & mutate
+## Tidyverse: summarize, mutate, etc.
 
-> How exactly does summarize work? I feel like I've read the documentation a bunch but still don't exactly get what R is "actually" doing.
+> I think I understand the difference between the mutate() and transmute() functions but, just to be clear, mutate() adds your new calculated variable on to your dataframe you've specified and keeps your original variables as well while transmute() only returns the new variable while eliminating or modifying the original variable you acted on as well?
 
-> Is there a way to ungroup something once it is grouped?
-
-> Could we discuss mutate and paste? I can't find how to add the column the second way.
 
 
 ## Making new variables
@@ -297,6 +400,7 @@ penguins <- penguins %>%
 
 str(penguins)
 ```
+
 
 ## Making new variables
 
@@ -357,44 +461,19 @@ Also explicit `ungroup()` function.
 
 ## Data Visualizations
 
-> So I think I understand how to apply log scale to plots well enough (or at least can refer to the notes to remind myself how to do it), but I think if I were putting this into practice for myself, I would not always understand when it is appropriate to do that. Based on what we have learned, it seems best to use if when you are trying to fit a linear model to things that are exponentially correlated? Is that correct? What are the reasons it is good to fit exponential correlations into linear models?
-
-> One thing that I tried to do in ggplot (for the density plots in problem set 04) is to set an alpha for each distribution, but I was having a hard time trying to get R to do so, even after consulting the tidyverse website. I coded 'alpha = 0.5' but I think it gave transparency to both density curves rather than just the one in front. Is there a way to assign alpha according to a factor/categorical variable? I also tried alpha = c(1, 0.5) but kept getting errors with that.
+> What should one consider when deciding which plot to use for a given data set? Based on the graphs, would it be easy to identify if we used the incorrect type of distribution and what would that look like?
 
 
-## log-log plots
+> In ggplot, how and why does assigning 'color = Species' works? Does it plot by the species or does it give it a color?
 
-```{r, echo=FALSE, warning=FALSE}
-p1 <- ggplot(penguins, aes(body_mass_g, bill_length_mm)) +
-  geom_point() +
-  scale_x_log10() +
-  scale_y_log10()
+> For ggplot, is there a general rule for what goes into the aes() argument and what doesn't? Specifically for the geom additions (geom_point, geom_density, etc.)?
 
-p2 <- ggplot(penguins, aes(log_body_mass, log_bill_length)) +
-  geom_point()
+> PS 4: Create a density plot for #3 and #6 above on the same plot. First create a single data frame with both sets and a column identifying each group.
 
-plot_grid(p1, p2, ncol = 2)
-```
+> How to clean up the scatterplots and make them less noisy and more legible.
 
+> Can you go over more plot manipulation please? (ggplot, boxplots, color manipulations, grouping, and more)
 
-## log-log plots
-
-```{r, echo=FALSE, warning=FALSE}
-set.seed(8538476)
-D <- tibble(x = runif(100, 1, 1e3),
-            y = x ^ 3)
-p1 <- ggplot(D, aes(x, y)) +
-  geom_point(size = 2) +
-  geom_smooth(formula = y ~ x, se = FALSE, method = "lm")
-
-p2 <- ggplot(D, aes(x, y)) +
-  geom_point(size = 2) +
-  scale_x_log10() +
-  scale_y_log10() +
-  geom_smooth(formula = y ~ x, se = FALSE, method = "lm")
-
-plot_grid(p1, p2, ncol = 2)
-```
 
 
 ## Working with aesthetics
@@ -479,11 +558,18 @@ ggplot(penguins, aes(log_bill_length, log_bill_depth, color = species,
 All are context-specific
 
 
-## Probability & Distributions
+## Probability
 
-> Can we review Bayes' Rule? I am confused about the variables in the equation and how to determine what goes where.
+> One more slow explanation of conditional probability can't hurt. I think I just about understand it, but I want to really try and follow along.
 
-> Could we please go over some more examples of using Bayes Theorem aside from medical testing? I understand how to use the formula, but still am having trouble understanding/ interpreting what it means.
+> Could you go over an example similar to the cancer example in Problem Set 4? I am still struggling with interpreting Bayes' Rule. I understand how to set them up, but I am still working on interpreting what the question is asking!
+
+> Can we briefly go over the prostate cancer example from Problem Set 4 - specifically how to solve it efficiently using R?
+
+> I would like to go over the probability formula we used in unit 4. I feel like I still struggle with where to put each variable.
+
+> I wouldn't mind another example of Bayes' Rule. I understand the premise but would like more practice with it.
+
 
 ## Temperature dependent sex determination
 
@@ -609,168 +695,22 @@ $$Pr[T_c | Female] = \frac{0.8 \cdot 0.5}{0.65} = \frac{0.40}{0.65} = 0.62$$
 </center>
 
 
-## Probability & Distributions
+## Probability
 
-> Can you please again explain how sensitivity and specificity are different from the true positive and true negative? What do specificity and sensitivity help us during the analysis?
+> How do you correctly identify true positives, false positives, true negatives, and false negatives based on the wording provided? Additionally, how does this relate to sensitivity and specificity?
 
 
-## Probability & Distributions
+## Probability
 
 <center>
 <img src="https://i.imgur.com/TdyYkUY.jpg" width="60%" />
 </center>
 
-- Sensitivity = [a/(a+c)] × 100
-- Specificity = [d/(b+d)] × 100
+- Sensitivity = [a/(a+c)] × 100 = True Positive *Proportion*
+- Specificity = [d/(b+d)] × 100 = True Negative *Proportion*
 - Positive predictive value(PPV) = [a/(a+b)] × 100
 - Negative predictive value(NPV) = [d/(c+d)] × 100.
 
 From: https://doi.org/10.3389/fpubh.2017.00307
 
 
-## Probability & Distributions
-
-> Can you provide an example of an experiment that shows the uniform distribution? It's hard for me to think of an example.
-
-- Appropriate null hypothesis 
-    - Are plants evenly spaced in a plot or are they uneven?
-    - Are sizes evenly distributed across the range or is there evidence of size classes?
-- Prior for Bayesian inference
-- Handy for simulating data evenly in some range
-
-```{r, eval=FALSE}
-x <- runif(10, 0, 10)
-y <- x * 2 + rnorm(10, 0, 1)
-```
-
-
-## Probability & Distributions
-
-> Could you explain the difference between runif and dunif? When generating values for PS_04 they do not return the same kind of distribution even though it seems like they should both return uniform distributions of values.
-
-
-## Probability mass
-
-```{r, echo=FALSE}
-tibble(y = 0:6,
-       d = dbinom(y, size = 6, prob = 0.5)) %>% 
-  ggplot(aes(y, d)) +
-  geom_bar(stat = "identity") +
-  scale_x_continuous(breaks = 0:6)+
-  labs(title = "Binomial(0:6, 6, 0.5)",
-       y = "Density",
-       x = "Successes")
-```
-
-
-## Probability density
-
-```{r, echo=FALSE}
-tibble(y = seq(-5, 5, length.out = 200),
-       d = dnorm(y)) %>% 
-  ggplot(aes(y, d)) +
-  geom_line() +
-  labs(title = "Standard Normal Distribution",
-       y = "Density")
-```
-
-
-## `runif()` vs. `dunif()`
-
-```{r}
-set.seed(2389749)
-
-runif(n = 10, min = 0, max = 1)
-```
-
-1,000,000 random numbers [0, 1]
-
-```{r}
-y <- tibble(y = runif(n = 1e6, min = 0, max = 1))
-```
-
-
-## `runif()` vs. `dunif()`
-
-```{r, echo=FALSE}
-ggplot(y, aes(y)) +
-  geom_histogram(bins = 20)
-```
-
-
-## `runif()` vs. `dunif()`
-
-```{r, echo=FALSE}
-ggplot(y, aes(y)) +
-  geom_density() +
-  labs(y = "Density")
-```
-
-
-## `runif()` vs. `dunif()`
-
-```{r}
-d <- tibble(
-  y = seq(0, 1, length.out = 200),
-  d = dunif(y, min = 0, max = 1))
-head(d)
-```
-
-
-## `runif()` vs. `dunif()`
-
-```{r, echo=FALSE}
-ggplot(d, aes(y, d)) +
-  geom_line() +
-  labs(title = "min = 0, max = 1",
-       y = "Density")
-```
-
-
-## `runif()` vs. `dunif()`
-
-```{r}
-d <- tibble(
-  y = seq(0, 10, length.out = 200),
-  d = dunif(y, min = 0, max = 10))
-```
-
-What is the density in the range $0 \rightarrow 10$?
-
-
-## `runif()` vs. `dunif()`
-
-```{r, echo=FALSE}
-ggplot(d, aes(y, d)) +
-  geom_line()  +
-  labs(title = "min = 0, max = 10",
-       y = "Density")
-```
-
-
-## Probability & Distributions
-
-> In 04-4 Distributions, you talk about going from frequency to probability distribution, and how you have to normalize by something, by the number of events. Could you explain again what it means to normalize and how that makes a frequency distribution into a probability distribution? I just didn't fully follow. Thanks!
-
-
-## Probability & Distributions 
-
-> Is pnorm probability and proportions of a normal distribution exchangeable? Like, can you use either one? Since a lot of our statistics require normally distributed data, can we just use pnorm? Is that what a t-test compares the value against?
-
-```{r, echo=FALSE, fig.height=3}
-dd <- rnorm(1e4)
-hist(dd)
-abline(v = -1, col = "red")
-```
-
-
-## Probability & Distributions 
-
-```{r, echo=TRUE, fig.height=2.5}
-pnorm(-1)
-length(which(dd <= -1))/length(dd)
-```
-
-> Is this what a t-test does? 
-
-Close. Stay tuned.
