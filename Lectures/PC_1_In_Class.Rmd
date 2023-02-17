@@ -86,6 +86,11 @@ Discrete "successes" with two possible outcomes:
 
 > What are power analyses and are they actually useful, or just a way of trying to get your data to a point of potential 'normality'? Would you recommend using it for any type of analysis?
 
+> I would like us to talk more on Normal distribution, specifically, on log normal distribution. When do we log transform data?
+
+
+## Distributions
+
 > The second question is related to distribution of data. Supposed we want to check which distribution our data fit in. Let's say we plot the histogram. Visually it looks that the data has a Poisson distribution with a lot of zero in our data. How can we test that it fits statistically that specific distribution?
 
 
