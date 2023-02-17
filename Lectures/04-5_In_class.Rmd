@@ -216,6 +216,7 @@ Approximately correct numbers:
 
 What is the probability of a randomly sampled woman having breast cancer, given a negative test?
 
+
 ## Breast cancer screening
 
 $$Pr[C|N] = \frac{False~Negatives}{False~Negatives + True~Negatives}$$
@@ -237,6 +238,7 @@ Without cancer: 99 * 0.9 = 89.1
 Total negative tests: 0.2 + 89.1 = 89.3
 
 Probability of having cancer, given negative test: 
+
 ```{r}
 0.2/89.3
 ```
