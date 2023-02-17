@@ -32,20 +32,19 @@ island_data <- tibble(
 4. Data Visualization
 5. Probability & Distributions
 
+
 ## Learning R {.smaller}
 
 > I have the basics, but a lot of times the problem sets ask for more and it's a bit hard to understand even with outside help (internet, R help, etc.)
 
-> I think I would most like a quick/comprehensive review of the 5 to 10 most used R functions for the class. It doesn't have to be long, but just an explanation of what they are, what they do, what their arguments are, how they work together, etc.
-
-> Should we memorize these functions that we covered in class?
-
-> When writing in R how do you know when to use " " and when not two when referring to variables and values.
+> ... (and this is a bit more philosophical) is there a "right" answer? Although you said at the beginning of the semester that there are many ways to do the same operation in R, it does seem like there are particular ways you would prefer us to do things in opposition to that. Could you be explicit about where we can have freedom to experiment and where you want "your" answer?
 
 
 ## Learning R {.smaller}
 
-> Secondly (and this is a bit more philosophical) is there a "right" answer? Although you said at the beginning of the semester that there are many ways to do the same operation in R, it does seem like there are particular ways you would prefer us to do things in opposition to that. Could you be explicit about where we can have freedom to experiment and where you want "your" answer?
+> I think I would most like a quick/comprehensive review of the 5 to 10 most used R functions for the class. It doesn't have to be long, but just an explanation of what they are, what they do, what their arguments are, how they work together, etc.
+
+> Should we memorize these functions that we covered in class?
 
 
 ## Strategies for Learning R
@@ -214,7 +213,7 @@ island_data
 ## Long data
 
 - Truly "tidy"
-- Usually impractical for data entry (lot of repeated values)
+- Frequently impractical for data entry (lot of repeated values)
 - Often useful for plotting
     - Column name becomes a value for a new variable
     - Cell value becomes the value for that new variable
@@ -224,14 +223,27 @@ island_data
 `pivot_wider()`: long $\rightarrow$ wide
 
 
+## "Quoted" vs. unquoted variables
+
+> When writing in R how do you know when to use " " and when not two when referring to variables and values.
+
+- Most tidyverse functions can be unquoted
+    - A few exceptions (e.g., `facet_wrap("variable")`)
+- When you need a "string"
+    - `names_to = "bill_measure"`
+    - `today <- "Friday"`
+- Mix in base R
+    - `penguins$species` vs. `penguins[, "species"]`
+
+
 ## You want this plot
 
 ```{r, echo=FALSE}
-penguins_long <- penguins %>%
-  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) %>% 
+penguins_long <- penguins |>
+  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) |> 
   pivot_longer(cols = -c(species, sex, body_mass_g),
                names_to = "bill_measure",
-               values_to = "length") %>% 
+               values_to = "length") |> 
   drop_na()
 
 ggplot(penguins_long, aes(x = body_mass_g, y = length, color = species)) +
@@ -255,22 +267,22 @@ Turn `bill_length_mm` and `bill_depth_mm` into a new column "bill_measure" and v
 ## `pivot_longer()`
 
 ```{r}
-penguins_long <- penguins %>%
-  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) %>% 
+penguins_long <- penguins |>
+  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) |> 
   pivot_longer(cols = c(bill_length_mm, bill_depth_mm),
                names_to = "bill_measure",
-               values_to = "length") %>% 
+               values_to = "length") |> 
   drop_na()
 ```
 
 or
 
 ```{r}
-penguins_long <- penguins %>%
-  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) %>% 
+penguins_long <- penguins |>
+  select(species, sex, body_mass_g, bill_length_mm, bill_depth_mm) |> 
   pivot_longer(cols = -c(species, sex, body_mass_g),
                names_to = "bill_measure",
-               values_to = "length") %>% 
+               values_to = "length") |> 
   drop_na()
 ```
 
@@ -305,7 +317,7 @@ ggplot(penguins_long, aes(x = body_mass_g, y = length, color = species)) +
 ## Edit values
 
 ```{r}
-penguins_long <- penguins_long %>% 
+penguins_long <- penguins_long |> 
   mutate(bill_measure = str_remove(bill_measure, "_mm"),
          bill_measure = str_remove(bill_measure, "bill_"))
 
@@ -318,7 +330,7 @@ head(penguins_long)
 Be careful:
 
 ```{r}
-penguins_long %>% 
+penguins_long |> 
   pivot_wider(id_cols = c(species, sex, body_mass_g),
               names_from = bill_measure, values_from = length)
 ```
@@ -329,8 +341,8 @@ penguins_long %>%
 `species`, `sex`, and `body_mass_g` don't uniquely identify new rows
 
 ```{r}
-penguins_long %>% 
-  group_by(species, sex, body_mass_g) %>% 
+penguins_long |> 
+  group_by(species, sex, body_mass_g) |> 
   tally()
 ```
 
@@ -394,7 +406,7 @@ left_join(penguins, island_data)
 ## Making new variables
 
 ```{r}
-penguins <- penguins %>% 
+penguins <- penguins |> 
   mutate(log_bill_length = log10(bill_length_mm),
          log_bill_depth = log10(bill_depth_mm))
 
@@ -425,10 +437,11 @@ str(penguins)
 ## Summarizing {.smaller}
 
 ```{r}
-penguins %>% 
-  group_by(species, sex, island) %>% 
+penguins |> 
+  group_by(species, sex, island) |> 
   summarize(mean_log_mass = mean(log_body_mass),
-            mean_log_bill_length = mean(log_bill_length))
+            mean_log_bill_length = mean(log_bill_length),
+            .groups = "drop")
 ```
 
 
@@ -437,26 +450,13 @@ penguins %>%
 - Some `sex` coded as `NA`
 
 ```{r}
-penguins %>% 
-  drop_na(sex) %>% 
-  group_by(species, sex, island) %>% 
-  summarize(mean_log_mass = mean(log_body_mass),
-            mean_log_bill_length = mean(log_bill_length))
-```
-
-
-## Ungrouping grouped data
-
-```{r}
-penguins %>% 
-  drop_na(sex) %>% 
-  group_by(species, sex, island) %>% 
+penguins |> 
+  drop_na(sex) |> 
+  group_by(species, sex, island) |> 
   summarize(mean_log_mass = mean(log_body_mass),
             mean_log_bill_length = mean(log_bill_length),
             .groups = "drop")
 ```
-
-Also explicit `ungroup()` function.
 
 
 ## Data Visualizations
@@ -468,6 +468,9 @@ Also explicit `ungroup()` function.
 
 > For ggplot, is there a general rule for what goes into the aes() argument and what doesn't? Specifically for the geom additions (geom_point, geom_density, etc.)?
 
+
+## Data Visualizations
+
 > PS 4: Create a density plot for #3 and #6 above on the same plot. First create a single data frame with both sets and a column identifying each group.
 
 > How to clean up the scatterplots and make them less noisy and more legible.
@@ -475,11 +478,10 @@ Also explicit `ungroup()` function.
 > Can you go over more plot manipulation please? (ggplot, boxplots, color manipulations, grouping, and more)
 
 
-
 ## Working with aesthetics
 
 ```{r, echo=FALSE}
-penguins <- penguins %>% 
+penguins <- penguins |> 
   drop_na(body_mass_g)
 ```
 
@@ -500,13 +502,13 @@ ggplot(penguins, aes(body_mass_g, fill = species)) +
 ## Working with aesthetics
 
 ```{r, fig.height=4}
-penguins <- penguins %>% 
+penguins <- penguins |> 
   mutate(species_alpha = case_when(
     species == "Adelie" ~ 1,
     species == "Chinstrap" ~ 0.5,
     species == "Gentoo" ~ 0.25
   ))
-penguins %>% select(species, species_alpha) %>% slice_sample(n = 10)
+penguins |> select(species, species_alpha) |> slice_sample(n = 10)
 ```
 
 
