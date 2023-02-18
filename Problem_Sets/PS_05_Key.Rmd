@@ -41,6 +41,7 @@ There are a few things to look at here:
 - Until you get comfortable with for loops, it's often useful to print out the values of the iterator and/or other critical data with each iteration so that you are certain of their values.
 - You can also use the function `message()` to print out counters. Try changing the code above to `message(ii)` and see how the output differs.
 
+
 ### Activity
 
 Write you own for loop, choosing a new variable name for the iterator, which will start at 50 and end at 60. Within the loop, print the value of the iterator plus 10.
@@ -58,6 +59,7 @@ Your output should be the sequence 60 to 70.
 ## Flow control: for loops, part 2
 
 A common way to work with for loops is to iterate through a pre-existing R object. The for loop will take on the values starting with the first value and iterating through to the last value of the object. So far, we have used sequence by 1, but you can iterate through the values of a vector. Here you will just pass the vector name: `for (ii in odds)`.
+
 
 ### Activity
 
@@ -87,6 +89,7 @@ for (ji in 1:length(odds)) {
 ```
 
 Notice here that the value of the iterator goes from 1 to 11 (the length of `odds`).
+
 
 ## Functions
 
@@ -124,6 +127,7 @@ y <- add_10(y)
 y
 ```
 
+
 ### Activity
 
 Write your own function below that takes two arguments. Multiply the arguments and return the value. Try out your function to make sure that it works for both single numerics and numeric vectors. What happens when the vectors are the same length? What happens when they are different lengths?
@@ -148,6 +152,7 @@ You and your friend George go to dinner once a week. You agreed that you would f
 
 After losing several times in a row, you start to get suspicious and begin keeping track. You find that after 20 weeks, you have only chosen the restaurant 5 times.
 
+
 ### Activity
 
 What is the maximum likelihood estimate (MLE) of the probability of heads for this sample from this coin? Test values ($\theta$) from 0.05 to 0.95 in increments of 0.05, and plot the log-likelihood vs. the values for $\theta$.
@@ -156,7 +161,7 @@ What is the maximum likelihood estimate (MLE) of the probability of heads for th
 # FIXME
 theta <- seq(0.05, 0.95, by  = 0.05)
 log_lik <- dbinom(5, 20, prob = theta, log = TRUE)
-p <- tibble(theta, log_lik) %>%
+p <- tibble(theta, log_lik) |>
   ggplot(aes(theta, log_lik)) +
   geom_line()
 p # Print the plot.
@@ -233,11 +238,12 @@ What do you conclude about the coin now?
 
 ## Adaptation to drought stress in Silver Fir
 
-The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to the mountainous regions of Europe. Csillery and colleagues carried out a very large (n > 8000 measurements) greenhouse experiment to study the genetic adaptations to drought tolerance in *Abies*. We are going to work with a part of this dataset to explore the mean and median.
+The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to the mountainous regions of Europe. Csillery and colleagues carried out a very large (n > 8,000 measurements) greenhouse experiment to study the genetic adaptations to drought tolerance in *Abies*. We are going to work with a part of this dataset to explore the mean and median.
 
 <div style="width:350px">
 ![](https://i.imgur.com/0KwbeIe.jpg)
 </div>
+
 
 ### Activity
 
@@ -245,7 +251,7 @@ Load the data in the file `Silver_fir.xlsx`. Determine how missing data were cod
 
 ```{r}
 # FIXME
-M <- read_excel("../data/Silver_fir.xlsx", na = "NA") %>% 
+M <- read_excel("../data/Silver_fir.xlsx", na = "NA") |> 
   mutate(family = factor(family),
          block = factor(block))
 
@@ -258,14 +264,14 @@ Group these data by `population`, `family`, and `block`, and then tally the numb
 
 ```{r}
 # FIXME
-M %>% 
-  group_by(population, family, block) %>% 
+M |> 
+  group_by(population, family, block) |> 
   tally()
 
-M %>% 
-  group_by(population, family, block) %>% 
-  tally() %>% 
-  ungroup() %>% 
+M |> 
+  group_by(population, family, block) |> 
+  tally() |> 
+  ungroup() |> 
   summarize(mean(n))
 ```
 
@@ -279,9 +285,9 @@ Start by selecting `population`, `id`, and the three columns that start with `ht
 
 ```{r}
 # FIXME
-M_sub <- M %>% 
+M_sub <- M |> 
   select(population, id, starts_with("ht"))
-M_sub %>% slice(1:20)
+M_sub |> slice(1:20)
 ```
 
 If you print out the first ~20 rows, you can see that there are a lot of NAs. Some seedlings have 3 measurements, some 2, some 1, and some none.
@@ -290,8 +296,8 @@ Next pivot the data to long format on the three height columns (you can use `sta
 
 ```{r}
 # FIXME
-M_long <- M_sub %>% 
-  pivot_longer(cols = starts_with("ht")) %>% 
+M_long <- M_sub |> 
+  pivot_longer(cols = starts_with("ht")) |> 
   drop_na(value)
 
 M_long
@@ -301,12 +307,12 @@ M_long
 
 ```{r}
 # FIXME
-M_agr <- M_long %>% 
-  group_by(population, id) %>% 
+M_agr <- M_long |> 
+  group_by(population, id) |> 
   summarize(max_height = max(value),
             .groups = "drop")
 
-M_agr %>% filter(id == "101_6")
+M_agr |> filter(id == "101_6")
 ```
 
 3789 rows should remain now. Plot the density of the distribution of maximum height and color by population. Use `facet_wrap()` to plot each population in a separate panel. If the x axis labs collide with each other add `theme(axis.text.x = element_text(angle = 90))` to rotate the axis labels by 90 degrees.
@@ -323,8 +329,8 @@ Now summarize the maximum length by population by calculating the mean and the m
 
 ```{r}
 # FIXME
-M_agr_summary <- M_agr %>% 
-  group_by(population) %>% 
+M_agr_summary <- M_agr |> 
+  group_by(population) |> 
   summarize(mean_max_height = mean(max_height),
             median_max_height = median(max_height),
             .groups = "drop")
