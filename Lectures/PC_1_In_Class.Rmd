@@ -30,7 +30,7 @@ island_data <- tibble(
 2. Distributions
 3. Tidyverse functions
 4. Data Visualization
-5. Probability & Distributions
+5. Probability
 
 
 ## Learning R {.smaller}
