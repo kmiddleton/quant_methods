@@ -16,9 +16,9 @@ bibliography: Multivariate.bib
 
 ## Themes
 
-- Topics that are coming up. We have a plan.
+- We have a plan. Trust us.
 - Need practice coding, lectures not as good for learning coding
-- Few quick questions
+    - Several questions about loops
 - Big picture of analytical vs. ML vs. resampling vs. Bayesian
 
 
@@ -28,14 +28,15 @@ bibliography: Multivariate.bib
 - Questions next week
 
 
-## Installing packages
+## Likelihood
 
-> It is best to install packages (e.g., `install.packages("cowplot")`) from the command line only. If you include this code in a R code chunk, you risk R trying to reinstall the package each time you knit your file.
+> The log-likelihood is still unclear: does the log-likelihood lie between -Inf to +Inf? If that's the case, how do we understand how to use it to give an indication of the fit of the model?
 
+> The most confusing lecture for me this week was Probability to Likelihood. If we could go over the dbinom() function and why we convert to log-likelihoods again that would be great. 
 
-## `read_excel()`
+> similarly, a little more explanation for the glm and optim code in 5-4. (also random question, for those codes, why is x lowercase and y uppercase?)
 
-> When I try to knit my code it does not want to complete a read_excel() command? Is this something I need to update? I worked around by making the excel file a .csv for now.
+> Can we have more examples on how to get the likelihood ratio using R?
 
 
 ## Analytical Frameworks
@@ -46,34 +47,33 @@ bibliography: Multivariate.bib
 - More practical examples
 
 
-## To breakout rooms
+## Frameworks
+
+> Theoretically, I'm not quite grasping why someone would choose to use the different models. The analytical model feels like it makes pronouncements about data that exists and that the researcher currently has, while the other three make inferences about data that could be possible. To me, it seems like they are doing very different things between Analytical and the rest, while the remaining three do roughly the same thing, especially maximum likelihood and resampling.
+
+> How do you determine which inference method to use in determining mean.
 
 
 ## Frameworks
 
-> Is there any instance where you would use both Maximum Likelihood and bayesian inference with a data set? Could one method be used to validate an answer you got from the other?
+> This may be a dumb question but what are models, are the named tests like t-tests, chi squared etc, considered to be models or are they something else? Or are these tests based on a model? 
 
-> If you have a small dataset would maximum likelihood be preferred over Bayesian inference?
+> When using the maximum likelihood method, should we always use optimization? Or are there scenarios when grid approximation is preferred?
 
-> Are there instances where using a Baysian vs ML approaches give you different answers? And if so what parameters are causing these differences? 
+
+## Frameworks
+
+> Could I use ML to validate the answer I got from using Bayesian method? Or will I get different answers depending on the size of the samples and other parameters?
+
+> What type of framework have you found yourselves working in the most? Do people often specialize in certain frameworks? Recently, I have heard many people talk about knowing Bayesian as being a plus when it comes to getting a job, I'm not sure if that is related to the field or maybe the progression of statistical analysis in the age of data, or something else. What is your take on that?
+
 
 ## Bayesian inference
 
-> With Bayesian, How far do you go to get your model to match your data? Is overfitting a problem here?
-
-> Are there guidelines for how to pick a distribution to represent your means?  For example, you picked Cauchy, but what made you pick that? (To be fair, I don't really know all the different distributions)
+> Can you go over the stan function again and explain it?
 
 
 ## Priors
 
-> For priors, do you just make an educated guess based on your data on how to frame things, or is there a more systematic way of doing it?
-
-> When discussing prior knowledge related to Bayesian methods; is that the same as things like genomic selection where a Genomic Breeding Value is assigned based on training data sets to inform a model on how to handle the experimental data sets?
-
-
-## Binomial sample sizes
-
-> One of my main questions has to do with connecting the results of the Maximum Likelihood method with its equation as sample size increases.  My confusion is - where is the sample size increasing at if, for the coin flip example, n = 1 for 2H/6flips, 20/60, and for 20000/60000.  Is 2H/6flips 1 observation or 6, and so on for 20/60 and 20000/60000?  (a separate email has more details).
-
-> How do you even get there? How do you meaningfully compare maximum likelihoods from datasets that have different numbers of observations (say X short winged insects but Y long-winged insects)?
+> When using prior knowledge for Bayesian method, how does one go about doing that? (is there an organized, systematic way of doing that)
 
