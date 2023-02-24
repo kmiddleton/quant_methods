@@ -1504,7 +1504,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Problem Set 05</h1>
 <h4 class="author">Your Name Here: Group X</h4>
-<h4 class="date">Last updated: 2023-02-18</h4>
+<h4 class="date">Last updated: 2023-02-24</h4>
 
 </div>
 
@@ -1841,10 +1841,8 @@ Within each <code>population</code>, multiple plants come from each
 subgroup.</p>
 <pre class="r"><code># FIXME
 M |&gt; 
-  group_by(population, family, block) |&gt; 
-  tally()</code></pre>
+  count(population, family, block)</code></pre>
 <pre><code>## # A tibble: 1,807 × 4
-## # Groups:   population, family [472]
 ##    population family block     n
 ##    &lt;chr&gt;      &lt;fct&gt;  &lt;fct&gt; &lt;int&gt;
 ##  1 BAY        801    1         4
@@ -1859,14 +1857,12 @@ M |&gt;
 ## 10 BAY        803    2         4
 ## # … with 1,797 more rows</code></pre>
 <pre class="r"><code>M |&gt; 
-  group_by(population, family, block) |&gt; 
-  tally() |&gt; 
-  ungroup() |&gt; 
-  summarize(mean(n))</code></pre>
+  count(population, family, block) |&gt; 
+  summarize(mean_n = mean(n))</code></pre>
 <pre><code>## # A tibble: 1 × 1
-##   `mean(n)`
-##       &lt;dbl&gt;
-## 1      4.54</code></pre>
+##   mean_n
+##    &lt;dbl&gt;
+## 1   4.54</code></pre>
 <p>About how many seedlings are at the smallest replicate
 <code>block</code> level of the data?</p>
 <blockquote>
@@ -2090,7 +2086,8 @@ mean and median. Make the two vertical lines different colors.</li>
 </ul>
 <pre class="r"><code># FIXME
 ggplot() +
-  geom_density(data = M_agr, aes(max_height, fill = population), alpha = 0.25) +
+  geom_density(data = M_agr, aes(max_height, fill = population),
+               alpha = 0.25) +
   geom_vline(data = M_agr_summary, aes(xintercept = mean_max_height),
              color = &quot;red&quot;) +
   geom_vline(data = M_agr_summary, aes(xintercept = median_max_height),

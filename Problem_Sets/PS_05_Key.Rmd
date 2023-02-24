@@ -265,14 +265,11 @@ Group these data by `population`, `family`, and `block`, and then tally the numb
 ```{r}
 # FIXME
 M |> 
-  group_by(population, family, block) |> 
-  tally()
+  count(population, family, block)
 
 M |> 
-  group_by(population, family, block) |> 
-  tally() |> 
-  ungroup() |> 
-  summarize(mean(n))
+  count(population, family, block) |> 
+  summarize(mean_n = mean(n))
 ```
 
 About how many seedlings are at the smallest replicate `block` level of the data?
@@ -351,7 +348,8 @@ Finally, let's add vertical lines to the density plot from above. To do this, we
 ```{r}
 # FIXME
 ggplot() +
-  geom_density(data = M_agr, aes(max_height, fill = population), alpha = 0.25) +
+  geom_density(data = M_agr, aes(max_height, fill = population),
+               alpha = 0.25) +
   geom_vline(data = M_agr_summary, aes(xintercept = mean_max_height),
              color = "red") +
   geom_vline(data = M_agr_summary, aes(xintercept = median_max_height),
