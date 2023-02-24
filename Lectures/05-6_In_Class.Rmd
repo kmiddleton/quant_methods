@@ -28,15 +28,31 @@ bibliography: Multivariate.bib
 - Questions next week
 
 
+## Overarching
+
+> I would like to solidify my ability to "translate" mathematical equations (such as the ones covered this week). However, I think that will take more practive on my end, there are a few things that are either new to me, or that I haven't seen in a number of years.
+
+> I would also like to get more of a clear understanding between probability and likelihood, but this also might just require re-watching the third video and taking better notes.
+
+> Mean and median were mentioned in the lecture but can we also use the mode to make inferences about our data?
+
+
 ## Likelihood
 
 > The log-likelihood is still unclear: does the log-likelihood lie between -Inf to +Inf? If that's the case, how do we understand how to use it to give an indication of the fit of the model?
 
 > The most confusing lecture for me this week was Probability to Likelihood. If we could go over the dbinom() function and why we convert to log-likelihoods again that would be great. 
 
-> similarly, a little more explanation for the glm and optim code in 5-4. (also random question, for those codes, why is x lowercase and y uppercase?)
+> Model comparisons was a bit difficult to grasp, specifically when comparing them.
+
+
+## Likelihood
+
+> ... similarly, a little more explanation for the glm and optim code in 5-4. (also random question, for those codes, why is x lowercase and y uppercase?)
 
 > Can we have more examples on how to get the likelihood ratio using R?
+
+> Does a likelihood measurement mean anything on its own? Can it be looked at independently like a probability, or is it only meaningful relative to other measures of likelihood? 
 
 
 ## Analytical Frameworks
@@ -71,6 +87,8 @@ bibliography: Multivariate.bib
 ## Bayesian inference
 
 > Can you go over the stan function again and explain it?
+
+> How should we pick our distributions for Bayesian inference? How would that affect the results?
 
 
 ## Priors
