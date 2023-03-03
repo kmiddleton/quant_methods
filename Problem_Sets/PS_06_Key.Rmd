@@ -34,12 +34,13 @@ Stalk-eyed flies are a clade of flies whose eyes are at the ends of long project
 
 The `Stalkies.csv` data file contains data for an experiment in which male stalk-eyed flies were reared on different food sources (corn and cotton). The hypothesis is that food type affects eye span. In the next few exercises, you will try to answer this question using different approaches.
 
-### Activity 1
+### Activity
 
 Load the `Stalkies.csv` file and examine the columns of data it contains.
 
 ```{r}
 # FIXME
+
 stalk <- read_csv("../data/Stalkies.csv")
 str(stalk)
 ```
@@ -49,7 +50,9 @@ Visualize the dataset in two ways:
 1. Make a boxplot showing each food type on the x axis.
 2. Plot the raw data (points) for the two groups. For the points, include jitter and transparency. Include means and standard errors plotted in a different color (the code in Lecture 06-1 might help you). Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate. Change the axis labels to what you would expect on a publication ready figure.
 
-```{r }
+```{r}
+# FIXME
+
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_boxplot() +
   labs(x = "Food Source", y = "Eye Span")
@@ -66,13 +69,13 @@ Describe the distributions within each group and between groups. What do these p
 
 > The mean eye span is higher for flies reared on corn than on cotton. The variance also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups.
 
-
 We will first use the analytical method to determine if the group means are significantly different. In this case, a *t*-test is most appropriate.
 
 By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*. You maybe want to calculate the per-food source variance.
 
 ```{r}
 # FIXME
+
 stalk %>% 
   group_by(food_source) %>% 
   summarise(var_eye_span = var(eye_span))
@@ -82,6 +85,7 @@ Perform a *t*-test using the formula method to specify the groups to test (follo
 
 ```{r }
 # FIXME
+
 myT <- t.test(eye_span ~ food_source, data = stalk)
 myT
 ```
@@ -89,7 +93,6 @@ myT
 What can you conclude from these results? Does the result of this statistical test agree with your prediction above?
 
 > The hypothesis that the means for the two groups are equal is very unlikely. There is a statistically significant difference between the groups.
-
 
 `t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). `lm()` is a general function that fits many many different kinds of linear models. We will talk quite a lot about linear models in the coming weeks.
 
@@ -100,6 +103,7 @@ A *t*-test is just a special kind of linear model (1 categorical predictor with 
 
 ```{r}
 # FIXME
+
 fm <- lm(eye_span ~ food_source, data = stalk)
 summary(fm)
 ```
@@ -109,7 +113,7 @@ Compare the results of the linear model with the results of the *t*-test above. 
 > The `(Intercept)` term from `lm()` is equal to the mean for the Corn group. The `food_sourceCotton` estimate is the *difference* between the means for the Corn and Cotton group means. $F = t^2$.
 
 
-### Activity 2
+### Activity
 
 In lecture, we gave the equations for calculating the Bayes Factor (likelihood ratio) to compare two models. This type of comparison is applicable in situations when you have model likelihoods available and gives you an estimate of the relative support of one model compared to the another. In the future, we will use variations of this test to compare models.
 
@@ -324,6 +328,7 @@ Load the earwigs data:
 
 ```{r}
 # FIXME
+
 EW <- read_csv("../data/Earwigs.csv")
 ```
 
@@ -331,6 +336,7 @@ Make a scatterplot of the proportion of earwigs with forceps vs. density.
 
 ```{r}
 # FIXME
+
 EW %>%
   ggplot(aes(Density, Proportion_Forceps)) +
   geom_point() +
@@ -351,6 +357,8 @@ EW %>%
 Use `lm()` to fit a linear model in which the proportion of earwigs with forceps is modeled by the density of earwigs. Assign the linear model to an object, and then pass that object to `summary()` as you did above.
 
 ```{r}
+# FIXME
+
 fm <- lm(Proportion_Forceps ~ Density, data = EW)
 summary(fm)
 ```

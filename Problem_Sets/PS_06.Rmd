@@ -29,11 +29,12 @@ Stalk-eyed flies are a clade of flies whose eyes are at the ends of long project
 
 The `Stalkies.csv` data file contains data for an experiment in which male stalk-eyed flies were reared on different food sources (corn and cotton). The hypothesis is that food type affects eye span. In the next few exercises, you will try to answer this question using different approaches.
 
-### Activity 1
+### Activity
 
 Load the `Stalkies.csv` file and examine the columns of data it contains.
 
 ```{r}
+
 ```
 
 Visualize the dataset in two ways:
@@ -42,6 +43,7 @@ Visualize the dataset in two ways:
 2. Plot the raw data (points) for the two groups. For the points, include jitter and transparency. Include means and standard errors plotted in a different color (the code in Lecture 06-1 might help you). Try a few different values for each of these elements to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate. Change the axis labels to what you would expect on a publication ready figure.
 
 ```{r }
+
 ```
 
 Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show?
@@ -54,11 +56,13 @@ We will first use the analytical method to determine if the group means are sign
 By default, the `t.test` function will perform a test that does not assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*. You maybe want to calculate the per-food source variance.
 
 ```{r}
+
 ```
 
 Perform a *t*-test using the formula method to specify the groups to test (follow the example in lecture if you need to). Print the results.
 
 ```{r }
+
 ```
 
 What can you conclude from these results? Does the result of this statistical test agree with your prediction above?
@@ -73,13 +77,14 @@ A *t*-test is just a special kind of linear model (1 categorical predictor with 
 2. Pass the object that you just created to the function `summary()`.
 
 ```{r}
+
 ```
 
 Compare the results of the linear model with the results of the *t*-test above. Do you recognize any of the estimates? Can you figure out the relationship between the t-statistic and the F-statistic from the `lm()` summary?
 
 > 
 
-### Activity 2
+### Activity
 
 In lecture, we gave the equations for calculating the Bayes Factor (likelihood ratio) to compare two models. This type of comparison is applicable in situations when you have model likelihoods available and gives you an estimate of the relative support of one model compared to the another. In the future, we will use variations of this test to compare models.
 
@@ -100,7 +105,9 @@ SS <- function(x, x_bar = NULL) {
 
 #### Setup data
 
-```{r}
+Set `eval=FALSE` to `eval=TRUE` in the chunks below.
+
+```{r, eval=FALSE}
 # Change stalk below to whatever you called the Stalkies.csv data
 n1 <- nrow(stalk[stalk$food_source == "Corn", ])
 n2 <- nrow(stalk[stalk$food_source == "Cotton", ])
@@ -121,7 +128,7 @@ $$\mathcal{L}\left(\hat{\mu}_1, \hat{\mu}_2, \hat{\sigma}^2_2|x\right) = \frac{1
 
 Translated into R:
 
-```{r}
+```{r, eval=FALSE}
 s_hat_2 <- (1 / (n1 + n2)) * (SS(x1) + SS(x2))
 
 L_2 <- 1 / (2 * pi * s_hat_2) ^ ((n1 + n2) / 2) * exp(-(n1 + n2) / 2)
@@ -139,7 +146,7 @@ $$\mathcal{L}\left(\hat{\mu}, \hat{\sigma}^2_1|x\right) = \frac{1}{\left(2\pi \h
 
 Translated into R:
 
-```{r}
+```{r, eval=FALSE}
 s_hat_1 <- (1 / (n1 + n2)) * (SS(x1, mean(x)) + SS(x2, mean(x)))
 L_1 <- 1 / ((2 * pi * s_hat_1) ^ ((n1 + n2) / 2)) * exp(-((n1 + n2) / 2))
 log(L_1)
@@ -157,6 +164,7 @@ Use the calculations we have given you above to calculate the Bayes Factor for m
 You can either use the ratio of the likelihoods or the ratio of variances from the equation above.
 
 ```{r}
+
 ```
 
 What do you conclude based on the Bayes Factor comparison?
@@ -178,6 +186,7 @@ We will use the same data to explore confidence intervals.
 Calculate a ~95% confidence interval for each mean (cotton & corn groups). You can use the approximate formula discussed in lecture $\mu$ +/- 2 * SEM.
 
 ```{r}
+
 ```
 
 We can simulate what we would expect for a confidence interval if we set the true mean and standard deviation for our population. Knowing these true values allows us to draw random data from a true underlying distribution. 
@@ -196,6 +205,7 @@ Let's set up our simulation. Do the following:
 
 
 ```{r}
+
 ```
 
 What do you conclude based on this simulation?
@@ -223,21 +233,25 @@ The hypothesis is that earwigs living at higher densities will be more likely to
 Load the earwigs data:
 
 ```{r}
+
 ```
 
 Make a scatterplot of the proportion of earwigs with forceps vs. density.
 
 ```{r}
+
 ```
 
 Use the following code to add an OLS regression line through the points to your plot: `+ geom_smooth(method = "lm")`. Just add that code after `geom_point()` in your call to ggplot.
 
 ```{r}
+
 ```
 
 Use `lm()` to fit a linear model in which the proportion of earwigs with forceps is modeled by the density of earwigs. Assign the linear model to an object, and then pass that object to `summary()` as you did above.
 
 ```{r}
+
 ```
 
 See if you can figure out what the coefficients represent. You will find estimates for the slope and intercept of the line, their respective standard errors,^[remember that standard errors tell us about the uncertainty in parameter estimates] and a *t*-test, which tests each parameter estimate vs. 0. Try to figure out how the *t*-value is calculated (divide one thing by another).
