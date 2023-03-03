@@ -229,13 +229,13 @@ Next pivot the data to long format on the three height columns (you can use `sta
 
 ```
 
-6286 rows should remain. If you print the new tibble you will see that the first seedling ("101_6") has three measurements: 90, 120, and 125. We can group this new tibble on `population` and `id` and then summarize on the maximum (`max()`) of value to only get the largest value of height for each seedling. Do this below and then check that `id` "101_6" has a value of 125. This will confirm that your summarizing worked correctly.
+6,286 rows should remain. If you print the new tibble you will see that the first seedling ("101_6") has three measurements: 90, 120, and 125. We can group this new tibble on `population` and `id` and then summarize on the maximum (`max()`) of value to only get the largest value of height for each seedling. Do this below and then check that `id` "101_6" has a value of 125. This will confirm that your summarizing worked correctly.
 
 ```{r}
 
 ```
 
-3789 rows should remain now. Plot the density of the distribution of maximum height and color by population. Use `facet_wrap()` to plot each population in a separate panel. If the x axis labs collide with each other add `theme(axis.text.x = element_text(angle = 90))` to rotate the axis labels by 90 degrees.
+3,798 rows should remain now. Plot the density of the distribution of maximum height and color by population. Use `facet_wrap()` to plot each population in a separate panel. If the x axis labs collide with each other add `theme(axis.text.x = element_text(angle = 90))` to rotate the axis labels by 90 degrees.
 
 ```{r}
 
