@@ -22,24 +22,10 @@ theme_set(theme_cowplot())
 - Progress check
 - If you can't knit your problem set
 
+## Questions
 
-## Theta (or Beta)
-
-> From the 4th slide in 06-4 lecture, is theta0 the intercept and theta1 the slope? I just want to confirm I understood that correctly.
-
-$$Y = \theta_0 + \theta_1 X$$
-$$Y = \beta_0 + \beta_1 X$$
-
-
-## Confidence Intervals
-
-> I am confused why the statement "We can be 95% confident that the true mean lies between 0.1 and 0.4." from the quiz's example doesn't translate to "A confidence interval is a range that we expect, with some level of confidence, to include the true value of a population parameter such as the mean." from Curran-Everett 2009 and the lecture video.  To me, those statements sound the same, so I'm just not sure where I'm misunderstanding something.
-
-
-## Maximum Likelihood vs. Bayesian
-
-> I think I'm confused on the difference between ML and Bayesian frameworks.  From lecture 05-5, I thought it was that ML asks what is the probability of observing the data we have (the Ys) given some parameters (e.g., values of theta that we assign and 'test' out).  And that Bayesian asks what is the probability of a certain set of parameters (thetas) given the data that we observed (the Ys).  However, in some of the other lecture videos (e.g., 06-5), when working with the ML frameworks, it is stated that "we're trying to figure out the likelihood of our parameters".  That sounds like the Bayesian approach to me, so I think I'm confused on what the difference is between these two frameworks.  
-
+- Quiz 6-1 & CIs
+- Frameworks & details
 
 ## Maximum Likelihood vs. Bayesian
 
@@ -55,41 +41,8 @@ Bayesian:
 
 $$Pr[\theta | Data] = \frac{Pr[Data | \theta] \times Pr[\theta]}{Pr[Data]}$$
 
+## Problem Set
 
-## Maximum Likelihood vs. REML
+- Ask if unsure what a question is asking
+- We will be more active in the groups today to work toward the CI question
 
-> How does restricted maximum likelihood differ from maximum likelihood?
-
-- https://towardsdatascience.com/maximum-likelihood-ml-vs-reml-78cf79bef2cf
-- https://stats.stackexchange.com/q/48671/597
-
-> Hence, the problem with $\hat{\sigma}^2_{\textrm{ML}}$ appears to be linked with the fact that **we have substituted $\bar{x}$ for the unknown mean in the estimation**. The intuitive idea of REML estimation is to end up with a likelihood that contains all the information on $\sigma^2$ but no longer contains the information on $\mu$. 
-
-## Residual variance
-
-$$\hat{\sigma}^2 = \frac{\Sigma_i\left(Y_i - \hat{Y}_i\right)^2}{n}$$
-
-This is a biased estimate, but that's ok. It is how model likelihoods are calculated in this case. 
-
-$$s^2 = MSE = \frac{n}{n-2}\left(\hat{\sigma}^2\right)$$
-
-For non-small $n$, $s^2 \approx \left(\hat{\sigma}^2\right)$. Here ~7% difference.
-
-
-## Maximum Likelihood vs. REML
-
-> How does restricted maximum likelihood differ from maximum likelihood?
-
-- https://towardsdatascience.com/maximum-likelihood-ml-vs-reml-78cf79bef2cf
-- https://stats.stackexchange.com/q/48671/597
-
-> Hence, the problem with $\hat{\sigma}^2_{\textrm{ML}}$ appears to be linked with the fact that **we have substituted $\bar{x}$ for the unknown mean in the estimation**. The intuitive idea of REML estimation is to end up with a likelihood that contains all the information on $\sigma^2$ but no longer contains the information on $\mu$. 
-
-
-## Maximum Likelihood vs. REML
-
-- If we only care about the parameter estimates, then biased estimate of $\hat{\sigma}^2$ is not a problem.
-    - If we are interested in variance then it is a problem.
-    - Estimating intraclass correlation, heritability, etc.
-- If we want to compare models fit with likelihood, then we need to use ML, not REML
-    - Unit 10
