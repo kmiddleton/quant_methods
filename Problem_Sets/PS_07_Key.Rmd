@@ -173,7 +173,7 @@ CVs <- tibble(dfs = seq(2, 100, by = 1),
               crit_vals = qt(0.975, df = dfs,
                              lower.tail = TRUE))
 
-CVs %>%
+CVs |>
   ggplot(aes(dfs, crit_vals)) +
   geom_line() +
   geom_hline(yintercept = qnorm(0.025, lower.tail = FALSE),
@@ -199,8 +199,8 @@ exact_CI <- function(x, prob = 0.95) {
   return(tibble(Lower, Mean = mean(x), Upper))
 }
 
-CIs <- BT1 %>% 
-  group_by(Trout) %>% 
+CIs <- BT1 |> 
+  group_by(Trout) |> 
   group_modify(~ exact_CI(.x$Proportion_Surviving))
 
 knitr::kable(CIs)
@@ -258,7 +258,7 @@ This is all we need for the setup. At this point, you have the data, two vectors
 
 ```{r warning=FALSE}
 # FIXME
-M <- read_excel("../data/mammals.xlsx", na = "NA") %>%
+M <- read_excel("../data/mammals.xlsx", na = "NA") |>
   mutate(log_Mass = log10(adult_body_mass_g),
          log_BMR = log10(basal_met_rate_m_l_o2hr))
 
