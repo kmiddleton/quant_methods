@@ -1,5 +1,5 @@
 ---
-title: "Unit 7: In ClassDiscussion"
+title: "Unit 7: In Class Discussion"
 subtitle: "Quantitative Methods in Life Sciences"
 author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
 output:
@@ -15,9 +15,6 @@ library(cowplot)
 theme_set(theme_cowplot())
 source("https://raw.githubusercontent.com/kmiddleton/quant_methods/master/Lectures/Shade_Distributions.R")
 ```
-
-
-## Quiz 6-1
 
 
 ## Quiz 7-4
@@ -65,7 +62,7 @@ Is `t_stat` more extreme than `t_crit`?
 
 ```{r, fig.height=4}
 shade_t(0.025, n - 1) +
-  geom_vline(xintercept = t_stat, color = "goldenrod", size = 1)
+  geom_vline(xintercept = t_stat, color = "goldenrod", linewidth = 1)
 ```
 
 
