@@ -141,11 +141,11 @@ What do you conclude about your collaborator's data?
 
 > $P = 0.054$ here. So we conclude, based on $\alpha = 0.05$, that there is not a significant difference in means.
 
-How do you feel about the results of these two studies?
+How do you feel about the differing results of these two studies?
 
 > They are nearly identical (5.5% vs. 5.3% difference in survivorship), but the arbitrarily chosen $\alpha$ level leads you to two different conclusions.
 
-Because you have data on individual-level survival of salmon, you might be tempted to use a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data, which might look something like this table:
+Because you have data on individual-level survival of salmon, which were used to make calculate the survival proportions, you might be tempted to use a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data. That table would look something like this table, where you have aggregated counts for numbers of surviving salmon in the presence or absence of trout:
 
 ```{r echo=FALSE}
 M <- tibble::tibble(Survival = c("Survived", "Did not survive"),
@@ -154,9 +154,9 @@ M <- tibble::tibble(Survival = c("Survived", "Did not survive"),
 knitr::kable(M)
 ```
 
-Why is this test not advisable in this case?
+Thinking about the assumptions of the statistical tests that we have learned, why is combining all the data for this test not appropriate? 
 
-> The observations (whether an individual salmon juvenile was alive or not) are not independent of one another, streams add a level of structure to the data (all salmon in a stream are more likely to have the same survival probability). Later in the course, we will cover multilevel and logistic regression, which is another way to (correctly) model survival, accounting for possible different survival rates in both streams.
+> Your data nd the data from your collaborator are from completely different streams, which is good, but streams differ from onr another (water chemistry, abundance of food, presence of other predators, etc.). And because we have many salmon from the same streat, the observations (whether an individual salmon juvenile was alive or not) are not independent of one another. This non-independence means that all the salmon in a stream are more likely to have the same survival probability. Streams add a level of structure to the data. Later in the course, we will cover multilevel and logistic regression, which are (separately or combined) another way to correctly model survival, accounting for possible different survival rates in both streams.
 
 
 ## Exact confidence intervals

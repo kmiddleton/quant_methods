@@ -75,11 +75,11 @@ What do you conclude about your collaborator's data?
 
 > 
 
-How do you feel about the results of these two studies?
+How do you feel about the differing results of these two studies?
 
 > 
 
-Because you have data on individual-level survival of salmon, you might be tempted to use a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data, which might look something like this table:
+Because you have data on individual-level survival of salmon, which were used to make calculate the survival proportions, you might be tempted to use a [$\chi^2$ test of association](http://www.stat.yale.edu/Courses/1997-98/101/chisq.htm) on the combined data. That table would look something like this table, where you have aggregated counts for numbers of surviving salmon in the presence or absence of trout:
 
 ```{r echo=FALSE}
 M <- tibble::tibble(Survival = c("Survived", "Did not survive"),
@@ -88,7 +88,7 @@ M <- tibble::tibble(Survival = c("Survived", "Did not survive"),
 knitr::kable(M)
 ```
 
-Why is this test not advisable in this case?
+Thinking about the assumptions of the statistical tests that we have learned, why is combining all the data for this test not appropriate? Even though 
 
 > 
 
