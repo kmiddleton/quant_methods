@@ -26,11 +26,12 @@ Datasets
   Birds.xlsx
 -->
 
+
 ## Variation Within and Between Groups
 
-In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`, as well as some `apply` relatives in the `tidyverse` that take some of the difficulty from apply functions across R structures.
+In this activity, we will explore the relationship between variances and the *F*-value using simulation and learn a new programming skill, `apply()`, as well as some `apply` relatives in the `tidyverse` that take some of the difficulty from apply functions across R structures.
 
-Let's start with `apply()`. `apply()` is part of a family of base-R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame`/`tibble` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
+Let's start with `apply()`. `apply()` is part of a family of base R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame`/`tibble` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
 
 ```{r}
 ap_test <- tibble(x1 = seq(1, 10),
@@ -52,7 +53,7 @@ ap_test <- tibble(x1 = seq(1, 10),
 
 The `tidyverse` has a family of `map` and `pmap` functions that alleviate some of the difficulty in programming with apply, especially when you are trying to pass multiple values to a function (as in the last example above with `x[1]`, `x[2]`, and `x[3]`). `map()` and relatives (e.g., `map_dbl()` which converts the returned values to a numeric vector [whereas `map()` by default returns a list]) are not as useful to us right now. We will instead focus on the `map2` functions that operate across `data.frame`s or `tibble`s.
 
-`pmap()` (for "parallel" `map`) passes the entire row of a `data.frame` to a function. By default, it returns a list. However, `pmap_dbl()` expects a numeric vector to be returned from the function, and `pmap_dfr()` expects a `data.frame`.
+`pmap()` (for "parallel" `map`) passes the entire row of a `data.frame` to a function. By default, it returns a list. However, `pmap_dbl()` expects a numeric vector to be returned from the function. `pmap()` is very flexible and is the way to proceed if your functions returns a `data.frame` (with a subsequent call to `list_rbind()`).
 
 We will use our example `ap_test` from above.
 
@@ -67,29 +68,16 @@ One nice thing about `pmap` is that it will figure out the correct order for pas
 
 ```{r}
 ap_test_reorder <- ap_test[, c(3, 2, 1)]
-pmap_dbl(ap_test_reorder, myfun) # Note that this is the same as above
+pmap_dbl(ap_test_reorder, myfun) # Note that these values are the same as above
 ```
 
 Another nice feature of `pmap()` is that it offers some protection from passing the wrong column names to the function. The following code would fail, because the function expects "x1", "x2", and "x3".
 
 ```{r, eval=FALSE}
 # Rename columns
-ap_test_rename <- ap_test %>% 
+ap_test_rename <- ap_test |> 
   rename(y1 = x1, y2 = x2, y3 = x3)
 pmap_dbl(ap_test_rename, myfun) # Fails with an error
-```
-
-`pmap()` will work with anonymous functions, just like `apply`. This can be handy if your function is quick and/or you want to just append the calculated value onto the existing object.
-
-```{r}
-pmap_dbl(ap_test, function(x1, x2, x3) (x1 * x2) / x3)
-
-# Note the . below in pmap_dbl, to indicate ap.test should be passed to
-# the function
-ap_test <- ap_test %>% 
-  mutate(x4 = pmap_dbl(., function(x1, x2, x3) (x1 * x2) / x3))
-
-ap_test
 ```
 
 
@@ -187,7 +175,7 @@ sims <- data.frame(
   nobs = rep(100, length = length(sds))
 )
 
-sims <- sims %>% 
+sims <- sims |> 
   mutate(Fs = pmap_dbl(sims, getF2))
 
 fcrit <- qf(0.05, 1, 98, lower.tail = FALSE)
@@ -235,8 +223,8 @@ Load the data for limb lengths. Use `summarize_all()` to calculate the mean and 
 ```{r}
 # FIXME
 M <- read_csv("../data/Limb_Lengths.csv")
-M %>% head()
-M %>% summarize_all(.funs = c("mean", "sd"))
+M |> head()
+M |> summarize_all(.funs = c("mean", "sd"))
 ```
 
 Make two plots, one for left limb length vs. height and one for right limb length vs. height. Use `plot_grid()` to put them side by side.
@@ -267,7 +255,7 @@ Explain the results that you find. Why do you think that neither left nor right 
 cor(M$left_limb, M$right_limb)
 ```
 
-> When we fit a model that includes both limb lengths, there is severe multicollinearity. Separately each is probably a good predictor, but together, they are not good. The correlation between them is > 0.99.
+> The correlation between them is > 0.99. When we fit a model that includes both limb lengths, there is severe multicollinearity. Separately each is probably a good predictor, but together, they are not good. All of the variation in Height is predicted by the 1st variable in the multiple regression, so there is no variation left for the 2nd variable to predict (and vice versa when the variables are reversed).
 
 Fit separate linear models in which height is predicted by left and then right limb length.
 
@@ -287,6 +275,7 @@ Do these models make more sense?
 ## Heart Transplant Survivorship
 
 The data in `Heart_Transplants.xlsx` contains data on survivorship (in days; `Survival_Days`) for three groups of heart transplant patients. Patients were groups by the severity of the mismatch between donor and recipient (`Mismatch_Degree`): `Low`, `Medium`, and `High`. A low mismatch means a *good* match.
+
 
 ### Activity
 
@@ -308,7 +297,7 @@ Use `mutate()` and `fct_inorder()` to make `Mismatch_Degree` into a factor.
 
 ```{r}
 # FIXME
-M <- M %>%
+M <- M |>
   mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
 ```
 
@@ -317,10 +306,11 @@ There are only 39 observations total, so we may as well plot the raw data. Modif
 ```{r}
 #FIXME
 ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
-  geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
+  geom_point(position = position_jitter(width = 0.05, seed = 384729),
+             alpha = 0.5) +
   stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
+               color = "red", linewidth = 0.7) +
   labs(x = "Mismatch Degree", y = "Survival (days)")
 ```
 
@@ -332,7 +322,7 @@ Find a transformation of `Survival_Days` that corrects the problems observed abo
 
 ```{r}
 # FIXME
-M <- M %>% mutate(log_Survival = log(Survival_Days))
+M <- M |> mutate(log_Survival = log(Survival_Days))
 ggplot(M, aes(x = Mismatch_Degree, y = log_Survival)) +
   geom_point(position = position_jitter(width = 0.1)) +
   xlab("Mismatch Degree") +
@@ -362,7 +352,7 @@ fm2 <- lm(log_Survival ~ Mismatch_Degree - 1, data = M)
 anova(fm2)
 summary(fm2)
 
-M %>% group_by(Mismatch_Degree) %>%
+M |> group_by(Mismatch_Degree) |>
   summarize(mean_survival = mean(log_Survival))
 ```
 
@@ -375,7 +365,7 @@ What does removing the intercept term from an ANOVA linear model do?
 
 The file `Birds.xlsx` contains data from Vuilleumier, F. (1970) Insular Biogeography in Continental Regions. I. The Northern Andes of South America. *American Naturalist* 104:373-388.
 
-This paper explores the numbers of bird species in isolated "islands" of paramo vegetation in the Andes. The Missouri Botanical Garden can explain it better than we can (http://bit.ly/1PNWfsq):
+This paper explores the numbers of bird species in isolated "islands" of páramo vegetation in the Andes. The Missouri Botanical Garden can explain it better than we can (http://bit.ly/1PNWfsq):
 
 > Within the tropical regions of Mexico, Central and South America, Africa, Malesia including New Guinea, and Hawaii, there is a vegetation type that occurs between the upper limit of continuous, closed-canopy forest (i.e., forest line or timberline) and the upper limit of plant life (i.e., snow line) that is characterized by tussock grasses, large rosette plants, shrubs with evergreen, coriaceous and sclerophyllous leaves, and cushion plants.  This vegetation type is scattered along the crests of the highest mountain ranges or on isolated mountaintops between about 3000 meters (m) and 5000 m, like islands in a sea of forest.
 
@@ -386,6 +376,7 @@ We would like to use these data to see what the best predictor(s) of bird abunda
 1. `Dist_to_Ecuador`: Distance to Ecuador (km)
 1. `Dist_to_Island`: Distance to nearest island (km)
 
+
 ### Activity
 
 We will use multiple regression to find the relative importance of each of these variables in predicting species abundance.
@@ -395,11 +386,14 @@ Start by loading the data and plotting histograms of the variables. You can make
 ```{r message=FALSE}
 # FIXME
 M <- read_excel("../data/Birds.xlsx")
-ggplot(M, aes(x = N_Species)) + geom_histogram(bins = 30)
-ggplot(M, aes(x = Area)) + geom_histogram(bins = 30)
-ggplot(M, aes(x = Elevation)) + geom_histogram(bins = 30)
-ggplot(M, aes(x = Dist_to_Ecuador)) + geom_histogram(bins = 30)
-ggplot(M, aes(x = Dist_to_Island)) + geom_histogram(bins = 30)
+plot_grid(
+  ggplot(M, aes(x = N_Species)) + geom_histogram(bins = 30),
+  ggplot(M, aes(x = Area)) + geom_histogram(bins = 30),
+  ggplot(M, aes(x = Elevation)) + geom_histogram(bins = 30),
+  ggplot(M, aes(x = Dist_to_Ecuador)) + geom_histogram(bins = 30),
+  ggplot(M, aes(x = Dist_to_Island)) + geom_histogram(bins = 30),
+  ncol = 3)
+
 ```
 
 Describe any patterns you see in the raw data.

@@ -17,9 +17,9 @@ library(tidyverse)
 
 ## Variation Within and Between Groups
 
-In this activity, we will explore the relationship between variances and the F-value using simulation and learn a new programming skill, `apply()`, as well as some `apply` relatives in the `tidyverse` that take some of the difficulty from apply functions across R structures.
+In this activity, we will explore the relationship between variances and the *F*-value using simulation and learn a new programming skill, `apply()`, as well as some `apply` relatives in the `tidyverse` that take some of the difficulty from apply functions across R structures.
 
-Let's start with `apply()`. `apply()` is part of a family of base-R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame`/`tibble` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
+Let's start with `apply()`. `apply()` is part of a family of base R functions that all "apply"^[It's not just a clever name.] some function to sets of your data. These sets can be each row, each column, or the elements in a list (in the list case, the function is `lapply()`). `apply()` takes three arguments: the `data.frame`/`tibble` or `matrix`, the margin to apply over (1 = rows, 2 = columns), and the function to apply to each margin. You can use built in functions, a custom written one, or one you write within the apply call (these are called "anonymous" functions). We'll show you the syntax here. Run the following and make sure you understand what is happening.
 
 ```{r}
 ap_test <- tibble(x1 = seq(1, 10),
@@ -41,7 +41,7 @@ ap_test <- tibble(x1 = seq(1, 10),
 
 The `tidyverse` has a family of `map` and `pmap` functions that alleviate some of the difficulty in programming with apply, especially when you are trying to pass multiple values to a function (as in the last example above with `x[1]`, `x[2]`, and `x[3]`). `map()` and relatives (e.g., `map_dbl()` which converts the returned values to a numeric vector [whereas `map()` by default returns a list]) are not as useful to us right now. We will instead focus on the `map2` functions that operate across `data.frame`s or `tibble`s.
 
-`pmap()` (for "parallel" `map`) passes the entire row of a `data.frame` to a function. By default, it returns a list. However, `pmap_dbl()` expects a numeric vector to be returned from the function, and `pmap_dfr()` expects a `data.frame`.
+`pmap()` (for "parallel" `map`) passes the entire row of a `data.frame` to a function. By default, it returns a list. However, `pmap_dbl()` expects a numeric vector to be returned from the function. `pmap()` is very flexible and is the way to proceed if your functions returns a `data.frame` (with a subsequent call to `list_rbind()`).
 
 We will use our example `ap_test` from above.
 
@@ -56,29 +56,16 @@ One nice thing about `pmap` is that it will figure out the correct order for pas
 
 ```{r}
 ap_test_reorder <- ap_test[, c(3, 2, 1)]
-pmap_dbl(ap_test_reorder, myfun) # Note that this is the same as above
+pmap_dbl(ap_test_reorder, myfun) # Note that these values are the same as above
 ```
 
 Another nice feature of `pmap()` is that it offers some protection from passing the wrong column names to the function. The following code would fail, because the function expects "x1", "x2", and "x3".
 
 ```{r, eval=FALSE}
 # Rename columns
-ap_test_rename <- ap_test %>% 
+ap_test_rename <- ap_test |> 
   rename(y1 = x1, y2 = x2, y3 = x3)
 pmap_dbl(ap_test_rename, myfun) # Fails with an error
-```
-
-`pmap()` will work with anonymous functions, just like `apply`. This can be handy if your function is quick and/or you want to just append the calculated value onto the existing object.
-
-```{r}
-pmap_dbl(ap_test, function(x1, x2, x3) (x1 * x2) / x3)
-
-# Note the . below in pmap_dbl, to indicate ap.test should be passed to
-# the function
-ap_test <- ap_test %>% 
-  mutate(x4 = pmap_dbl(., function(x1, x2, x3) (x1 * x2) / x3))
-
-ap_test
 ```
 
 
