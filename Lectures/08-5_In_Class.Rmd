@@ -1,7 +1,7 @@
 ---
 title: "Unit 8 Linear Models: In Class Discussion"
 subtitle: "Quantitative Methods in Life Sciences"
-author: 'Elizabeth King, Kevin Middleton and Lauren Sullivan'
+author: "Elizabeth King, Kevin Middleton and Lauren Sullivan"
 output:
   ioslides_presentation:
     fig_width: 8
@@ -14,22 +14,22 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(ggrepel)
 library(cowplot)
-theme_set(theme_cowplot())
 library(readxl)
 library(knitr)
 library(GGally)
 library(knitr)
 library(ggforce)
-library(rethinking)
+
+theme_set(theme_cowplot(font_size = 10))
 ```
 
 
 ## Multiple regression
 
-```{r, fig.height = 4, echo=FALSE}
+```{r, fig.height = 5, echo=FALSE, warning=FALSE}
 milk <- read_excel("../data/Milk.xlsx", na = "NA")
-M <- milk %>%
-  select(species, kcal.per.g, perc.fat, perc.lactose) %>%
+M <- milk |>
+  select(species, kcal.per.g, perc.fat, perc.lactose) |>
   drop_na()
 names(M) <- c("Species", "Milk_Energy", "Fat", "Lactose")
 ggscatmat(M, columns = 2:4)
@@ -78,13 +78,13 @@ How much variation does X1 alone explain in Y?
 ```{r}
 fm_Lact <- lm(Fat ~ Lactose, data = M)
 M$resid_Lact <- residuals(fm_Lact)
-head(M)
+M |> arrange(resid_Lact) |> slice(1:5)
 ```
 
 
 ## Estimate `Fat` coefficient
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 desc <- 'Large negative residual'
 
 F_v_L <- ggplot(M, aes(Lactose, Fat, label = Species)) +
@@ -104,7 +104,7 @@ print(
 
 ## Estimate `Fat` coefficient
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 milk_res_lact <- ggplot(M, aes(resid_Lact, Milk_Energy,
                                label = Species)) +
   geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf),
@@ -114,15 +114,14 @@ milk_res_lact <- ggplot(M, aes(resid_Lact, Milk_Energy,
               color = "darkgreen") +
   geom_point() +
   labs(x = "Residual Fat Percent", y = "Milk Energy")
-print(
-  milk_res_lact +
-    annotate(geom = "label", x = -5.4, y = 0.97,
-             label = "Less fat than predicted",
-             color = "red", size = 5) +
-    geom_text_repel(size = 3, force = 15) +
-    geom_mark_ellipse(aes(filter = Species == "Callimico goeldii"),
-                      label.fontsize = 8)
-  )
+
+milk_res_lact +
+  annotate(geom = "label", x = -5.4, y = 0.97,
+           label = "Less fat than predicted",
+           color = "red", size = 5) +
+  geom_text_repel(size = 3, force = 15) +
+  geom_mark_ellipse(aes(filter = Species == "Callimico goeldii"),
+                    label.fontsize = 8)
 ```
 
 
@@ -147,7 +146,7 @@ M$resid_Fat <- residuals(fm_Fat)
 
 ## Estimate `Lactose` coefficient
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 L_v_F <- ggplot(M, aes(Fat, Lactose, label = Species)) +
   geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
               color = "blue") +
@@ -160,7 +159,7 @@ print(L_v_F +
 
 ## Estimate `Lactose` coefficient
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 milk_res_fat <- ggplot(M, aes(resid_Fat, Milk_Energy,
                               label = Species)) +
   geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf),
@@ -188,14 +187,14 @@ coef(fm)
 
 ## Compare
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 plot_grid(F_v_L, L_v_F, ncol = 2)
 ```
 
 
 ## Compare
 
-```{r echo=FALSE, fig.height = 4}
+```{r echo=FALSE, warning=FALSE, fig.height = 4}
 plot_grid(milk_res_lact, milk_res_fat, ncol = 2)
 coef(fm)
 ```
