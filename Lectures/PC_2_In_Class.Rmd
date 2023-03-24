@@ -19,9 +19,10 @@ theme_set(theme_cowplot())
 
 ## Topics for Today
 
+- Clarifications about the Progress Check
 - PS 8 review
     - Removing the intercept in a linear model
-    - Output tables, F and t stats, getting results
+    - Output tables, *F* and *t* stats, getting results
 - Common names for analyses - arbitrary stars significance
 - Connection between intervals, significance testing, critical values, etc
 - What makes a model "linear"? When is a model non-linear?
@@ -30,30 +31,42 @@ theme_set(theme_cowplot())
     - Mapping functions
 - Publication ready figures
 
----
+
+## Frameworks
+
+- Review of each
+- New analogy
+- Setting up Bayes
+
+
+## Confidence intervals
+
+- Quantiles
+- Critical values
+- Two sided
+- How to figure out tails?
+- Review CI simulation
+
+
+## Understanding `lm()` output
 
 <img src="https://i.imgur.com/P8034XE.jpg" width="100%" />
 
 
----
+## Understanding `lm()` output
 
 <img src="https://i.imgur.com/38J8BwL.jpg" width="100%" />
 
 
----
+## Understanding `lm()` output
 
 <img src="https://i.imgur.com/oIqWNJg.jpg" width="100%" />
 
 
-## Tests of arbitrary slopes and intercepts
+## What makes a good predictor?
 
-$$t = \frac{\beta - \beta_{null}}{\mbox{SE}_{\beta}}$$
 
-is a general equation that can be used to test any null hypothesized parameter estimate.
-
-- $\beta$ is the parameter estimate
-- $\beta_{null}$ is the null hypothesized value
-    - often and by default $\beta_{null} = 0$
+## Problem set 8
 
 
 ## Hierarchy of GLMs
@@ -69,6 +82,16 @@ is a general equation that can be used to test any null hypothesized parameter e
 1. Continuous ~ $\ge$ 1 Categorical: **ANOVA, *t*-test**
 1. Continuous ~ 1 Continuous + 1 Categorical: **ANCOVA**
 1. Continuous ~ $\ge$ 1 Continuous + $\ge$ 1 Categorical: **Multiple regression**
+
+
+## `anova()` vs. `lm()` vs. `aov()`
+
+- Do we even need `t.test()`?
+
+
+## Assumptions of linear models
+
+- IID
 
 
 ## What makes a model "linear"? When is a model non-linear?
@@ -122,9 +145,9 @@ Logistic growth:
 
 $$f(x) = \frac{\beta_{max}}{1 + e^{-\beta_{rate}(x - \beta_{mid})}}$$
 
-Additive logistic growth: 
+Michaelis−Menten: 
 
-$$f(age) = \frac{a_1}{1 + e^{(-b_1 (age - c_1))}} + \frac{f - a_1}{1 + e^{(-b_2 (age - c_2))}}$$
+$$f(x) = \frac{ax}{b+x}$$
 
 
 ## Gompertz Growth Curve
@@ -151,8 +174,8 @@ ggplot() +
 ```
 
 - No analytical solution (can't use `lm()`)
-- Need to use maximum likelihood or Bayesian approach
-- Can be very challenging to fit.
+- Need to use maximum likelihood or Bayesian inference
+- Can be very challenging to fit (starting values)
 
 
 ## Programming
@@ -204,4 +227,3 @@ What you have been learning:
 - Open in PDF viewer
 - Start changing elements in the theme iteratively
     - Define a theme
-
