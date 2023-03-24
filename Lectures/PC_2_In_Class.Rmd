@@ -16,51 +16,45 @@ library(cowplot)
 theme_set(theme_cowplot())
 ```
 
-
-## Topics for Today
-
-- Clarifications about the Progress Check
-- PS 8 review
-    - Removing the intercept in a linear model
-    - Output tables, *F* and *t* stats, getting results
-- Common names for analyses - arbitrary stars significance
-- Connection between intervals, significance testing, critical values, etc
-- What makes a model "linear"? When is a model non-linear?
-- Lists, data.frames, and tibbles, and tables in loops
-    - Loops, functions, debugging code
-    - Mapping functions
-- Publication ready figures
+## Clarifications on question wording 
 
 
-## Frameworks
+## Models and Inference
 
-- Review of each
-- New analogy
-- Setting up Bayes
+- You want to use data to answer questions.
+- Make *inferences* using *models* with data.
 
+The method you use for inference is part of the model.
+
+- Different sets of assumptions
+- Many will give very similar answers
+
+## Frameworks for Inference
+
+1. Analytical
+2. Maximum likelihood
+3. Resampling (Monte Carlo)
+4. Bayesian
+
+Each is a tool with different costs and benefits.
 
 ## Confidence intervals
 
-- Quantiles
-- Critical values
-- Two sided
-- How to figure out tails?
-- Review CI simulation
+- Review CI simulation & exact CIs
+
+## Understanding `lm()` output
+
+<img src="https://i.imgur.com/P8034XE.jpg" width="90%" />
 
 
 ## Understanding `lm()` output
 
-<img src="https://i.imgur.com/P8034XE.jpg" width="100%" />
+<img src="https://i.imgur.com/38J8BwL.jpg" width="90%" />
 
 
 ## Understanding `lm()` output
 
-<img src="https://i.imgur.com/38J8BwL.jpg" width="100%" />
-
-
-## Understanding `lm()` output
-
-<img src="https://i.imgur.com/oIqWNJg.jpg" width="100%" />
+<img src="https://i.imgur.com/oIqWNJg.jpg" width="90%" />
 
 
 ## What makes a good predictor?
@@ -92,7 +86,8 @@ theme_set(theme_cowplot())
 ## Assumptions of linear models
 
 - IID
-
+- Normality of residuals
+- Equality of variances
 
 ## What makes a model "linear"? When is a model non-linear?
 
@@ -212,18 +207,5 @@ What you have been learning:
     - `cowplot` package: `plot_grid()`
     - `patchwork` package: https://patchwork.data-imaginist.com/
 - [ggpubr](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/)
-- [sjPlot](https://strengejacke.github.io/sjPlot/)
 - [Big list of ggplot extensions](https://github.com/erikgahner/awesome-ggplot2)
 
-
-## General plan
-
-- Basic plot looks OK in RStudio
-- Determine the output size you want
-    - Measure 1 or 2 column figure in the journal
-- Save plot as PDF (`last_plot()` is the most recent plot)
-    - `ggsave()` with `width =` and `height =`
-    - `save_plot()` with `base_height =` and `base_width = `
-- Open in PDF viewer
-- Start changing elements in the theme iteratively
-    - Define a theme
