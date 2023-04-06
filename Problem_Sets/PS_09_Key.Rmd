@@ -22,14 +22,13 @@ library(sjPlot)
 library(multcomp)
 
 theme_set(theme_cowplot())
+
+# Required datasets:
+#   - Bird_Plasma.xlsx
+#   - Zooplankton.csv
+#   - richness.txt
 ```
 
-<!--
-Datasets
-  Bird_Plasma.xlsx
-  Zooplankton.csv
-  richness.txt
--->
 
 ## Calcium concentration in bird plasma
 
@@ -42,7 +41,7 @@ Load the Excel file, and convert hormone and sex to factors. The levels of `Trea
 
 ```{r, message = FALSE}
 # FIXME
-M <- read_excel("../data/Bird_Plasma.xlsx") %>%
+M <- read_excel("../data/Bird_Plasma.xlsx") |>
   mutate(Treatment = factor(Treatment),
          Sex = factor(Sex),
          Treatment = fct_relevel(Treatment, "None"))
@@ -52,7 +51,7 @@ Use `group_by()` and `tally()` to determine the sample size in each of the group
 
 ```{r}
 # FIXME
-M %>% group_by(Treatment, Sex) %>% tally()
+M |> group_by(Treatment, Sex) |> tally()
 ```
 
 Is this a balanced factorial design?
@@ -139,7 +138,7 @@ Read in the data and convert both Treatment and Block into factors. It is especi
 
 ```{r, message = FALSE}
 # FIXME
-M <- read_csv("../data/Zooplankton.csv", col_types = "cdd") %>%
+M <- read_csv("../data/Zooplankton.csv", col_types = "cdd") |>
   mutate(Treatment = factor(Treatment),
          Block = factor(Block))
 ```
@@ -159,10 +158,10 @@ Make two plots, one in which Treatment is on the x-axis and Block is encoded by 
 
 ```{r}
 # FIXME
-M %>%
+M |>
   ggplot(aes(x = Treatment, y = Zooplankton, color = Block)) +
   geom_point()
-M %>%
+M |>
   ggplot(aes(x = Block, y = Zooplankton, color = Treatment)) +
   geom_point()
 ```
@@ -173,11 +172,11 @@ Summarize the mean and standard deviation of each group in a table.
 
 ```{r}
 # FIXME
-M %>% 
-  group_by(Treatment) %>% 
+M |> 
+  group_by(Treatment) |> 
   summarize(Mean = mean(Zooplankton),
             `Std. Dev.` = sd(Zooplankton),
-            .groups = "drop") %>% 
+            .groups = "drop") |> 
   knitr::kable(digits = c(2, 2))
 ```
 
@@ -218,7 +217,7 @@ Describe the results. Do they make sense biologically?
 
 ## Grass Species Richness
 
-At the Conard Environmental Research Area (Grinnell, IA), there are 20 experimental plots with 10 burned each fall and 10 left unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
+At the Conard Environmental Research Area (Grinnell, IA), there are 20 experimental plots with 10 burned each fall and 10 left unburned. The following data are grass species richness data from 5 separate, haphazardly chosen, 10 meter^2^  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
 
 ```{r}
 # FIXME
@@ -243,7 +242,7 @@ Load in the richness data (`richness.txt`), which is a tab-delimited text file (
 ```{r}
 rich.dat <- read_delim("../data/richness.txt",
                        col_types = "dcd",
-                       delim = "\t") %>% 
+                       delim = "\t") |> 
   mutate(plot = factor(plot))
 
 ggplot(rich.dat, aes(x = treatment, y = richness, color = plot)) +
@@ -268,8 +267,8 @@ What can you conclude from the results of this model?
 Now, calculate the mean species richness value for each plot. Fit a model predicting mean species richness from treatment. This is how you would approach this statistical problem if you did not want to use a multilevel model.
 
 ```{r}
-mean.plot <- rich.dat %>%
-  group_by(plot, treatment) %>%
+mean.plot <- rich.dat |>
+  group_by(plot, treatment) |>
   summarize(meanrich = mean(richness),
             .groups = "drop")
 anova(lm(meanrich ~ treatment, data = mean.plot))

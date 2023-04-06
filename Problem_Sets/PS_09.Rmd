@@ -12,14 +12,12 @@ output:
 
 ```{r setup, message=FALSE, warning=FALSE}
 
+# Required datasets:
+#   - Bird_Plasma.xlsx
+#   - Zooplankton.csv
+#   - richness.txt
 ```
 
-<!--
-Datasets
-  Bird_Plasma.xlsx
-  Zooplankton.csv
-  richness.txt
--->
 
 ## Calcium concentration in bird plasma
 
@@ -160,7 +158,7 @@ Describe the results. Do they make sense biologically?
 
 ## Grass Species Richness
 
-At the Conard Environmental Research Area (Grinnell, IA), there are 20 experimental plots with 10 burned each fall and 10 left unburned. The following data are grass species richness data from 5 separate, hapazardly chosen, 10 meter^2  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
+At the Conard Environmental Research Area (Grinnell, IA), there are 20 experimental plots with 10 burned each fall and 10 left unburned. The following data are grass species richness data from 5 separate, haphazardly chosen, 10 meter^2^  plots within each of these 20 experimental plots. The hypothesis to be tested is that burning increases species richness.
 
 ### Activity
 
