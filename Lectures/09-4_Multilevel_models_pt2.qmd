@@ -1,0 +1,459 @@
+---
+title: "GLMs: Applications of Multilevel Models"
+subtitle: "Quantitative Methods in Life Sciences"
+author:
+  - Elizabeth King
+  - Kevin Middleton
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    standalone: true
+    self-contained: true
+    logo: QMLS_Logo.png
+    slide-number: true
+    show-slide-number: all
+code-annotations: hover
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r}
+#| label: setup
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(readxl)
+library(cowplot)
+library(wesanderson)
+library(car)
+library(glmmTMB)
+
+knitr::opts_chunk$set(cache = TRUE)
+theme_set(theme_cowplot(font_size = 18))
+
+# Datasets
+#   RIKZ.xlsx
+#   Ortho.xlsx
+```
+
+
+## Multilevel models in R: many options
+
+- `nlme`: Restricted to a subset of models (linear and non-linear Gaussian)
+- `lme4`: More complex models with crossed random effects, pedigrees, non-Gaussian response, etc., more flexible distributions of response variables
+- `glmmTMB`: Might replace `lme4` eventually, lots of flexibility in distributions of response variables
+- `MCMCglmm`, `rstan`, `brms`: Fit Bayesian multilevel models
+
+
+## Multilevel model formula syntax
+
+`+ ( effect expression | groups )`
+
+- `()` tell R that the formula specifies a multilevel model
+- Pipe `|` separates the effect expression from the grouping variable
+- Many ways to specify relationships
+    - We will cover a few common ones here
+
+
+## Example data
+
+Imagine:
+
+- `y`: Numeric response with a Gaussian distribution
+- `A`: Factor with 5 levels
+- `x`: Continuous predictor
+
+5 `y` samples from each level of `A` and predictor `x`
+
+
+## Simple block design
+
+`y ~ 1 + (1 | A)`
+
+- Fit an overall mean (`1`) of `y`
+- Each level of `A` has a mean estimated as a deviation from the overall mean
+- Each observation in each `A` is represented as a deviation from the group mean
+
+
+## Block design with a continuous predictor 1
+
+`y ~ 1 + x + (1 | A)`
+
+- Fit an overall mean (`1`) of `y`
+- Fit the overall slope of `x`
+- Each level of `A` has a mean estimated as a deviation from the overall mean
+- Each observation in each `A` is represented as a deviation from the group mean
+
+
+## Block design with a continuous predictor 2
+
+`y ~ 1 + x + (1 + x | A)`
+
+- Fit an overall mean (`1`) of `y`
+- Fit the overall slope of `x`
+- Each level of `A` has a slope estimated as a deviation from the overall slope
+- Each level of `A` has a mean estimated as a deviation from the overall mean
+- Each observation in each `A` is represented as a deviation from the group mean
+
+
+## Block designs and nested data
+
+Data with hierarchical structure:
+
+- *i* samples within *n* blocks
+
+We could just calculate a mean for each block and use those data for ANOVA.
+
+- Lose all the information about variability within blocks
+- Might increase apparent variation
+
+
+## Intertidal species richness
+
+Collected by National Institute for Coastal and Marine Management (RIKZ)
+
+<center>
+<img src="https://i.imgur.com/4YGDggA.jpg" width="80%" />
+</center>
+
+
+## Intertidal data
+
+```{r}
+RIKZ <- read_excel("../data/RIKZ.xlsx") |> 
+  mutate(Beach = factor(Beach))
+glimpse(RIKZ)
+```
+
+- `Richness`: Number of species
+- `NAP`: Height above mean tidal level
+- `Exposure`: Index composed of wave action, length of the surf zone, slope, grain size, and the depth of the anaerobic layer
+- `Beach`: Factor denoting which beach
+
+
+## Sampling structure
+
+<center>
+<img src="https://i.imgur.com/HY6P6GF.jpg" width="100%" />
+</center>
+
+Sites are the level of the observation.
+
+
+## Sampling structure
+
+```{r}
+RIKZ |> count(Beach)
+```
+
+5 observation sites at each of 9 beaches
+
+
+## Visualizing `NAP`
+
+```{r}
+#| echo: false
+
+ggplot(RIKZ, aes(NAP, Richness)) +
+  geom_point() +
+  facet_wrap("Beach", nrow = 3)
+```
+
+
+## Visualizing `Exposure`
+
+```{r}
+#| echo: false
+
+ggplot(RIKZ, aes(Exposure, Richness)) +
+  geom_point() +
+  facet_wrap("Beach", nrow = 3)
+```
+
+Each `Beach` only has 1 value of `Exposure`.
+
+
+## Naive multiple regression model
+
+```{r}
+#| echo: true
+fm1 <- lm(Richness ~ NAP + Beach, data = RIKZ)
+Anova(fm1, type = "III")
+```
+
+
+## Naive multiple regression model
+
+```{r}
+#| echo: false
+
+plot(fm1, which = 1)
+```
+
+Maybe we are not interested in knowing the exact nature of the beach effect.
+
+
+## Multilevel model
+
+Allow a different mean richness per beach, while pooling information about other beaches:
+
+```{r}
+#| echo: true
+
+library(glmmTMB)
+
+fm2 <- glmmTMB(Richness ~ 1 + NAP + (1 | Beach), data = RIKZ)
+```
+
+
+## Summary
+
+```{r}
+summary(fm2)
+```
+
+
+## Visualizing the model
+
+Generate predicted values for overall population level estimates and within beach estimates.
+
+```{r}
+#| echo: true
+
+Preds <- crossing(NAP = c(min(RIKZ$NAP), max(RIKZ$NAP)),
+                  Beach = unique(RIKZ$Beach))
+
+# Overall (set random effects to zero)
+Preds$Pred0 <- predict(fm2, newdata = Preds, re.form = ~ 0)
+
+# Within beach
+Preds$Pred1 <- predict(fm2, newdata = Preds)
+```
+
+
+## Visualizing the model
+
+```{r}
+ggplot() +
+  geom_point(data = RIKZ, aes(x = NAP, y = Richness, color = Beach)) +
+  geom_line(data = Preds, aes(x = NAP, y = Pred0), lwd = 2) +
+  geom_line(data = Preds, aes(x = NAP, y = Pred1, color = Beach)) +
+  labs(x = "NAP", y = "Richness")
+```
+
+
+## Does the relationship differ per beach?
+
+Allow each `Beach` to have its own `NAP` to `Richness` linear relationship:
+
+```{r}
+#| echo: true
+
+fm3 <- glmmTMB(Richness ~ 1 + NAP + (1 + NAP | Beach),
+               data = RIKZ,
+               control = glmmTMBControl(optimizer = optim,
+                                        optArgs = list(method = "BFGS")))
+```
+
+`NAP` to `Richness` relationship varies for each `Beach`.
+
+
+## Summary
+
+```{r}
+summary(fm3)
+```
+
+
+## Visualizing the model
+
+Generate predicted values for overall population level estimates and within beach estimates.
+
+```{r}
+#| echo: true
+
+Preds <- crossing(NAP = c(min(RIKZ$NAP), max(RIKZ$NAP)),
+                  Beach = unique(RIKZ$Beach))
+
+# Overall (set random effects to zero)
+Preds$Pred0 <- predict(fm3, newdata = Preds, re.form = ~ 0)
+
+# Within beach
+Preds$Pred1 <- predict(fm3, newdata = Preds)
+```
+
+
+## Visualizing the model
+
+```{r echo=FALSE}
+ggplot() +
+  geom_point(data = RIKZ, aes(x = NAP, y = Richness, color = Beach)) +
+  geom_line(data = Preds, aes(x = NAP, y = Pred0), lwd = 2) +
+  geom_line(data = Preds, aes(x = NAP, y = Pred1, color = Beach)) +
+  labs(x = "NAP", y = "Richness")
+```
+
+
+## Compare fixed effects
+
+```{r}
+fixef(fm2)
+fixef(fm3)
+```
+
+
+## Compare random effects
+
+```{r}
+ranef(fm2)
+ranef(fm3)
+```
+
+
+## Longitudinal studies and repeated measures
+
+Sequential measurements of the same individual / plot / organism, etc. will result in within-subject correlation.
+
+- Growth curves
+- Long-term ecological monitoring
+
+
+## Cranial growth rates in children
+
+Distance from the sella turcica to the pterygomaxillary fissure in growing children.
+
+<center>
+<img src="https://i.imgur.com/N9e47BR.jpg" width="50%" />
+</center>
+
+
+## Orthodontics data
+
+```{r}
+Or <- read_excel("../data/Ortho.xlsx") |>
+  mutate(Subject = factor(Subject),
+         Sex = factor(Sex))
+Or
+```
+
+Potthoff, R. F. and Roy, S. N. (1964) A generalized multivariate analysis of variance model useful especially for growth curve problems. *Biometrika* 51: 313-326.
+
+
+## Orthodontics data
+
+```{r}
+#| echo: true
+
+Or |> count(Sex, Subject)
+Or |> count(Sex)
+```
+
+
+
+## Visualizing
+
+```{r}
+ggplot(Or, aes(x = Age, y = Distance)) +
+  geom_line() +
+  facet_wrap("Subject") +
+  theme(axis.text = element_text(size = 9),
+        strip.text = element_text(size = 10),
+        axis.title = element_text(size = 10, face = "bold"))
+```
+
+
+## Visualizing
+
+```{r}
+ggplot(Or, aes(Age, Distance, color = Subject)) +
+  geom_line() +
+  facet_grid(. ~ Sex) +
+  theme(legend.position = "none")
+```
+
+
+## What are the growth patterns of the head in boys and girls?
+
+- Main effects of `Age` and `Sex` (like an ANCOVA model).
+- Random effects allow the `Age` by `Distance` relationship (slope) to vary for each `Subject`, which is also allowed to have its own mean.
+
+```{r}
+#| echo: true
+
+fm2 <- glmmTMB(Distance ~ 1 + Sex + Age + (1 + Age | Subject),
+               data = Or)
+```
+
+
+## Predicted values
+
+Note: Creates all the combinations and `Sex` and `Subject` but then filter only the subjects of each sex.
+
+```{r}
+#| echo: true
+
+Preds <- crossing(Age = c(min(Or$Age), max(Or$Age)),
+                  Sex = unique(Or$Sex),
+                  Subject = unique(Or$Subject)) |> 
+  filter(Sex == "Female" & str_detect(Subject, "F") | 
+           Sex == "Male" & str_detect(Subject, "M"))
+
+# Overall
+Preds$Pred0 <- predict(fm2, newdata = Preds, re.form = ~ 0)
+
+# Age within Subject
+Preds$Pred1 <- predict(fm2, newdata = Preds)
+```
+
+
+## Visualizing
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_point(data = Or, aes(Age, Distance, color = Subject)) +
+  geom_line(data = Preds, aes(x = Age, y = Pred1, color = Subject)) +
+  geom_line(data = Preds, aes(x = Age, y = Pred0), lwd = 2) +
+  labs(x = "Age", y = "Distance") +
+  facet_grid(. ~ Sex) +
+  theme(legend.position = "none")
+```
+
+
+## Summary
+
+```{r}
+#| echo: false
+
+summary(fm2)
+```
+
+
+## ANOVA table
+
+```{r}
+#| echo: true
+
+Anova(fm2, type = "III")
+```
+
+
+## Reasons to use multilevel models {.smaller}
+
+Adapted from McElreath [-@McElreath2015-no]
+
+1. *To adjust estimates for repeat sampling*. When more than one observation arises from the same individual, location, or time, then traditional, single-level models may mislead us.
+2. *To adjust estimates for imbalance in sampling*. When some individuals, locations, or times are sampled more than others, we may also be misled by single-level models.
+3. *To study variation*. If research questions include variation among individuals or other groups within the data, multilevel models help, because they model variation explicitly.
+4. *To avoid averaging*. Avoid pre-average to construct variables for a regression analysis. Averaging removes variation. Multilevel models allow us to preserve the uncertainty in the original, pre-averaged values, while still using the average to make predictions.
+
+
+## Can poor experimental design be saved by multilevel models?
+
+No.
+
+
+## References
