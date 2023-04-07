@@ -14,6 +14,7 @@ bibliography: Multivariate.bib
 library(tidyverse)
 library(cowplot)
 library(wesanderson)
+library(lme4)
 
 theme_set(theme_cowplot())
 ```
@@ -127,4 +128,135 @@ CasteWorker  0.39334    0.14611   2.692   0.0112
 ## Visualization of Hierarchical Modeling
 
 http://mfviz.com/hierarchical-models/
+
+
+## Generate data
+
+```{r}
+set.seed(543675)
+departments <- c('sociology', 'biology', 'english', 'informatics', 'statistics')
+base.salaries <- c(40000, 50000, 60000, 70000, 80000)
+annual.raises <- c(2000, 500, 500, 1700, 500)
+faculty.per.dept <- 20
+total.faculty <- faculty.per.dept * length(departments)
+
+# Generate dataframe of faculty and (random) years of experience
+ids <- 1:total.faculty
+department <- rep(departments, faculty.per.dept)
+experience <- floor(runif(total.faculty, 0, 10))
+bases <- rep(base.salaries, faculty.per.dept) * runif(total.faculty, .9, 1.1) # noise
+raises <- rep(annual.raises, faculty.per.dept) * runif(total.faculty, .9, 1.1) # noise
+df <- data.frame(ids, department, bases, experience, raises)
+
+# Generate salaries (base + experience * raise)
+df <- df %>% mutate(
+    salary = bases + experience * raises)
+```
+
+
+## Plotting
+
+```{r, echo=FALSE}
+p <- ggplot(df, aes(x = experience, y = salary, color = department)) +
+  geom_point()
+p
+```
+
+
+## No grouping
+
+`salary ~ 1 + experience`
+
+```{r, echo=FALSE}
+fm1 <- lm(salary ~ 1 + experience, data = df)
+
+preds <- crossing(department = unique(df$department),
+                    experience = c(0, 10))
+preds <- preds |> 
+  mutate(fm1 = predict(fm1, newdata = preds))
+
+p +
+  geom_line(data = preds, aes(x = experience, y = fm1), color = "firebrick4",
+            linewidth = 1)
+```
+
+
+## Group by department
+
+`salary ~ 1 + experience + department`
+
+```{r, echo=FALSE}
+fm2 <- lm(salary ~ 1 + experience + department, data = df)
+
+preds <- preds |> 
+  mutate(fm2 = predict(fm2, newdata = preds))
+
+p +
+  geom_line(data = preds, aes(x = experience, y = fm2, color = department),
+            linewidth = 1) +
+  geom_line(data = preds, aes(x = experience, y = fm1), color = "firebrick4",
+            linewidth = 1)
+```
+
+
+## Group by department, partial pooling
+
+`salary ~ 1 + experience + (1 | department)`
+
+```{r, echo=FALSE}
+fm3 <- lmer(salary ~ 1 + experience + (1 | department), data = df)
+
+preds <- preds |> 
+  mutate(fm3 = predict(fm3, newdata = preds))
+
+p +
+  geom_line(data = preds, aes(x = experience, y = fm3, color = department),
+            linewidth = 1) +
+  geom_line(data = preds, aes(x = experience, y = fm1), color = "firebrick4",
+            linewidth = 1)
+```
+
+
+## Predictions
+
+```{r, echo=FALSE}
+preds |> knitr::kable()
+```
+
+
+## Slope by department
+
+`salary ~ 1 + experience * department`
+
+```{r, echo=FALSE}
+fm4 <- lm(salary ~ 1 + experience * department, data = df)
+
+preds <- preds |> 
+  mutate(fm4 = predict(fm4, newdata = preds))
+
+p +
+  geom_line(data = preds, aes(x = experience, y = fm4, color = department),
+            linewidth = 1)
+```
+
+
+## Slope by department, partial pooling
+
+`salary ~ 1 + experience + (1 + experience | department)`
+
+```{r, echo=FALSE}
+fm5 <- lmer(salary ~ 1 + experience + (1 + experience | department), data = df)
+
+preds <- preds |> 
+  mutate(fm5 = predict(fm5, newdata = preds))
+
+p +
+  geom_line(data = preds, aes(x = experience, y = fm5, color = department),
+            linewidth = 1) +
+  geom_line(data = preds, aes(x = experience, y = fm4, color = department),
+            linewidth = 1, linetype = "dashed") +
+  geom_line(data = preds, aes(x = experience, y = fm1), color = "firebrick4",
+            linewidth = 1)
+```
+
 
