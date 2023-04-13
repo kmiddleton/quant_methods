@@ -22,11 +22,10 @@ Try adding `scale_color_d3()`, `scale_color_aaas()`, and others to your plots.
 
 ## Nested Sites in Streams
 
-Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the raw data file provided by the authors on Dryad.
+Snyder et al. (2015)^[Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8] collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the raw data file provided by the authors on Dryad.
 
 One goal is to be able to predict water temperature only using air temperature (since air temperature is more efficiently measured at large scale).
 
-Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8
 
 ### Activity
 
@@ -66,11 +65,11 @@ Because not all observations have observed air temperature, first we should chec
 
 ```
 
-The correlation should be pretty high (r = 0.95). So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete).
+The correlation should be pretty high (*r* = 0.95). So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete).
 
 Let's plot: make a line plot with day on the x-axis and predicted air temp on the-y axis. Then facet by `Stream_Name`.
 
-One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly.The plot should look something like this: https://imgur.com/J0lD2cp.png
+One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly. The plot should look something like this: https://imgur.com/J0lD2cp.png
 
 Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable).
 
@@ -89,7 +88,7 @@ We have an added wrinkle with these data that we have not yet encountered: nesti
 1. Fit a multilevel model where the intercept for site nested in stream is random (`~ 1 | ...`). This model allows each `Site` to have it's own intercept, which is nested within `Stream_Name`. But this value does not change over time.
 2. Fit a multilevel model where the intercept for site nested in stream is random and day is also included as a continuous random predictor (`~ Day | ...`).
 
-Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood. Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. 
+Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood instead of the default of restricted maximum likelihood^[We need to use ML instead of REML so that the resulting likelihoods are comparable]. Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. 
 
 ```{r}
 
@@ -111,7 +110,7 @@ Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the 
 
 > 
 
-Fit a third model that is the same as model 2, but with the addition of `Day` as an additive, main effect. This model fits an overall slope to `Day`, with the random effects slope now an offset from the overall slope. Then use `aictab()` to compare all three models.
+Fit a third model that is the same as model 2, but with the addition of `Day` as an additive, main effect. This model fits an overall slope to `Day` that is shared across all streams, with the random effects slope now an offset from the overall slope. Then use `aictab()` to compare all three models.
 
 ```{r}
 
@@ -209,8 +208,9 @@ Study the code and see if you can figure out what it is doing.
 ```{r, eval=FALSE, echo=FALSE}
 
 pred <- crossing(ln_Mass = seq(3.9, 4.5, length.out = 100),
-                 Species = levels(M$Species)) %>% 
-  mutate(ln_Brain_pred = predict(fm2, newdata = .))
+                 Species = levels(M$Species))
+pred <- pred |> 
+  mutate(ln_Brain_pred = predict(fm2, newdata = pred))
 
 ggplot() +
   geom_point(data = M, aes(ln_Mass, ln_Brain, color = Species), size = 3) +
@@ -220,7 +220,8 @@ ggplot() +
   theme(legend.position = c(0.75, 0.12),
         legend.background = element_rect(size = 0.5,
                                          color = "black",
-                                         linetype = "solid")) +
+                                         linetype = "solid"),
+        legend.margin=margin(c(2, 2, 2, 2))) +
   labs(x = "ln Body Mass", y = "ln Brain Size")
 ```
 

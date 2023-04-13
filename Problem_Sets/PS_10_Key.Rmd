@@ -34,11 +34,10 @@ Try adding `scale_color_d3()`, `scale_color_aaas()`, and others to your plots.
 
 ## Nested Sites in Streams
 
-Snyder et al. (2015) collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the raw data file provided by the authors on Dryad.
+Snyder et al. (2015)^[Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8] collected data on the response of water temperature to air temperature to better understand the time scale of how changing air temperature affects water temperature (e.g., as a result of global climate change). The data they collected are in the file `Streams.xlsx`, the raw data file provided by the authors on Dryad.
 
 One goal is to be able to predict water temperature only using air temperature (since air temperature is more efficiently measured at large scale).
 
-Snyder CD, Hitt NP, Young JA (2015) Accounting for groundwater in stream fish thermal habitat responses to climate change. *Ecological Applications* 25(5): 1397-1419. http://datadryad.org/resource/doi:10.5061/dryad.th6g8
 
 ### Activity
 
@@ -46,7 +45,8 @@ Load the `TemperatureData` sheet from the `Streams.xlsx` file. Look at the struc
 
 ```{r}
 # FIXME
-Temp_Data <- read_excel("../data/Streams.xlsx", sheet = "TemperatureData")
+Temp_Data <- read_excel("../data/Streams.xlsx",
+                        sheet = "TemperatureData")
 ```
 
 Now load the `SiteData` sheet from the Excel file. It has four columns, including the mapping from `Stream_Name` to `Site`. We need to merge the two tibbles together. Because they share a column `Site`, we can match rows, yielding a single tibble.
@@ -60,12 +60,13 @@ We covered joining tibbles in Unit 03-3, but here is a brief review. Base R has 
 `left_join()` the temperature data and the site data and assign to a new object. This will add the columns of one to the other, matching on `Site`. You should end up with a 3,744 x 8 tibble.
 
 ```{r}
+# FIXME
 Site_Data <- read_excel("../data/Streams.xlsx", sheet = "SiteData")
 M <- left_join(Temp_Data, Site_Data)
 
 glimpse(M)
 
-M %>% count(Site, Stream_Name)
+M |> count(Site, Stream_Name)
 ```
 
 Data were collected for 78 different sites across 48 days. The 78 sites are nested within 9 different watersheds (`Stream_Name`). So this is a large, multilevel dataset.
@@ -76,7 +77,7 @@ We then need to do one more thing: make a new variable that converts `Date` into
 
 ```{r}
 # FIXME
-M <- M %>%
+M <- M |>
   mutate(Site = factor(Site),
          Date = factor(Date),
          Stream_Name = factor(Stream_Name),
@@ -91,11 +92,11 @@ cor(M$AirTemp_observed, M$AirTempPredicted,
     use = "pairwise.complete.obs")
 ```
 
-The correlation should be pretty high (r = 0.95). So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete).
+The correlation should be pretty high (*r* = 0.95). So this means that we can safely use predicted air temperature (data which is complete) as a proxy for actual air temperature (data which is incomplete).
 
 Let's plot: make a line plot with day on the x-axis and predicted air temp on the-y axis. Then facet by `Stream_Name`.
 
-One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly.The plot should look something like this: https://imgur.com/J0lD2cp.png
+One more thing we need to add to `aes()` is `group = Site`. This code will tell ggplot to treat each `Site` separately when plotting lines. If your plot has a bunch of jagged vertical lines, you haven't set the group correctly. The plot should look something like this: https://imgur.com/J0lD2cp.png
 
 Once you get your plot working, make the same plot for water temperature (copy the code and change the y variable).
 
@@ -125,7 +126,7 @@ We have an added wrinkle with these data that we have not yet encountered: nesti
 1. Fit a multilevel model where the intercept for site nested in stream is random (`~ 1 | ...`). This model allows each `Site` to have it's own intercept, which is nested within `Stream_Name`. But this value does not change over time.
 2. Fit a multilevel model where the intercept for site nested in stream is random and day is also included as a continuous random predictor (`~ Day | ...`).
 
-Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood. Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. 
+Use `lme()` and be sure to include the option `method = "ML"` to use maximum likelihood instead of the default of restricted maximum likelihood^[We need to use ML instead of REML so that the resulting likelihoods are comparable]. Save both models to objects and take a look at the summaries to make sure that you are getting output that makes sense. 
 
 ```{r}
 # FIXME
@@ -158,9 +159,9 @@ aictab(list(fm1, fm2))
 
 Interpret the difference in AICc values and Akaike weights (`AICcWt`). Does the model comparison make sense in light of your understanding of the difference between the two models?
 
-> The second model is massively preferred ($\Delta$AIC = 2560). This makes sense because there is a lot of day to day variation in temperature. We could probably do even better by adding a main effect of day to model the overall trend of increasing temperature.
+> The second model is very highly preferred ($\Delta$AIC > 2500). This makes sense because there is a lot of day to day variation in temperature. We could probably do even better by adding a main effect of day to model the overall trend of increasing temperature.
 
-Fit a third model that is the same as model 2, but with the addition of `Day` as an additive, main effect. This model fits an overall slope to `Day`, with the random effects slope now an offset from the overall slope. Then use `aictab()` to compare all three models.
+Fit a third model that is the same as model 2, but with the addition of `Day` as an additive, main effect. This model fits an overall slope to `Day` that is shared across all streams, with the random effects slope now an offset from the overall slope. Then use `aictab()` to compare all three models.
 
 ```{r}
 # FIXME
@@ -177,7 +178,7 @@ What do you learn? Remember that AIC can only compare models that you fit.
 
 ## Neandertal Brains
 
-There are well-known differences in both body size between modern humans and Neanderthals. But are there differences in brain size as well, adjusted for body size. Ruff and colleagues (1997) tried to answer just that question.^[Ruff, C.B., E. Trinkaus, and T.W. Holliday. 1997. Body mass and encephalization in Pleistocene _Homo_. _Nature_ 387: 173-176.]
+There are well-known differences in both body size between modern humans and Neanderthals. But are there differences in brain size as well, adjusted for body size. Ruff and colleagues (1997) tried to answer just that question.^[Ruff, C.B., E. Trinkaus, and T.W. Holliday. 1997. Body mass and encephalization in Pleistocene *Homo*. *Nature* 387: 173-176.]
 
 ### Activity
 
@@ -185,7 +186,7 @@ The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log
 
 ```{r}
 # FIXME
-M <- read_csv("../data/NeandertalBrainSize.csv", col_types = "ddc") %>% 
+M <- read_csv("../data/NeandertalBrainSize.csv", col_types = "ddc") |> 
   mutate(Species = fct_relevel(Species, "Recent"))
 ```
 
@@ -193,13 +194,14 @@ Make a scatterplot of brain size vs. body mass, with points colored by species. 
 
 ```{r}
 # FIXME
-M %>% ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+M |> ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
   geom_point(size = 3) +
   scale_color_d3() +
   theme(legend.position = c(0.75, 0.12),
-        legend.background = element_rect(size = 0.5,
+        legend.background = element_rect(linewidth = 0.5,
                                          color = "black",
-                                         linetype = "solid")) +
+                                         linetype = "solid"),
+        legend.margin=margin(c(2, 2, 2, 2))) +
   labs(x = "ln Body Mass", y = "ln Brain Size")
 ```
 
@@ -277,7 +279,7 @@ How do these results compare to 10-fold CV?
 
 Compare the results of the likelihood ratio test, the AICc comparison, and cross-validation. What information does each provide you?
 
-> They all agree in the model comparison results and interpretation, while providing different information. LRT gives you a yes/no P-value comparison among models (and not much else). AICc and Akaika model weights give a little more nuance: most of the model weight is on the additive model, but ~30% is on the interaction model, so it deserves discussion as well. Finally, cross-validation gives a comparison of out of sample prediction error for the models. This final comparison shows that the root mean squared error is actually pretty small across all models.
+> They all agree in the model comparison results and interpretation, while providing different information. LRT gives you a yes/no *P*-value comparison among models (and not much else). AICc and Akaike model weights give a little more nuance: most of the model weight is on the additive model, but ~30% is on the interaction model, so it deserves discussion as well. Finally, cross-validation gives a comparison of out of sample prediction error for the models. This final comparison shows that the root mean squared error is actually pretty small across all models.
 
 Finally, let's add predicted lines for the additive model. To do this, you need to predict brain size across a range of body masses for each species. The code below does this. Change `eval=FALSE` to `eval=TRUE` to have R run the code when you knit. 
 
@@ -285,9 +287,11 @@ Study the code and see if you can figure out what it is doing.
 
 ```{r, eval=TRUE, echo=FALSE}
 ## FIXME set above to eval=FALSE
+
 pred <- crossing(ln_Mass = seq(3.9, 4.5, length.out = 100),
-                 Species = levels(M$Species)) %>% 
-  mutate(ln_Brain_pred = predict(fm2, newdata = .))
+                 Species = levels(M$Species))
+pred <- pred |> 
+  mutate(ln_Brain_pred = predict(fm2, newdata = pred))
 
 ggplot() +
   geom_point(data = M, aes(ln_Mass, ln_Brain, color = Species), size = 3) +
@@ -297,7 +301,8 @@ ggplot() +
   theme(legend.position = c(0.75, 0.12),
         legend.background = element_rect(size = 0.5,
                                          color = "black",
-                                         linetype = "solid")) +
+                                         linetype = "solid"),
+        legend.margin=margin(c(2, 2, 2, 2))) +
   labs(x = "ln Body Mass", y = "ln Brain Size")
 ```
 
