@@ -58,7 +58,9 @@ Is this a balanced factorial design?
 
 > Yes, all combinations of `Sex` and `Treatment` are present and all groups have n = 5.
 
-Create interaction plots of the calcium concentration data. Use the code from lecture as a template. Make two plots, one with `Treatment` on the x axis and one with `Sex` on the x axis. Use `plot_grid()` to place them side by side
+Create interaction plots of the calcium concentration data. Use the code from lecture as a template. Make two plots, one with `Treatment` on the x axis and one with `Sex` on the x axis. Use `plot_grid()` to place them side by side. 
+
+An additional thing to keep in mind is that `sjPlot`, which we use later in this problem set, also has a function `plot_grid()`. If you load `sjPlot` after you load `cowplot`, the `cowplot` version of `plot_grid()` will be masked and not directly accessible (and you will get an error if you use `cowplot` syntax). You make sure to use the `cowplot` version by calling the function with `cowplot::plot_grid()`. The syntax is `package::function()` to specifically use a function from a certain package.
 
 ```{r}
 # FIXME
@@ -113,7 +115,9 @@ The package [`sjPlot`](https://strengejacke.github.io/sjPlot/index.html) has lot
 
 Spend a few minutes looking at the documentation/examples online. An alternative is the [gtsummary](http://www.danieldsjoberg.com/gtsummary/) package.
 
-Use the `tab_model()` function from `sjPlot` to crate a publication-style ANOVA table for the model. There are a lot of options for this function. Start with the defaults and change it as you see fit. Include whatever regression information you want.
+Use the `tab_model()` function from `sjPlot` to crate a publication-style ANOVA table for the model. Be sure to pass the original model fit object (from `lm()`,) rather than the `Anova()` object. 
+
+There are a lot of options for this function. Start with the defaults and change it as you see fit. Include whatever regression information you want.
 
 ```{r, echo=FALSE}
 # FIXME
