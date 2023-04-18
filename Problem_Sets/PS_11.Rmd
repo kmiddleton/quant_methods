@@ -11,6 +11,7 @@ output:
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
+
 ```
 
 
@@ -35,6 +36,7 @@ You take 2 measurements each on 25 different walking stick femurs, which are inc
 Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so that R will treat it as categorical rather than as numeric.
 
 ```{r echo=FALSE}
+
 ```
 
 Look at the structure of the data. The data are in long format, with one measurement per row. We want to be able to plot Measurement 1 vs. Measurement 2 to visualize the paired relationship. To do so, we need to convert the data into wide format, with 2 columns per Specimen: Measurement 1 and Measurement 2.
@@ -47,6 +49,7 @@ Pivot the data to wide:
 - Use the `names_prefix =` option to prefix "Measurement_" before the column name
 
 ```{r}
+
 ```
 
 Plot the pairs of observations as a scatterplot.
@@ -55,6 +58,7 @@ Plot the pairs of observations as a scatterplot.
 - Set the axis coordinates to equal scaling with `coord_equal()`
 
 ```{r}
+
 ```
 
 Based on your plot, do you expect repeatability to be high or low? Give an estimate?
@@ -64,6 +68,7 @@ Based on your plot, do you expect repeatability to be high or low? Give an estim
 Follow the example from lecture to calculate repeatability of the femur length  measurement using `aov()`. As in the lecture, you can just manually copy the values from the `aov()` summary rather than trying to extract them programmatically.
 
 ```{r}
+
 ```
 
 What value of repeatability to you find?
@@ -73,6 +78,7 @@ What value of repeatability to you find?
 Calculate repeatability of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package (you might need to install the package).
 
 ```{r}
+
 ```
 
 Compare the results
@@ -93,26 +99,31 @@ Consider that you are planning some experiments, use the `pwr` package to calcul
 Use `cohen.ES()` to look up the effect size for a "small" effect for a *t*-test.
 
 ```{r}
+
 ```
 
 Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
 
 ```{r}
+
 ```
 
 Repeat the test above but for a paired *t*-test.
 
 ```{r}
+
 ```
 
 Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
 
 ```{r}
+
 ```
 
 Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
 
 ```{r}
+
 ```
 
 
@@ -146,9 +157,10 @@ fm <- lm(Ys ~ Sex, data = M)
 obsP <- tibble('P' = getP(fm))
 ```
 
-Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
+Visualize your *P*-values by plotting a histogram and a q-q plot. For the q-q plot, transform your *P*-values to -log10(*P*-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
 
 ```{r}
+
 ```
 
 Based on these visualizations, do you think there are true positives in this data set?
@@ -158,11 +170,13 @@ Based on these visualizations, do you think there are true positives in this dat
 Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction (Holm procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant. Print a `tibble` with the observed P-value and sequential Bonferroni corrected P-value. Finally, count the number of P-values that are less than 0.05.
 
 ```{r}
+
 ```
 
 Repeat the procedure above, but now use the false discovery rate procedure of Benjamini and Hochberg.
 
 ```{r}
+
 ```
 
 Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the `qvalue` package, which is available through Bioconductor (rather than CRAN). https://www.bioconductor.org/packages/release/bioc/html/qvalue.html
@@ -170,6 +184,7 @@ Follow the code in lecture to carry out a pFDR analysis of these P-values. You w
 **Note**: When you install from bioconductor, it will ask you if you want to update your packages, expecting a response at the command line. You can enter "y" or "n", but you need to enter something. Otherwise, R will appear to be frozen.
 
 ```{r}
+
 ```
 
 What is the value of $\pi_0$? What does this value represent?
@@ -183,6 +198,7 @@ How many P-values are associated with q-values less than 0.05?
 What is an adjusted $\alpha$-level that will control pDFR at 0.05?
 
 ```{r}
+
 ```
 
 The code below shows a randomization that we can use to estimate the number of expected false positives for this experiment. 1) We want to keep the correlation structure of the gene expression measures. An easy way to do this is to shuffle the sex labels and leave the expression measures the same. 2) We performed our set of 100 tests in the same way that we did above. 3) We collected the associated p values using the `getP` function. 4) These were put into a 1000 x 100 matrix with each column as one iteration. 
@@ -215,6 +231,7 @@ Load this matrix we generated using the `readRDS` function (this is a new one fo
 Visualize the P-values from one or a few of these iterations as you did above with a histogram and a q-q plot.
 
 ```{r}
+
 ```
 
 For each iteration, get a count of the number of positives at a threshold of 0.05. Visualize the number of positives with a histogram. Keep in mind, because you have randomized the data, *all positives here are false positives*.
@@ -225,6 +242,7 @@ For each iteration, get a count of the number of positives at a threshold of 0.0
 
 
 ```{r}
+
 ```
 
 Now use this same procedure to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `tibble`.
@@ -238,6 +256,7 @@ thresholds <- seq(0.0005, 0.05 , length = 200)
 Make plots of the FDR, FP, and FWER plotted against the threshold (feel free to make three separate plots). In each, draw a horizontal line at 5%.
 
 ```{r}
+
 ```
 
 Inspecting the data you made above, what P-value threshold should you use if you want a false discovery rate of 5%?
@@ -247,6 +266,6 @@ Inspecting the data you made above, what P-value threshold should you use if you
 Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile. hint: you will want to use `apply()` here.
 
 ```{r}
-```
 
+```
 

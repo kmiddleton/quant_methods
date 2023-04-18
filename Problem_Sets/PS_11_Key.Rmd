@@ -43,7 +43,7 @@ Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so tha
 
 ```{r echo=FALSE}
 # FIXME
-M <- read_csv("../data/WalkingStickFemurs.csv", col_types = "ddd") %>% 
+M <- read_csv("../data/WalkingStickFemurs.csv", col_types = "ddd") |> 
   mutate(Specimen = factor(Specimen))
 ```
 
@@ -60,7 +60,7 @@ Pivot the data to wide:
 # FIXME
 glimpse(M)
 
-M_wide <- M %>% 
+M_wide <- M |> 
   pivot_wider(id_cols = Specimen, names_from = Measurement,
               values_from = Femur_length, names_prefix = "Measurement_")
 ```
@@ -111,6 +111,7 @@ Would you be comfortable going forward with data collection given this value for
 
 > Maybe or maybe not. If we expect fairly large differences between groups, then it's probably fine. But if the differences are small, then there may be so much variation associated with taking measurements that it will swamp out the variation between groups. It's probably fine.
 
+
 ## Planning experiments
 
 Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
@@ -152,6 +153,7 @@ Calculate the power for a correlation test where you estimate the correlation co
 pwr.r.test(r = 0.4, n = 15)
 ```
 
+
 ## RNAseq (gene expression) on males and females of the Glanville Fritillary
 
 ```{r}
@@ -166,14 +168,14 @@ quant.norm <- function(y) {
 
 sid <- read_csv("../data/Butteryfly_IDs.csv",
                 col_names = c("ID", "Treatment", "Sex", "Population"))
-sid <- sid %>%
+sid <- sid |>
   mutate(Treatment = str_replace(Treatment, "treatment: ", ""),
          Sex = str_replace(Sex, "Sex: ", ""),
          Population = str_replace(Population, "population: ", ""),
          ID2 = str_split(ID, "_", simplify = TRUE)[, 2],
          ID = str_split(ID, "_", simplify = TRUE)[, 1],
-         ID = str_replace_all(ID, "-", "_")) %>%
-  filter(ID2 == 450) %>%
+         ID = str_replace_all(ID, "-", "_")) |>
+  filter(ID2 == 450) |>
   dplyr::select(-ID2)
 
 gg <- read_delim("../data/Butterfly_NormalizedCountsGenes.txt",
@@ -226,7 +228,7 @@ fm <- lm(Ys ~ Sex, data = M)
 obsP <- tibble('P' = getP(fm))
 ```
 
-Visualize your P-values by plotting a histogram and a q-q plot. For the q-q plot, transform your P-values to -log10(P-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
+Visualize your *P*-values by plotting a histogram and a q-q plot. For the q-q plot, transform your *P*-values to -log10(*P*-values) and sort them from smallest to largest. Then, generate expected values from the uniform distribution using `runif()` and again transform and sort them. Now plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
 
 ```{r}
 set.seed(273645)
@@ -253,8 +255,8 @@ Use R's built-in `p.adjust()` function to adjust the P-values using the sequenti
 # FIXME
 seq_bonf <- p.adjust(obsP$P, method = "holm")
 tibble(P = obsP$P,
-       seq_bonf) %>%
-  arrange(P) %>%
+       seq_bonf) |>
+  arrange(P) |>
   filter(seq_bonf <= 0.05)
 sum(seq_bonf < 0.05)
 ```
@@ -265,13 +267,13 @@ Repeat the procedure above, but now use the false discovery rate procedure of Be
 # FIXME
 fdr <- p.adjust(obsP$P, method = "fdr")
 tibble(P = obsP$P,
-       fdr) %>%
-  arrange(P) %>%
+       fdr) |>
+  arrange(P) |>
   filter(fdr <= 0.05)
 sum(fdr < 0.05)
 ```
 
-Follow the code in lecture to carry out a pFDR analysis of these P-values. You will probably need to install the `qvalue` package, which is available through Bioconductor (rather than CRAN). https://www.bioconductor.org/packages/release/bioc/html/qvalue.html
+Follow the code in lecture to carry out a pFDR analysis of these *P*-values. You will probably need to install the `qvalue` package, which is available through Bioconductor (rather than CRAN). https://www.bioconductor.org/packages/release/bioc/html/qvalue.html
 
 **Note**: When you install from bioconductor, it will ask you if you want to update your packages, expecting a response at the command line. You can enter "y" or "n", but you need to enter something. Otherwise, R will appear to be frozen.
 
@@ -320,7 +322,7 @@ saveRDS(allP, file="../data/Shuffle_Expression.rds")
 Load this matrix we generated using the `readRDS` function (this is a new one for you that will read an R object in directly) and assign it to an object called `allP`.
 
 ```{r}
-#FIXME
+# FIXME
 allP <- readRDS(file="../data/Shuffle_Expression.rds")
 ```
 
@@ -369,6 +371,7 @@ mean(pos.counts$counts) / sum(obsP$P < th)
 Now use this same procedure to calculate the false positive rate, FWER, and false discovery rate at the range of thresholds given below. Store your output (including the threshold) in a `tibble`.
 
 ```{r}
+# FIXME
 thresholds <- seq(0.0005, 0.05 , length = 200)
 
 #FIXME
@@ -394,17 +397,17 @@ Make plots of the FDR, FP, and FWER plotted against the threshold (feel free to 
 
 ```{r}
 #FIXME
-output %>%
+output |>
   ggplot(aes(threshold, FDR)) +
   geom_point() +
   geom_hline(yintercept = 0.05)
 
-output %>%
+output |>
   ggplot(aes(threshold, FP)) +
   geom_point() +
   geom_hline(yintercept = 0.05)
 
-output %>%
+output |>
   ggplot(aes(threshold, FWER)) +
   geom_point() +
   geom_hline(yintercept = 0.05)
@@ -420,5 +423,3 @@ Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-v
 minP <- apply(allP, 2, min)
 quantile(minP, 0.05)
 ```
-
-
