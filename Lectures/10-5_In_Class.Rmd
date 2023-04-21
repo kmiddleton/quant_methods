@@ -20,6 +20,14 @@ library(AICcmodavg)
 theme_set(theme_cowplot())
 ```
 
+## Topics
+
+- DataPhiles Next Week: Planning session
+    - 2 or 3 slides (the main question you are trying to answer in your experiment, a schematic of your planned design, and some initial ideas for analysis)
+- Last Optional Review Session (stop day: May 5)
+- Questions from Unit 9?
+- Questions from this week
+
 ## PC 2
 
 
