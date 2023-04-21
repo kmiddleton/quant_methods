@@ -1,0 +1,116 @@
+---
+title: "Unit 11: In Class Discussion"
+subtitle: "Quantitative Methods in Life Sciences"
+author: 'Elizabeth King, Kevin Middleton, and Lauren Sullivan'
+output:
+  ioslides_presentation:
+    fig_width: 8
+    css: styles.css
+csl: evolution.csl
+bibliography: Multivariate.bib
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+
+theme_set(theme_cowplot())
+```
+
+## Topics
+
+- Progress Check 3 Reminder
+- Quizzes
+- Questions from Unit 10?
+- Questions from this week
+
+## Quiz 11-1
+
+- Pseudoreplication
+- Batch effects
+
+## Quiz 11-2
+
+- Repeatability
+    - Why?
+    - How to use this & not introduce bias?
+
+## Quiz 11-3
+
+- Power
+    - I found it confusing that there is no variable in the equation that is specific for the experiment being performed.
+    - Relationship between decision errors
+
+## Types of errors and statistical power {.smaller}
+
+
+|               | Reject H~0~    | Fail to reject H~0~   |
+|--------------:|:--------------:|:---------------------:|
+|H~0~ is true   | Type I error   | *Correct*             |
+|H~0~ is false  | *Correct*      | Type II error         |
+
+False positive (Type I error):
+
+- You decide there is an effect when in reality there is not
+    - *P* is small by *random chance*, given that $\alpha$ is chosen ahead of the test
+
+False negative (Type II error) probability depends on:
+
+- You decide there is no effect when in reality there is
+    - Depends on the value of $\alpha$ & how "wrong" H~0~ is
+    - *Random chance* leads to the estimated effect being smaller than it is in reality
+
+## Quiz 11-4
+
+-FWER, FDR, FPR, etc.
+    - In what scenario is the Sequential Bonferroni procedure the best multiple testing method?
+    - How do you know if your study requires FWER instead of just methods to control the FDR?"
+    - Difference between false positive and false discovery
+
+## Types of errors and statistical power {.smaller}
+
+
+|               | Reject H~0~    | Fail to reject H~0~   |
+|--------------:|:--------------:|:---------------------:|
+|H~0~ is true   | Type I error   | *Correct*             |
+|H~0~ is false  | *Correct*      | Type II error         |
+
+False positive (Type I error):
+
+- You decide there is an effect when in reality there is not
+    - *P* is small by *random chance*, given that $\alpha$ is chosen ahead of the test
+
+False negative (Type II error) probability depends on:
+
+- You decide there is no effect when in reality there is
+    - Depends on the value of $\alpha$ & how "wrong" H~0~ is
+    - *Random chance* leads to the estimated effect being smaller than it is in reality
+    
+## A menu of MCPs
+
+1. <s>Do nothing</s>
+    - Not an option 
+2. Methods to control the Family-Wise Error Rate (FWER):
+    - MCs within a single linear model (e.g. Tukey, etc.; see 08-2)
+    - Bonferroni correction
+      - Not recommended - overly conservative
+    - Sequential Bonferroni procedure
+    - Randomization procedures to empirically control FWER 
+6. Methods to control the False Discovery Rate (FDR)
+    - False Discovery Rate Methods
+    - _Positive_ False Discovery Rate Methods
+    
+
+## False discovery rate
+
+Proposed by Benjamini and Hochberg [-@Benjamini1995-cw].
+
+- Also see Curran-Everett (2000).
+
+Controls FDR (i.e., rate of Type I errors), rather than FWER
+
+$$\mbox{FDR} = \frac{\mbox{n False Positives}}{\mbox{n All Positives}}$$
+
+e.g., I'm OK with 5% false positives *among the tests I judge as significant*.
+
+Note: False Positive Rate = $\frac{\mbox{n False Positives}}{\mbox{n All Tests}}$
