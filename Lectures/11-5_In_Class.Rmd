@@ -20,20 +20,21 @@ theme_set(theme_cowplot())
 ## Topics
 
 - Progress Check 3 Reminder
-- Quizzes
 - Questions from Unit 10?
-- Questions from this week
+- Quizzes & Questions from this week
 
 ## Quiz 11-1
 
 - Pseudoreplication
-- Batch effects
+- Batch effects & confounding variables
 
 ## Quiz 11-2
 
 - Repeatability
     - Why?
     - How to use this & not introduce bias?
+    
+![](https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fnature23536/MediaObjects/41586_2017_Article_BFnature23536_Fig1_HTML.jpg){width=80%}
 
 ## Quiz 11-3
 
@@ -62,9 +63,9 @@ False negative (Type II error) probability depends on:
 
 ## Quiz 11-4
 
--FWER, FDR, FPR, etc.
+- FWER, FDR, FPR, etc.
     - In what scenario is the Sequential Bonferroni procedure the best multiple testing method?
-    - How do you know if your study requires FWER instead of just methods to control the FDR?"
+    - How do you know if your study requires FWER instead of just methods to control the FDR?
     - Difference between false positive and false discovery
 
 ## Types of errors and statistical power {.smaller}
@@ -114,3 +115,28 @@ $$\mbox{FDR} = \frac{\mbox{n False Positives}}{\mbox{n All Positives}}$$
 e.g., I'm OK with 5% false positives *among the tests I judge as significant*.
 
 Note: False Positive Rate = $\frac{\mbox{n False Positives}}{\mbox{n All Tests}}$
+
+## FDR & FPR
+
+- You do 100 correlations
+- You find 22 are statistically significant at an $\alpha$ = 0.05
+- Let's say 5 are false positives
+
+1. What is the FPR?
+2. What is the FDR?
+
+
+
+$$\mbox{FPR} = \frac{\mbox{n False Positives}}{\mbox{n All Tests}}$$
+$$\mbox{FDR} = \frac{\mbox{n False Positives}}{\mbox{n All Positives}}$$
+
+
+## FDR & FPR
+
+$$FPR = \frac{5}{100} = 0.05$$
+
+$$FDR = \frac{5}{22} = 0.227$$
+
+## References
+
+
