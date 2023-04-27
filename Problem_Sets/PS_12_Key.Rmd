@@ -40,21 +40,23 @@ Load the sole data from the file `Sole.xlsx`. Several of the variables are categ
 
 ```{r}
 # FIXME
-M <- read_excel("../data/Sole.xlsx")
-M <- M %>% mutate(season = factor(season),
-                  month = factor(month),
-                  area = factor(area),
-                  Solea_solea = factor(Solea_solea))
-M <- M %>% as.data.frame()
-str(M)
+
+Sole <- read_excel("../data/Sole.xlsx") |>
+  mutate(season = factor(season),
+         month = factor(month),
+         area = factor(area),
+         Solea_solea = factor(Solea_solea)) |> 
+  as.data.frame()
+str(Sole)
 ```
 
 The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent their proportional concentrations in the substrate (they sum to 100). Calculate a composite score for "substrate". Use principal components analysis on these columns.
 
 ```{r}
 # FIXME
+
 z <- prcomp(~ gravel + large_sand + med_fine_sand + mud,
-              data = M,
+              data = Sole,
               scale. = TRUE,
               center = TRUE)
 ```
@@ -63,6 +65,7 @@ Use the `summary()` and `print()` methods to determine the percent of variance a
 
 ```{r}
 # FIXME
+
 summary(z)
 print(z)
 ```
@@ -75,32 +78,35 @@ Fit a logistic regression where presence of sole is predicted by the first PC fr
 
 ```{r}
 # FIXME
-fm2 <- glm(Solea_solea ~ z$x[, 1], data = M, family = "binomial")
+
+fm2 <- glm(Solea_solea ~ z$x[, 1], data = Sole, family = "binomial")
 ```
 
 Try to interpret the output of the summary of the fitted model. What kind of substrate do sole appear to prefer?
 
 ```{r}
 # FIXME
+
 summary(fm2)
 ```
 
 > PC is basically as axis of sand with values in negative PC1 scores to mud in positive PC1 scores. Gravel doesn't load appreciably on PC1. Logistic regression shows that as PC1 score increases, sole are less likely to be present (negative coefficient estimate). So sole are less likely to be present as the substrate gets more muddy. They are more likely to be present as the substrate gets more sandy.
 
-The code below plots the outcome. Change eval=FALSE to eval=TRUE to run this chunk when knitting.
+The code below plots the outcome. Change `eval=FALSE` to `eval=TRUE` to run this chunk when knitting.
 
 ```{r, eval=FALSE}
 # Plotting the outcome.
 # FIXME
+
 M$PC1 <- z$x[, 1]
 
 ggplot(M, aes(x = PC1,
               y = as.numeric(Solea_solea) - 1)) +
-  geom_hline(yintercept = 0.5, linetype = "dotted", size = 0.5) +
+  geom_hline(yintercept = 0.5, linetype = "dotted", linewidth = 0.5) +
   geom_smooth(method = "glm",
               formula = y ~ x,
               method.args = list(family = "binomial"),
-              se = FALSE, size = 2) +
+              se = FALSE, linewidth = 2) +
   geom_point(size = 3) +
   labs(y = "Probability of Presence", x = "PC1") +
   scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
@@ -109,7 +115,7 @@ ggplot(M, aes(x = PC1,
 ```
 
 
-## Randomization and Empirical P-values
+## Randomization and Empirical *P*-values
 
 Randomization is an approach hypothesis testing that doesn't rely on the same set of assumption as the "original" test. The general procedure is:
 
@@ -140,8 +146,8 @@ library(tictoc)
 stalk <- read_csv("../data/Stalkies.csv", col_types = "cd")
 
 # Check standard deviations
-stalk %>% 
-  group_by(food_source) %>% 
+stalk |> 
+  group_by(food_source) |> 
   summarize(st_dev = sd(eye_span),
             .groups = "drop")
 
@@ -150,7 +156,7 @@ ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
   stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "red", size = 0.7) +
+               color = "red", linewidth = 0.7) +
   labs(x = "Food Source", y = "Eye Span")
 
 set.seed(8987324)
@@ -164,7 +170,7 @@ for (ii in 2:nreps) {
 }
 toc() # Stop timer
 
-tibble(t_stats) %>%
+tibble(t_stats) |>
   ggplot(aes(t_stats)) +
   geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1], color = "red") +
@@ -181,11 +187,11 @@ tibble(t_stats) %>%
 t.test(eye_span ~ food_source, data = stalk)
 ```
 
-10^5^ iterations took ~84 seconds on a single processor (on this computer). We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical *P* is 6e-10, so we expect the empirical *P* to be on the same scale.
+10^5^ iterations took ~84 seconds on a single processor (on this computer). We don't need to run that many iterations to get a good sense that the empirical P-value is going to be very low. The analytical *P* is 6^-10^, so we expect the empirical *P* to be on the same scale.
 
 We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
 
-The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the furrr package (https://furrr.futureverse.org/), which handle the parallelization and collection of the results.
+The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. But rather than doing a for loop, we will use the `furrr` package (https://furrr.futureverse.org/), which handle the parallelization and collection of the results.
 
 The following chunk will not run during knitting.
 
@@ -218,9 +224,9 @@ t_rand <- function(.x, stalk) { # the 1st parameter is the iterator .x
 # t_stats (numeric vector).
 tic()
 rand_ts <- future_map_dbl(.x = 1:nreps,
-               .f = t_rand,
-               stalk = stalk,
-               .options = furrr_options(seed = TRUE))
+                          .f = t_rand,
+                          stalk = stalk,
+                          .options = furrr_options(seed = TRUE))
 toc()
 
 # Stop cluster
@@ -249,23 +255,23 @@ We get a speed-up of about 4.7 times. There is some overhead in the parallelizat
 
 ### Heart Transplant Survivorship (PS 08)
 
-For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation, testing the same hypothesis as before.
+For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation, testing the same hypothesis as you did in PS 08.
 
 Refer to the key for PS 08 to refresh yourself with the question and adapt the code from the example above (either sequential or parallel). Otherwise we will leave this exercise undirected.
 
 ```{r, heart_transplants}
 # FIXME
-M <- read_excel("../data/Heart_Transplants.xlsx") %>%
+HT <- read_excel("../data/Heart_Transplants.xlsx") |>
   mutate(Mismatch_Degree = fct_inorder(Mismatch_Degree))
 
-ggplot(M, aes(x = Mismatch_Degree, y = Survival_Days)) +
+ggplot(HT, aes(x = Mismatch_Degree, y = Survival_Days)) +
   geom_point(position = position_jitter(width = 0.05), alpha = 0.5) +
   stat_summary(fun.y = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
                color = "red", size = 0.7) +
   labs(x = "Mismatch Degree", y = "Survival (days)")
 
-fm <- lm(Survival_Days ~ Mismatch_Degree, data = M)
+fm <- lm(Survival_Days ~ Mismatch_Degree, data = HT)
 obs <- summary(fm)
 
 set.seed(823476)
@@ -275,11 +281,11 @@ F_stats[1] <- obs$fstatistic["value"]
 
 for (ii in 2:nreps) {
   fm_rand <- lm(sample(Survival_Days) ~ Mismatch_Degree,
-                    data = M)
+                    data = HT)
   F_stats[ii] <- summary(fm_rand)$fstatistic["value"]
 }
 
-tibble(F_stats) %>%
+tibble(F_stats) |>
   ggplot(aes(F_stats)) +
   geom_histogram(bins = 30) +
   geom_vline(xintercept = F_stats[1], color = "red") +
