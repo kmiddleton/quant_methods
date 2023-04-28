@@ -61,7 +61,7 @@ Try to interpret the output of the summary of the fitted model. What kind of sub
 
 > 
 
-The code below plots the outcome. Change eval=FALSE to eval=TRUE to run this chunk when knitting.
+The code below plots the outcome. Change `eval=FALSE` to `eval=TRUE` to run this chunk when knitting.
 
 ```{r, eval=FALSE}
 # Plotting the outcome.
@@ -83,7 +83,7 @@ ggplot(M, aes(x = PC1,
 ```
 
 
-## Randomization and Empirical P-values
+## Randomization and Empirical *P*-values
 
 Randomization is an approach hypothesis testing that doesn't rely on the same set of assumption as the "original" test. The general procedure is:
 
@@ -114,8 +114,8 @@ library(tictoc)
 stalk <- read_csv("../data/Stalkies.csv", col_types = "cd")
 
 # Check standard deviations
-stalk %>% 
-  group_by(food_source) %>% 
+stalk |> 
+  group_by(food_source) |> 
   summarize(st_dev = sd(eye_span),
             .groups = "drop")
 
@@ -138,7 +138,7 @@ for (ii in 2:nreps) {
 }
 toc() # Stop timer
 
-tibble(t_stats) %>%
+tibble(t_stats) |>
   ggplot(aes(t_stats)) +
   geom_histogram(bins = 30) +
   geom_vline(xintercept = t_stats[1], color = "red") +
@@ -159,7 +159,7 @@ t.test(eye_span ~ food_source, data = stalk)
 
 We can use parallel processing to speed things up considerably, taking advantage of the fact that we are really just doing the same kind of calculation over and over.
 
-The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. Basically we set things up as we normally do, setting up an empty vector to hold the output and assign the observed value to the first position. But rather than doing a for loop, we will use the furrr package (https://furrr.futureverse.org/), which handle the parallelization and collection of the results.
+The code below implements a simple parallel loop using some straightforward R packages. Some of this code will look unfamiliar, but we have commented it for you, in case you want to try something like this with your own data. But rather than doing a for loop, we will use the `furrr` package (https://furrr.futureverse.org/), which handle the parallelization and collection of the results.
 
 The following chunk will not run during knitting.
 
@@ -223,7 +223,7 @@ We get a speed-up of about 4.7 times. There is some overhead in the parallelizat
 
 ### Heart Transplant Survivorship (PS 08)
 
-For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation, testing the same hypothesis as before.
+For the data on survivorship after heart transplant, we had to transform the data due to unequal variances. That is not necessary when we use randomization. Reanalyze these data without transformation, testing the same hypothesis as you did in PS 08.
 
 Refer to the key for PS 08 to refresh yourself with the question and adapt the code from the example above (either sequential or parallel). Otherwise we will leave this exercise undirected.
 
