@@ -1,0 +1,91 @@
+---
+title: "P_sim"
+author: "Libby King"
+date: "2023-03-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+Simulate data with no difference
+Extract P-value from summary
+Repeat many times
+Plot
+
+```{r}
+set.seed(27846283)
+mu1 <- 3.5
+mu2 <- 3.5
+sd1 <- 2
+sd2 <- 2
+nobs <- 20
+
+niter <- 1000
+
+output <- tibble(
+  iter_num = 1:niter,
+  deltas = NA,
+  Ps = NA
+)
+
+for (ii in 1:niter) {
+  y1 <- rnorm(n = nobs, mean = mu1, sd = sd1)
+  y2 <- rnorm(n = nobs, mean = mu2, sd = sd2)
+  
+  DD <- tibble(
+    y = c(y1, y2),
+    group = rep(c("g1", "g2"), each = nobs)
+  )
+  
+  output$deltas[ii] <- mean(y1) - mean(y2)
+  
+  fm <- lm(y ~ group, data = DD)
+  ss <- summary(fm)
+  output$Ps[ii] <- ss$coefficients[2, 4]
+}
+```
+
+
+```{r}
+ggplot(output, aes(deltas)) +
+  geom_histogram()
+
+mean(output$deltas)
+
+1000 * 0.05 # 0 - 0.05
+# 0.05 - 0.1
+# 0.1 - 0.15
+
+ggplot(output, aes(Ps)) +
+  geom_histogram(binwidth = 0.05)
+```
+
+```{r}
+p_sim <- function(nobs, mu1, mu2, sd1, sd2) {
+  y1 <- rnorm(n = nobs, mean = mu1, sd = sd1)
+  y2 <- rnorm(n = nobs, mean = mu2, sd = sd2)
+  
+  DD <- tibble(
+    y = c(y1, y2),
+    group = rep(c("g1", "g2"), each = nobs)
+  )
+  
+  
+  fm <- lm(y ~ group, data = DD)
+  ss <- summary(fm)
+  return(c(mean(y1) - mean(y2), ss$coefficients[2, 4]))
+}
+p_sim(10, 1, 1, 2, 2)
+```
+
+
+
+
+
+
+
+
+

@@ -22,7 +22,7 @@ library(lme4)
 
 - Instructor specific (so there are 2 - sorry!)
 - Already have an email
-- Open until May 14
+- Open until May 12
 - Can't find email? 
     - Go to [evaluations.missouri.edu](https://evaluation.missouri.edu/)
 
@@ -30,86 +30,20 @@ library(lme4)
 ## Progress Check 3
 
 - Posted early next week
-- Due Friday, May 14th by end of day (11:59pm)
-- Review and Q & A: Friday May 7 1-2:50
+- Due Friday, May 12th by end of day (11:59pm)
+- Review and Q & A: Friday May 5 10-12:50
     - Optional
     - Recorded
 
 
-## Non-independence
 
-> With regard to non-independence, I kind of feel like sometimes that could become a blurry line, and am wondering if there are general guidelines for some blurry spaces. For example, in the quiz, you mentioned that there were 200 wild caught frogs, each sampled once. But for a moment in my head, I thought "well, some of them could be related to each other." But we also have no way of knowing which are and are not related to each other, so it would be near impossible (unless you did genetic sampling) to include this is your model. Is that something that just ends up in random "noise?"  Is it only non-independent if you know you are what those differences are (like when you know you have sampled from two different populations)?
+## Unit 11
 
-
-## Direction of the inequality in randomization
-
-> In the 12-3 Lecture, I was trying to understand why the inequality sign should be one way or another. In the lion noses case, should it be ">=" because the observed t-stat was greater than zero?  And then in the quiz for 12-3, should we be thinking about "<=" because the observed t-stat was less than zero?  I also wanted to clarify, do we use the "2*" in 2*mean(t_stats >= t_stats[1])  because the t-distribution is, itself, 2-tailed, but we are asking a one-tailed question?
-
-> How do we calculate the empirical P-value given the histogram?
-
-
-## Interpretation of PCs
-
-> Can you go over on the interpretation of principle components, and how to compare the variables?
-
+- Questions?
+- Problem Set 11
+    - FDR from randomization
 
 ## Unit 12 quizzes
 
+- Most questions this week were general about each topic
 
-## Stream temperature data
-
-```{r}
-Temp_Data <- read_excel("../data/Streams.xlsx", sheet = "TemperatureData")
-Site_Data <- read_excel("../data/Streams.xlsx", sheet = "SiteData")
-M <- left_join(Temp_Data, Site_Data, by = "Site") %>% 
-  mutate(Site = factor(Site),
-         Date = factor(Date),
-         Stream_Name = factor(Stream_Name),
-         Day = as.numeric(Date))
-```
-
-
-## Nesting as an interaction
-
-Nesting is equivalent to one main effect and an interaction between the main effect and the nested factor.
-
-```{r}
-fm1 <- lmer(WaterTemp ~ AirTempPredicted + Day +
-              (1 | Stream_Name/Site),
-            data = M, REML = FALSE)
-
-fm2 <- lmer(WaterTemp ~ AirTempPredicted + Day +
-              (1 | Stream_Name) +
-              (1 | Stream_Name:Site),
-            data = M, REML = FALSE)
-```
-
-
-## Nesting as an interaction
-
-```{r}
-summary(fm1)
-```
-
-
-## Nesting as an interaction
-
-```{r}
-summary(fm2)
-```
-
-
-## Nesting as an interaction
-
-```{r}
-fixef(fm1)
-fixef(fm2)
-```
-
-
-## Nesting as an interaction
-
-```{r}
-ranef(fm1)$`Site:Stream_Name`[1:10, 1]
-ranef(fm2)$`Stream_Name:Site`[1:10, 1]
-```
