@@ -34,7 +34,7 @@ bibliography: Multivariate.bib
 
 > I would like to go over power analysis one more time--I think another example might help it click better for me.
 
->Can we review the differences between FWER, FDR, and pFDR.
+> Can we review the differences between FWER, FDR, and pFDR.
 
 > I was/am confused on the last question of the key for PS-11 where it asks to "Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile." - why isn't it: "1-(quantile(minP, 0.05))"? When I look at the graph of FWER against alpha thresholds, it looks like the FWER is very close to 1 at an alpha of 0.05? I feel like I'm misinterpreting the concept and/or the question.
 
