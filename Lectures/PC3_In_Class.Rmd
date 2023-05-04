@@ -10,6 +10,13 @@ csl: evolution.csl
 bibliography: Multivariate.bib
 ---
 
+## Anonymous
+
+> Can you please go over how to access the class materials from this class and the other Quant Meth classes from GitHub? Oh and what the Youtube channel is for the lectures? I have never used GitHub, so I am not sure how to navigate it or access files from it.
+
+
+
+
 
 ## Topics for Today
 
