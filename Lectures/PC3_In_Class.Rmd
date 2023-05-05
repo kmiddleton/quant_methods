@@ -10,22 +10,77 @@ csl: evolution.csl
 bibliography: Multivariate.bib
 ---
 
-## Anonymous
+## Course Materials
 
-> Can you please go over how to access the class materials from this class and the other Quant Meth classes from GitHub? Oh and what the Youtube channel is for the lectures? I have never used GitHub, so I am not sure how to navigate it or access files from it.
+> Can you please go over how to access the class materials from this class and the other Quant Meth classes from GitHub? What the Youtube channel is for the lectures?
+
+- https://github.com/kmiddleton/quant_methods
+- https://www.youtube.com/playlist?list=PLeIk-G-wZpqx1yW49XAHqoccBXhNJrUSu
 
 
+## Quant Methods 2
 
+- Current modules (5 weeks; 1 unit each)
+    - Advanced data visualization
+    - Bayesian inference 1
+    - Randomization and simulation methods
+- BIO_SC 8642 (when approved)
 
 
 ## Topics for Today
 
-  - False negatives and False Positives
-  - General Questions about Linear Models
-  - PCA
-  - Problem Set 12
-  - The Role of Simulations
-  - Pipelines & Guides
+- PCA
+- False negatives and False Positives
+- General Questions about Linear Models
+- Problem Set 12
+- Pipelines & Guides
+
+
+## PCA
+
+
+## Life history in mammals
+
+Hamel, S., J.-M. Gaillard, M. Festa-Bianchet, and S. D. Côté. 2009. Individual quality, early-life conditions, and reproductive success in contrasted populations of large herbivores. Ecology 90:1981–1995.
+
+> Variations among individuals in phenotypic quality and fitness often confound analyses of life-history strategies assessed at the population level. We used detailed long-term data from three populations of large herbivores ... to quantify heterogeneity in individual quality among females, and to assess its influence on mean annual reproductive success over the lifetime (MRS). ... Using multivariate analyses (PCA), we identified ... covariations among life-history traits (longevity, success in the last breeding opportunity, adult mass, and social rank) as indexes of individual quality that positively influenced MRS of females. Individual quality was reduced by unfavorable weather, low resource availability, and high population density in the year of birth. ...
+
+
+## Life history in mammals
+
+![](https://i.imgur.com/NJnCHcK.png){width=70% fig-align="center"}
+
+
+## Life history in mammals
+
+> For mountain goats, the two first PCs were retained (consecutive eigenvalues [% variation explained]: PC1: 2.4 [29.8%], PC2: 2.0 [24.7%], PC3: 1.2 [15.1%], PC4: 0.9 [11.4%], PC5: 0.6 [7.9%], PC6: 0.5 [5.6%], PC7: 0.4 [5.2%], PC8: 0.01 [0.1%]) and accounted for 54% of the variation observed among life-history traits at the individual level
+
+
+## Life history in mammals
+
+> PC1 corresponded to a quality index opposing heavy and dominant individuals to light and subordinate ones (thereafter called "mass–social rank scores"; eigenvectors: social rank = 0.49, adult mass = 0.39, offspring sex ratio = -0.15, AFR = -0.20, molt date = - 0.33, ALR = -0.36, longevity = -0.39, parturition date = -0.41
+
+![](https://i.imgur.com/NJnCHcK.png){width=50% fig-align="center"}
+
+
+## Predictors of flight and foraging in birds
+
+Bribiesca-Contreras, F., B. Parslew, and W. I. Sellers. 2021. Functional morphology of the forelimb musculature reflects flight and foraging styles in aquatic birds. *J. Ornithol*. 162:779–793.
+
+> Aquatic birds show a great diversity of locomotion styles and wing morphologies, from penguins that are fully specialized for an aquatic life to species of aerial flyers that also use their wings for underwater propulsion ... we investigated the functional morphology of the forelimb musculature of 18 species of aquatic birds that display a variety of flight and foraging styles. ... A principal component analysis (PCA) of normalised muscle masses resulted in a biplot where three main morphological groups can be distinguished. Anatids (ducks and geese) occupy a space represented by muscles that are activated during downstroke. Auks and penguins clustered together in a region dominated by muscles that assist in wing elevation and showed a degree of hypertrophy. The rest of the species grouped together in the lower limits of both PCs ...
+
+
+## Predictors of flight and foraging in birds
+
+![](https://i.imgur.com/lxoeZy4.png){width=80% fig-align="center"}
+
+> PCA resulted in three principal components (PC1–PC3)  that explained 74.56% of the total variance of muscle mass along the wing. PC1 mostly separated the anatids  (Ab, Ap, As) from penguins (Em, Sd, Sh) in opposite extremes and the rest of the species in the middle.
+
+
+## Predictors of flight and foraging in birds
+
+![](https://i.imgur.com/7M66XHF.png){width=100% fig-align="center"}
+
 
 
 ## False negatives & False positives
@@ -46,15 +101,6 @@ bibliography: Multivariate.bib
 > I was/am confused on the last question of the key for PS-11 where it asks to "Calculate the FWER corresponding to an alpha of 5% by calculating the lowest P-value for each iteration. Then, use the `quantile()` function to calculate the 5% quantile." - why isn't it: "1-(quantile(minP, 0.05))"? When I look at the graph of FWER against alpha thresholds, it looks like the FWER is very close to 1 at an alpha of 0.05? I feel like I'm misinterpreting the concept and/or the question.
 
 >I will be doing protein analysis in the near future, and I would like to know more about FDR. If possible, please go over this topic again
-
-
-## PCA 
-
-> Does a loading value closer to 1 indicate that it explains more variation within that PC?
-
-> I would appreciated if you talk about nested models, and the interpretation of PCA.
-
-> Can you review PCA and biplots?
 
 
 ## Linear models
