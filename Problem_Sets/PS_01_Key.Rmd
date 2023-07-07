@@ -14,6 +14,8 @@ output:
 library(tidyverse)
 ```
 
+> "...the descriptive and analytical power of an adequate programming language amply repays the considerable effort required for its mastery." Ken Iverson (1962)
+
 
 ## How to use the problem sets
 
